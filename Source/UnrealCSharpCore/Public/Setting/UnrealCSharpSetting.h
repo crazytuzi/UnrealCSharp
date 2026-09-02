@@ -76,6 +76,7 @@ enum class EScriptDomainType : uint8
 {
 	Mono,
 	CoreCLR,
+	LeanCLR,
 };
 
 /**
@@ -155,10 +156,10 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	EScriptDomainType MacScriptDomainType;
 
-	UPROPERTY(Config, VisibleAnywhere, Category = Domain)
+	UPROPERTY(Config, EditAnywhere, Category = Domain, meta = (ValidEnumValues = "Mono, LeanCLR"))
 	EScriptDomainType AndroidScriptDomainType;
 
-	UPROPERTY(Config, VisibleAnywhere, Category = Domain)
+	UPROPERTY(Config, EditAnywhere, Category = Domain, meta = (ValidEnumValues = "Mono, LeanCLR"))
 	EScriptDomainType IOSScriptDomainType;
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)

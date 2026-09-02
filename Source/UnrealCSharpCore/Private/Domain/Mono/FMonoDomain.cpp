@@ -9,7 +9,6 @@
 #include "CoreMacro/CompilerMacro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Binding/FBinding.h"
@@ -435,6 +434,14 @@ void FMonoDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
+#define MONO_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
+
+	COMMON_BRIDGE_METHODS(MONO_METHOD_CLEAR)
+
+	NATIVE_BRIDGE_METHODS(MONO_METHOD_CLEAR)
+
+#undef MONO_METHOD_CLEAR
+
 	UtilsIsOverrideFn = nullptr;
 
 	UtilsGetClassDescriptorFn = nullptr;
@@ -444,6 +451,8 @@ void FMonoDomain::UnloadAssembly()
 	UtilsGetClassFieldsFn = nullptr;
 
 	UtilsGetClassMethodsFn = nullptr;
+
+	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
 }
@@ -487,120 +496,17 @@ void FMonoDomain::RegisterInterop(const FString& InAssembly)
 			       : nullptr;
 	};
 
-	const auto AssemblyLoader = GetClass(NAMESPACE_INTEROP, CLASS_ASSEMBLY_LOADER);
+#define RESOLVE_MONO_METHOD(Name, FnType, ClassMacro, FuncMacro, ParamCount) \
+	{ \
+		const auto ManagedClass = GetClass(NAMESPACE_INTEROP, ClassMacro); \
+		GET_METHOD_AND_GET_FUNCTION_POINTER(Name##Fn, ManagedClass, FuncMacro, ParamCount) \
+	}
 
-	GET_METHOD_AND_GET_FUNCTION_POINTER(AssemblyLoaderLoadFromStreamFn, AssemblyLoader,
-	                                    FUNCTION_ASSEMBLY_LOADER_LOAD_FROM_STREAM, 3)
+	COMMON_BRIDGE_METHODS(RESOLVE_MONO_METHOD)
 
-	GET_METHOD_AND_GET_FUNCTION_POINTER(AssemblyLoaderUnloadFn, AssemblyLoader, FUNCTION_ASSEMBLY_LOADER_UNLOAD, 0)
+	NATIVE_BRIDGE_METHODS(RESOLVE_MONO_METHOD)
 
-	const auto HandleData = GetClass(NAMESPACE_INTEROP, CLASS_HANDLE_DATA);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(HandleDataFreeFn, HandleData, FUNCTION_HANDLE_DATA_FREE, 1)
-
-	const auto LogBridge = GetClass(NAMESPACE_INTEROP, CLASS_LOG_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(LogBridgeSetLogFn, LogBridge, FUNCTION_LOG_BRIDGE_SET_LOG, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(LogBridgeInitializeFn, LogBridge, FUNCTION_LOG_BRIDGE_INITIALIZE, 0)
-
-	const auto TypeBridge = GetClass(NAMESPACE_INTEROP, CLASS_TYPE_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetClassFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_CLASS, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetTypeFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_TYPE, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetMethodFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_METHOD, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetFunctionPointerFn, TypeBridge,
-	                                    FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetNamespaceFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_NAMESPACE, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetNameFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_NAME, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeGetFullNameFn, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_FULL_NAME, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeMakeGenericTypeFn, TypeBridge, FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE,
-	                                    2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeMakeGenericType2Fn, TypeBridge,
-	                                    FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE2, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxBoolFn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_BOOL, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxSByteFn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_SBYTE, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxInt16Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT16, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxInt32Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT32, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxInt64Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT64, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxByteFn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_BYTE, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxUInt16Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT16, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxUInt32Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT32, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxUInt64Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT64, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxFloatFn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_FLOAT, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeBoxDoubleFn, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_DOUBLE, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxBoolFn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_BOOL, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxSByteFn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_SBYTE, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxInt16Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT16, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxInt32Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT32, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxInt64Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT64, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxByteFn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_BYTE, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxUInt16Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT16, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxUInt32Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT32, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxUInt64Fn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT64, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxFloatFn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(TypeBridgeUnboxDoubleFn, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE, 2)
-
-	const auto ObjectBridge = GetClass(NAMESPACE_INTEROP, CLASS_OBJECT_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(ObjectBridgeNewObjectFn, ObjectBridge, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 1)
-
-	const auto FieldBridge = GetClass(NAMESPACE_INTEROP, CLASS_FIELD_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(FieldBridgeSetStaticValueFn, FieldBridge,
-	                                    FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(FieldBridgeGetStaticValueFn, FieldBridge,
-	                                    FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE, 2)
-
-	const auto MethodBridge = GetClass(NAMESPACE_INTEROP, CLASS_METHOD_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(MethodBridgeRegisterBindingFn, MethodBridge,
-	                                    FUNCTION_METHOD_BRIDGE_REGISTER_BINDING, 3)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(MethodBridgeInvokeFn, MethodBridge, FUNCTION_METHOD_BRIDGE_INVOKE, 4)
-
-	const auto StringBridge = GetClass(NAMESPACE_INTEROP, CLASS_STRING_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(StringBridgeNewStringFn, StringBridge, FUNCTION_STRING_BRIDGE_NEW_STRING, 1)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(StringBridgeGetStringFn, StringBridge, FUNCTION_STRING_BRIDGE_GET_STRING, 3)
-
-	const auto ArrayBridge = GetClass(NAMESPACE_INTEROP, CLASS_ARRAY_BRIDGE);
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(ArrayBridgeNewArrayFn, ArrayBridge, FUNCTION_ARRAY_BRIDGE_ARRAY_NEW, 2)
-
-	GET_METHOD_AND_GET_FUNCTION_POINTER(ArrayBridgeArrayGetFn, ArrayBridge, FUNCTION_ARRAY_BRIDGE_ARRAY_GET, 2)
+#undef RESOLVE_MONO_METHOD
 }
 
 void FMonoDomain::RegisterProfiler()

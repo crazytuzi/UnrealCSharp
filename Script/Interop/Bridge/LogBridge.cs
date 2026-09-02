@@ -22,6 +22,11 @@ public sealed class LogBridge : TextWriter
 
     public override Encoding Encoding => Encoding.UTF8;
 
+    private static bool bIsLeanCLR;
+
+    [DllImport("UnrealCSharp", CallingConvention = CallingConvention.Cdecl)]
+    private static unsafe extern void LogLeanCLR(byte* InBuffer, int InSize, byte InIsError);
+
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe void SetLog(nint InLogFn)
     {
@@ -35,9 +40,15 @@ public sealed class LogBridge : TextWriter
 
         ConsoleError = Console.Error;
 
-        Console.SetOut(new LogBridge(InIsError: false));
+        RedirectConsole();
+    }
 
-        Console.SetError(new LogBridge(InIsError: true));
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    public static void InitializeLeanCLR()
+    {
+        bIsLeanCLR = true;
+
+        RedirectConsole();
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -61,6 +72,13 @@ public sealed class LogBridge : TextWriter
         {
             LogFn = null;
         }
+    }
+
+    private static void RedirectConsole()
+    {
+        Console.SetOut(new LogBridge(InIsError: false));
+
+        Console.SetError(new LogBridge(InIsError: true));
     }
 
     public override void Write(char value)
@@ -130,21 +148,27 @@ public sealed class LogBridge : TextWriter
 
     private static unsafe void Flush(ReadOnlySpan<char> InBuffer, bool InIsError)
     {
-        if (LogFn != null)
+        var MaxByteCount = Encoding.UTF8.GetMaxByteCount(InBuffer.Length) + 1;
+
+        var UTF8 = MaxByteCount <= 512
+            ? stackalloc byte[MaxByteCount]
+            : new byte[MaxByteCount];
+
+        var Size = Encoding.UTF8.GetBytes(InBuffer, UTF8);
+
+        UTF8[Size] = 0;
+
+        var IsError = (byte)(InIsError ? 1 : 0);
+
+        fixed (byte* Ptr = UTF8)
         {
-            var MaxByteCount = Encoding.UTF8.GetMaxByteCount(InBuffer.Length) + 1;
-
-            var UTF8 = MaxByteCount <= 512
-                ? stackalloc byte[MaxByteCount]
-                : new byte[MaxByteCount];
-
-            var Size = Encoding.UTF8.GetBytes(InBuffer, UTF8);
-
-            UTF8[Size] = 0;
-
-            fixed (byte* Ptr = UTF8)
+            if (LogFn != null)
             {
-                LogFn(Ptr, Size, (byte)(InIsError ? 1 : 0));
+                LogFn(Ptr, Size, IsError);
+            }
+            else if (bIsLeanCLR)
+            {
+                LogLeanCLR(Ptr, Size, IsError);
             }
         }
     }

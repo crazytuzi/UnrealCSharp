@@ -4,64 +4,35 @@ using Interop;
 
 namespace Script.Library
 {
-    public static class TScriptInterfaceImplementation
+    public static partial class TScriptInterfaceImplementation
     {
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void>
-            __TScriptInterface_RegisterImplementation;
+        private static unsafe partial void __TScriptInterface_RegisterImplementation(nint InScriptInterface, nint InObject, nint InType);
 
         public static unsafe void TScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
             nint InObject, Type InType) where T : IInterface
         {
-            if (__TScriptInterface_RegisterImplementation == null)
-            {
-                __TScriptInterface_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.TScriptInterfaceImplementation::TScriptInterface_RegisterImplementation");
-            }
-
             __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface), InObject,
                 HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TScriptInterface_IdenticalImplementation;
+        private static unsafe partial byte __TScriptInterface_IdenticalImplementation(nint InA, nint InB);
 
         public static unsafe bool TScriptInterface_IdenticalImplementation(nint InA, nint InB)
         {
-            if (__TScriptInterface_IdenticalImplementation == null)
-            {
-                __TScriptInterface_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.TScriptInterfaceImplementation::TScriptInterface_IdenticalImplementation");
-            }
-
             return __TScriptInterface_IdenticalImplementation(InA, InB) != 0;
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, void> __TScriptInterface_UnRegisterImplementation;
+        private static unsafe partial void __TScriptInterface_UnRegisterImplementation(nint InScriptInterface);
 
         public static unsafe void TScriptInterface_UnRegisterImplementation(nint InScriptInterface)
         {
-            if (__TScriptInterface_UnRegisterImplementation == null)
-            {
-                __TScriptInterface_UnRegisterImplementation = (delegate* unmanaged[Cdecl]<nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.TScriptInterfaceImplementation::TScriptInterface_UnRegisterImplementation");
-            }
-
             __TScriptInterface_UnRegisterImplementation(InScriptInterface);
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint> __TScriptInterface_GetObjectImplementation;
+        private static unsafe partial nint __TScriptInterface_GetObjectImplementation(nint InScriptInterface);
 
         public static unsafe T TScriptInterface_GetObjectImplementation<T>(nint InScriptInterface)
         {
-            if (__TScriptInterface_GetObjectImplementation == null)
-            {
-                __TScriptInterface_GetObjectImplementation = (delegate* unmanaged[Cdecl]<nint, nint>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.TScriptInterfaceImplementation::TScriptInterface_GetObjectImplementation");
-            }
-
             var Handle = __TScriptInterface_GetObjectImplementation(InScriptInterface);
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;

@@ -150,7 +150,11 @@ public static class TypeBridge
         {
             if (HandleData.GetObject(InHandle) is Type Type)
             {
-                var FullName = $"{Type.FullName}, {Type.Assembly.GetName().Name}";
+                var TypeFullName = Type.IsGenericTypeDefinition
+                    ? $"{Type.Namespace}.{Type.Name}"
+                    : Type.FullName;
+
+                var FullName = $"{TypeFullName}, {Type.Assembly.GetName().Name}";
 
                 var String = new Span<byte>(OutString, InStringSize);
 
@@ -456,12 +460,10 @@ public static class TypeBridge
 
         if (Type == null)
         {
-            var Context = AssemblyLoader.CurrentContext;
+            var Assemblies = AssemblyLoader.CurrentContext?.Assemblies
+                             ?? AppDomain.CurrentDomain.GetAssemblies();
 
-            if (Context != null)
-            {
-                Type = GetTypeImplementation(Context.Assemblies, AssemblyName, TypeName);
-            }
+            Type = GetTypeImplementation(Assemblies, AssemblyName, TypeName);
         }
 
         if (Type != null)

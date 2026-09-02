@@ -4,208 +4,106 @@ using Interop;
 
 namespace Script.Library
 {
-    public static unsafe class FMulticastDelegateImplementation
+    public static unsafe partial class FMulticastDelegateImplementation
     {
-        private static delegate* unmanaged[Cdecl]<nint, nint, void>
-            __FMulticastDelegate_RegisterImplementation;
+        private static unsafe partial void __FMulticastDelegate_RegisterImplementation(nint InDelegate, nint InType);
 
-        public static void FMulticastDelegate_RegisterImplementation(object InMonoObject, Type InType)
+        public static void FMulticastDelegate_RegisterImplementation(object InDelegate, Type InType)
         {
-            if (__FMulticastDelegate_RegisterImplementation == null)
-            {
-                __FMulticastDelegate_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_RegisterImplementation");
-            }
-
-            __FMulticastDelegate_RegisterImplementation(HandleData.Alloc(InMonoObject), HandleData.Alloc(InType));
+            __FMulticastDelegate_RegisterImplementation(HandleData.Alloc(InDelegate), HandleData.Alloc(InType));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, void> __FMulticastDelegate_UnRegisterImplementation;
+        private static unsafe partial void __FMulticastDelegate_UnRegisterImplementation(nint InDelegate);
 
-        public static void FMulticastDelegate_UnRegisterImplementation(nint InMonoObject)
+        public static void FMulticastDelegate_UnRegisterImplementation(nint InDelegate)
         {
-            if (__FMulticastDelegate_UnRegisterImplementation == null)
-            {
-                __FMulticastDelegate_UnRegisterImplementation = (delegate* unmanaged[Cdecl]<nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_UnRegisterImplementation");
-            }
-
-            __FMulticastDelegate_UnRegisterImplementation(InMonoObject);
+            __FMulticastDelegate_UnRegisterImplementation(InDelegate);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte> __FMulticastDelegate_IsBoundImplementation;
+        private static unsafe partial byte __FMulticastDelegate_IsBoundImplementation(nint InDelegate);
 
-        public static unsafe bool FMulticastDelegate_IsBoundImplementation(nint InMonoObject)
+        public static unsafe bool FMulticastDelegate_IsBoundImplementation(nint InDelegate)
         {
-            if (__FMulticastDelegate_IsBoundImplementation == null)
-            {
-                __FMulticastDelegate_IsBoundImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_IsBoundImplementation");
-            }
-
-            return __FMulticastDelegate_IsBoundImplementation(InMonoObject) != 0;
+            return __FMulticastDelegate_IsBoundImplementation(InDelegate) != 0;
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, byte>
-            __FMulticastDelegate_ContainsImplementation;
+        private static unsafe partial byte __FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
 
-        public static bool FMulticastDelegate_ContainsImplementation(nint InMonoObject, nint InObject,
+        public static bool FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject,
             Type InType, MethodInfo InMethodInfo)
         {
-            if (__FMulticastDelegate_ContainsImplementation == null)
-            {
-                __FMulticastDelegate_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, byte>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_ContainsImplementation");
-            }
-
-            return __FMulticastDelegate_ContainsImplementation(InMonoObject, InObject,
+            return __FMulticastDelegate_ContainsImplementation(InDelegate, InObject,
                 HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo)) != 0;
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
-            __FMulticastDelegate_AddImplementation;
+        private static unsafe partial void __FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
 
-        public static void FMulticastDelegate_AddImplementation(nint InMonoObject, nint InObject, Type InType,
+        public static void FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject, Type InType,
             MethodInfo InMethodInfo)
         {
-            if (__FMulticastDelegate_AddImplementation == null)
-            {
-                __FMulticastDelegate_AddImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_AddImplementation");
-            }
-
-            __FMulticastDelegate_AddImplementation(InMonoObject, InObject, HandleData.Alloc(InType),
+            __FMulticastDelegate_AddImplementation(InDelegate, InObject, HandleData.Alloc(InType),
                 HandleData.Alloc(InMethodInfo));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
-            __FMulticastDelegate_AddUniqueImplementation;
+        private static unsafe partial void __FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
 
-        public static void FMulticastDelegate_AddUniqueImplementation(nint InMonoObject, nint InObject,
+        public static void FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject,
             Type InType, MethodInfo InMethodInfo)
         {
-            if (__FMulticastDelegate_AddUniqueImplementation == null)
-            {
-                __FMulticastDelegate_AddUniqueImplementation =
-                    (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_AddUniqueImplementation");
-            }
-
-            __FMulticastDelegate_AddUniqueImplementation(InMonoObject, InObject,
+            __FMulticastDelegate_AddUniqueImplementation(InDelegate, InObject,
                 HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
-            __FMulticastDelegate_RemoveImplementation;
+        private static unsafe partial void __FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
 
-        public static void FMulticastDelegate_RemoveImplementation(nint InMonoObject, nint InObject, Type InType,
+        public static void FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject, Type InType,
             MethodInfo InMethodInfo)
         {
-            if (__FMulticastDelegate_RemoveImplementation == null)
-            {
-                __FMulticastDelegate_RemoveImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_RemoveImplementation");
-            }
-
-            __FMulticastDelegate_RemoveImplementation(InMonoObject, InObject, HandleData.Alloc(InType),
+            __FMulticastDelegate_RemoveImplementation(InDelegate, InObject, HandleData.Alloc(InType),
                 HandleData.Alloc(InMethodInfo));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, void> __FMulticastDelegate_RemoveAllImplementation;
+        private static unsafe partial void __FMulticastDelegate_RemoveAllImplementation(nint InDelegate, nint InObject);
 
-        public static void FMulticastDelegate_RemoveAllImplementation(nint InMonoObject, nint InObject)
+        public static void FMulticastDelegate_RemoveAllImplementation(nint InDelegate, nint InObject)
         {
-            if (__FMulticastDelegate_RemoveAllImplementation == null)
-            {
-                __FMulticastDelegate_RemoveAllImplementation = (delegate* unmanaged[Cdecl]<nint, nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_RemoveAllImplementation");
-            }
-
-            __FMulticastDelegate_RemoveAllImplementation(InMonoObject, InObject);
+            __FMulticastDelegate_RemoveAllImplementation(InDelegate, InObject);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, void> __FMulticastDelegate_ClearImplementation;
+        private static unsafe partial void __FMulticastDelegate_ClearImplementation(nint InDelegate);
 
-        public static void FMulticastDelegate_ClearImplementation(nint InMonoObject)
+        public static void FMulticastDelegate_ClearImplementation(nint InDelegate)
         {
-            if (__FMulticastDelegate_ClearImplementation == null)
-            {
-                __FMulticastDelegate_ClearImplementation = (delegate* unmanaged[Cdecl]<nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_ClearImplementation");
-            }
-
-            __FMulticastDelegate_ClearImplementation(InMonoObject);
+            __FMulticastDelegate_ClearImplementation(InDelegate);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, void>
-            __FMulticastDelegate_GenericBroadcast0Implementation;
+        private static unsafe partial void __FMulticastDelegate_GenericBroadcast0Implementation(nint InDelegate);
 
-        public static void FMulticastDelegate_GenericBroadcast0Implementation(nint InMonoObject)
+        public static void FMulticastDelegate_GenericBroadcast0Implementation(nint InDelegate)
         {
-            if (__FMulticastDelegate_GenericBroadcast0Implementation == null)
-            {
-                __FMulticastDelegate_GenericBroadcast0Implementation = (delegate* unmanaged[Cdecl]<nint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_GenericBroadcast0Implementation");
-            }
-
-            __FMulticastDelegate_GenericBroadcast0Implementation(InMonoObject);
+            __FMulticastDelegate_GenericBroadcast0Implementation(InDelegate);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, void>
-            __FMulticastDelegate_GenericBroadcast2Implementation;
+        private static unsafe partial void __FMulticastDelegate_GenericBroadcast2Implementation(nint InDelegate, byte* InBuffer);
 
-        public static void FMulticastDelegate_GenericBroadcast2Implementation(nint InMonoObject, byte* InBuffer)
+        public static void FMulticastDelegate_GenericBroadcast2Implementation(nint InDelegate, byte* InBuffer)
         {
-            if (__FMulticastDelegate_GenericBroadcast2Implementation == null)
-            {
-                __FMulticastDelegate_GenericBroadcast2Implementation = (delegate* unmanaged[Cdecl]<nint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_GenericBroadcast2Implementation");
-            }
-
-            __FMulticastDelegate_GenericBroadcast2Implementation(InMonoObject, InBuffer);
+            __FMulticastDelegate_GenericBroadcast2Implementation(InDelegate, InBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, void>
-            __FMulticastDelegate_GenericBroadcast4Implementation;
+        private static unsafe partial void __FMulticastDelegate_GenericBroadcast4Implementation(nint InDelegate, byte* OutBuffer);
 
-        public static void FMulticastDelegate_GenericBroadcast4Implementation(nint InMonoObject, byte* OutBuffer)
+        public static void FMulticastDelegate_GenericBroadcast4Implementation(nint InDelegate, byte* OutBuffer)
         {
-            if (__FMulticastDelegate_GenericBroadcast4Implementation == null)
-            {
-                __FMulticastDelegate_GenericBroadcast4Implementation = (delegate* unmanaged[Cdecl]<nint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_GenericBroadcast4Implementation");
-            }
-
-            __FMulticastDelegate_GenericBroadcast4Implementation(InMonoObject, OutBuffer);
+            __FMulticastDelegate_GenericBroadcast4Implementation(InDelegate, OutBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, byte*, void>
-            __FMulticastDelegate_GenericBroadcast6Implementation;
+        private static unsafe partial void __FMulticastDelegate_GenericBroadcast6Implementation(nint InDelegate, byte* InBuffer, byte* OutBuffer);
 
-        public static void FMulticastDelegate_GenericBroadcast6Implementation(nint InMonoObject, byte* InBuffer,
+        public static void FMulticastDelegate_GenericBroadcast6Implementation(nint InDelegate, byte* InBuffer,
             byte* OutBuffer)
         {
-            if (__FMulticastDelegate_GenericBroadcast6Implementation == null)
-            {
-                __FMulticastDelegate_GenericBroadcast6Implementation =
-                    (delegate* unmanaged[Cdecl]<nint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_GenericBroadcast6Implementation");
-            }
-
-            __FMulticastDelegate_GenericBroadcast6Implementation(InMonoObject, InBuffer, OutBuffer);
+            __FMulticastDelegate_GenericBroadcast6Implementation(InDelegate, InBuffer, OutBuffer);
         }
     }
 }

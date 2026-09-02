@@ -32,6 +32,8 @@ private:
 
 	static void ReplaceYield(FString& OutResult);
 
+	static void ReplaceGameName(FString& OutResult);
+
 	static void ReplaceDefinition(FString& OutResult);
 
 	static void ReplaceProject(FString& OutResult);
