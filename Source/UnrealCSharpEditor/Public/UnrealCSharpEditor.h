@@ -46,6 +46,8 @@ private:
 
 	TUniquePtr<FAutoConsoleCommand> GeneratorConsoleCommand;
 
+	TUniquePtr<FAutoConsoleCommand> SetActiveConsoleCommand;
+
 	FEditorListener EditorListener;
 
 	FTSTicker::FDelegateHandle TickHandle;

@@ -30,6 +30,8 @@ private:
 
 	static void ReplaceProjectReference(FString& OutResult);
 
+	static void AddGameplayTagAdditionalFiles(FString& OutResult);
+
 	static void ReplaceYield(FString& OutResult);
 
 	static void ReplaceGameName(FString& OutResult);
