@@ -1,4 +1,5 @@
 #include "FCSharpCompilerRunnable.h"
+#include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -243,9 +244,23 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 				{
 					if (!GExitPurge)
 					{
+						auto& CoreModule = FUnrealCSharpCoreModule::Get();
+
+						const auto bWasActive = CoreModule.IsActive();
+
+						if (bWasActive)
+						{
+							CoreModule.SetActive(false);
+						}
+
 						FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(FileChanges);
 
 						InFunction();
+
+						if (bWasActive)
+						{
+							CoreModule.SetActive(true);
+						}
 					}
 				},
 				TStatId(),
@@ -388,6 +403,8 @@ void FCSharpCompilerRunnable::Compile()
 
 		if (InReturnCode == 0)
 		{
+			FUnrealCSharpFunctionLibrary::TouchBuildStamp();
+
 			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
 
 			NotificationInfo->bUseSuccessFailIcons = true;

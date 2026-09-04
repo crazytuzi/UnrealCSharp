@@ -122,6 +122,8 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
+		const auto ClassDescriptor = *FoundClassDescriptor;
+
 		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
 		{
 			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
@@ -132,7 +134,31 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 			}
 		}
 
-		delete *FoundClassDescriptor;
+		for (auto It = CSharpFunctionHashMap.CreateIterator(); It; ++It)
+		{
+			if (std::get<0>(It->Value) == ClassDescriptor)
+			{
+				It.RemoveCurrent();
+			}
+		}
+
+		for (auto It = UnrealFunctionHashMap.CreateIterator(); It; ++It)
+		{
+			if (std::get<0>(It->Value) == ClassDescriptor)
+			{
+				It.RemoveCurrent();
+			}
+		}
+
+		for (auto It = PropertyHashMap.CreateIterator(); It; ++It)
+		{
+			if (std::get<0>(It->Value) == ClassDescriptor)
+			{
+				It.RemoveCurrent();
+			}
+		}
+
+		delete ClassDescriptor;
 
 		ClassDescriptorMap.Remove(InStruct);
 	}

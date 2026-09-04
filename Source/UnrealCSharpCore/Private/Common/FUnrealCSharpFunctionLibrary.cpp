@@ -1129,6 +1129,35 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 }
 #endif
 
+#if WITH_EDITOR
+static bool GScriptFileChanged = false;
+
+void FUnrealCSharpFunctionLibrary::ResetScriptFileChanged()
+{
+	GScriptFileChanged = false;
+}
+
+void FUnrealCSharpFunctionLibrary::MarkScriptFileChanged()
+{
+	GScriptFileChanged = true;
+}
+
+bool FUnrealCSharpFunctionLibrary::HasScriptFileChanged()
+{
+	return GScriptFileChanged;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetBuildStampPath()
+{
+	return GetFullPublishDirectory() / TEXT(".build.stamp");
+}
+
+void FUnrealCSharpFunctionLibrary::TouchBuildStamp()
+{
+	FFileHelper::SaveStringToFile(FDateTime::UtcNow().ToString(), *GetBuildStampPath());
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
 	const auto FileManager = &IFileManager::Get();
@@ -1143,6 +1172,10 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 			}
 		}
 	}
+
+#if WITH_EDITOR
+	MarkScriptFileChanged();
+#endif
 
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 

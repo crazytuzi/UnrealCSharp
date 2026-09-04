@@ -83,9 +83,17 @@ FEditorListener::~FEditorListener()
 {
 	if (!IsRunningCookCommandlet())
 	{
-		if (OnBlueprintCompiledDelegateHandle.IsValid() && GEditor != nullptr)
+		if (GEditor != nullptr)
 		{
-			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
+			if (OnBlueprintCompiledDelegateHandle.IsValid())
+			{
+				GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
+			}
+
+			if (OnBlueprintPreCompileDelegateHandle.IsValid())
+			{
+				GEditor->OnBlueprintPreCompile().Remove(OnBlueprintPreCompileDelegateHandle);
+			}
 		}
 
 		if (OnDirectoryChangedDelegateHandle.IsValid())
@@ -164,8 +172,19 @@ void FEditorListener::OnPostEngineInit()
 
 	if (GEditor != nullptr)
 	{
+		OnBlueprintPreCompileDelegateHandle = GEditor->OnBlueprintPreCompile().AddRaw(
+			this, &FEditorListener::OnBlueprintPreCompile);
+
 		OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled().AddRaw(
 			this, &FEditorListener::OnBlueprintCompiled);
+	}
+}
+
+void FEditorListener::OnBlueprintPreCompile(UBlueprint* InBlueprint)
+{
+	if (InBlueprint != nullptr && !PendingCompiledBlueprints.Contains(InBlueprint))
+	{
+		PendingCompiledBlueprints.Add(InBlueprint, GetClassSignature(InBlueprint->GeneratedClass));
 	}
 }
 
@@ -173,78 +192,104 @@ void FEditorListener::OnBlueprintCompiled()
 {
 	if (!bIsPIEPlaying && !bIsPreparingPIE && !bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
 	{
+		GeneratePendingCompiledBlueprints();
+
+		if (FCSharpCompiler::Get().IsCompiling())
+		{
+			return;
+		}
+
 		if (!FileChanges.IsEmpty())
 		{
 			FCSharpCompiler::Get().Compile(FileChanges);
 
 			FileChanges.Reset();
 		}
-		else
+		else if (IsScriptOutOfDate())
 		{
 			FCSharpCompiler::Get().Compile();
 		}
 	}
 }
 
+bool FEditorListener::IsScriptOutOfDate()
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	for (const auto& AssemblyPath : FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath())
+	{
+		if (!PlatformFile.FileExists(*AssemblyPath))
+		{
+			return true;
+		}
+	}
+
+	const auto BuildStampPath = FUnrealCSharpFunctionLibrary::GetBuildStampPath();
+
+	if (!PlatformFile.FileExists(*BuildStampPath))
+	{
+		return true;
+	}
+
+	const auto BuildStampTime = PlatformFile.GetTimeStamp(*BuildStampPath);
+
+	auto bNeedsCompile = false;
+
+	for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+	{
+		PlatformFile.IterateDirectoryRecursively(
+			*Directory,
+			[&](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
+			{
+				if (!bIsDirectory && FPaths::GetExtension(InFilenameOrDirectory) == TEXT("cs"))
+				{
+					FString NormalizedPath(InFilenameOrDirectory);
+
+					NormalizedPath.ReplaceInline(TEXT("\\"), TEXT("/"));
+
+					if (NormalizedPath.Contains(TEXT("/obj/")) || NormalizedPath.Contains(TEXT("/bin/")))
+					{
+						return true;
+					}
+
+					if (PlatformFile.GetTimeStamp(InFilenameOrDirectory) > BuildStampTime)
+					{
+						bNeedsCompile = true;
+
+						return false;
+					}
+				}
+
+				return true;
+			});
+
+		if (bNeedsCompile)
+		{
+			break;
+		}
+	}
+
+	return bNeedsCompile;
+}
+
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 {
 	bIsPreparingPIE = true;
-
+	bool bBpCompile = false;
 	for (TObjectIterator<UBlueprint> It; It; ++It)
 	{
 		if (It->Status == BS_Dirty && !It->bBeingCompiled)
 		{
 			FKismetEditorUtilities::CompileBlueprint(*It, EBlueprintCompileOptions::SkipGarbageCollection);
+			bBpCompile = true;
 		}
 	}
 
-	if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+	if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling() && bBpCompile)
 	{
-		auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+		GeneratePendingCompiledBlueprints();
 
-		auto bNeedsCompile = false;
-
-		auto OldestAssemblyTime = FDateTime::MaxValue();
-
-		for (const auto& AssemblyPath : FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath())
-		{
-			if (!PlatformFile.FileExists(*AssemblyPath))
-			{
-				bNeedsCompile = true;
-
-				break;
-			}
-
-			OldestAssemblyTime = FMath::Min(OldestAssemblyTime, PlatformFile.GetTimeStamp(*AssemblyPath));
-		}
-
-		if (!bNeedsCompile)
-		{
-			for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
-			{
-				PlatformFile.IterateDirectoryRecursively(
-					*Directory,
-					[&](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
-					{
-						if (!bIsDirectory && FPaths::GetExtension(InFilenameOrDirectory) == TEXT("cs") &&
-							PlatformFile.GetTimeStamp(InFilenameOrDirectory) > OldestAssemblyTime)
-						{
-							bNeedsCompile = true;
-
-							return false;
-						}
-
-						return true;
-					});
-
-				if (bNeedsCompile)
-				{
-					break;
-				}
-			}
-		}
-
-		if (bNeedsCompile)
+		if (!FCSharpCompiler::Get().IsCompiling() && IsScriptOutOfDate())
 		{
 			if (!FileChanges.IsEmpty())
 			{
@@ -415,8 +460,11 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData));
+		if (const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
+			FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*FileName))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+		}
 	});
 }
 
@@ -424,8 +472,11 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath));
+		if (const auto OldFileName = FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath);
+			FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*OldFileName))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+		}
 
 		FAssetGenerator::Generator(InAssetData);
 	});
@@ -525,13 +576,105 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 
 				if (FGeneratorCore::IsSupported(InAssetData))
 				{
+					FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+
 					InGenerator();
 
-					FCSharpCompiler::Get().Compile();
+					if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+					{
+						FCSharpCompiler::Get().Compile();
+					}
 				}
 
 				FGeneratorCore::EndGenerator(false);
 			}
 		}
 	}
+}
+
+void FEditorListener::GeneratePendingCompiledBlueprints()
+{
+	if (PendingCompiledBlueprints.IsEmpty())
+	{
+		return;
+	}
+
+	TMap<TWeakObjectPtr<UBlueprint>, FString> Blueprints;
+
+	Swap(Blueprints, PendingCompiledBlueprints);
+
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		if (!UnrealCSharpEditorSetting->EnableAssetChanged())
+		{
+			return;
+		}
+	}
+
+	TArray<UBlueprint*> ChangedBlueprints;
+
+	for (const auto& [Blueprint, PreviousSignature] : Blueprints)
+	{
+		if (Blueprint.IsValid() && Blueprint->GeneratedClass != nullptr && Blueprint->GetOutermost() != GetTransientPackage())
+		{
+			if (GetClassSignature(Blueprint->GeneratedClass) != PreviousSignature)
+			{
+				ChangedBlueprints.Add(Blueprint.Get());
+			}
+		}
+	}
+
+	if (ChangedBlueprints.IsEmpty())
+	{
+		return;
+	}
+
+	FGeneratorCore::BeginGenerator(false);
+
+	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+
+	for (const auto Blueprint : ChangedBlueprints)
+	{
+		if (const FAssetData AssetData(Blueprint); FGeneratorCore::IsSupported(AssetData))
+		{
+			FAssetGenerator::Generator(AssetData);
+		}
+	}
+
+	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+	{
+		FCSharpCompiler::Get().Compile();
+	}
+
+	FGeneratorCore::EndGenerator(false);
+}
+
+FString FEditorListener::GetClassSignature(const UClass* InClass)
+{
+	if (InClass == nullptr)
+	{
+		return {};
+	}
+
+	TStringBuilder<1024> Builder;
+
+	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
+	{
+		Builder << It->GetFName() << TEXT(':') << It->GetCPPType() << TEXT(';');
+	}
+
+	for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
+	{
+		Builder << It->GetFName() << TEXT('(');
+
+		for (TFieldIterator<FProperty> ParamIt(*It); ParamIt; ++ParamIt)
+		{
+			Builder << ParamIt->GetFName() << TEXT(':') << ParamIt->GetCPPType() << TEXT(',');
+		}
+
+		Builder << TEXT(");");
+	}
+
+	return Builder.ToString();
 }

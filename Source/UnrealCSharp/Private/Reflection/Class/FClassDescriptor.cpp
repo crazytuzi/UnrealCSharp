@@ -23,7 +23,10 @@ void FClassDescriptor::Initialize()
 
 	Class = FReflectionRegistry::Get().GetClass(Struct);
 
-	Class->ConstructorClass();
+	if (Class != nullptr)
+	{
+		Class->ConstructorClass();
+	}
 }
 
 void FClassDescriptor::Deinitialize()
