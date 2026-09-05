@@ -650,6 +650,58 @@ void FEditorListener::GeneratePendingCompiledBlueprints()
 	FGeneratorCore::EndGenerator(false);
 }
 
+// GetCPPType asserts on half-built classes (pre-compile skeleton / stale generated class):
+// delegate SignatureFunction, struct Struct or object PropertyClass may still be null.
+static FString GetSafeCPPType(const FProperty* InProperty)
+{
+	if (const auto DelegateProperty = CastField<FDelegateProperty>(InProperty))
+	{
+		return DelegateProperty->SignatureFunction != nullptr
+			       ? InProperty->GetCPPType()
+			       : InProperty->GetClass()->GetName();
+	}
+
+	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(InProperty))
+	{
+		return MulticastDelegateProperty->SignatureFunction != nullptr
+			       ? InProperty->GetCPPType()
+			       : InProperty->GetClass()->GetName();
+	}
+
+	if (const auto StructProperty = CastField<FStructProperty>(InProperty))
+	{
+		return StructProperty->Struct != nullptr
+			       ? InProperty->GetCPPType()
+			       : InProperty->GetClass()->GetName();
+	}
+
+	if (const auto ObjectProperty = CastField<FObjectPropertyBase>(InProperty))
+	{
+		return ObjectProperty->PropertyClass != nullptr
+			       ? InProperty->GetCPPType()
+			       : InProperty->GetClass()->GetName();
+	}
+
+	if (const auto ArrayProperty = CastField<FArrayProperty>(InProperty))
+	{
+		return FString::Printf(TEXT("TArray<%s>"), *GetSafeCPPType(ArrayProperty->Inner));
+	}
+
+	if (const auto SetProperty = CastField<FSetProperty>(InProperty))
+	{
+		return FString::Printf(TEXT("TSet<%s>"), *GetSafeCPPType(SetProperty->ElementProp));
+	}
+
+	if (const auto MapProperty = CastField<FMapProperty>(InProperty))
+	{
+		return FString::Printf(TEXT("TMap<%s,%s>"),
+		                       *GetSafeCPPType(MapProperty->KeyProp),
+		                       *GetSafeCPPType(MapProperty->ValueProp));
+	}
+
+	return InProperty->GetCPPType();
+}
+
 FString FEditorListener::GetClassSignature(const UClass* InClass)
 {
 	if (InClass == nullptr)
@@ -661,7 +713,7 @@ FString FEditorListener::GetClassSignature(const UClass* InClass)
 
 	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
 	{
-		Builder << It->GetFName() << TEXT(':') << It->GetCPPType() << TEXT(';');
+		Builder << It->GetFName() << TEXT(':') << GetSafeCPPType(*It) << TEXT(';');
 	}
 
 	for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
@@ -670,7 +722,7 @@ FString FEditorListener::GetClassSignature(const UClass* InClass)
 
 		for (TFieldIterator<FProperty> ParamIt(*It); ParamIt; ++ParamIt)
 		{
-			Builder << ParamIt->GetFName() << TEXT(':') << ParamIt->GetCPPType() << TEXT(',');
+			Builder << ParamIt->GetFName() << TEXT(':') << GetSafeCPPType(*ParamIt) << TEXT(',');
 		}
 
 		Builder << TEXT(");");
