@@ -21,6 +21,7 @@
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "FCodeAnalysis.h"
+#include "UnrealCSharpCore.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpPlayToolBar.h"
@@ -113,6 +114,17 @@ void FUnrealCSharpEditorModule::StartupModule()
 			[]()
 			{
 				Generator(FPlatformProperties::IniPlatformName());
+			}));
+
+	SetActiveConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.SetActive"),
+		TEXT("Activate or deactivate the C# environment at design time. Usage: UnrealCSharp.Editor.SetActive [0|1] (default 1)"),
+		FConsoleCommandWithArgsDelegate::CreateLambda(
+			[](const TArray<FString>& Args)
+			{
+				const auto bActive = Args.IsEmpty() || Args[0] != TEXT("0");
+
+				FUnrealCSharpCoreModule::Get().SetActive(bActive);
 			}));
 
 	UpdatePackagingSettings();

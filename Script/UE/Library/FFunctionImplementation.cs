@@ -57,6 +57,22 @@ namespace Script.Library
             __FFunction_GenericCall4Implementation(InDelegate, InFunctionHash, OutBuffer);
         }
 
+        private static unsafe partial void __FFunction_PrimitiveCall5Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer, byte* ReturnBuffer);
+
+        public static void FFunction_PrimitiveCall5Implementation(nint InDelegate, uint InFunctionHash,
+            byte* OutBuffer, byte* ReturnBuffer)
+        {
+            __FFunction_PrimitiveCall5Implementation(InDelegate, InFunctionHash, OutBuffer, ReturnBuffer);
+        }
+
+        private static unsafe partial void __FFunction_CompoundCall5Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer, byte* ReturnBuffer);
+
+        public static void FFunction_CompoundCall5Implementation(nint InDelegate, uint InFunctionHash,
+            byte* OutBuffer, byte* ReturnBuffer)
+        {
+            __FFunction_CompoundCall5Implementation(InDelegate, InFunctionHash, OutBuffer, ReturnBuffer);
+        }
+
         private static unsafe partial void __FFunction_GenericCall6Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer);
 
         public static void FFunction_GenericCall6Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer,

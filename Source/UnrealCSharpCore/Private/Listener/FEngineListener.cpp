@@ -6,6 +6,9 @@
 
 FEngineListener::FEngineListener()
 {
+	// Always deactivate on exit so listeners registered via PIE or the SetActive console command are removed before UObject array shutdown
+	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
+
 #if WITH_EDITOR
 	if (!IsRunningGame())
 	{
@@ -15,8 +18,6 @@ FEngineListener::FEngineListener()
 
 	OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
 		this, &FEngineListener::OnLoadingPhaseComplete);
-
-	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 }
 
 FEngineListener::~FEngineListener()
@@ -40,7 +41,6 @@ void FEngineListener::OnPreBeginPIE(const bool)
 
 void FEngineListener::OnCancelPIE()
 {
-	SetActive(false);
 }
 #endif
 

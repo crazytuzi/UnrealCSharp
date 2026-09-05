@@ -22,6 +22,8 @@ public:
 public:
 	void SetActive(bool InbIsActive);
 
+	bool IsActive() const { return bIsActive; }
+
 private:
 	FEngineListener EngineListener;
 

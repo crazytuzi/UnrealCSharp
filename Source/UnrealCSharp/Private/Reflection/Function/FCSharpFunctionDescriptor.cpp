@@ -2,6 +2,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Macro/FunctionMacro.h"
+#include "Log/UnrealCSharpLog.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
                                                      FCSharpFunctionRegister&& InFunctionRegister):
@@ -90,38 +91,52 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 	auto ReferenceParam = OutParams;
 
-	Invoke(
-		Method,
-		FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
-			? InvalidManagedHandle
-			: FCSharpEnvironment::GetEnvironment().GetObject(InContext),
-		[this, Params, &ReferenceParam](const int32 Index) -> void*
-		{
-			if (ReferencePropertyIndexes.Contains(Index))
-			{
-				if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
-				{
-					ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
+	const auto bIsStatic = (FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static) != 0;
 
-					if (ReferenceParam != nullptr)
+	// Objects created before the C# environment was activated (e.g. design-time SetActive) have no managed counterpart yet
+	const auto ManagedHandle = bIsStatic
+		                           ? InvalidManagedHandle
+		                           : FCSharpEnvironment::GetEnvironment().Bind(InContext);
+
+	if (bIsStatic || IManagedHandleIsValid(ManagedHandle))
+	{
+		Invoke(
+			Method,
+			ManagedHandle,
+			[this, Params, &ReferenceParam](const int32 Index) -> void*
+			{
+				if (ReferencePropertyIndexes.Contains(Index))
+				{
+					if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
 					{
-						return ReferenceParam->PropAddr;
+						ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
+
+						if (ReferenceParam != nullptr)
+						{
+							return ReferenceParam->PropAddr;
+						}
 					}
+
+					return nullptr;
 				}
 
-				return nullptr;
+				return PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
+			},
+			RESULT_PARAM,
+			[this, &OutParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
+			{
+				OutParams = FindOutParmRec(OutParams, InPropertyDescriptor->GetProperty());
+
+				return OutParams != nullptr ? OutParams->PropAddr : nullptr;
 			}
-
-			return PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
-		},
-		RESULT_PARAM,
-		[this, &OutParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
-		{
-			OutParams = FindOutParmRec(OutParams, InPropertyDescriptor->GetProperty());
-
-			return OutParams != nullptr ? OutParams->PropAddr : nullptr;
-		}
-	);
+		);
+	}
+	else
+	{
+		UE_LOG(LogUnrealCSharp, Warning, TEXT("CallCSharp: failed to bind managed object for %s::%s"),
+		       InContext != nullptr ? *InContext->GetName() : TEXT("null"),
+		       Function != nullptr ? *Function->GetName() : TEXT("null"));
+	}
 
 	if (Params != nullptr && Params != InStack.Locals)
 	{

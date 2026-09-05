@@ -55,7 +55,7 @@ private:
 private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
-	TMap<uint32, std::tuple<FClassDescriptor*, FProperty*>> PropertyHashMap;
+	TMap<uint32, std::tuple<FClassDescriptor*, TFieldPath<FProperty>>> PropertyHashMap;
 
 	TMap<uint32, FPropertyDescriptor*> PropertyDescriptorMap;
 

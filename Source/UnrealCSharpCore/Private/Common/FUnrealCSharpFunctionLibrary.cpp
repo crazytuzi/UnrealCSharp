@@ -1128,6 +1128,35 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 }
 #endif
 
+#if WITH_EDITOR
+static bool GScriptFileChanged = false;
+
+void FUnrealCSharpFunctionLibrary::ResetScriptFileChanged()
+{
+	GScriptFileChanged = false;
+}
+
+void FUnrealCSharpFunctionLibrary::MarkScriptFileChanged()
+{
+	GScriptFileChanged = true;
+}
+
+bool FUnrealCSharpFunctionLibrary::HasScriptFileChanged()
+{
+	return GScriptFileChanged;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetBuildStampPath()
+{
+	return GetFullPublishDirectory() / TEXT(".build.stamp");
+}
+
+void FUnrealCSharpFunctionLibrary::TouchBuildStamp()
+{
+	FFileHelper::SaveStringToFile(FDateTime::UtcNow().ToString(), *GetBuildStampPath());
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
 	const auto FileManager = &IFileManager::Get();
@@ -1142,6 +1171,10 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 			}
 		}
 	}
+
+#if WITH_EDITOR
+	MarkScriptFileChanged();
+#endif
 
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -1496,7 +1529,8 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 #if WITH_EDITOR
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
-                                               const FString& InWorkingDirectory)
+                                               const FString& InWorkingDirectory,
+                                               const TFunction<void(const FString&)>& InOnOutput)
 {
 	void* ReadPipe = nullptr;
 
@@ -1534,7 +1568,25 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 	{
 		FPlatformProcess::Sleep(0.01f);
 
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe); !Output.IsEmpty())
+		{
+			Result.Append(Output);
+
+			if (InOnOutput)
+			{
+				InOnOutput(Output);
+			}
+		}
+	}
+
+	if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe); !Output.IsEmpty())
+	{
+		Result.Append(Output);
+
+		if (InOnOutput)
+		{
+			InOnOutput(Output);
+		}
 	}
 
 	auto ReturnCode = 0;

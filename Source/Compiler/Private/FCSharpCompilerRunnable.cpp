@@ -1,4 +1,5 @@
 #include "FCSharpCompilerRunnable.h"
+#include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -17,7 +18,9 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
 	bIsCompiling(false),
 	bIsGenerating(false),
-	bIsStopped(false)
+	bIsStopped(false),
+	CompletedProjectCount(0),
+	TotalProjectCount(0)
 {
 	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
 		this, &FCSharpCompilerRunnable::OnBeginGenerator);
@@ -145,6 +148,60 @@ bool FCSharpCompilerRunnable::IsCompiling() const
 	return bIsCompiling == true || !Tasks.IsEmpty();
 }
 
+void FCSharpCompilerRunnable::GetCompileProgress(FString& OutMessage, float& OutFraction) const
+{
+	FScopeLock ScopeLock(&ProgressCriticalSection);
+
+	OutMessage = ProgressMessage;
+
+	OutFraction = TotalProjectCount > 0
+		              ? FMath::Clamp(static_cast<float>(CompletedProjectCount) / TotalProjectCount, 0.0f, 1.0f)
+		              : 0.0f;
+}
+
+void FCSharpCompilerRunnable::ResetCompileProgress(const FString& InMessage)
+{
+	FScopeLock ScopeLock(&ProgressCriticalSection);
+
+	ProgressMessage = InMessage;
+
+	ProgressOutputBuffer.Empty();
+
+	CompletedProjectCount = 0;
+}
+
+void FCSharpCompilerRunnable::ParseCompileOutput(const FString& InOutput)
+{
+	FScopeLock ScopeLock(&ProgressCriticalSection);
+
+	ProgressOutputBuffer.Append(InOutput);
+
+	int32 NewlineIndex = INDEX_NONE;
+
+	while (ProgressOutputBuffer.FindChar(TEXT('\n'), NewlineIndex))
+	{
+		auto Line = ProgressOutputBuffer.Left(NewlineIndex);
+
+		ProgressOutputBuffer.MidInline(NewlineIndex + 1);
+
+		Line.TrimStartAndEndInline();
+
+		if (Line.IsEmpty())
+		{
+			continue;
+		}
+
+		UE_LOG(LogUnrealCSharp, Display, TEXT("%s"), *Line);
+
+		if (Line.Contains(TEXT(" -> ")))
+		{
+			++CompletedProjectCount;
+		}
+
+		ProgressMessage = Line;
+	}
+}
+
 void FCSharpCompilerRunnable::DoWork()
 {
 	Compile([&]()
@@ -173,6 +230,8 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 		{
 			bIsCompiling = true;
 
+			ResetCompileProgress(TEXT("Preparing C# compilation..."));
+
 			if (bCompileInterop)
 			{
 				CompileInterop(bForceCompileInterop);
@@ -185,9 +244,23 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 				{
 					if (!GExitPurge)
 					{
+						auto& CoreModule = FUnrealCSharpCoreModule::Get();
+
+						const auto bWasActive = CoreModule.IsActive();
+
+						if (bWasActive)
+						{
+							CoreModule.SetActive(false);
+						}
+
 						FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(FileChanges);
 
 						InFunction();
+
+						if (bWasActive)
+						{
+							CoreModule.SetActive(true);
+						}
 					}
 				},
 				TStatId(),
@@ -228,6 +301,8 @@ void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
 		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
 	{
+		ResetCompileProgress(TEXT("Compiling Interop..."));
+
 		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 		const auto CompileParam = FString::Printf(TEXT(
@@ -255,6 +330,24 @@ void FCSharpCompilerRunnable::Compile()
 	if (!IFileManager::Get().FileExists(*FUnrealCSharpFunctionLibrary::GetGameProjectPath()))
 	{
 		return;
+	}
+
+	{
+		TArray<FString> ProjectFiles;
+
+		IFileManager::Get().FindFilesRecursive(ProjectFiles,
+		                                       *FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
+		                                       TEXT("*.csproj"), true, false);
+
+		FScopeLock ScopeLock(&ProgressCriticalSection);
+
+		TotalProjectCount = FMath::Max(ProjectFiles.Num(), 1);
+
+		CompletedProjectCount = 0;
+
+		ProgressOutputBuffer.Empty();
+
+		ProgressMessage = TEXT("Starting dotnet build...");
 	}
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
@@ -310,6 +403,8 @@ void FCSharpCompilerRunnable::Compile()
 
 		if (InReturnCode == 0)
 		{
+			FUnrealCSharpFunctionLibrary::TouchBuildStamp();
+
 			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
 
 			NotificationInfo->bUseSuccessFailIcons = true;
@@ -336,7 +431,11 @@ void FCSharpCompilerRunnable::Compile()
 		}
 	};
 
-	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete);
+	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(),
+	                                          [this](const FString& InOutput)
+	                                          {
+		                                          ParseCompileOutput(InOutput);
+	                                          });
 
 	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
 	{

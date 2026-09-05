@@ -25,6 +25,8 @@ public:
 
 	bool IsCompiling() const;
 
+	void GetCompileProgress(FString& OutMessage, float& OutFraction) const;
+
 	void DoWork();
 
 	void ImmediatelyDoWork(bool bForceCompileInterop = false);
@@ -44,6 +46,11 @@ private:
 	void OnEndGenerator();
 
 private:
+	void ResetCompileProgress(const FString& InMessage);
+
+	void ParseCompileOutput(const FString& InOutput);
+
+private:
 	FDelegateHandle OnBeginGeneratorDelegateHandle;
 
 	FDelegateHandle OnEndGeneratorDelegateHandle;
@@ -61,6 +68,16 @@ private:
 	bool bIsGenerating;
 
 	bool bIsStopped;
+
+	mutable FCriticalSection ProgressCriticalSection;
+
+	FString ProgressMessage;
+
+	FString ProgressOutputBuffer;
+
+	int32 CompletedProjectCount;
+
+	int32 TotalProjectCount;
 
 	TSharedPtr<SNotificationItem> NotificationItem;
 };

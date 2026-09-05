@@ -6,6 +6,9 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Setting/UnrealCSharpSetting.h"
+#include "Log/UnrealCSharpLog.h"
 
 FDomain::FDomain()
 {
@@ -25,10 +28,35 @@ void FDomain::Initialize()
 	{
 		ScriptDomain = FScriptDomainFactory::Create();
 
+		if (ScriptDomain == nullptr)
+		{
+			const auto Setting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>();
+
+			UE_LOG(LogUnrealCSharp, Error,
+			       TEXT(
+				       "FScriptDomainFactory::Create() returned null. ScriptDomainType=%d, WITH_MONO=%d, WITH_CORECLR=%d"
+			       ),
+			       Setting
+				       ? static_cast<int32>(Setting->GetScriptDomainType(FPlatformProperties::IniPlatformName()))
+				       : -1,
+			       WITH_MONO,
+			       WITH_CORECLR);
+
+			return;
+		}
+
 		IScriptDomain::Set(ScriptDomain);
 	}
 
 	ScriptDomain->Initialize();
+
+	if (!ScriptDomain->IsInitialized())
+	{
+		UE_LOG(LogUnrealCSharp, Error,
+		       TEXT("ScriptDomain Initialize failed. Check assemblies in Content/Script (Interop/UE/Game dll)."));
+
+		return;
+	}
 
 	InitializeSynchronizationContext();
 }

@@ -12,6 +12,10 @@ public:
 private:
 	void OnPostEngineInit();
 
+	void OnBlueprintPreCompile(UBlueprint* InBlueprint);
+
+	void OnBlueprintCompiled();
+
 	void OnPreBeginPIE(const bool bIsSimulating);
 
 	void OnPrePIEEnded(const bool bIsSimulating);
@@ -43,6 +47,12 @@ private:
 private:
 	void OnAssetChanged(const FAssetData& InAssetData, const TFunction<void()>& InGenerator) const;
 
+	void GeneratePendingCompiledBlueprints();
+
+	static FString GetClassSignature(const UClass* InClass);
+
+	static bool IsScriptOutOfDate();
+
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
@@ -64,10 +74,18 @@ private:
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 
+	FDelegateHandle OnBlueprintPreCompileDelegateHandle;
+
+	FDelegateHandle OnBlueprintCompiledDelegateHandle;
+
 private:
 	TArray<FFileChangeData> FileChanges;
 
+	TMap<TWeakObjectPtr<UBlueprint>, FString> PendingCompiledBlueprints;
+
 	bool bIsPIEPlaying;
+
+	bool bIsPreparingPIE;
 
 	bool bIsGenerating;
 };
