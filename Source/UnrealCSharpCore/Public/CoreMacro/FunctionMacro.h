@@ -36,9 +36,21 @@
 
 #define FUNCTION_HANDLE_DATA_FREE FString(TEXT("Free"))
 
+#define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTER FString(TEXT("GetObjectPointer"))
+
+#define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTERS FString(TEXT("GetObjectPointers"))
+
+#define FUNCTION_HANDLE_DATA_ALLOC FString(TEXT("Alloc"))
+
 #define FUNCTION_LOG_BRIDGE_SET_LOG FString(TEXT("SetLog"))
 
 #define FUNCTION_LOG_BRIDGE_INITIALIZE FString(TEXT("Initialize"))
+
+#if WITH_LEANCLR
+#define FUNCTION_LOG_BRIDGE_INITIALIZE_LEANCLR FString(TEXT("InitializeLeanCLR"))
+
+#define FUNCTION_LOG_BRIDGE_LOG_LEANCLR FString(TEXT("LogLeanCLR"))
+#endif
 
 #define FUNCTION_TYPE_BRIDGE_GET_CLASS FString(TEXT("GetClass"))
 

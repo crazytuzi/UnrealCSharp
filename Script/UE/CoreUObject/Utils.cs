@@ -12,6 +12,52 @@ namespace Script.CoreUObject
 {
     public static class Utils
     {
+#if WITH_LEANCLR
+        private static Dictionary<string, Type> FullName2Type;
+
+        private const string FieldPrefix = "__";
+
+        private const string AttributeFieldSuffix = "_Attrs";
+
+        private static readonly int FieldPrefixLength = FieldPrefix.Length;
+
+        private static readonly int AttributeFieldPrefixLength = FieldPrefixLength + AttributeFieldSuffix.Length;
+
+        private static Type FindType(string InFullName)
+        {
+            if (FullName2Type == null)
+            {
+                Type[] Types;
+
+                try
+                {
+                    Types = typeof(UClassAttribute).Assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ReflectionTypeLoadException)
+                {
+                    Types = ReflectionTypeLoadException.Types;
+                }
+
+                var TypeMap = new Dictionary<string, Type>(Types.Length);
+
+                foreach (var Type in Types)
+                {
+                    var FullName = Type?.FullName;
+
+                    if (FullName != null)
+                    {
+                        TypeMap.TryAdd(FullName, Type);
+                    }
+                }
+
+                FullName2Type = TypeMap;
+            }
+
+            return FullName2Type.TryGetValue(InFullName, out var OutType) ? OutType : null;
+        }
+
+#endif
+
         public static string GetPathName(Type InType) => InType.GetCustomAttribute<PathNameAttribute>(true)?.PathName;
 
         private static Type GetType(Type InType) =>
@@ -181,14 +227,16 @@ namespace Script.CoreUObject
         {
             if (InType.IsClass)
             {
+#if !WITH_LEANCLR
                 var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
+#endif
 
                 OutPropertyInfos = InType.GetProperties(
                     BindingFlags.Instance |
                     BindingFlags.Static |
                     BindingFlags.Public |
-                    BindingFlags.NonPublic
-                );
+                    BindingFlags.NonPublic |
+                    BindingFlags.DeclaredOnly);
 
                 OutPropertyLength = OutPropertyInfos.Length;
 
@@ -204,6 +252,36 @@ namespace Script.CoreUObject
 
                 var PropertyAttributeValues = new List<string>();
 
+#if WITH_LEANCLR
+                var Fields = InType.GetFields(
+                    BindingFlags.Static | BindingFlags.Instance |
+                    BindingFlags.Public | BindingFlags.NonPublic |
+                    BindingFlags.DeclaredOnly);
+
+                var WovenFieldNames = new HashSet<string>(Fields.Length);
+
+                var WovenAttributeFields = new Dictionary<string, FieldInfo>(Fields.Length);
+
+                foreach (var Field in Fields)
+                {
+                    if (Field != null && Field.Name.StartsWith(FieldPrefix, StringComparison.Ordinal))
+                    {
+                        if (Field.Name.EndsWith(AttributeFieldSuffix, StringComparison.Ordinal))
+                        {
+                            if (Field.Name.Length > AttributeFieldPrefixLength)
+                            {
+                                WovenAttributeFields[Field.Name.Substring(FieldPrefixLength,
+                                    Field.Name.Length - AttributeFieldPrefixLength)] = Field;
+                            }
+                        }
+                        else
+                        {
+                            WovenFieldNames.Add(Field.Name.Substring(FieldPrefixLength));
+                        }
+                    }
+                }
+#endif
+
                 for (var i = 0; i < OutPropertyInfos.Length; i++)
                 {
                     OutPropertyNames[i] = OutPropertyInfos[i].Name;
@@ -212,6 +290,53 @@ namespace Script.CoreUObject
 
                     var PropertyAttributeCount = 0;
 
+#if WITH_LEANCLR
+                    if (WovenFieldNames.Contains(OutPropertyInfos[i].Name))
+                    {
+                        PropertyAttributes.Add(typeof(UPropertyAttribute));
+
+                        PropertyAttributeIndex.Add(0);
+
+                        PropertyAttributeCount++;
+                    }
+
+                    if (WovenAttributeFields.TryGetValue(OutPropertyInfos[i].Name, out var AttributeField))
+                    {
+                        var AttributeFieldValue = AttributeField.GetValue(null) as string;
+
+                        if (!string.IsNullOrEmpty(AttributeFieldValue))
+                        {
+                            foreach (var AttributeLine in AttributeFieldValue.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                var Segments = AttributeLine.Split('|');
+
+                                if (int.TryParse(Segments[1], out var ValueCount) == false ||
+                                    Segments.Length - 2 != ValueCount)
+                                {
+                                    continue;
+                                }
+
+                                var AttributeType = FindType(Segments[0]);
+
+                                if (AttributeType == null)
+                                {
+                                    continue;
+                                }
+
+                                PropertyAttributes.Add(AttributeType);
+
+                                for (var ValueIndex = 0; ValueIndex < ValueCount; ValueIndex++)
+                                {
+                                    PropertyAttributeValues.Add(Segments[ValueIndex + 2]);
+                                }
+
+                                PropertyAttributeIndex.Add(ValueCount);
+
+                                PropertyAttributeCount++;
+                            }
+                        }
+                    }
+#else
                     foreach (var CustomAttribute in OutPropertyInfos[i].CustomAttributes)
                     {
                         if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace)
@@ -232,6 +357,7 @@ namespace Script.CoreUObject
                             PropertyAttributeCount++;
                         }
                     }
+#endif
 
                     OutPropertyAttributeCounts[i] = PropertyAttributeCount;
                 }
@@ -318,7 +444,8 @@ namespace Script.CoreUObject
                         BindingFlags.Instance |
                         BindingFlags.Static |
                         BindingFlags.Public |
-                        BindingFlags.NonPublic)
+                        BindingFlags.NonPublic |
+                        BindingFlags.DeclaredOnly)
                     .Where(Method => !Method.IsSpecialName)
                     .ToArray();
 

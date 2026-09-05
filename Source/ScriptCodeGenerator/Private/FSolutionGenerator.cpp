@@ -43,6 +43,7 @@ void FSolutionGenerator::Generator()
 		ScriptPath / SOURCE_GENERATOR_NAME / UNREAL_TYPE_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>
 		{
+			&FSolutionGenerator::ReplaceGameName,
 			&FSolutionGenerator::AddCSharpGeneratorHeaderComment
 		});
 
@@ -218,6 +219,11 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 		DefineConstants += TEXT("WITH_EDITOR;");
 	}
 
+	if (FUnrealCSharpFunctionLibrary::GetScriptDomainType() == EScriptDomainType::LeanCLR)
+	{
+		DefineConstants += TEXT("WITH_LEANCLR;");
+	}
+
 	DefineConstants = FString::Printf(TEXT(
 		"<DefineConstants>$(DefineConstants);%s</DefineConstants>"
 	),
@@ -316,6 +322,12 @@ void FSolutionGenerator::ReplaceYield(FString& OutResult)
 	OutResult = OutResult.Replace(*UE_NAME_PLACEHOLDER,
 	                              *FUnrealCSharpFunctionLibrary::GetUEName());
 
+	OutResult = OutResult.Replace(*GAME_NAME_PLACEHOLDER,
+	                              *FUnrealCSharpFunctionLibrary::GetGameName());
+}
+
+void FSolutionGenerator::ReplaceGameName(FString& OutResult)
+{
 	OutResult = OutResult.Replace(*GAME_NAME_PLACEHOLDER,
 	                              *FUnrealCSharpFunctionLibrary::GetGameName());
 }

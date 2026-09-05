@@ -92,6 +92,9 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FConsoleCommandDelegate::CreateLambda(
 			[]()
 			{
+				FScriptDomainTypeScope ScriptDomainTypeScope(
+					FUnrealCSharpFunctionLibrary::GetScriptDomainType(FPlatformProperties::IniPlatformName()));
+
 				FSolutionGenerator::Generator();
 			}));
 

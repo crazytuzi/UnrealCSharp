@@ -2,388 +2,197 @@ using Interop;
 
 namespace Script.Library
 {
-    public static unsafe class FFunctionImplementation
+    public static unsafe partial class FFunctionImplementation
     {
-        private static delegate* unmanaged[Cdecl]<nint, uint, void> __FFunction_GenericCall0Implementation;
+        private static unsafe partial void __FFunction_GenericCall0Implementation(nint InDelegate, uint InFunctionHash);
 
-        public static void FFunction_GenericCall0Implementation(nint InMonoObject, uint InFunctionHash)
+        public static void FFunction_GenericCall0Implementation(nint InDelegate, uint InFunctionHash)
         {
-            if (__FFunction_GenericCall0Implementation == null)
-            {
-                __FFunction_GenericCall0Implementation = (delegate* unmanaged[Cdecl]<nint, uint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall0Implementation");
-            }
-
-            __FFunction_GenericCall0Implementation(InMonoObject, InFunctionHash);
+            __FFunction_GenericCall0Implementation(InDelegate, InFunctionHash);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_PrimitiveCall1Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall1Implementation(nint InDelegate, uint InFunctionHash, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall1Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall1Implementation(nint InDelegate, uint InFunctionHash,
             byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall1Implementation == null)
-            {
-                __FFunction_PrimitiveCall1Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall1Implementation");
-            }
-
-            __FFunction_PrimitiveCall1Implementation(InMonoObject, InFunctionHash, ReturnBuffer);
+            __FFunction_PrimitiveCall1Implementation(InDelegate, InFunctionHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_CompoundCall1Implementation;
+        private static unsafe partial void __FFunction_CompoundCall1Implementation(nint InDelegate, uint InFunctionHash, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall1Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_CompoundCall1Implementation(nint InDelegate, uint InFunctionHash,
             byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall1Implementation == null)
-            {
-                __FFunction_CompoundCall1Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall1Implementation");
-            }
-
-            __FFunction_CompoundCall1Implementation(InMonoObject, InFunctionHash, ReturnBuffer);
+            __FFunction_CompoundCall1Implementation(InDelegate, InFunctionHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_GenericCall2Implementation;
+        private static unsafe partial void __FFunction_GenericCall2Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer);
 
-        public static void FFunction_GenericCall2Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer)
+        public static void FFunction_GenericCall2Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer)
         {
-            if (__FFunction_GenericCall2Implementation == null)
-            {
-                __FFunction_GenericCall2Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall2Implementation");
-            }
-
-            __FFunction_GenericCall2Implementation(InMonoObject, InFunctionHash, InBuffer);
+            __FFunction_GenericCall2Implementation(InDelegate, InFunctionHash, InBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_PrimitiveCall3Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall3Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall3Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall3Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall3Implementation == null)
-            {
-                __FFunction_PrimitiveCall3Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall3Implementation");
-            }
-
-            __FFunction_PrimitiveCall3Implementation(InMonoObject, InFunctionHash, InBuffer, ReturnBuffer);
+            __FFunction_PrimitiveCall3Implementation(InDelegate, InFunctionHash, InBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_CompoundCall3Implementation;
+        private static unsafe partial void __FFunction_CompoundCall3Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall3Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer,
+        public static void FFunction_CompoundCall3Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer,
             byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall3Implementation == null)
-            {
-                __FFunction_CompoundCall3Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall3Implementation");
-            }
-
-            __FFunction_CompoundCall3Implementation(InMonoObject, InFunctionHash, InBuffer, ReturnBuffer);
+            __FFunction_CompoundCall3Implementation(InDelegate, InFunctionHash, InBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_GenericCall4Implementation;
+        private static unsafe partial void __FFunction_GenericCall4Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer);
 
-        public static void FFunction_GenericCall4Implementation(nint InMonoObject, uint InFunctionHash, byte* OutBuffer)
+        public static void FFunction_GenericCall4Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer)
         {
-            if (__FFunction_GenericCall4Implementation == null)
-            {
-                __FFunction_GenericCall4Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall4Implementation");
-            }
-
-            __FFunction_GenericCall4Implementation(InMonoObject, InFunctionHash, OutBuffer);
+            __FFunction_GenericCall4Implementation(InDelegate, InFunctionHash, OutBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_PrimitiveCall5Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall5Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall5Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall5Implementation(nint InDelegate, uint InFunctionHash,
             byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall5Implementation == null)
-            {
-                __FFunction_PrimitiveCall5Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall5Implementation");
-            }
-
-            __FFunction_PrimitiveCall5Implementation(InMonoObject, InFunctionHash, OutBuffer, ReturnBuffer);
+            __FFunction_PrimitiveCall5Implementation(InDelegate, InFunctionHash, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_CompoundCall5Implementation;
+        private static unsafe partial void __FFunction_CompoundCall5Implementation(nint InDelegate, uint InFunctionHash, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall5Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_CompoundCall5Implementation(nint InDelegate, uint InFunctionHash,
             byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall5Implementation == null)
-            {
-                __FFunction_CompoundCall5Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall5Implementation");
-            }
-
-            __FFunction_CompoundCall5Implementation(InMonoObject, InFunctionHash, OutBuffer, ReturnBuffer);
+            __FFunction_CompoundCall5Implementation(InDelegate, InFunctionHash, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_GenericCall6Implementation;
+        private static unsafe partial void __FFunction_GenericCall6Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer);
 
-        public static void FFunction_GenericCall6Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer,
+        public static void FFunction_GenericCall6Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer,
             byte* OutBuffer)
         {
-            if (__FFunction_GenericCall6Implementation == null)
-            {
-                __FFunction_GenericCall6Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall6Implementation");
-            }
-
-            __FFunction_GenericCall6Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer);
+            __FFunction_GenericCall6Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>
-            __FFunction_PrimitiveCall7Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall7Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall7Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall7Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall7Implementation == null)
-            {
-                __FFunction_PrimitiveCall7Implementation =
-                    (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall7Implementation");
-            }
-
-            __FFunction_PrimitiveCall7Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
+            __FFunction_PrimitiveCall7Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>
-            __FFunction_CompoundCall7Implementation;
+        private static unsafe partial void __FFunction_CompoundCall7Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall7Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer,
+        public static void FFunction_CompoundCall7Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer,
             byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall7Implementation == null)
-            {
-                __FFunction_CompoundCall7Implementation =
-                    (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall7Implementation");
-            }
-
-            __FFunction_CompoundCall7Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
+            __FFunction_CompoundCall7Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, void> __FFunction_GenericCall8Implementation;
+        private static unsafe partial void __FFunction_GenericCall8Implementation(nint InDelegate, uint InFunctionHash);
 
-        public static void FFunction_GenericCall8Implementation(nint InMonoObject, uint InFunctionHash)
+        public static void FFunction_GenericCall8Implementation(nint InDelegate, uint InFunctionHash)
         {
-            if (__FFunction_GenericCall8Implementation == null)
-            {
-                __FFunction_GenericCall8Implementation = (delegate* unmanaged[Cdecl]<nint, uint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall8Implementation");
-            }
-
-            __FFunction_GenericCall8Implementation(InMonoObject, InFunctionHash);
+            __FFunction_GenericCall8Implementation(InDelegate, InFunctionHash);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_PrimitiveCall9Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall9Implementation(nint InDelegate, uint InFunctionHash, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall9Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall9Implementation(nint InDelegate, uint InFunctionHash,
             byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall9Implementation == null)
-            {
-                __FFunction_PrimitiveCall9Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall9Implementation");
-            }
-
-            __FFunction_PrimitiveCall9Implementation(InMonoObject, InFunctionHash, ReturnBuffer);
+            __FFunction_PrimitiveCall9Implementation(InDelegate, InFunctionHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_CompoundCall9Implementation;
+        private static unsafe partial void __FFunction_CompoundCall9Implementation(nint InDelegate, uint InFunctionHash, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall9Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_CompoundCall9Implementation(nint InDelegate, uint InFunctionHash,
             byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall9Implementation == null)
-            {
-                __FFunction_CompoundCall9Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall9Implementation");
-            }
-
-            __FFunction_CompoundCall9Implementation(InMonoObject, InFunctionHash, ReturnBuffer);
+            __FFunction_CompoundCall9Implementation(InDelegate, InFunctionHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_GenericCall10Implementation;
+        private static unsafe partial void __FFunction_GenericCall10Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer);
 
-        public static void FFunction_GenericCall10Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer)
+        public static void FFunction_GenericCall10Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer)
         {
-            if (__FFunction_GenericCall10Implementation == null)
-            {
-                __FFunction_GenericCall10Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall10Implementation");
-            }
-
-            __FFunction_GenericCall10Implementation(InMonoObject, InFunctionHash, InBuffer);
+            __FFunction_GenericCall10Implementation(InDelegate, InFunctionHash, InBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_PrimitiveCall11Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall11Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall11Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall11Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall11Implementation == null)
-            {
-                __FFunction_PrimitiveCall11Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall11Implementation");
-            }
-
-            __FFunction_PrimitiveCall11Implementation(InMonoObject, InFunctionHash, InBuffer, ReturnBuffer);
+            __FFunction_PrimitiveCall11Implementation(InDelegate, InFunctionHash, InBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_CompoundCall11Implementation;
+        private static unsafe partial void __FFunction_CompoundCall11Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall11Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_CompoundCall11Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall11Implementation == null)
-            {
-                __FFunction_CompoundCall11Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall11Implementation");
-            }
-
-            __FFunction_CompoundCall11Implementation(InMonoObject, InFunctionHash, InBuffer, ReturnBuffer);
+            __FFunction_CompoundCall11Implementation(InDelegate, InFunctionHash, InBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>
-            __FFunction_GenericCall14Implementation;
+        private static unsafe partial void __FFunction_GenericCall14Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer);
 
-        public static void FFunction_GenericCall14Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer,
+        public static void FFunction_GenericCall14Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer,
             byte* OutBuffer)
         {
-            if (__FFunction_GenericCall14Implementation == null)
-            {
-                __FFunction_GenericCall14Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall14Implementation");
-            }
-
-            __FFunction_GenericCall14Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer);
+            __FFunction_GenericCall14Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>
-            __FFunction_PrimitiveCall15Implementation;
+        private static unsafe partial void __FFunction_PrimitiveCall15Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_PrimitiveCall15Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_PrimitiveCall15Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_PrimitiveCall15Implementation == null)
-            {
-                __FFunction_PrimitiveCall15Implementation =
-                    (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_PrimitiveCall15Implementation");
-            }
-
-            __FFunction_PrimitiveCall15Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
+            __FFunction_PrimitiveCall15Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>
-            __FFunction_CompoundCall15Implementation;
+        private static unsafe partial void __FFunction_CompoundCall15Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
-        public static void FFunction_CompoundCall15Implementation(nint InMonoObject, uint InFunctionHash,
+        public static void FFunction_CompoundCall15Implementation(nint InDelegate, uint InFunctionHash,
             byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer)
         {
-            if (__FFunction_CompoundCall15Implementation == null)
-            {
-                __FFunction_CompoundCall15Implementation =
-                    (delegate* unmanaged[Cdecl]<nint, uint, byte*, byte*, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_CompoundCall15Implementation");
-            }
-
-            __FFunction_CompoundCall15Implementation(InMonoObject, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
+            __FFunction_CompoundCall15Implementation(InDelegate, InFunctionHash, InBuffer, OutBuffer, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, void> __FFunction_GenericCall16Implementation;
+        private static unsafe partial void __FFunction_GenericCall16Implementation(nint InDelegate, uint InFunctionHash);
 
-        public static void FFunction_GenericCall16Implementation(nint InMonoObject, uint InFunctionHash)
+        public static void FFunction_GenericCall16Implementation(nint InDelegate, uint InFunctionHash)
         {
-            if (__FFunction_GenericCall16Implementation == null)
-            {
-                __FFunction_GenericCall16Implementation = (delegate* unmanaged[Cdecl]<nint, uint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall16Implementation");
-            }
-
-            __FFunction_GenericCall16Implementation(InMonoObject, InFunctionHash);
+            __FFunction_GenericCall16Implementation(InDelegate, InFunctionHash);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_GenericCall18Implementation;
+        private static unsafe partial void __FFunction_GenericCall18Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer);
 
-        public static void FFunction_GenericCall18Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer)
+        public static void FFunction_GenericCall18Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer)
         {
-            if (__FFunction_GenericCall18Implementation == null)
-            {
-                __FFunction_GenericCall18Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall18Implementation");
-            }
-
-            __FFunction_GenericCall18Implementation(InMonoObject, InFunctionHash, InBuffer);
+            __FFunction_GenericCall18Implementation(InDelegate, InFunctionHash, InBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, void> __FFunction_GenericCall24Implementation;
+        private static unsafe partial void __FFunction_GenericCall24Implementation(nint InDelegate, uint InFunctionHash);
 
-        public static void FFunction_GenericCall24Implementation(nint InMonoObject, uint InFunctionHash)
+        public static void FFunction_GenericCall24Implementation(nint InDelegate, uint InFunctionHash)
         {
-            if (__FFunction_GenericCall24Implementation == null)
-            {
-                __FFunction_GenericCall24Implementation = (delegate* unmanaged[Cdecl]<nint, uint, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall24Implementation");
-            }
-
-            __FFunction_GenericCall24Implementation(InMonoObject, InFunctionHash);
+            __FFunction_GenericCall24Implementation(InDelegate, InFunctionHash);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FFunction_GenericCall26Implementation;
+        private static unsafe partial void __FFunction_GenericCall26Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer);
 
-        public static void FFunction_GenericCall26Implementation(nint InMonoObject, uint InFunctionHash, byte* InBuffer)
+        public static void FFunction_GenericCall26Implementation(nint InDelegate, uint InFunctionHash, byte* InBuffer)
         {
-            if (__FFunction_GenericCall26Implementation == null)
-            {
-                __FFunction_GenericCall26Implementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FFunctionImplementation::FFunction_GenericCall26Implementation");
-            }
-
-            __FFunction_GenericCall26Implementation(InMonoObject, InFunctionHash, InBuffer);
+            __FFunction_GenericCall26Implementation(InDelegate, InFunctionHash, InBuffer);
         }
     }
 }

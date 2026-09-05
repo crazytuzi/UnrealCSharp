@@ -766,41 +766,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	{
 		const auto bIsConstructor = InType != TEXT("nint");
 
-		const auto MethodName = FString::Printf(TEXT(
-			"__%s"),
-		                                        *InMethodName
-		);
-
-		FString ParamType;
-
-		if (!InParam.IsEmpty())
-		{
-			TArray<FString> Params;
-
-			InParam.ParseIntoArray(Params, TEXT(", "));
-
-			TArray<FString> Type;
-
-			for (const auto& Param : Params)
-			{
-				int32 LastSpace = INDEX_NONE;
-
-				Param.FindLastChar(TEXT(' '), LastSpace);
-
-				Type.Add(LastSpace != INDEX_NONE
-					         ? Param.Left(LastSpace).TrimEnd()
-					         : Param);
-			}
-
-			ParamType = FString::Join(Type, TEXT(", ")) + TEXT(", ");
-		}
-
-		const auto Signature = FString::Printf(TEXT(
-			"delegate* unmanaged[Cdecl]<nint, %svoid>"
-		),
-		                                       *ParamType
-		);
-
 		auto ObjectParam = FString(TEXT("InObject"));
 
 		if (bIsConstructor)
@@ -808,35 +773,37 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 			ObjectParam = TEXT("HandleData.Alloc(InObject)");
 		}
 
+		if (bIsConstructor)
+		{
+			return FString::Printf(TEXT(
+				"\t\tprivate static unsafe partial void %s(nint InObject%s%s);\n"
+				"\n"
+				"\t\tpublic static unsafe void %s(%s InObject%s%s)\n"
+				"\t\t{\n"
+				"\t\t\t%s(%s%s%s);\n"
+				"\t\t}\n"
+			),
+			                       *InMethodName,
+			                       !InParam.IsEmpty() ? TEXT(", ") : TEXT(""),
+			                       *InParam,
+			                       *InMethodName,
+			                       *InType,
+			                       !InParam.IsEmpty() ? TEXT(", ") : TEXT(""),
+			                       *InParam,
+			                       *InMethodName,
+			                       *ObjectParam,
+			                       !InReturn.IsEmpty() ? TEXT(", ") : TEXT(""),
+			                       *InReturn
+			);
+		}
+
 		return FString::Printf(TEXT(
-			"\t\tprivate static unsafe %s %s;\n"
-			"\n"
-			"\t\tpublic static unsafe void %s(%s InObject%s%s)\n"
-			"\t\t{\n"
-			"\t\t\tif (%s == null)\n"
-			"\t\t\t{\n"
-			"\t\t\t\t%s = (%s)MethodBridge.GetMethod(\"%s.%s::%s\");\n"
-			"\t\t\t}\n"
-			"\n"
-			"\t\t\t%s(%s%s%s);\n"
-			"\t\t}\n"
+			"\t\tpublic static unsafe partial void %s(%s InObject%s%s);\n"
 		),
-		                       *Signature,
-		                       *MethodName,
 		                       *InMethodName,
 		                       *InType,
 		                       !InParam.IsEmpty() ? TEXT(", ") : TEXT(""),
-		                       *InParam,
-		                       *MethodName,
-		                       *MethodName,
-		                       *Signature,
-		                       *ImplementationNameSpaceContent,
-		                       *ClassImplementationContent,
-		                       *InMethodName,
-		                       *MethodName,
-		                       *ObjectParam,
-		                       !InReturn.IsEmpty() ? TEXT(", ") : TEXT(""),
-		                       *InReturn
+		                       *InParam
 		);
 	};
 

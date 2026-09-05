@@ -4,8 +4,11 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using System.Collections.Generic;
-using System.Linq;
+#if WITH_LEANCLR
+using System.Globalization;
+#endif
 using System.IO;
+using System.Linq;
 
 namespace Weavers
 {
@@ -223,6 +226,106 @@ namespace Weavers
             return "/Script/CoreUObject." + (name.EndsWith("_C") || Type.IsEnum ? name : name.Substring(1));
         }
 
+#if WITH_LEANCLR
+        private static string GetRootNamespace(TypeReference Type)
+        {
+            var root = Type;
+
+            while (root.DeclaringType != null)
+            {
+                root = root.DeclaringType;
+            }
+
+            return root.Namespace;
+        }
+
+        private void EmitPropertyAttributesField(TypeDefinition Type, PropertyDefinition Property)
+        {
+            var lines = new List<string>();
+
+            foreach (var attr in Property.CustomAttributes)
+            {
+                var attrType = attr.AttributeType;
+
+                if (GetRootNamespace(attrType) != "Script.Dynamic" ||
+                    attrType.Name == "UPropertyAttribute")
+                {
+                    continue;
+                }
+
+                var parts = new List<string>();
+
+                if (attr.HasConstructorArguments)
+                {
+                    foreach (var arg in attr.ConstructorArguments)
+                    {
+                        var value = arg.Value;
+
+                        string text;
+
+                        if (value == null)
+                        {
+                            text = string.Empty;
+                        }
+                        else if (value is IFormattable formattable)
+                        {
+                            text = formattable.ToString(null, CultureInfo.InvariantCulture);
+                        }
+                        else
+                        {
+                            text = value.ToString();
+                        }
+
+                        parts.Add(text);
+                    }
+                }
+
+                parts.Insert(0, parts.Count.ToString(CultureInfo.InvariantCulture));
+
+                parts.Insert(0, attrType.FullName.Replace('/', '+'));
+
+                lines.Add(string.Join("|", parts));
+            }
+
+            if (lines.Count == 0)
+            {
+                return;
+            }
+
+            var encoded = string.Join("\n", lines);
+
+            var attrsField = new FieldDefinition("__" + Property.Name + "_Attrs",
+                FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly,
+                ModuleDefinition.TypeSystem.String);
+
+            Type.Fields.Add(attrsField);
+
+            var cctor = Type.Methods.FirstOrDefault(Method =>
+                Method.Name == ".cctor" && Method.IsStatic && !Method.HasParameters);
+
+            if (cctor == null)
+            {
+                cctor = new MethodDefinition(".cctor",
+                    MethodAttributes.Static | MethodAttributes.SpecialName |
+                    MethodAttributes.RTSpecialName | MethodAttributes.Private,
+                    ModuleDefinition.TypeSystem.Void);
+
+                cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+
+                Type.Methods.Add(cctor);
+            }
+
+            var il = cctor.Body.GetILProcessor();
+
+            var firstInstr = il.Body.Instructions[0];
+
+            il.InsertBefore(firstInstr, Instruction.Create(OpCodes.Ldstr, encoded));
+
+            il.InsertBefore(firstInstr, Instruction.Create(OpCodes.Stsfld,
+                ModuleDefinition.ImportReference(attrsField)));
+        }
+#endif
+
         private void ProcessUClassType(TypeDefinition Type)
         {
             foreach (var property in Type.Properties)
@@ -247,6 +350,10 @@ namespace Weavers
             {
                 Type.Fields.Remove(backingField);
             }
+
+#if WITH_LEANCLR
+            EmitPropertyAttributesField(Type, Property);
+#endif
 
             // 修改setter
             if (Property.SetMethod != null)
@@ -462,6 +569,10 @@ namespace Weavers
             {
                 Type.Fields.Remove(backingField);
             }
+
+#if WITH_LEANCLR
+            EmitPropertyAttributesField(Type, Property);
+#endif
 
             // 修改setter
             if (Property.SetMethod != null)

@@ -274,6 +274,8 @@ public class UnrealCSharpCore : ModuleRules
 
 		var bWithCoreCLR = string.Equals(ScriptDomainType, "CoreCLR", System.StringComparison.OrdinalIgnoreCase);
 
+		var bWithLeanCLR = string.Equals(ScriptDomainType, "LeanCLR", System.StringComparison.OrdinalIgnoreCase);
+
 		if (bWithCoreCLR)
 		{
 			PublicDependencyModuleNames.Add("CoreCLR");
@@ -294,6 +296,17 @@ public class UnrealCSharpCore : ModuleRules
 		else
 		{
 			PublicDefinitions.Add("WITH_MONO=0");
+		}
+
+		if (bWithLeanCLR)
+		{
+			PublicDependencyModuleNames.Add("LeanCLR");
+
+			PublicDefinitions.Add("WITH_LEANCLR=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_LEANCLR=0");
 		}
 	}
 

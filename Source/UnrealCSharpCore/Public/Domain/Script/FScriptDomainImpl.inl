@@ -1,89 +1,86 @@
+#pragma once
+
+#include "CoreMacro/PropertyMacro.h"
+#include "Template/TGetUtf8String.inl"
+#include "UEVersion.h"
+
+#ifndef SCRIPT_DOMAIN_INVOKE
+#define SCRIPT_DOMAIN_INVOKE(Return, Fn, ...) Fn(__VA_ARGS__)
+#endif
+
+#ifndef SCRIPT_DOMAIN_STRING_CAST
+#define SCRIPT_DOMAIN_STRING_CAST(InString) \
+	reinterpret_cast<const uint8*>(StringCast<UTF8CHAR>(*(InString)).Get())
+#endif
+
+#ifndef SCRIPT_DOMAIN_CUSTOM_TICK
 void SCRIPT_DOMAIN_TYPE::Tick(const float InDeltaTime)
 {
 	if (SynchronizationContextTickFn != nullptr)
 	{
-		SynchronizationContextTickFn(InDeltaTime);
+		SCRIPT_DOMAIN_INVOKE(void, SynchronizationContextTickFn, InDeltaTime);
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_NAMESPACE
 FString SCRIPT_DOMAIN_TYPE::GetNamespace(const IManagedHandle InManagedClass)
 {
-	if (IManagedHandleIsValid(InManagedClass))
-	{
-		if (TypeBridgeGetNamespaceFn != nullptr)
-		{
-			constexpr auto Size = 512;
-
-			uint8 String[Size];
-
-			if (const auto Length = TypeBridgeGetNamespaceFn(InManagedClass, String, Size);
-				Length > 0)
-			{
-				return FString(UTF8_TO_TCHAR(reinterpret_cast<const char*>(String)));
-			}
-		}
-	}
-
-	return {};
+	return IManagedHandleIsValid(InManagedClass) && TypeBridgeGetNamespaceFn != nullptr
+		       ? TGetUTF8String(
+			       [this, InManagedClass](uint8* OutString, const int32 InSize)
+			       {
+				       return SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeGetNamespaceFn, InManagedClass, OutString, InSize);
+			       })
+		       : FString{};
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_NAME
 FString SCRIPT_DOMAIN_TYPE::GetName(const IManagedHandle InManagedClass)
 {
-	if (IManagedHandleIsValid(InManagedClass))
-	{
-		if (TypeBridgeGetNameFn != nullptr)
-		{
-			constexpr auto Size = 512;
-
-			uint8 String[Size];
-
-			if (const auto Length = TypeBridgeGetNameFn(InManagedClass, String, Size);
-				Length > 0)
-			{
-				return FString(UTF8_TO_TCHAR(reinterpret_cast<const char*>(String)));
-			}
-		}
-	}
-
-	return {};
+	return IManagedHandleIsValid(InManagedClass) && TypeBridgeGetNameFn != nullptr
+		       ? TGetUTF8String(
+			       [this, InManagedClass](uint8* OutString, const int32 InSize)
+			       {
+				       return SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeGetNameFn, InManagedClass, OutString, InSize);
+			       })
+		       : FString{};
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_FULL_NAME
 FString SCRIPT_DOMAIN_TYPE::GetFullName(const IManagedHandle InManagedClass)
 {
-	if (IManagedHandleIsValid(InManagedClass))
+	auto Result = IManagedHandleIsValid(InManagedClass) && TypeBridgeGetFullNameFn != nullptr
+		              ? TGetUTF8String(
+			              [this, InManagedClass](uint8* OutString, const int32 InSize)
+			              {
+				              return SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeGetFullNameFn, InManagedClass, OutString,
+				                                          InSize);
+			              })
+		              : FString{};
+
+	if (int32 Index; Result.FindLastChar(TEXT(','), Index))
 	{
-		if (TypeBridgeGetFullNameFn != nullptr)
-		{
-			constexpr auto Size = 512;
-
-			uint8 String[Size];
-
-			if (const auto Length = TypeBridgeGetFullNameFn(InManagedClass, String, Size);
-				Length > 0)
-			{
-				auto Result = FString(UTF8_TO_TCHAR(reinterpret_cast<const char*>(String)));
-
-				if (int32 Index; Result.FindLastChar(TEXT(','), Index))
-				{
-					Result = Result.Left(Index).TrimEnd();
-				}
-
-				return Result;
-			}
-		}
+		Result = Result.Left(Index).TrimEnd();
 	}
 
-	return {};
+	return Result;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_NEW_OBJECT
 IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass)
 {
 	return ObjectBridgeNewObjectFn != nullptr
-		       ? ObjectBridgeNewObjectFn(InManagedClass)
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass)
 		       : InvalidManagedHandle;
 }
+#endif
 
-IManagedHandle SCRIPT_DOMAIN_TYPE::BoxValue(const FString& InNamespace, const FString& InName, void* InValue)
+#ifndef SCRIPT_DOMAIN_CUSTOM_BOX_VALUE
+IManagedHandle SCRIPT_DOMAIN_TYPE::BoxValue(const FString& InName, void* InValue)
 {
 	if (InValue != nullptr)
 	{
@@ -91,84 +88,86 @@ IManagedHandle SCRIPT_DOMAIN_TYPE::BoxValue(const FString& InNamespace, const FS
 		{
 			if (TypeBridgeBoxBoolFn != nullptr)
 			{
-				return TypeBridgeBoxBoolFn(static_cast<int*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxBoolFn, static_cast<int*>(InValue));
 			}
 		}
 		else if (InName == TEXT("sbyte") || InName == TEXT("SByte") || InName == TEXT("int8"))
 		{
 			if (TypeBridgeBoxSByteFn != nullptr)
 			{
-				return TypeBridgeBoxSByteFn(static_cast<int8*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxSByteFn, static_cast<int8*>(InValue));
 			}
 		}
 		else if (InName == TEXT("int16") || InName == TEXT("Int16") || InName == TEXT("short"))
 		{
 			if (TypeBridgeBoxInt16Fn != nullptr)
 			{
-				return TypeBridgeBoxInt16Fn(static_cast<int16*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxInt16Fn, static_cast<int16*>(InValue));
 			}
 		}
 		else if (InName == TEXT("int32") || InName == TEXT("Int32") || InName == TEXT("int"))
 		{
 			if (TypeBridgeBoxInt32Fn != nullptr)
 			{
-				return TypeBridgeBoxInt32Fn(static_cast<int32*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxInt32Fn, static_cast<int32*>(InValue));
 			}
 		}
 		else if (InName == TEXT("int64") || InName == TEXT("Int64") || InName == TEXT("long"))
 		{
 			if (TypeBridgeBoxInt64Fn != nullptr)
 			{
-				return TypeBridgeBoxInt64Fn(static_cast<int64*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxInt64Fn, static_cast<int64*>(InValue));
 			}
 		}
 		else if (InName == TEXT("byte") || InName == TEXT("Byte") || InName == TEXT("uint8"))
 		{
 			if (TypeBridgeBoxByteFn != nullptr)
 			{
-				return TypeBridgeBoxByteFn(static_cast<uint8*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxByteFn, static_cast<uint8*>(InValue));
 			}
 		}
 		else if (InName == TEXT("uint16") || InName == TEXT("UInt16") || InName == TEXT("ushort"))
 		{
 			if (TypeBridgeBoxUInt16Fn != nullptr)
 			{
-				return TypeBridgeBoxUInt16Fn(static_cast<uint16*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxUInt16Fn, static_cast<uint16*>(InValue));
 			}
 		}
 		else if (InName == TEXT("uint32") || InName == TEXT("UInt32") || InName == TEXT("uint"))
 		{
 			if (TypeBridgeBoxUInt32Fn != nullptr)
 			{
-				return TypeBridgeBoxUInt32Fn(static_cast<uint32*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxUInt32Fn, static_cast<uint32*>(InValue));
 			}
 		}
 		else if (InName == TEXT("uint64") || InName == TEXT("UInt64") || InName == TEXT("ulong"))
 		{
 			if (TypeBridgeBoxUInt64Fn != nullptr)
 			{
-				return TypeBridgeBoxUInt64Fn(static_cast<uint64*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxUInt64Fn, static_cast<uint64*>(InValue));
 			}
 		}
 		else if (InName == TEXT("float") || InName == TEXT("Single"))
 		{
 			if (TypeBridgeBoxFloatFn != nullptr)
 			{
-				return TypeBridgeBoxFloatFn(static_cast<float*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxFloatFn, static_cast<float*>(InValue));
 			}
 		}
 		else if (InName == TEXT("double") || InName == TEXT("Double"))
 		{
 			if (TypeBridgeBoxDoubleFn != nullptr)
 			{
-				return TypeBridgeBoxDoubleFn(static_cast<double*>(InValue));
+				return SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeBoxDoubleFn, static_cast<double*>(InValue));
 			}
 		}
 	}
 
 	return InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_UNBOX_VALUE
 void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 {
 	static uint64 Result{};
@@ -179,7 +178,7 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 		{
 			int32 Value{};
 
-			if (TypeBridgeUnboxBoolFn(InManagedHandle, &Value))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxBoolFn, InManagedHandle, &Value))
 			{
 				*static_cast<bool*>(static_cast<void*>(&Result)) = Value != 0;
 
@@ -189,7 +188,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxSByteFn != nullptr)
 		{
-			if (TypeBridgeUnboxSByteFn(InManagedHandle, static_cast<int8*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxSByteFn, InManagedHandle,
+			                         static_cast<int8*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -197,7 +197,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxInt16Fn != nullptr)
 		{
-			if (TypeBridgeUnboxInt16Fn(InManagedHandle, static_cast<int16*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxInt16Fn, InManagedHandle,
+			                         static_cast<int16*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -205,7 +206,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxInt32Fn != nullptr)
 		{
-			if (TypeBridgeUnboxInt32Fn(InManagedHandle, static_cast<int32*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxInt32Fn, InManagedHandle,
+			                         static_cast<int32*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -213,7 +215,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxInt64Fn != nullptr)
 		{
-			if (TypeBridgeUnboxInt64Fn(InManagedHandle, static_cast<int64*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxInt64Fn, InManagedHandle,
+			                         static_cast<int64*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -221,7 +224,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxByteFn != nullptr)
 		{
-			if (TypeBridgeUnboxByteFn(InManagedHandle, static_cast<uint8*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxByteFn, InManagedHandle,
+			                         static_cast<uint8*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -229,7 +233,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxUInt16Fn != nullptr)
 		{
-			if (TypeBridgeUnboxUInt16Fn(InManagedHandle, static_cast<uint16*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxUInt16Fn, InManagedHandle,
+			                         static_cast<uint16*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -237,7 +242,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxUInt32Fn != nullptr)
 		{
-			if (TypeBridgeUnboxUInt32Fn(InManagedHandle, static_cast<uint32*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxUInt32Fn, InManagedHandle,
+			                         static_cast<uint32*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -245,7 +251,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxUInt64Fn != nullptr)
 		{
-			if (TypeBridgeUnboxUInt64Fn(InManagedHandle, static_cast<uint64*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxUInt64Fn, InManagedHandle,
+			                         static_cast<uint64*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -253,7 +260,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxFloatFn != nullptr)
 		{
-			if (TypeBridgeUnboxFloatFn(InManagedHandle, static_cast<float*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxFloatFn, InManagedHandle,
+			                         static_cast<float*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -261,7 +269,8 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 		if (TypeBridgeUnboxDoubleFn != nullptr)
 		{
-			if (TypeBridgeUnboxDoubleFn(InManagedHandle, static_cast<double*>(static_cast<void*>(&Result))))
+			if (SCRIPT_DOMAIN_INVOKE(int32, TypeBridgeUnboxDoubleFn, InManagedHandle,
+			                         static_cast<double*>(static_cast<void*>(&Result))))
 			{
 				return &Result;
 			}
@@ -270,14 +279,18 @@ void* SCRIPT_DOMAIN_TYPE::UnboxValue(const IManagedHandle InManagedHandle)
 
 	return nullptr;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_NEW_STRING
 IManagedHandle SCRIPT_DOMAIN_TYPE::NewString(const char* InText)
 {
 	return StringBridgeNewStringFn != nullptr && InText != nullptr
-		       ? StringBridgeNewStringFn(reinterpret_cast<const uint8*>(InText))
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, StringBridgeNewStringFn, reinterpret_cast<const uint8*>(InText))
 		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_STRING_TO_FSTRING
 FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle)
 {
 	if (IManagedHandleIsValid(InManagedHandle))
@@ -288,10 +301,14 @@ FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle
 
 			char16_t String[Size];
 
-			if (const auto Length = StringBridgeGetStringFn(InManagedHandle, String, Size))
+			if (const auto Length = SCRIPT_DOMAIN_INVOKE(int32, StringBridgeGetStringFn, InManagedHandle, String, Size);
+				Length >= 0)
 			{
-				return FString(StringCast<TCHAR>(
-					               reinterpret_cast<const UTF16CHAR*>(String), Length).Get(), Length);
+#if UE_F_STRING_CONSTRUCT_FROM_PTR_SIZE
+				return FString::ConstructFromPtrSize(reinterpret_cast<const UCS2CHAR*>(String), Length);
+#else
+				return FString(Length, reinterpret_cast<const UCS2CHAR*>(String));
+#endif
 			}
 
 			constexpr auto MaxSize = 65536;
@@ -300,17 +317,24 @@ FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle
 
 			StringArray.SetNumUninitialized(MaxSize);
 
-			if (const auto Length = StringBridgeGetStringFn(InManagedHandle, StringArray.GetData(), MaxSize))
+			if (const auto Length = SCRIPT_DOMAIN_INVOKE(int32, StringBridgeGetStringFn, InManagedHandle,
+			                                             StringArray.GetData(), MaxSize);
+				Length >= 0)
 			{
-				return FString(StringCast<TCHAR>(
-					               reinterpret_cast<const UTF16CHAR*>(StringArray.GetData()), Length).Get(), Length);
+#if UE_F_STRING_CONSTRUCT_FROM_PTR_SIZE
+				return FString::ConstructFromPtrSize(reinterpret_cast<const UCS2CHAR*>(StringArray.GetData()), Length);
+#else
+				return FString(Length, reinterpret_cast<const UCS2CHAR*>(StringArray.GetData()));
+#endif
 			}
 		}
 	}
 
 	return {};
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_FREE
 void SCRIPT_DOMAIN_TYPE::Free(const IManagedHandle InManagedHandle)
 {
 	if (IManagedHandleIsValid(InManagedHandle))
@@ -321,96 +345,79 @@ void SCRIPT_DOMAIN_TYPE::Free(const IManagedHandle InManagedHandle)
 		}
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_NEW_ARRAY
 IManagedHandle SCRIPT_DOMAIN_TYPE::NewArray(const FString& InNamespace, const FString& InName, const int32 InLength)
 {
-	if (InLength > 0)
-	{
-		if (ArrayBridgeNewArrayFn != nullptr)
-		{
-			return ArrayBridgeNewArrayFn(
-				reinterpret_cast<const uint8*>(StringCast<UTF8CHAR>(*COMBINE_FULL_NAME(InNamespace, InName)).Get()),
-				InLength);
-		}
-	}
-
-	return InvalidManagedHandle;
+	return InLength > 0 && ArrayBridgeNewArrayFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ArrayBridgeNewArrayFn,
+		                              SCRIPT_DOMAIN_STRING_CAST(COMBINE_FULL_NAME(InNamespace, InName)),
+		                              InLength)
+		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_ARRAY_GET
 IManagedHandle SCRIPT_DOMAIN_TYPE::ArrayGet(const IManagedHandle InManagedArray, const int32 InIndex)
 {
-	if (IManagedHandleIsValid(InManagedArray))
-	{
-		if (ArrayBridgeArrayGetFn != nullptr)
-		{
-			return ArrayBridgeArrayGetFn(InManagedArray, InIndex);
-		}
-	}
-
-	return InvalidManagedHandle;
+	return IManagedHandleIsValid(InManagedArray) && ArrayBridgeArrayGetFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ArrayBridgeArrayGetFn, InManagedArray, InIndex)
+		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASS
 IManagedHandle SCRIPT_DOMAIN_TYPE::GetClass(const FString& InNamespace, const FString& InName)
 {
-	if (TypeBridgeGetClassFn != nullptr)
-	{
-		return TypeBridgeGetClassFn(
-			reinterpret_cast<const uint8*>(StringCast<UTF8CHAR>(*COMBINE_FULL_NAME(InNamespace, InName)).Get()));
-	}
-
-	return InvalidManagedHandle;
+	return TypeBridgeGetClassFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeGetClassFn,
+		                              SCRIPT_DOMAIN_STRING_CAST(COMBINE_FULL_NAME(InNamespace, InName)))
+		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_METHOD
 IManagedHandle SCRIPT_DOMAIN_TYPE::GetMethod(const IManagedHandle InManagedClass, const FString& InName,
                                              const int32 InParamCount)
 {
-	if (IManagedHandleIsValid(InManagedClass))
-	{
-		if (TypeBridgeGetMethodFn != nullptr)
-		{
-			return TypeBridgeGetMethodFn(
-				InManagedClass,
-				reinterpret_cast<const uint8*>(StringCast<UTF8CHAR>(*InName).Get()),
-				InParamCount);
-		}
-	}
-
-	return InvalidManagedHandle;
+	return IManagedHandleIsValid(InManagedClass) && TypeBridgeGetMethodFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeGetMethodFn, InManagedClass,
+		                              SCRIPT_DOMAIN_STRING_CAST(InName), InParamCount)
+		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_SET_FIELD_STATIC_VALUE
 void SCRIPT_DOMAIN_TYPE::SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName, void* InValue)
 {
 	if (IManagedHandleIsValid(InManagedClass))
 	{
 		if (FieldBridgeSetStaticValueFn != nullptr)
 		{
-			FieldBridgeSetStaticValueFn(InManagedClass,
-			                            reinterpret_cast<const uint8*>(StringCast<UTF8CHAR>(*InName).Get()),
-			                            IManagedHandle{*static_cast<uint32*>(InValue)});
+			SCRIPT_DOMAIN_INVOKE(void, FieldBridgeSetStaticValueFn, InManagedClass, SCRIPT_DOMAIN_STRING_CAST(InName),
+			                     IManagedHandle{*static_cast<uint32*>(InValue)});
 		}
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_FIELD_STATIC_VALUE
 void* SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName)
 {
-	if (IManagedHandleIsValid(InManagedClass))
-	{
-		if (FieldBridgeGetStaticValueFn != nullptr)
-		{
-			return IManagedHandleToObject(FieldBridgeGetStaticValueFn(InManagedClass,
-			                                                          reinterpret_cast<const uint8*>(StringCast<
-				                                                          UTF8CHAR>(*InName).Get())));
-		}
-	}
-
-	return nullptr;
+	return IManagedHandleIsValid(InManagedClass) && FieldBridgeGetStaticValueFn != nullptr
+		       ? IManagedHandleToObject(SCRIPT_DOMAIN_INVOKE(IManagedHandle, FieldBridgeGetStaticValueFn,
+		                                                     InManagedClass, SCRIPT_DOMAIN_STRING_CAST(InName)))
+		       : nullptr;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_SET_PROPERTY_VALUE
 void SCRIPT_DOMAIN_TYPE::SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName, void** InParams)
 {
 	if (TypeBridgeGetTypeFn != nullptr)
 	{
-		if (const auto Class = TypeBridgeGetTypeFn(InManagedHandle);
+		if (const auto Class = SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeGetTypeFn, InManagedHandle);
 			IManagedHandleIsValid(Class))
 		{
 			const auto Name = FString::Printf(TEXT(
@@ -423,115 +430,112 @@ void SCRIPT_DOMAIN_TYPE::SetPropertyValue(const IManagedHandle InManagedHandle, 
 				IManagedHandleIsValid(Method))
 			{
 				Invoke(InManagedHandle, Method, 1, InParams);
+
+				Free(Method);
 			}
+
+			Free(Class);
 		}
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_MAKE_GENERIC_TYPE
 FClassReflection* SCRIPT_DOMAIN_TYPE::MakeGenericType(const FClassReflection* InGeneric, const FClassReflection* InType)
 {
-	if (InGeneric != nullptr && InType != nullptr)
-	{
-		if (TypeBridgeGetClassFn != nullptr)
-		{
-			return FReflectionRegistry::Get().GetClass(
-				TypeBridgeMakeGenericTypeFn(InGeneric->GetManagedClass(),
-				                            InType->GetManagedClass()));
-		}
-	}
-
-	return nullptr;
+	return TypeBridgeMakeGenericTypeFn != nullptr && InGeneric != nullptr && InType != nullptr
+		       ? FReflectionRegistry::Get().GetClass(
+			       SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeMakeGenericTypeFn, InGeneric->GetManagedClass(),
+			                            InType->GetManagedClass()))
+		       : nullptr;
 }
 
 FClassReflection* SCRIPT_DOMAIN_TYPE::MakeGenericType(const FClassReflection* InGeneric,
                                                       const FClassReflection* InKeyType,
                                                       const FClassReflection* InValueType)
 {
-	if (InGeneric != nullptr && InKeyType != nullptr && InValueType != nullptr)
-	{
-		if (TypeBridgeMakeGenericType2Fn != nullptr)
-		{
-			return FReflectionRegistry::Get().GetClass(
-				TypeBridgeMakeGenericType2Fn(
-					InGeneric->GetManagedClass(),
-					InKeyType->GetManagedClass(),
-					InValueType->GetManagedClass()));
-		}
-	}
-
-	return nullptr;
+	return TypeBridgeMakeGenericType2Fn != nullptr &&
+	       InGeneric != nullptr && InKeyType != nullptr && InValueType != nullptr
+		       ? FReflectionRegistry::Get().GetClass(
+			       SCRIPT_DOMAIN_INVOKE(IManagedHandle, TypeBridgeMakeGenericType2Fn, InGeneric->GetManagedClass(),
+			                            InKeyType->GetManagedClass(), InValueType->GetManagedClass()))
+		       : nullptr;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_INVOKE
 IManagedHandle SCRIPT_DOMAIN_TYPE::Invoke(const IManagedHandle InManagedHandle, const IManagedHandle InManagedMethod,
                                           const int32 InParamCount, void** InParams)
 {
-	if (IManagedHandleIsValid(InManagedMethod))
-	{
-		if (MethodBridgeInvokeFn != nullptr)
-		{
-			return MethodBridgeInvokeFn(
-				InManagedHandle,
-				InManagedMethod,
-				InParamCount,
-				reinterpret_cast<IManagedHandle*>(InParams));
-		}
-	}
-
-	return InvalidManagedHandle;
+	return IManagedHandleIsValid(InManagedMethod) && MethodBridgeInvokeFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, MethodBridgeInvokeFn, InManagedHandle, InManagedMethod,
+		                              InParamCount, reinterpret_cast<IManagedHandle*>(InParams))
+		       : InvalidManagedHandle;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_IS_OVERRIDE
 bool SCRIPT_DOMAIN_TYPE::IsOverride(const IManagedHandle InManagedClass)
 {
-	if (UtilsIsOverrideFn != nullptr)
-	{
-		return UtilsIsOverrideFn(InManagedClass) != 0;
-	}
-
-	return false;
+	return UtilsIsOverrideFn != nullptr && SCRIPT_DOMAIN_INVOKE(int32, UtilsIsOverrideFn, InManagedClass) != 0;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASS_DESCRIPTOR
 void SCRIPT_DOMAIN_TYPE::GetClassDescriptor(const IManagedHandle InManagedClass, PTRINT* OutParams)
 {
 	if (UtilsGetClassDescriptorFn != nullptr)
 	{
-		UtilsGetClassDescriptorFn(InManagedClass, OutParams);
+		SCRIPT_DOMAIN_INVOKE(void, UtilsGetClassDescriptorFn, InManagedClass, OutParams);
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASS_PROPERTIES
 void SCRIPT_DOMAIN_TYPE::GetClassProperties(const IManagedHandle InManagedClass, PTRINT* OutParams)
 {
 	if (UtilsGetClassPropertiesFn != nullptr)
 	{
-		UtilsGetClassPropertiesFn(InManagedClass, OutParams);
+		SCRIPT_DOMAIN_INVOKE(void, UtilsGetClassPropertiesFn, InManagedClass, OutParams);
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASS_FIELDS
 void SCRIPT_DOMAIN_TYPE::GetClassFields(const IManagedHandle InManagedClass, PTRINT* OutParams)
 {
 	if (UtilsGetClassFieldsFn != nullptr)
 	{
-		UtilsGetClassFieldsFn(InManagedClass, OutParams);
+		SCRIPT_DOMAIN_INVOKE(void, UtilsGetClassFieldsFn, InManagedClass, OutParams);
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASS_METHODS
 void SCRIPT_DOMAIN_TYPE::GetClassMethods(const IManagedHandle InManagedClass, PTRINT* OutParams)
 {
 	if (UtilsGetClassMethodsFn != nullptr)
 	{
-		UtilsGetClassMethodsFn(InManagedClass, OutParams);
+		SCRIPT_DOMAIN_INVOKE(void, UtilsGetClassMethodsFn, InManagedClass, OutParams);
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_IS_INITIALIZED
 bool SCRIPT_DOMAIN_TYPE::IsInitialized() const
 {
 	return bIsInitialized;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_ASSEMBLIES
 TArray<IManagedHandle> SCRIPT_DOMAIN_TYPE::GetAssemblies() const
 {
 	return Assemblies;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_GET_CLASSES_WITH_ATTRIBUTE
 TArray<FClassReflection*> SCRIPT_DOMAIN_TYPE::GetClassesWithAttribute(const FClassReflection* InClass,
                                                                       const IManagedHandle InManagedHandle)
 {
@@ -576,7 +580,9 @@ TArray<FClassReflection*> SCRIPT_DOMAIN_TYPE::GetClassesWithAttribute(const FCla
 
 	return Result;
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_LOG
 void SCRIPT_DOMAIN_TYPE::RegisterLog()
 {
 	if (LogBridgeSetLogFn != nullptr)
@@ -589,7 +595,9 @@ void SCRIPT_DOMAIN_TYPE::RegisterLog()
 		LogBridgeInitializeFn();
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
 void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 {
 	if (MethodBridgeRegisterBindingFn != nullptr)
@@ -623,7 +631,9 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), MethodNames.Num());
 	}
 }
+#endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_SYNCHRONIZATION_CONTEXT_TICK
 void SCRIPT_DOMAIN_TYPE::RegisterSynchronizationContextTick()
 {
 	if (TypeBridgeGetFunctionPointerFn != nullptr)
@@ -636,3 +646,7 @@ void SCRIPT_DOMAIN_TYPE::RegisterSynchronizationContextTick()
 			reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>(*FUNCTION_SYNCHRONIZATION_CONTEXT_TICK).Get())));
 	}
 }
+#endif
+
+#undef SCRIPT_DOMAIN_STRING_CAST
+#undef SCRIPT_DOMAIN_INVOKE

@@ -19,6 +19,9 @@
 #include "Dynamic/FDynamicStructGenerator.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
+#if WITH_CORECLR
+#include "Domain/CoreCLR/FCoreCLRFunctionLibrary.h"
+#endif
 #include "UEVersion.h"
 #if WITH_EDITOR
 #if UE_SET_HANDLE_INFORMATION
@@ -1023,15 +1026,11 @@ FString FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 
 FString FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath()
 {
-#if WITH_EDITOR
+#if !WITH_EDITOR && WITH_CORECLR
 	return FPaths::ConvertRelativePathToFull(
-		FUnrealCSharpFunctionLibrary::GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
-#elif WITH_MONO
-	return FPaths::ConvertRelativePathToFull(
-		FUnrealCSharpFunctionLibrary::GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
+		FCoreCLRFunctionLibrary::GetCoreCLRDirectory() / (INTEROP_NAME + DLL_SUFFIX));
 #else
-	return FPaths::ConvertRelativePathToFull(
-		FPaths::GetPath(FPlatformProcess::ExecutablePath()) / (INTEROP_NAME + DLL_SUFFIX));
+	return FPaths::ConvertRelativePathToFull(GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
 #endif
 }
 

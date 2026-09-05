@@ -1,5 +1,6 @@
 #include "Reflection/Class/FClassDescriptor.h"
 #include "CoreMacro/PropertyMacro.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
 
@@ -31,30 +32,24 @@ void FClassDescriptor::Initialize()
 
 void FClassDescriptor::Deinitialize()
 {
-	if (const auto FoundClass = Cast<UClass>(Struct))
+	const auto FoundClass = Cast<UClass>(Struct);
+
+	if (FoundClass != nullptr)
 	{
 		FoundClass->ClearFunctionMapsCaches();
-
-		if (Class != nullptr && IManagedHandleIsValid(Class->GetManagedClass()))
-		{
-			void* InParams[] = {nullptr};
-
-			if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_CLASS_SINGLETON))
-			{
-				FoundProperty->SetValue(InvalidManagedHandle, InParams);
-			}
-		}
 	}
-	else
-	{
-		if (Class != nullptr && IManagedHandleIsValid(Class->GetManagedClass()))
-		{
-			void* InParams[] = {nullptr};
 
-			if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_STRUCT_SINGLETON))
-			{
-				FoundProperty->SetValue(InvalidManagedHandle, InParams);
-			}
+	if (Class != nullptr && IManagedHandleIsValid(Class->GetManagedClass()))
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			uint32 Value{};
+
+			ScriptDomain->SetFieldStaticValue(Class->GetManagedClass(),
+			                                  FoundClass != nullptr
+				                                  ? PROPERTY_STATIC_CLASS_SINGLETON_BACKING_FIELD
+				                                  : PROPERTY_STATIC_STRUCT_SINGLETON_BACKING_FIELD,
+			                                  &Value);
 		}
 	}
 

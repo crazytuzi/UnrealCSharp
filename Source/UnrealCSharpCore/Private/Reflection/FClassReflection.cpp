@@ -2,7 +2,6 @@
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Template/TGetArrayLength.inl"
@@ -508,17 +507,6 @@ void FClassReflection::Deinitialize()
 	{
 		if (const auto ScriptDomain = IScriptDomain::Get())
 		{
-			if (bMethodsLoaded && !bIsEnum)
-			{
-				uint32 Value{};
-
-				ScriptDomain->SetFieldStaticValue(ManagedClass,
-				                                  bIsClass
-					                                  ? PROPERTY_STATIC_CLASS_SINGLETON
-					                                  : PROPERTY_STATIC_STRUCT_SINGLETON,
-				                                  &Value);
-			}
-
 			ScriptDomain->Free(ManagedClass);
 		}
 
@@ -761,7 +749,7 @@ IManagedHandle FClassReflection::BoxValue(void* InValue) const
 
 	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		return ScriptDomain->BoxValue(NameSpace, Name, InValue);
+		return ScriptDomain->BoxValue(Name, InValue);
 	}
 
 	return InvalidManagedHandle;

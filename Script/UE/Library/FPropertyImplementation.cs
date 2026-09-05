@@ -2,66 +2,38 @@ using Interop;
 
 namespace Script.Library
 {
-    public static unsafe class FPropertyImplementation
+    public static unsafe partial class FPropertyImplementation
     {
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FProperty_GetObjectPropertyImplementation;
+        private static unsafe partial void __FProperty_GetObjectPropertyImplementation(nint InDelegate, uint InPropertyHash, byte* ReturnBuffer);
 
-        public static void FProperty_GetObjectPropertyImplementation(nint InMonoObject, uint InPropertyHash,
+        public static void FProperty_GetObjectPropertyImplementation(nint InDelegate, uint InPropertyHash,
             byte* ReturnBuffer)
         {
-            if (__FProperty_GetObjectPropertyImplementation == null)
-            {
-                __FProperty_GetObjectPropertyImplementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FPropertyImplementation::FProperty_GetObjectPropertyImplementation");
-            }
-
-            __FProperty_GetObjectPropertyImplementation(InMonoObject, InPropertyHash, ReturnBuffer);
+            __FProperty_GetObjectPropertyImplementation(InDelegate, InPropertyHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FProperty_SetObjectPropertyImplementation;
+        private static unsafe partial void __FProperty_SetObjectPropertyImplementation(nint InDelegate, uint InPropertyHash, byte* InBuffer);
 
-        public static void FProperty_SetObjectPropertyImplementation(nint InMonoObject, uint InPropertyHash,
+        public static void FProperty_SetObjectPropertyImplementation(nint InDelegate, uint InPropertyHash,
             byte* InBuffer)
         {
-            if (__FProperty_SetObjectPropertyImplementation == null)
-            {
-                __FProperty_SetObjectPropertyImplementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FPropertyImplementation::FProperty_SetObjectPropertyImplementation");
-            }
-
-            __FProperty_SetObjectPropertyImplementation(InMonoObject, InPropertyHash, InBuffer);
+            __FProperty_SetObjectPropertyImplementation(InDelegate, InPropertyHash, InBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FProperty_GetStructPropertyImplementation;
+        private static unsafe partial void __FProperty_GetStructPropertyImplementation(nint InDelegate, uint InPropertyHash, byte* ReturnBuffer);
 
-        public static void FProperty_GetStructPropertyImplementation(nint InMonoObject, uint InPropertyHash,
+        public static void FProperty_GetStructPropertyImplementation(nint InDelegate, uint InPropertyHash,
             byte* ReturnBuffer)
         {
-            if (__FProperty_GetStructPropertyImplementation == null)
-            {
-                __FProperty_GetStructPropertyImplementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FPropertyImplementation::FProperty_GetStructPropertyImplementation");
-            }
-
-            __FProperty_GetStructPropertyImplementation(InMonoObject, InPropertyHash, ReturnBuffer);
+            __FProperty_GetStructPropertyImplementation(InDelegate, InPropertyHash, ReturnBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FProperty_SetStructPropertyImplementation;
+        private static unsafe partial void __FProperty_SetStructPropertyImplementation(nint InDelegate, uint InPropertyHash, byte* InBuffer);
 
-        public static void FProperty_SetStructPropertyImplementation(nint InMonoObject, uint InPropertyHash,
+        public static void FProperty_SetStructPropertyImplementation(nint InDelegate, uint InPropertyHash,
             byte* InBuffer)
         {
-            if (__FProperty_SetStructPropertyImplementation == null)
-            {
-                __FProperty_SetStructPropertyImplementation = (delegate* unmanaged[Cdecl]<nint, uint, byte*, void>)
-                    MethodBridge.GetMethod(
-                        "Script.Library.FPropertyImplementation::FProperty_SetStructPropertyImplementation");
-            }
-
-            __FProperty_SetStructPropertyImplementation(InMonoObject, InPropertyHash, InBuffer);
+            __FProperty_SetStructPropertyImplementation(InDelegate, InPropertyHash, InBuffer);
         }
     }
 }
