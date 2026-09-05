@@ -101,6 +101,34 @@ namespace
 			}
 		}
 
+		static void PrimitiveCall5Implementation(const IManagedHandle InManagedHandle,
+		                                         const uint32 InFunctionHash, OUT_BUFFER_SIGNATURE,
+		                                         RETURN_BUFFER_SIGNATURE)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
+			{
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
+				{
+					FunctionDescriptor->Call5<EFunctionReturnType::Primitive>(FoundObject, OUT_BUFFER, RETURN_BUFFER);
+				}
+			}
+		}
+
+		static void CompoundCall5Implementation(const IManagedHandle InManagedHandle,
+		                                        const uint32 InFunctionHash, OUT_BUFFER_SIGNATURE,
+		                                        RETURN_BUFFER_SIGNATURE)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
+			{
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
+				{
+					FunctionDescriptor->Call5<EFunctionReturnType::Compound>(FoundObject, OUT_BUFFER, RETURN_BUFFER);
+				}
+			}
+		}
+
 		static void GenericCall6Implementation(const IManagedHandle InManagedHandle,
 		                                       const uint32 InFunctionHash, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE)
 		{
@@ -329,6 +357,8 @@ namespace
 				.Function("PrimitiveCall3", PrimitiveCall3Implementation)
 				.Function("CompoundCall3", CompoundCall3Implementation)
 				.Function("GenericCall4", GenericCall4Implementation)
+				.Function("PrimitiveCall5", PrimitiveCall5Implementation)
+				.Function("CompoundCall5", CompoundCall5Implementation)
 				.Function("GenericCall6", GenericCall6Implementation)
 				.Function("PrimitiveCall7", PrimitiveCall7Implementation)
 				.Function("CompoundCall7", CompoundCall7Implementation)
