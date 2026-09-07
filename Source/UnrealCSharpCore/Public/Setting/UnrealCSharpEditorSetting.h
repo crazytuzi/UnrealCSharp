@@ -65,6 +65,12 @@ public:
 
 	bool EnableDirectoryChanged() const;
 
+	bool EnableCompileOnBlueprintCompiled() const;
+
+	bool EnableCompileDirtyBlueprintsPreBeginPIE() const;
+
+	bool EnableCompilePreBeginPIE() const;
+
 	bool IsSkipGenerateEngineModules() const;
 
 	bool IsGenerateAllModules() const;
@@ -117,6 +123,15 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableDirectoryChanged;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompileOnBlueprintCompiled;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompileDirtyBlueprintsPreBeginPIE;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompilePreBeginPIE;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bIsSkipGenerateEngineModules;

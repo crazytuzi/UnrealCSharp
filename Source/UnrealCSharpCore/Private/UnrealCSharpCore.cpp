@@ -22,6 +22,8 @@ void FUnrealCSharpCoreModule::SetActive(const bool InbIsActive)
 	{
 		bIsActive = InbIsActive;
 
+		bIsReloadPending = false;
+
 		if (InbIsActive)
 		{
 			FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleActive.Broadcast();
@@ -31,6 +33,11 @@ void FUnrealCSharpCoreModule::SetActive(const bool InbIsActive)
 			FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleInActive.Broadcast();
 		}
 	}
+}
+
+void FUnrealCSharpCoreModule::RequestReload()
+{
+	bIsReloadPending = bIsActive;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -93,7 +93,6 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 	const auto bIsStatic = (FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static) != 0;
 
-	// Objects created before the C# environment was activated (e.g. design-time SetActive) have no managed counterpart yet
 	const auto ManagedHandle = bIsStatic
 		                           ? InvalidManagedHandle
 		                           : FCSharpEnvironment::GetEnvironment().Bind(InContext);

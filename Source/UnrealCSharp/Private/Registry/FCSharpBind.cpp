@@ -16,7 +16,10 @@ TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 static void AddCallCSharpNativeFunction(UClass* InClass, const FName InFunctionName)
 {
 	if (!InClass->NativeFunctionLookupTable.ContainsByPredicate(
-		[InFunctionName](const FNativeFunctionLookup& InLookup) { return InLookup.Name == InFunctionName; }))
+		[InFunctionName](const FNativeFunctionLookup& InLookup)
+		{
+			return InLookup.Name == InFunctionName;
+		}))
 	{
 		InClass->AddNativeFunction(*InFunctionName.ToString(), &UCSharpFunction::execCallCSharp);
 	}

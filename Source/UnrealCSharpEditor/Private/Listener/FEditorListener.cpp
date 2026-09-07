@@ -1,14 +1,20 @@
 #include "Listener/FEditorListener.h"
+#include "Widgets/SCompileProgressDialog.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Kismet2/KismetEditorUtilities.h"
-#include "Misc/ScopedSlowTask.h"
 #include "UObject/UObjectIterator.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
 #include "HAL/PlatformFileManager.h"
 #include "HAL/ThreadHeartBeat.h"
 #include "HAL/ThreadManager.h"
+#include "RenderingThread.h"
+#include "Rendering/SlateRenderer.h"
+#include "RHI.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/SNullWidget.h"
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
@@ -41,6 +47,8 @@ FEditorListener::FEditorListener():
 
 		OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
 
+		OnEndPIEDelegateHandle = FEditorDelegates::EndPIE.AddRaw(this, &FEditorListener::OnEndPIE);
+
 		OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIE);
 
 		OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
@@ -51,6 +59,19 @@ FEditorListener::FEditorListener():
 
 		OnCompileDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnCompile.AddRaw(
 			this, &FEditorListener::OnCompile);
+
+		if (GEditor != nullptr)
+		{
+			if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+				UUnrealCSharpEditorSetting>())
+			{
+				if (UnrealCSharpEditorSetting->EnableCompileOnBlueprintCompiled())
+				{
+					OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled().AddRaw(
+						this, &FEditorListener::OnBlueprintCompiled);
+				}
+			}
+		}
 
 		const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<
 			FAssetRegistryModule>(TEXT("AssetRegistry"));
@@ -65,9 +86,7 @@ FEditorListener::FEditorListener():
 		auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 			TEXT("DirectoryWatcher"));
 
-		const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
-
-		for (const auto& Directory : ChangedDirectories)
+		for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 		{
 			DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
 				Directory,
@@ -83,17 +102,9 @@ FEditorListener::~FEditorListener()
 {
 	if (!IsRunningCookCommandlet())
 	{
-		if (GEditor != nullptr)
+		if (OnBlueprintCompiledDelegateHandle.IsValid() && GEditor != nullptr)
 		{
-			if (OnBlueprintCompiledDelegateHandle.IsValid())
-			{
-				GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
-			}
-
-			if (OnBlueprintPreCompileDelegateHandle.IsValid())
-			{
-				GEditor->OnBlueprintPreCompile().Remove(OnBlueprintPreCompileDelegateHandle);
-			}
+			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
 		}
 
 		if (OnDirectoryChangedDelegateHandle.IsValid())
@@ -101,9 +112,7 @@ FEditorListener::~FEditorListener()
 			auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 				TEXT("DirectoryWatcher"));
 
-			const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
-
-			for (const auto& Directory : ChangedDirectories)
+			for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 			{
 				DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
 					Directory, OnDirectoryChangedDelegateHandle);
@@ -148,6 +157,11 @@ FEditorListener::~FEditorListener()
 			FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
 		}
 
+		if (OnEndPIEDelegateHandle.IsValid())
+		{
+			FEditorDelegates::EndPIE.Remove(OnEndPIEDelegateHandle);
+		}
+
 		if (OnPreBeginPIEDelegateHandle.IsValid())
 		{
 			FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
@@ -169,152 +183,28 @@ void FEditorListener::OnPostEngineInit()
 	FCodeAnalysis::CodeAnalysis();
 
 	FDynamicGenerator::CodeAnalysisGenerator();
-
-	if (GEditor != nullptr)
-	{
-		OnBlueprintPreCompileDelegateHandle = GEditor->OnBlueprintPreCompile().AddRaw(
-			this, &FEditorListener::OnBlueprintPreCompile);
-
-		OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled().AddRaw(
-			this, &FEditorListener::OnBlueprintCompiled);
-	}
-}
-
-void FEditorListener::OnBlueprintPreCompile(UBlueprint* InBlueprint)
-{
-	if (InBlueprint == nullptr || PendingCompiledBlueprints.Contains(InBlueprint))
-	{
-		return;
-	}
-
-	if (IsStillLoading(InBlueprint) || IsStillLoading(InBlueprint->GeneratedClass))
-	{
-		return;
-	}
-
-	PendingCompiledBlueprints.Add(InBlueprint, GetClassSignature(InBlueprint->GeneratedClass));
-}
-
-bool FEditorListener::IsStillLoading(const UObject* InObject)
-{
-	return InObject != nullptr &&
-		(InObject->HasAnyFlags(RF_NeedLoad | RF_NeedPostLoad) ||
-		 InObject->HasAnyInternalFlags(EInternalObjectFlags_AsyncLoading));
-}
-
-void FEditorListener::OnBlueprintCompiled()
-{
-	if (!bIsPIEPlaying && !bIsPreparingPIE && !bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
-	{
-		GeneratePendingCompiledBlueprints();
-
-		if (FCSharpCompiler::Get().IsCompiling())
-		{
-			return;
-		}
-
-		if (!FileChanges.IsEmpty())
-		{
-			FCSharpCompiler::Get().Compile(FileChanges);
-
-			FileChanges.Reset();
-		}
-		else if (IsScriptOutOfDate())
-		{
-			FCSharpCompiler::Get().Compile();
-		}
-	}
-}
-
-bool FEditorListener::IsScriptOutOfDate()
-{
-	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-
-	for (const auto& AssemblyPath : FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath())
-	{
-		if (!PlatformFile.FileExists(*AssemblyPath))
-		{
-			return true;
-		}
-	}
-
-	const auto BuildStampPath = FUnrealCSharpFunctionLibrary::GetBuildStampPath();
-
-	if (!PlatformFile.FileExists(*BuildStampPath))
-	{
-		return true;
-	}
-
-	const auto BuildStampTime = PlatformFile.GetTimeStamp(*BuildStampPath);
-
-	auto bNeedsCompile = false;
-
-	for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
-	{
-		PlatformFile.IterateDirectoryRecursively(
-			*Directory,
-			[&](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
-			{
-				if (!bIsDirectory && FPaths::GetExtension(InFilenameOrDirectory) == TEXT("cs"))
-				{
-					FString NormalizedPath(InFilenameOrDirectory);
-
-					NormalizedPath.ReplaceInline(TEXT("\\"), TEXT("/"));
-
-					if (NormalizedPath.Contains(TEXT("/obj/")) || NormalizedPath.Contains(TEXT("/bin/")))
-					{
-						return true;
-					}
-
-					if (PlatformFile.GetTimeStamp(InFilenameOrDirectory) > BuildStampTime)
-					{
-						bNeedsCompile = true;
-
-						return false;
-					}
-				}
-
-				return true;
-			});
-
-		if (bNeedsCompile)
-		{
-			break;
-		}
-	}
-
-	return bNeedsCompile;
 }
 
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 {
-	bIsPreparingPIE = true;
-	bool bBpCompile = false;
-	for (TObjectIterator<UBlueprint> It; It; ++It)
+	TGuardValue<bool> Guard(bIsPreparingPIE, true);
+
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
-		if (It->Status == BS_Dirty && !It->bBeingCompiled)
+		if (UnrealCSharpEditorSetting->EnableCompileDirtyBlueprintsPreBeginPIE())
 		{
-			FKismetEditorUtilities::CompileBlueprint(*It, EBlueprintCompileOptions::SkipGarbageCollection);
-			bBpCompile = true;
+			CompileDirtyBlueprints();
+
+			if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+			{
+				CompileChangedBlueprints();
+			}
 		}
-	}
 
-	if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling() && bBpCompile)
-	{
-		GeneratePendingCompiledBlueprints();
-
-		if (!FCSharpCompiler::Get().IsCompiling() && IsScriptOutOfDate())
+		if (UnrealCSharpEditorSetting->EnableCompilePreBeginPIE())
 		{
-			if (!FileChanges.IsEmpty())
-			{
-				FCSharpCompiler::Get().Compile(FileChanges);
-
-				FileChanges.Reset();
-			}
-			else
-			{
-				FCSharpCompiler::Get().Compile();
-			}
+			RequestCompile();
 		}
 	}
 
@@ -322,43 +212,10 @@ void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 
 	if (FCSharpCompiler::Get().IsCompiling())
 	{
-		FScopedSlowTask SlowTask(1.0f, NSLOCTEXT("UnrealCSharp", "WaitingForCSharpCompile",
-		                                         "Compiling C# scripts, PIE will start automatically when finished..."));
-		SlowTask.MakeDialog();
-
-		auto LastFraction = 0.0f;
-
-		while (FCSharpCompiler::Get().IsCompiling())
-		{
-			FString ProgressMessage;
-
-			auto Fraction = 0.0f;
-
-			FCSharpCompiler::Get().GetCompileProgress(ProgressMessage, Fraction);
-
-			const auto DeltaFraction = FMath::Max(0.0f, Fraction - LastFraction);
-
-			LastFraction = FMath::Max(LastFraction, Fraction);
-
-			SlowTask.EnterProgressFrame(DeltaFraction,
-			                            ProgressMessage.IsEmpty()
-				                            ? FText::GetEmpty()
-				                            : FText::FromString(ProgressMessage));
-
-			FThreadHeartBeat::Get().HeartBeat();
-
-			FPlatformProcess::SleepNoStats(0.0001f);
-
-			FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
-
-			FThreadManager::Get().Tick();
-
-			FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
-		}
+		WaitForCompile();
 	}
 
 	FEngineListener::OnPreBeginPIE(bIsSimulating);
-	bIsPreparingPIE = false;
 }
 
 void FEditorListener::OnPrePIEEnded(const bool bIsSimulating)
@@ -366,11 +223,17 @@ void FEditorListener::OnPrePIEEnded(const bool bIsSimulating)
 	FDynamicGenerator::OnPrePIEEnded(bIsSimulating);
 }
 
+void FEditorListener::OnEndPIE(const bool)
+{
+	bIsPIEPlaying = false;
+}
+
 void FEditorListener::OnCancelPIE()
 {
 	FEngineListener::OnCancelPIE();
 
 	bIsPreparingPIE = false;
+
 	bIsPIEPlaying = false;
 }
 
@@ -424,6 +287,24 @@ void FEditorListener::OnEndGenerator()
 	bIsGenerating = false;
 
 	FileChanges.Reset();
+
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		if (UnrealCSharpEditorSetting->EnableCompileOnBlueprintCompiled())
+		{
+			for (TObjectIterator<UBlueprint> Iterator; Iterator; ++Iterator)
+			{
+				if (const auto Blueprint = *Iterator)
+				{
+					if (Blueprint->GeneratedClass != nullptr)
+					{
+						CrcCompiledSignatures.Add(FSoftObjectPath(Blueprint), Blueprint->CrcLastCompiledSignature);
+					}
+				}
+			}
+		}
+	}
 }
 
 void FEditorListener::OnCompile(const TArray<FFileChangeData>& InFileChangeData)
@@ -510,17 +391,15 @@ void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow>, boo
 		AddRaw(this, &FEditorListener::OnApplicationActivationStateChanged);
 }
 
-void FEditorListener::OnApplicationActivationStateChanged(const bool IsActive)
+void FEditorListener::OnApplicationActivationStateChanged(const bool bIsActive)
 {
-	if (IsActive)
+	if (bIsActive)
 	{
 		if (!FileChanges.IsEmpty())
 		{
 			if (!bIsPIEPlaying && !bIsGenerating)
 			{
-				FCSharpCompiler::Get().Compile(FileChanges);
-
-				FileChanges.Reset();
+				Compile();
 			}
 		}
 	}
@@ -543,7 +422,7 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 
 				for (const auto& FileChange : InFileChanges)
 				{
-					if (FPaths::GetExtension(FileChange.Filename) == TEXT("cs"))
+					if (FPaths::GetExtension(FileChange.Filename) == CSHARP_SUFFIX.RightChop(1))
 					{
 						auto bIsIgnored = false;
 
@@ -577,6 +456,69 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 	}
 }
 
+void FEditorListener::OnBlueprintCompiled()
+{
+	if (bIsPIEPlaying || bIsPreparingPIE || bIsGenerating || FCSharpCompiler::Get().IsCompiling())
+	{
+		return;
+	}
+
+	CompileChangedBlueprints();
+}
+
+void FEditorListener::CompileChangedBlueprints()
+{
+	FGeneratorCore::BeginGenerator(false);
+
+	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+
+	for (TObjectIterator<UBlueprint> Iterator; Iterator; ++Iterator)
+	{
+		if (const auto Blueprint = *Iterator)
+		{
+			if (Blueprint->GeneratedClass != nullptr)
+			{
+				if (const auto AssetData = FAssetData(Blueprint);
+					FGeneratorCore::IsSupported(AssetData))
+				{
+					const auto SoftObjectPath = FSoftObjectPath(Blueprint);
+
+					const auto CrcLastCompiledSignature = Blueprint->CrcLastCompiledSignature;
+
+					const auto CrcCompiledSignature = CrcCompiledSignatures.Find(SoftObjectPath);
+
+					if (CrcCompiledSignature == nullptr)
+					{
+						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
+
+						if (!IFileManager::Get().FileExists(
+							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
+						{
+							FAssetGenerator::Generator(AssetData);
+						}
+
+						continue;
+					}
+
+					if (*CrcCompiledSignature != CrcLastCompiledSignature)
+					{
+						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
+
+						FAssetGenerator::Generator(AssetData);
+					}
+				}
+			}
+		}
+	}
+
+	FGeneratorCore::EndGenerator(false);
+
+	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+	{
+		Compile();
+	}
+}
+
 void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunction<void()>& InGenerator) const
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
@@ -606,180 +548,195 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 	}
 }
 
-void FEditorListener::GeneratePendingCompiledBlueprints()
+void FEditorListener::CompileDirtyBlueprints()
 {
-	if (PendingCompiledBlueprints.IsEmpty())
+	for (TObjectIterator<UBlueprint> Blueprint; Blueprint; ++Blueprint)
 	{
-		return;
-	}
-
-	TMap<TWeakObjectPtr<UBlueprint>, FString> Blueprints;
-
-	Swap(Blueprints, PendingCompiledBlueprints);
-
-	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-		UUnrealCSharpEditorSetting>())
-	{
-		if (!UnrealCSharpEditorSetting->EnableAssetChanged())
+		if (Blueprint->Status == BS_Dirty && !Blueprint->bBeingCompiled)
 		{
-			return;
+			FKismetEditorUtilities::CompileBlueprint(
+				*Blueprint, EBlueprintCompileOptions::SkipGarbageCollection);
+		}
+	}
+}
+
+bool FEditorListener::IsCompileRequired() const
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	auto bNeedCompile = false;
+
+	const auto PublishDirectory = FUnrealCSharpFunctionLibrary::GetFullPublishDirectory();
+
+	const auto InteropAssemblyPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
+
+	auto FallbackTimestamp = FDateTime::MaxValue();
+
+	for (const auto& AssemblyPath : FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath())
+	{
+		if (!PlatformFile.FileExists(*AssemblyPath))
+		{
+			return true;
+		}
+
+		if (!FPaths::IsSamePath(AssemblyPath, InteropAssemblyPath))
+		{
+			FallbackTimestamp = FMath::Min(FallbackTimestamp, PlatformFile.GetTimeStamp(*AssemblyPath));
 		}
 	}
 
-	TArray<UBlueprint*> ChangedBlueprints;
-
-	for (const auto& [Blueprint, PreviousSignature] : Blueprints)
+	for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 	{
-		if (Blueprint.IsValid() && Blueprint->GeneratedClass != nullptr && Blueprint->GetOutermost() != GetTransientPackage())
-		{
-			if (GetClassSignature(Blueprint->GeneratedClass) != PreviousSignature)
+		const auto AssemblyPath = PublishDirectory / FPaths::GetCleanFilename(Directory) + DLL_SUFFIX;
+
+		const auto AssemblyTimestamp = PlatformFile.FileExists(*AssemblyPath)
+			                               ? PlatformFile.GetTimeStamp(*AssemblyPath)
+			                               : FallbackTimestamp;
+
+		PlatformFile.IterateDirectoryRecursively(
+			*Directory,
+			[&](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
 			{
-				ChangedBlueprints.Add(Blueprint.Get());
-			}
-		}
-	}
+				if (!bIsDirectory &&
+					FPaths::GetExtension(InFilenameOrDirectory) == CSHARP_SUFFIX.RightChop(1) &&
+					PlatformFile.GetTimeStamp(InFilenameOrDirectory) > AssemblyTimestamp)
+				{
+					bNeedCompile = true;
 
-	if (ChangedBlueprints.IsEmpty())
-	{
-		return;
-	}
+					return false;
+				}
 
-	FGeneratorCore::BeginGenerator(false);
+				return true;
+			});
 
-	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
-
-	for (const auto Blueprint : ChangedBlueprints)
-	{
-		if (const FAssetData AssetData(Blueprint); FGeneratorCore::IsSupported(AssetData))
+		if (bNeedCompile)
 		{
-			FAssetGenerator::Generator(AssetData);
+			break;
 		}
 	}
 
-	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+	return bNeedCompile;
+}
+
+void FEditorListener::RequestCompile()
+{
+	if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling() && IsCompileRequired())
+	{
+		Compile();
+	}
+}
+
+void FEditorListener::Compile()
+{
+	if (!FileChanges.IsEmpty())
+	{
+		FCSharpCompiler::Get().Compile(FileChanges);
+
+		FileChanges.Reset();
+	}
+	else
 	{
 		FCSharpCompiler::Get().Compile();
 	}
-
-	FGeneratorCore::EndGenerator(false);
 }
 
-static void AppendPropertyType(FStringBuilderBase& InBuilder, const FProperty* InProperty)
+void FEditorListener::TickProgressWindow(const TSharedPtr<SWindow>& InWindow)
 {
-	if (InProperty == nullptr)
+	if (InWindow.IsValid() && !FSlateApplication::Get().IsTicking())
 	{
-		InBuilder << TEXT("null");
+		FPlatformMisc::PumpMessagesForSlowTask();
 
-		return;
-	}
+		FSlateApplication::Get().Tick();
 
-	const auto AppendObjectName = [&InBuilder](const UObject* InObject)
-	{
-		if (InObject != nullptr)
+		if (GIsRHIInitialized)
 		{
-			InBuilder << TEXT('<') << InObject->GetFName() << TEXT('>');
+			ENQUEUE_RENDER_COMMAND(CompileWaitEndFrame)([](FRHICommandListImmediate& RHICmdList)
+			{
+				RHICmdList.EndFrame();
+			});
 		}
-		else
-		{
-			InBuilder << TEXT("<null>");
-		}
-	};
 
-	InBuilder << InProperty->GetClass()->GetFName();
-
-	if (const auto DelegateProperty = CastField<FDelegateProperty>(InProperty))
-	{
-		AppendObjectName(DelegateProperty->SignatureFunction);
-	}
-	else if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(InProperty))
-	{
-		AppendObjectName(MulticastDelegateProperty->SignatureFunction);
-	}
-	else if (const auto EnumProperty = CastField<FEnumProperty>(InProperty))
-	{
-		AppendObjectName(EnumProperty->GetEnum());
-	}
-	else if (const auto ByteProperty = CastField<FByteProperty>(InProperty))
-	{
-		AppendObjectName(ByteProperty->Enum);
-	}
-	else if (const auto StructProperty = CastField<FStructProperty>(InProperty))
-	{
-		AppendObjectName(StructProperty->Struct);
-	}
-	else if (const auto ClassProperty = CastField<FClassProperty>(InProperty))
-	{
-		AppendObjectName(ClassProperty->MetaClass);
-	}
-	else if (const auto SoftClassProperty = CastField<FSoftClassProperty>(InProperty))
-	{
-		AppendObjectName(SoftClassProperty->MetaClass);
-	}
-	else if (const auto ObjectProperty = CastField<FObjectPropertyBase>(InProperty))
-	{
-		AppendObjectName(ObjectProperty->PropertyClass);
-	}
-	else if (const auto InterfaceProperty = CastField<FInterfaceProperty>(InProperty))
-	{
-		AppendObjectName(InterfaceProperty->InterfaceClass);
-	}
-	else if (const auto ArrayProperty = CastField<FArrayProperty>(InProperty))
-	{
-		InBuilder << TEXT('<');
-		AppendPropertyType(InBuilder, ArrayProperty->Inner);
-		InBuilder << TEXT('>');
-	}
-	else if (const auto SetProperty = CastField<FSetProperty>(InProperty))
-	{
-		InBuilder << TEXT('<');
-		AppendPropertyType(InBuilder, SetProperty->ElementProp);
-		InBuilder << TEXT('>');
-	}
-	else if (const auto MapProperty = CastField<FMapProperty>(InProperty))
-	{
-		InBuilder << TEXT('<');
-		AppendPropertyType(InBuilder, MapProperty->KeyProp);
-		InBuilder << TEXT(',');
-		AppendPropertyType(InBuilder, MapProperty->ValueProp);
-		InBuilder << TEXT('>');
-	}
-	else if (const auto OptionalProperty = CastField<FOptionalProperty>(InProperty))
-	{
-		InBuilder << TEXT('<');
-		AppendPropertyType(InBuilder, OptionalProperty->GetValueProperty());
-		InBuilder << TEXT('>');
+		FSlateApplication::Get().GetRenderer()->Sync();
 	}
 }
 
-FString FEditorListener::GetClassSignature(const UClass* InClass)
+void FEditorListener::WaitForCompile()
 {
-	if (InClass == nullptr)
+	const auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
+
+	const auto ParentWindow = MainFrameModule.GetParentWindow();
+
+	TSharedPtr<SWindow> ProgressWindow;
+
+	TSharedPtr<SCompileProgressDialog> ProgressDialog;
+
+	if (FSlateApplication::Get().CanDisplayWindows())
 	{
-		return {};
-	}
-
-	TStringBuilder<1024> Builder;
-
-	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
-	{
-		Builder << It->GetFName() << TEXT(':');
-		AppendPropertyType(Builder, *It);
-		Builder << TEXT(';');
-	}
-
-	for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
-	{
-		Builder << It->GetFName() << TEXT('(');
-
-		for (TFieldIterator<FProperty> ParamIt(*It); ParamIt; ++ParamIt)
+		if (ParentWindow.IsValid())
 		{
-			Builder << ParamIt->GetFName() << TEXT(':');
-			AppendPropertyType(Builder, *ParamIt);
-			Builder << TEXT(',');
+			ProgressDialog = SNew(SCompileProgressDialog);
+
+			ProgressWindow = SNew(SWindow)
+				.SizingRule(ESizingRule::Autosized)
+				.AutoCenter(EAutoCenter::PreferredWorkArea)
+				.IsPopupWindow(true)
+				.CreateTitleBar(true)
+				.SupportsMaximize(false)
+				.SupportsMinimize(false)
+				.FocusWhenFirstShown(false)
+				.ActivationPolicy(EWindowActivationPolicy::Never);
+
+			ProgressWindow->SetContent(ProgressDialog.ToSharedRef());
+
+			FSlateApplication::Get().AddModalWindow(ProgressWindow.ToSharedRef(), ParentWindow, true);
+
+			ProgressWindow->ShowWindow();
+
+			TickProgressWindow(ProgressWindow);
+		}
+	}
+
+	const auto StartTime = FPlatformTime::Seconds();
+
+	auto LastTime = StartTime;
+
+	constexpr auto IntervalSecond = 1.0 / 60.0;
+
+	while (FCSharpCompiler::Get().IsCompiling())
+	{
+		FThreadHeartBeat::Get().HeartBeat();
+
+		if (const auto Now = FPlatformTime::Seconds();
+			ProgressWindow.IsValid() &&
+			ProgressDialog.IsValid() &&
+			Now - LastTime >= IntervalSecond)
+		{
+			LastTime = Now;
+
+			FString StatusMessage = FCSharpCompiler::Get().GetCompileProgress();
+
+			const auto ElapsedSeconds = static_cast<int32>(Now - StartTime);
+
+			ProgressDialog->UpdateProgress(StatusMessage, ElapsedSeconds);
+
+			TickProgressWindow(ProgressWindow);
 		}
 
-		Builder << TEXT(");");
+		FPlatformProcess::SleepNoStats(0.0005f);
+
+		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
+
+		FThreadManager::Get().Tick();
+
+		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
 	}
 
-	return Builder.ToString();
+	if (ProgressWindow.IsValid())
+	{
+		ProgressWindow->SetContent(SNullWidget::NullWidget);
+
+		ProgressWindow->RequestDestroyWindow();
+
+		TickProgressWindow(ProgressWindow);
+	}
 }

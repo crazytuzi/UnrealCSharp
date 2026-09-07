@@ -6,7 +6,6 @@
 
 FEngineListener::FEngineListener()
 {
-	// Always deactivate on exit so listeners registered via PIE or the SetActive console command are removed before UObject array shutdown
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 
 #if WITH_EDITOR
@@ -36,6 +35,12 @@ FEngineListener::~FEngineListener()
 #if WITH_EDITOR
 void FEngineListener::OnPreBeginPIE(const bool)
 {
+	if (auto& CoreModule = FUnrealCSharpCoreModule::Get();
+		CoreModule.IsReloadPending())
+	{
+		CoreModule.SetActive(false);
+	}
+
 	SetActive(true);
 }
 

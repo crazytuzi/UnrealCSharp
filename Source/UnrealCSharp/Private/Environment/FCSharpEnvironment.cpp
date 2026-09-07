@@ -340,8 +340,6 @@ void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 	if (InBlueprint != nullptr && InBlueprint->GeneratedClass != nullptr &&
 		GetClassDescriptor(InBlueprint->GeneratedClass) != nullptr)
 	{
-		// Restore the original functions before the reinstancer duplicates the class into REINST_,
-		// otherwise the copy carries FUNC_Native functions it cannot resolve
 		RemoveClassDescriptor(InBlueprint->GeneratedClass);
 
 		RecompilingClasses.AddUnique(InBlueprint->GeneratedClass);
@@ -350,7 +348,6 @@ void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 
 void FCSharpEnvironment::OnBlueprintCompiled()
 {
-	// The compiler purges and rebuilds the same UClass object, so the descriptor and injected functions must be recreated
 	for (const auto& RecompilingClass : RecompilingClasses)
 	{
 		if (const auto Class = RecompilingClass.Get())

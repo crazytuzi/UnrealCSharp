@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IDirectoryWatcher.h"
+#include "Containers/Ticker.h"
+#include "FCSharpCompileProgress.h"
 
 class FCSharpCompilerRunnable final : public FRunnable
 {
@@ -25,20 +27,23 @@ public:
 
 	bool IsCompiling() const;
 
-	void GetCompileProgress(FString& OutMessage, float& OutFraction) const;
+	FString GetCompileProgress() const;
 
 	void DoWork();
 
 	void ImmediatelyDoWork(bool bForceCompileInterop = false);
 
-	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false, bool bForceCompileInterop = false);
+	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false, bool bForceCompileInterop = false,
+	             bool bImmediatelyReload = false);
 
 private:
 	static FString GetBuildConfiguration();
 
-	void CompileInterop(bool bForceCompileInterop);
+	bool CompileInterop(bool bForceCompileInterop);
 
-	void Compile();
+	bool Compile();
+
+	void ShowCompileResultNotification(bool bSucceeded) const;
 
 private:
 	void OnBeginGenerator();
@@ -46,14 +51,11 @@ private:
 	void OnEndGenerator();
 
 private:
-	void ResetCompileProgress(const FString& InMessage);
-
-	void ParseCompileOutput(const FString& InOutput);
-
-private:
 	FDelegateHandle OnBeginGeneratorDelegateHandle;
 
 	FDelegateHandle OnEndGeneratorDelegateHandle;
+
+	FTSTicker::FDelegateHandle ProgressTickerHandle;
 
 	TQueue<bool> Tasks;
 
@@ -63,21 +65,13 @@ private:
 
 	FEvent* Event;
 
-	bool bIsCompiling;
+	std::atomic<bool> bIsCompiling;
 
 	bool bIsGenerating;
 
 	bool bIsStopped;
 
-	mutable FCriticalSection ProgressCriticalSection;
-
-	FString ProgressMessage;
-
-	FString ProgressOutputBuffer;
-
-	int32 CompletedProjectCount;
-
-	int32 TotalProjectCount;
+	FCSharpCompileProgress CompileProgress;
 
 	TSharedPtr<SNotificationItem> NotificationItem;
 };

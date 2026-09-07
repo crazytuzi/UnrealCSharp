@@ -23,6 +23,8 @@ public:
 private:
 	void OnPostEngineInit();
 
+	void OnEditorRefreshGameplayTagTree();
+
 private:
 	void RegisterMenus();
 
@@ -37,6 +39,8 @@ private:
 	TSharedPtr<class FUnrealCSharpBlueprintToolBar> UnrealCSharpBlueprintToolBar;
 
 	FDelegateHandle OnPostEngineInitDelegateHandle;
+
+	FDelegateHandle OnEditorRefreshGameplayTagTreeDelegateHandle;
 
 	TUniquePtr<FAutoConsoleCommand> CodeAnalysisConsoleCommand;
 

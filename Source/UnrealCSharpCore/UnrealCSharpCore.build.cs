@@ -98,7 +98,10 @@ public class UnrealCSharpCore : ModuleRules
 
 		AddExternalDependencies();
 
-		GeneratorModules();
+		if (Target.bBuildEditor)
+		{
+			GeneratorModules();
+		}
 
 		EnableExport();
 
@@ -154,11 +157,7 @@ public class UnrealCSharpCore : ModuleRules
 
 		GetPlugins(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/")), EnginePlugins);
 
-		// UBT may construct multiple targets concurrently. Write each target's
-		// result to a private file, then publish it in one filesystem operation.
-		var TempJsonFullFilename = JsonFullFilename + "." + System.Guid.NewGuid().ToString("N") + ".tmp";
-		using (var Writer = new JsonWriter(TempJsonFullFilename))
-		{
+		using var Writer = new JsonWriter(JsonFullFilename);
 
 		Writer.WriteObjectStart();
 
@@ -199,9 +198,6 @@ public class UnrealCSharpCore : ModuleRules
 		Writer.WriteObjectEnd();
 
 		Writer.WriteObjectEnd();
-		}
-
-		File.Move(TempJsonFullFilename, JsonFullFilename, true);
 	}
 
 	private void EnableExport()

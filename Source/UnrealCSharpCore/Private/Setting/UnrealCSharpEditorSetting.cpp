@@ -28,6 +28,9 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bEnableCompiled(true),
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
+	bEnableCompileOnBlueprintCompiled(true),
+	bEnableCompileDirtyBlueprintsPreBeginPIE(true),
+	bEnableCompilePreBeginPIE(true),
 	bIsSkipGenerateEngineModules(false),
 	bIsGenerateAllModules(true),
 	bIsGenerateAsset(true),
@@ -265,6 +268,21 @@ bool UUnrealCSharpEditorSetting::EnableAssetChanged() const
 bool UUnrealCSharpEditorSetting::EnableDirectoryChanged() const
 {
 	return bEnableDirectoryChanged;
+}
+
+bool UUnrealCSharpEditorSetting::EnableCompileOnBlueprintCompiled() const
+{
+	return bEnableCompileOnBlueprintCompiled;
+}
+
+bool UUnrealCSharpEditorSetting::EnableCompileDirtyBlueprintsPreBeginPIE() const
+{
+	return bEnableCompileDirtyBlueprintsPreBeginPIE;
+}
+
+bool UUnrealCSharpEditorSetting::EnableCompilePreBeginPIE() const
+{
+	return bEnableCompilePreBeginPIE;
 }
 
 bool UUnrealCSharpEditorSetting::IsSkipGenerateEngineModules() const

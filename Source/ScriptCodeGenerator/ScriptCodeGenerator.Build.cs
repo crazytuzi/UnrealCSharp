@@ -37,6 +37,7 @@ public class ScriptCodeGenerator : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"GameplayTags",
 				"Slate",
 				"SlateCore",
 				"UMGEditor",

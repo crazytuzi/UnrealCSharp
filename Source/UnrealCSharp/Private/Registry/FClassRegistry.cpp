@@ -122,7 +122,29 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
-		const auto ClassDescriptor = *FoundClassDescriptor;
+		for (auto Iterator = CSharpFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
+		for (auto Iterator = UnrealFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
+		for (auto Iterator = PropertyHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
 
 		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
 		{
@@ -134,31 +156,7 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 			}
 		}
 
-		for (auto It = CSharpFunctionHashMap.CreateIterator(); It; ++It)
-		{
-			if (std::get<0>(It->Value) == ClassDescriptor)
-			{
-				It.RemoveCurrent();
-			}
-		}
-
-		for (auto It = UnrealFunctionHashMap.CreateIterator(); It; ++It)
-		{
-			if (std::get<0>(It->Value) == ClassDescriptor)
-			{
-				It.RemoveCurrent();
-			}
-		}
-
-		for (auto It = PropertyHashMap.CreateIterator(); It; ++It)
-		{
-			if (std::get<0>(It->Value) == ClassDescriptor)
-			{
-				It.RemoveCurrent();
-			}
-		}
-
-		delete ClassDescriptor;
+		delete *FoundClassDescriptor;
 
 		ClassDescriptorMap.Remove(InStruct);
 	}
@@ -173,22 +171,22 @@ FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InP
 
 	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
 	{
-		const auto Property = std::get<1>(*FoundPropertyHash).Get();
+		if (const auto Property = std::get<1>(*FoundPropertyHash).Get())
+		{
+			if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(Property))
+			{
+				PropertyHashMap.Remove(InPropertyHash);
 
-		if (Property == nullptr)
+				PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
+
+				return FoundPropertyDescriptor;
+			}
+		}
+		else
 		{
 			PropertyHashMap.Remove(InPropertyHash);
 
 			return nullptr;
-		}
-
-		if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(Property))
-		{
-			PropertyHashMap.Remove(InPropertyHash);
-
-			PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
-
-			return FoundPropertyDescriptor;
 		}
 	}
 

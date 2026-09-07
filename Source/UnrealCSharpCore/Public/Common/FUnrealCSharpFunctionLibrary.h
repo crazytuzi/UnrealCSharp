@@ -224,10 +224,6 @@ public:
 	static void MarkScriptFileChanged();
 
 	static bool HasScriptFileChanged();
-
-	static FString GetBuildStampPath();
-
-	static void TouchBuildStamp();
 #endif
 
 	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);
@@ -276,7 +272,7 @@ public:
 	static void SyncProcess(const FString& InURL, const FString& InParms,
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
 	                        const FString& InWorkingDirectory = FString(),
-	                        const TFunction<void(const FString&)>& InOnOutput = nullptr);
+	                        const TFunction<void(const FString&)>& InOnOutput = {});
 #endif
 
 #if WITH_EDITOR

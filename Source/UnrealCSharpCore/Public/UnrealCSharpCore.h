@@ -22,10 +22,22 @@ public:
 public:
 	void SetActive(bool InbIsActive);
 
-	bool IsActive() const { return bIsActive; }
+	bool IsActive() const
+	{
+		return bIsActive;
+	}
+
+	void RequestReload();
+
+	bool IsReloadPending() const
+	{
+		return bIsReloadPending;
+	}
 
 private:
 	FEngineListener EngineListener;
 
 	bool bIsActive = false;
+
+	bool bIsReloadPending = false;
 };
