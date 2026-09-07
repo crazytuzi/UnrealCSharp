@@ -1,5 +1,4 @@
 #include "Domain/Script/FScriptDomainFactory.h"
-#include "Log/UnrealCSharpLog.h"
 #if WITH_MONO
 #include "Domain/Mono/FMonoDomain.h"
 #endif
@@ -41,10 +40,6 @@ IScriptDomain* FScriptDomainFactory::Create()
 		return new FLeanCLRDomain();
 #endif
 	}
-
-	UE_LOG(LogUnrealCSharp, Error,
-	       TEXT("FScriptDomainFactory::Create fell through. Type=%d, Core WITH_MONO=%d, WITH_CORECLR=%d"),
-	       static_cast<int32>(GetScriptDomainType()), WITH_MONO, WITH_CORECLR);
 
 	return nullptr;
 }

@@ -6,6 +6,8 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Containers/Ticker.h"
+#include "Internationalization/Text.h"
 #include "UEVersion.h"
 #if UE_F_APP_STYLE_GET_BRUSH
 #include "Styling/AppStyle.h"
@@ -17,9 +19,7 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
 	bIsCompiling(false),
 	bIsGenerating(false),
-	bIsStopped(false),
-	CompletedProjectCount(0),
-	TotalProjectCount(0)
+	bIsStopped(false)
 {
 	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
 		this, &FCSharpCompilerRunnable::OnBeginGenerator);
@@ -147,58 +147,9 @@ bool FCSharpCompilerRunnable::IsCompiling() const
 	return bIsCompiling == true || !Tasks.IsEmpty();
 }
 
-void FCSharpCompilerRunnable::GetCompileProgress(FString& OutMessage, float& OutFraction) const
+FString FCSharpCompilerRunnable::GetCompileProgress() const
 {
-	FScopeLock ScopeLock(&ProgressCriticalSection);
-
-	OutMessage = ProgressMessage;
-
-	OutFraction = TotalProjectCount > 0
-		              ? FMath::Clamp(static_cast<float>(CompletedProjectCount) / TotalProjectCount, 0.0f, 1.0f)
-		              : 0.0f;
-}
-
-void FCSharpCompilerRunnable::ResetCompileProgress(const FString& InMessage)
-{
-	FScopeLock ScopeLock(&ProgressCriticalSection);
-
-	ProgressMessage = InMessage;
-
-	ProgressOutputBuffer.Empty();
-
-	CompletedProjectCount = 0;
-}
-
-void FCSharpCompilerRunnable::ParseCompileOutput(const FString& InOutput)
-{
-	FScopeLock ScopeLock(&ProgressCriticalSection);
-
-	ProgressOutputBuffer.Append(InOutput);
-
-	int32 NewlineIndex = INDEX_NONE;
-
-	while (ProgressOutputBuffer.FindChar(TEXT('\n'), NewlineIndex))
-	{
-		auto Line = ProgressOutputBuffer.Left(NewlineIndex);
-
-		ProgressOutputBuffer.MidInline(NewlineIndex + 1);
-
-		Line.TrimStartAndEndInline();
-
-		if (Line.IsEmpty())
-		{
-			continue;
-		}
-
-		UE_LOG(LogUnrealCSharp, Display, TEXT("%s"), *Line);
-
-		if (Line.Contains(TEXT(" -> ")))
-		{
-			++CompletedProjectCount;
-		}
-
-		ProgressMessage = Line;
-	}
+	return CompileProgress.GetStage();
 }
 
 void FCSharpCompilerRunnable::DoWork()
@@ -229,11 +180,17 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 		{
 			bIsCompiling = true;
 
-			ResetCompileProgress(TEXT("Preparing C# compilation..."));
+			CompileProgress.SetStage(FCSharpCompileProgress::StagePreparing);
 
-			if (bCompileInterop)
+			if (bCompileInterop && !CompileInterop(bForceCompileInterop))
 			{
-				CompileInterop(bForceCompileInterop);
+				CompileProgress.SetStage(FCSharpCompileProgress::StageFailed);
+
+				ShowCompileResultNotification(false);
+
+				bIsCompiling = false;
+
+				return;
 			}
 
 			Compile();
@@ -274,19 +231,19 @@ FString FCSharpCompilerRunnable::GetBuildConfiguration()
 	return TEXT("Debug");
 }
 
-void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
+bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
 
 	if (!IFileManager::Get().FileExists(*InteropProjectPath))
 	{
-		return;
+		return true;
 	}
 
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
 		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
 	{
-		ResetCompileProgress(TEXT("Compiling Interop..."));
+		CompileProgress.SetStage(FCSharpCompileProgress::StageCompilingInterop);
 
 		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
@@ -298,16 +255,31 @@ void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 		                                          bForceCompileInterop ? TEXT(" --no-incremental") : TEXT("")
 		);
 
+		auto bSucceeded = false;
+
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
-		                                          [](const int32 InReturnCode, const FString& InResult)
+		                                          [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
 		                                          {
-			                                          if (InReturnCode != 0)
+			                                          bSucceeded = InReturnCode == 0;
+
+			                                          CompileProgress.Flush();
+
+			                                          if (!bSucceeded)
 			                                          {
+				                                          UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 			                                          }
 		                                          },
-		                                          FPaths::GetPath(InteropProjectPath)
+		                                          FPaths::GetPath(InteropProjectPath),
+		                                          [this](const FString& InOutput)
+		                                          {
+			                                          CompileProgress.SetOutput(InOutput);
+		                                          }
 		);
+
+		return bSucceeded;
 	}
+
+	return true;
 }
 
 void FCSharpCompilerRunnable::Compile()
@@ -317,23 +289,7 @@ void FCSharpCompilerRunnable::Compile()
 		return;
 	}
 
-	{
-		TArray<FString> ProjectFiles;
-
-		IFileManager::Get().FindFilesRecursive(ProjectFiles,
-		                                       *FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
-		                                       TEXT("*.csproj"), true, false);
-
-		FScopeLock ScopeLock(&ProgressCriticalSection);
-
-		TotalProjectCount = FMath::Max(ProjectFiles.Num(), 1);
-
-		CompletedProjectCount = 0;
-
-		ProgressOutputBuffer.Empty();
-
-		ProgressMessage = TEXT("Starting dotnet build...");
-	}
+	CompileProgress.SetStage(FCSharpCompileProgress::StageCompilingUE);
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
@@ -344,7 +300,9 @@ void FCSharpCompilerRunnable::Compile()
 
 		static const FName CompileStatusBackground("Blueprint.CompileStatus.Background");
 
-		FNotificationInfo NotificationInfo(FText::FromString(TEXT("Compilation background")));
+		const auto DefaultText = NSLOCTEXT("UnrealCSharp", "CompilingNotification", "Compiling Scripts");
+
+		FNotificationInfo NotificationInfo(DefaultText);
 
 		NotificationInfo.bUseSuccessFailIcons = true;
 
@@ -363,6 +321,33 @@ void FCSharpCompilerRunnable::Compile()
 		NotificationInfo.FadeInDuration = 0.5f;
 
 		NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
+
+		if (NotificationItem.IsValid())
+		{
+			FTSTicker::GetCoreTicker().RemoveTicker(ProgressTickerHandle);
+
+			ProgressTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateLambda(
+					[this, DefaultText, LastText = FString()](float) mutable
+					{
+						if (GExitPurge || !NotificationItem.IsValid() || !IsCompiling())
+						{
+							return false;
+						}
+
+						const auto Stage = CompileProgress.GetStage();
+
+						if (const auto Text = Stage.IsEmpty() ? DefaultText.ToString() : Stage;
+							Text != LastText)
+						{
+							LastText = Text;
+
+							NotificationItem->SetText(FText::FromString(Text));
+						}
+
+						return true;
+					}));
+		}
 	});
 
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
@@ -374,58 +359,36 @@ void FCSharpCompilerRunnable::Compile()
 	                                          *GetBuildConfiguration()
 	);
 
-	FNotificationInfo* NotificationInfo{};
-
-	const auto OnComplete = [&NotificationInfo](const int32 InReturnCode, const FString& InResult)
+	const auto OnComplete = [this](const int32 InReturnCode, const FString& InResult)
 	{
-		[[maybe_unused]] static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
+		CompileProgress.Flush();
 
-		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
+		CompileProgress.SetStage(InReturnCode == 0
+			                         ? FCSharpCompileProgress::StageSucceeded
+			                         : FCSharpCompileProgress::StageFailed);
 
-		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
-
-		[[maybe_unused]] static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
-
-		if (InReturnCode == 0)
+		if (InReturnCode != 0)
 		{
-			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
-
-			NotificationInfo->bUseSuccessFailIcons = true;
-
-#if UE_F_APP_STYLE_GET_BRUSH
-			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusGood);
-#else
-			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusGood);
-#endif
-		}
-		else
-		{
-			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation failed")));
-
-			NotificationInfo->bUseSuccessFailIcons = true;
-
-#if UE_F_APP_STYLE_GET_BRUSH
-			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusError);
-#else
-			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);
-#endif
-
 			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 		}
+
+		ShowCompileResultNotification(InReturnCode == 0);
 	};
 
 	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(),
 	                                          [this](const FString& InOutput)
 	                                          {
-		                                          ParseCompileOutput(InOutput);
+		                                          CompileProgress.SetOutput(InOutput);
 	                                          });
 
-	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
+	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
 		if (GExitPurge)
 		{
 			return;
 		}
+
+		FTSTicker::GetCoreTicker().RemoveTicker(ProgressTickerHandle);
 
 		if (NotificationItem.IsValid())
 		{
@@ -433,17 +396,34 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationItem.Reset();
 		}
+	});
+}
 
-		if (NotificationInfo != nullptr)
+void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded) const
+{
+	AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+	{
+		if (GExitPurge)
 		{
-			NotificationInfo->bFireAndForget = true;
-
-			NotificationInfo->FadeOutDuration = 2.0f;
-
-			NotificationInfo->FadeInDuration = 0.5f;
-
-			FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
+			return;
 		}
+
+		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
+
+		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
+
+		const auto NotificationInfo = new FNotificationInfo(
+			FText::FromString(bSucceeded ? TEXT("Compilation succeeded") : TEXT("Compilation failed")));
+
+		NotificationInfo->bUseSuccessFailIcons = true;
+
+#if UE_F_APP_STYLE_GET_BRUSH
+		NotificationInfo->Image = FAppStyle::GetBrush(bSucceeded ? CompileStatusGood : CompileStatusError);
+#else
+		NotificationInfo->Image = FEditorStyle::GetBrush(bSucceeded ? CompileStatusGood : CompileStatusError);
+#endif
+
+		FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
 	});
 }
 

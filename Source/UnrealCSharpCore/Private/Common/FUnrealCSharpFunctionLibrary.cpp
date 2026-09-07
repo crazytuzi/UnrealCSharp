@@ -1531,11 +1531,10 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	const auto ReadOutput = [&]()
 	{
-		FPlatformProcess::Sleep(0.01f);
-
-		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe); !Output.IsEmpty())
+		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
+			!Output.IsEmpty())
 		{
 			Result.Append(Output);
 
@@ -1544,24 +1543,25 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 				InOnOutput(Output);
 			}
 		}
-	}
+	};
 
-	if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe); !Output.IsEmpty())
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
-		Result.Append(Output);
+		FPlatformProcess::Sleep(0.01f);
 
-		if (InOnOutput)
-		{
-			InOnOutput(Output);
-		}
+		ReadOutput();
 	}
+
+	ReadOutput();
 
 	auto ReturnCode = 0;
 
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
-		InOnComplete(ReturnCode, Result);
+		ReturnCode = -1;
 	}
+
+	InOnComplete(ReturnCode, Result);
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 
