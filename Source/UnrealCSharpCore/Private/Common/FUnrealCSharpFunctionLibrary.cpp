@@ -1496,7 +1496,8 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 #if WITH_EDITOR
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
-                                               const FString& InWorkingDirectory)
+                                               const FString& InWorkingDirectory,
+                                               const TFunction<void(const FString&)>& InOnOutput)
 {
 	void* ReadPipe = nullptr;
 
@@ -1530,19 +1531,37 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
+	const auto ReadOutput = [&]()
+	{
+		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
+			!Output.IsEmpty())
+		{
+			Result.Append(Output);
+
+			if (InOnOutput)
+			{
+				InOnOutput(Output);
+			}
+		}
+	};
+
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
 		FPlatformProcess::Sleep(0.01f);
 
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+		ReadOutput();
 	}
+
+	ReadOutput();
 
 	auto ReturnCode = 0;
 
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
-		InOnComplete(ReturnCode, Result);
+		ReturnCode = -1;
 	}
+
+	InOnComplete(ReturnCode, Result);
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 

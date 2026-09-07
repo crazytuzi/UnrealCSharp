@@ -122,6 +122,14 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
+		for (auto Iterator = PropertyHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
 		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
 		{
 			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
@@ -147,14 +155,22 @@ FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InP
 
 	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
 	{
-		if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(
-			std::get<1>(*FoundPropertyHash)))
+		if (const auto Property = std::get<1>(*FoundPropertyHash).Get())
+		{
+			if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(Property))
+			{
+				PropertyHashMap.Remove(InPropertyHash);
+
+				PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
+
+				return FoundPropertyDescriptor;
+			}
+		}
+		else
 		{
 			PropertyHashMap.Remove(InPropertyHash);
 
-			PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
-
-			return FoundPropertyDescriptor;
+			return nullptr;
 		}
 	}
 
@@ -185,7 +201,7 @@ void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
 void FClassRegistry::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
                                      FProperty* InProperty)
 {
-	PropertyHashMap.Add(InPropertyHash, std::make_tuple(InClassDescriptor, InProperty));
+	PropertyHashMap.Add(InPropertyHash, std::make_tuple(InClassDescriptor, TFieldPath<FProperty>(InProperty)));
 }
 
 void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)

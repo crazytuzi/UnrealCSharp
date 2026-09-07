@@ -2,7 +2,8 @@
 #include "FCSharpCompilerRunnable.h"
 
 FCSharpCompiler::FCSharpCompiler():
-	Runnable(nullptr)
+	Runnable(nullptr),
+	Thread(nullptr)
 {
 	Runnable = new FCSharpCompilerRunnable();
 
@@ -67,4 +68,9 @@ void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
 bool FCSharpCompiler::IsCompiling() const
 {
 	return Runnable != nullptr ? Runnable->IsCompiling() : false;
+}
+
+FString FCSharpCompiler::GetCompileProgress() const
+{
+	return Runnable != nullptr ? Runnable->GetCompileProgress() : TEXT("");
 }

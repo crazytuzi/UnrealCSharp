@@ -98,7 +98,10 @@ public class UnrealCSharpCore : ModuleRules
 
 		AddExternalDependencies();
 
-		GeneratorModules();
+		if (Target.bBuildEditor)
+		{
+			GeneratorModules();
+		}
 
 		EnableExport();
 

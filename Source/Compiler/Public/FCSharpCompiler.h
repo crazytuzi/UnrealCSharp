@@ -23,6 +23,8 @@ public:
 
 	bool IsCompiling() const;
 
+	FString GetCompileProgress() const;
+
 private:
 	class FCSharpCompilerRunnable* Runnable;
 
