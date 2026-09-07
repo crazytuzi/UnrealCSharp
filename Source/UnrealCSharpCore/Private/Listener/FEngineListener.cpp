@@ -6,6 +6,8 @@
 
 FEngineListener::FEngineListener()
 {
+	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
+
 #if WITH_EDITOR
 	if (!IsRunningGame())
 	{
@@ -15,8 +17,6 @@ FEngineListener::FEngineListener()
 
 	OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
 		this, &FEngineListener::OnLoadingPhaseComplete);
-
-	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 }
 
 FEngineListener::~FEngineListener()
@@ -35,12 +35,17 @@ FEngineListener::~FEngineListener()
 #if WITH_EDITOR
 void FEngineListener::OnPreBeginPIE(const bool)
 {
+	if (auto& CoreModule = FUnrealCSharpCoreModule::Get();
+		CoreModule.IsReloadPending())
+	{
+		CoreModule.SetActive(false);
+	}
+
 	SetActive(true);
 }
 
 void FEngineListener::OnCancelPIE()
 {
-	SetActive(false);
 }
 #endif
 

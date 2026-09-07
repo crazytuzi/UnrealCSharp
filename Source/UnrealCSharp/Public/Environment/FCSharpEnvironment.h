@@ -41,6 +41,12 @@ public:
 
 	void OnAsyncLoadingFlushUpdate();
 
+#if WITH_EDITOR
+	void OnBlueprintPreCompile(class UBlueprint* InBlueprint);
+
+	void OnBlueprintCompiled();
+#endif
+
 public:
 	template <auto IsNeedOverride>
 	auto Bind(UStruct* InStruct) const;
@@ -308,6 +314,14 @@ private:
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
 
 	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;
+
+#if WITH_EDITOR
+	FDelegateHandle OnBlueprintPreCompileHandle;
+
+	FDelegateHandle OnBlueprintCompiledHandle;
+
+	TArray<TWeakObjectPtr<UClass>> RecompilingClasses;
+#endif
 
 private:
 	FCriticalSection CriticalSection;

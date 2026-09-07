@@ -52,6 +52,18 @@ void FUnrealFunctionDescriptor::Call4(UObject* InObject, OUT_BUFFER_SIGNATURE) c
 }
 
 template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call5(UObject* InObject, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
+{
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
+
+	InObject->UObject::ProcessEvent(Function.Get(), Params);
+
+	PROCESS_OUT()
+
+	PROCESS_RETURN()
+}
+
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call6(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;

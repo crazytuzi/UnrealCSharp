@@ -41,7 +41,10 @@ void FGameplayTagGenerator::Generator()
 		if (auto& FileManager = IFileManager::Get();
 			FileManager.FileExists(*FileName))
 		{
-			FileManager.Delete(*FileName);
+			if (FileManager.Delete(*FileName))
+			{
+				FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+			}
 		}
 
 		return;

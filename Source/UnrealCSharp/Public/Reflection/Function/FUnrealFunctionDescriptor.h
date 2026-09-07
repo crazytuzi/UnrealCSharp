@@ -29,6 +29,9 @@ public:
 	void Call4(UObject* InObject, OUT_BUFFER_SIGNATURE) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call5(UObject* InObject, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const;
+
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call6(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>

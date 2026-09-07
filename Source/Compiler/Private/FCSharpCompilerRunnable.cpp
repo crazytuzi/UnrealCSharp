@@ -1,4 +1,5 @@
 #include "FCSharpCompilerRunnable.h"
+#include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -167,11 +168,11 @@ void FCSharpCompilerRunnable::ImmediatelyDoWork(const bool bForceCompileInterop)
 	Compile([]()
 	{
 		FDynamicGenerator::Generator();
-	}, true, bForceCompileInterop);
+	}, true, bForceCompileInterop, true);
 }
 
 void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop,
-                                      const bool bForceCompileInterop)
+                                      const bool bForceCompileInterop, const bool bImmediatelyReload)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -193,23 +194,52 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 				return;
 			}
 
-			Compile();
+			if (Compile())
+			{
+				TArray<FFileChangeData> AnalysisFileChanges;
 
-			const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-				[InFunction, this]()
 				{
-					if (!GExitPurge)
+					FScopeLock ScopeLock(&CriticalSection);
+
+					AnalysisFileChanges = FileChanges;
+				}
+
+				FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(AnalysisFileChanges);
+
+				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+					[InFunction, bImmediatelyReload, this]()
 					{
-						FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(FileChanges);
+						if (!GExitPurge)
+						{
+							auto& CoreModule = FUnrealCSharpCoreModule::Get();
 
-						InFunction();
-					}
-				},
-				TStatId(),
-				nullptr,
-				ENamedThreads::GameThread);
+							const auto bWasActive = CoreModule.IsActive();
 
-			FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+							if (bWasActive && (bImmediatelyReload || FDynamicGenerator::HasDynamicFileChanged(FileChanges)))
+							{
+								CoreModule.SetActive(false);
+
+								InFunction();
+
+								CoreModule.SetActive(true);
+							}
+							else
+							{
+								InFunction();
+
+								if (bWasActive)
+								{
+									CoreModule.RequestReload();
+								}
+							}
+						}
+					},
+					TStatId(),
+					nullptr,
+					ENamedThreads::GameThread);
+
+				FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+			}
 
 			bIsCompiling = false;
 		}
@@ -282,11 +312,11 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 	return true;
 }
 
-void FCSharpCompilerRunnable::Compile()
+bool FCSharpCompilerRunnable::Compile()
 {
 	if (!IFileManager::Get().FileExists(*FUnrealCSharpFunctionLibrary::GetGameProjectPath()))
 	{
-		return;
+		return false;
 	}
 
 	CompileProgress.SetStage(FCSharpCompileProgress::StageCompilingUE);
@@ -359,20 +389,24 @@ void FCSharpCompilerRunnable::Compile()
 	                                          *GetBuildConfiguration()
 	);
 
-	const auto OnComplete = [this](const int32 InReturnCode, const FString& InResult)
+	auto bSucceeded = false;
+
+	const auto OnComplete = [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
 	{
+		bSucceeded = InReturnCode == 0;
+
 		CompileProgress.Flush();
 
-		CompileProgress.SetStage(InReturnCode == 0
+		CompileProgress.SetStage(bSucceeded
 			                         ? FCSharpCompileProgress::StageSucceeded
 			                         : FCSharpCompileProgress::StageFailed);
 
-		if (InReturnCode != 0)
+		if (!bSucceeded)
 		{
 			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 		}
 
-		ShowCompileResultNotification(InReturnCode == 0);
+		ShowCompileResultNotification(bSucceeded);
 	};
 
 	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(),
@@ -397,6 +431,8 @@ void FCSharpCompilerRunnable::Compile()
 			NotificationItem.Reset();
 		}
 	});
+
+	return bSucceeded;
 }
 
 void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded) const

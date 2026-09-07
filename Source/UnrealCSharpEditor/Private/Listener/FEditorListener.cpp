@@ -195,6 +195,11 @@ void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 		if (UnrealCSharpEditorSetting->EnableCompileDirtyBlueprintsPreBeginPIE())
 		{
 			CompileDirtyBlueprints();
+
+			if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+			{
+				CompileChangedBlueprints();
+			}
 		}
 
 		if (UnrealCSharpEditorSetting->EnableCompilePreBeginPIE())
@@ -350,8 +355,11 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData));
+		if (const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
+			FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*FileName))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+		}
 	});
 }
 
@@ -359,8 +367,11 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath));
+		if (const auto OldFileName = FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath);
+			FPlatformFileManager::Get().GetPlatformFile().DeleteFile(*OldFileName))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+		}
 
 		FAssetGenerator::Generator(InAssetData);
 	});
@@ -452,9 +463,14 @@ void FEditorListener::OnBlueprintCompiled()
 		return;
 	}
 
-	auto bNeedCompile = false;
+	CompileChangedBlueprints();
+}
 
+void FEditorListener::CompileChangedBlueprints()
+{
 	FGeneratorCore::BeginGenerator(false);
+
+	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
 
 	for (TObjectIterator<UBlueprint> Iterator; Iterator; ++Iterator)
 	{
@@ -478,8 +494,6 @@ void FEditorListener::OnBlueprintCompiled()
 						if (!IFileManager::Get().FileExists(
 							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
 						{
-							bNeedCompile = true;
-
 							FAssetGenerator::Generator(AssetData);
 						}
 
@@ -488,8 +502,6 @@ void FEditorListener::OnBlueprintCompiled()
 
 					if (*CrcCompiledSignature != CrcLastCompiledSignature)
 					{
-						bNeedCompile = true;
-
 						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
 
 						FAssetGenerator::Generator(AssetData);
@@ -497,11 +509,11 @@ void FEditorListener::OnBlueprintCompiled()
 				}
 			}
 		}
-
-		FGeneratorCore::EndGenerator(false);
 	}
 
-	if (bNeedCompile)
+	FGeneratorCore::EndGenerator(false);
+
+	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
 	{
 		Compile();
 	}
@@ -520,9 +532,14 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 
 				if (FGeneratorCore::IsSupported(InAssetData))
 				{
+					FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+
 					InGenerator();
 
-					FCSharpCompiler::Get().Compile();
+					if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+					{
+						FCSharpCompiler::Get().Compile();
+					}
 				}
 
 				FGeneratorCore::EndGenerator(false);

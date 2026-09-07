@@ -13,6 +13,18 @@
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
+static void AddCallCSharpNativeFunction(UClass* InClass, const FName InFunctionName)
+{
+	if (!InClass->NativeFunctionLookupTable.ContainsByPredicate(
+		[InFunctionName](const FNativeFunctionLookup& InLookup)
+		{
+			return InLookup.Name == InFunctionName;
+		}))
+	{
+		InClass->AddNativeFunction(*InFunctionName.ToString(), &UCSharpFunction::execCallCSharp);
+	}
+}
+
 FCSharpBind::FCSharpBind()
 {
 	Initialize();
@@ -130,6 +142,8 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	if (Class == nullptr)
 	{
+		FCSharpEnvironment::GetEnvironment().RemoveClassDescriptor(InStruct);
+
 		return false;
 	}
 
@@ -368,6 +382,8 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		OriginalFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
 
 		OriginalFunction->FunctionFlags |= FUNC_Native;
+
+		AddCallCSharpNativeFunction(InClass, FunctionName);
 	}
 	else
 	{
@@ -388,6 +404,8 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		NewFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
 
 		NewFunction->FunctionFlags |= FUNC_Native;
+
+		AddCallCSharpNativeFunction(InClass, FunctionName);
 	}
 
 	return true;

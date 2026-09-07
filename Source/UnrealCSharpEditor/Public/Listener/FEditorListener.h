@@ -51,6 +51,8 @@ private:
 
 	void CompileDirtyBlueprints();
 
+	void CompileChangedBlueprints();
+
 	bool IsCompileRequired() const;
 
 	void RequestCompile();

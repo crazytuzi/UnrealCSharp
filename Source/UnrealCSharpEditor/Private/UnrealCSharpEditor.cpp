@@ -250,9 +250,14 @@ void FUnrealCSharpEditorModule::OnPostEngineInit()
 
 void FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree()
 {
+	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+
 	FGameplayTagGenerator::Generator();
 
-	FCSharpCompiler::Get().Compile();
+	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+	{
+		FCSharpCompiler::Get().Compile();
+	}
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()

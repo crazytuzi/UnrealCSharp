@@ -122,6 +122,22 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
+		for (auto Iterator = CSharpFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
+		for (auto Iterator = UnrealFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
 		for (auto Iterator = PropertyHashMap.CreateIterator(); Iterator; ++Iterator)
 		{
 			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
