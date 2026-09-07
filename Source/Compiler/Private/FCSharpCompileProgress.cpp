@@ -65,7 +65,7 @@ void FCSharpCompileProgress::Flush()
 
 FString FCSharpCompileProgress::GetStage() const
 {
-	FScopeLock ScopeLock(&CriticalSection);
+	FScopeLock ScopeLock(&const_cast<FCSharpCompileProgress*>(this)->CriticalSection);
 
 	return Stage;
 }

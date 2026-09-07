@@ -42,7 +42,7 @@ private:
 
 	void ProcessLine(const FString& InLine);
 
-	mutable FCriticalSection CriticalSection;
+	FCriticalSection CriticalSection;
 
 	FString Stage;
 
