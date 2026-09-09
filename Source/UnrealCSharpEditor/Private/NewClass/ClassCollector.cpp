@@ -44,13 +44,8 @@ FClassCollector::FClassCollector()
 
 	if (GEditor)
 	{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 		OnBlueprintCompiledDelegateHandle =
 			GEditor->OnBlueprintCompiled().AddStatic(&FClassCollector::RequestPopulateClassHierarchy);
-#else
-		OnBlueprintCompiledDelegateHandle =
-			GEditor->OnBlueprintCompiled.AddStatic(&FClassCollector::RequestPopulateClassHierarchy);
-#endif
 	}
 
 	if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
@@ -90,11 +85,7 @@ FClassCollector::~FClassCollector()
 	{
 		if (OnBlueprintCompiledDelegateHandle.IsValid())
 		{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
-#else
-			GEditor->OnBlueprintCompiled.Remove(OnBlueprintCompiledDelegateHandle);
-#endif
 		}
 	}
 

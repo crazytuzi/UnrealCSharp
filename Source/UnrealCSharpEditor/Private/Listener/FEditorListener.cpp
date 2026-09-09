@@ -67,13 +67,8 @@ FEditorListener::FEditorListener():
 			{
 				if (UnrealCSharpEditorSetting->EnableCompileOnBlueprintCompiled())
 				{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 					OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled().AddRaw(
 						this, &FEditorListener::OnBlueprintCompiled);
-#else
-					OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled.AddRaw(
-						this, &FEditorListener::OnBlueprintCompiled);
-#endif
 				}
 			}
 		}
@@ -109,11 +104,7 @@ FEditorListener::~FEditorListener()
 	{
 		if (OnBlueprintCompiledDelegateHandle.IsValid() && GEditor != nullptr)
 		{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
-#else
-			GEditor->OnBlueprintCompiled.Remove(OnBlueprintCompiledDelegateHandle);
-#endif
 		}
 
 		if (OnDirectoryChangedDelegateHandle.IsValid())
@@ -660,7 +651,11 @@ void FEditorListener::Compile()
 
 void FEditorListener::TickProgressWindow(const TSharedPtr<SWindow>& InWindow)
 {
+#if UE_F_SLATE_APPLICATION_IS_TICKING
 	if (InWindow.IsValid() && !FSlateApplication::Get().IsTicking())
+#else
+	if (InWindow.IsValid())
+#endif
 	{
 		FPlatformMisc::PumpMessagesForSlowTask();
 

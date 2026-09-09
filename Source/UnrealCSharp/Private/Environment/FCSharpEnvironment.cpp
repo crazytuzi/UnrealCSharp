@@ -90,21 +90,11 @@ void FCSharpEnvironment::Initialize()
 #if WITH_EDITOR
 	if (GEditor != nullptr)
 	{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_PRE_COMPILE
 		OnBlueprintPreCompileHandle = GEditor->OnBlueprintPreCompile().AddRaw(
 			this, &FCSharpEnvironment::OnBlueprintPreCompile);
-#else
-		OnBlueprintPreCompileHandle = GEditor->OnBlueprintPreCompile.AddRaw(
-			this, &FCSharpEnvironment::OnBlueprintPreCompile);
-#endif
 
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 		OnBlueprintCompiledHandle = GEditor->OnBlueprintCompiled().AddRaw(
 			this, &FCSharpEnvironment::OnBlueprintCompiled);
-#else
-		OnBlueprintCompiledHandle = GEditor->OnBlueprintCompiled.AddRaw(
-			this, &FCSharpEnvironment::OnBlueprintCompiled);
-#endif
 	}
 #endif
 
@@ -165,22 +155,14 @@ void FCSharpEnvironment::Deinitialize()
 	{
 		if (OnBlueprintCompiledHandle.IsValid())
 		{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledHandle);
-#else
-			GEditor->OnBlueprintCompiled.Remove(OnBlueprintCompiledHandle);
-#endif
 
 			OnBlueprintCompiledHandle.Reset();
 		}
 
 		if (OnBlueprintPreCompileHandle.IsValid())
 		{
-#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_PRE_COMPILE
 			GEditor->OnBlueprintPreCompile().Remove(OnBlueprintPreCompileHandle);
-#else
-			GEditor->OnBlueprintPreCompile.Remove(OnBlueprintPreCompileHandle);
-#endif
 
 			OnBlueprintPreCompileHandle.Reset();
 		}

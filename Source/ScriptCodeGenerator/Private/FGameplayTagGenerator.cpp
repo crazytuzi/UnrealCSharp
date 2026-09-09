@@ -7,6 +7,10 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/AccessPrivateMacro.h"
+#include "UEVersion.h"
+
+ACCESS_PRIVATE_MEMBER_PROPERTY(FGameplayTagNode, DevComment, FString)
 
 struct FGameplayTagGenerator::FGameplayTagTreeNode
 {
@@ -262,7 +266,12 @@ void FGameplayTagGenerator::VisitTagNodes(const TSharedPtr<FGameplayTagNode>& In
 	{
 		if (InNode->IsExplicitTag() && !InNode->IsRestrictedGameplayTag())
 		{
+#if UE_F_GAMEPLAY_TAG_NODE_GET_DEV_COMMENT
 			OutTags.Emplace(InNode->GetCompleteTagString(), InNode->GetDevComment());
+#else
+			OutTags.Emplace(InNode->GetCompleteTagString(),
+			                InNode.Get()->*TAccessPrivate<FGameplayTagNode_DevComment>::Value);
+#endif
 		}
 
 		for (const auto& Child : InNode->GetChildTagNodes())
