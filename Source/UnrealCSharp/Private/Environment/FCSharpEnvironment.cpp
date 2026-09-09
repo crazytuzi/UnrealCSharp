@@ -90,11 +90,21 @@ void FCSharpEnvironment::Initialize()
 #if WITH_EDITOR
 	if (GEditor != nullptr)
 	{
+#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_PRE_COMPILE
 		OnBlueprintPreCompileHandle = GEditor->OnBlueprintPreCompile().AddRaw(
 			this, &FCSharpEnvironment::OnBlueprintPreCompile);
+#else
+		OnBlueprintPreCompileHandle = GEditor->OnBlueprintPreCompile.AddRaw(
+			this, &FCSharpEnvironment::OnBlueprintPreCompile);
+#endif
 
+#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 		OnBlueprintCompiledHandle = GEditor->OnBlueprintCompiled().AddRaw(
 			this, &FCSharpEnvironment::OnBlueprintCompiled);
+#else
+		OnBlueprintCompiledHandle = GEditor->OnBlueprintCompiled.AddRaw(
+			this, &FCSharpEnvironment::OnBlueprintCompiled);
+#endif
 	}
 #endif
 
@@ -149,20 +159,28 @@ void FCSharpEnvironment::Deinitialize()
 	AsyncLoadingObjectArray.Empty();
 
 #if WITH_EDITOR
-	RecompilingClasses.Empty();
+	PendingBindClasses.Empty();
 
 	if (GEditor != nullptr)
 	{
 		if (OnBlueprintCompiledHandle.IsValid())
 		{
+#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_COMPILED
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledHandle);
+#else
+			GEditor->OnBlueprintCompiled.Remove(OnBlueprintCompiledHandle);
+#endif
 
 			OnBlueprintCompiledHandle.Reset();
 		}
 
 		if (OnBlueprintPreCompileHandle.IsValid())
 		{
+#if UE_U_EDITOR_ENGINE_ON_BLUEPRINT_PRE_COMPILE
 			GEditor->OnBlueprintPreCompile().Remove(OnBlueprintPreCompileHandle);
+#else
+			GEditor->OnBlueprintPreCompile.Remove(OnBlueprintPreCompileHandle);
+#endif
 
 			OnBlueprintPreCompileHandle.Reset();
 		}
@@ -337,20 +355,21 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 #if WITH_EDITOR
 void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 {
-	if (InBlueprint != nullptr && InBlueprint->GeneratedClass != nullptr &&
+	if (InBlueprint != nullptr &&
+		InBlueprint->GeneratedClass != nullptr &&
 		GetClassDescriptor(InBlueprint->GeneratedClass) != nullptr)
 	{
 		RemoveClassDescriptor(InBlueprint->GeneratedClass);
 
-		RecompilingClasses.AddUnique(InBlueprint->GeneratedClass);
+		PendingBindClasses.AddUnique(InBlueprint->GeneratedClass);
 	}
 }
 
 void FCSharpEnvironment::OnBlueprintCompiled()
 {
-	for (const auto& RecompilingClass : RecompilingClasses)
+	for (const auto& PendingBindClass : PendingBindClasses)
 	{
-		if (const auto Class = RecompilingClass.Get())
+		if (const auto Class = PendingBindClass.Get())
 		{
 			RemoveClassDescriptor(Class);
 
@@ -361,7 +380,7 @@ void FCSharpEnvironment::OnBlueprintCompiled()
 		}
 	}
 
-	RecompilingClasses.Empty();
+	PendingBindClasses.Empty();
 }
 #endif
 

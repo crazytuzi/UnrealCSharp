@@ -34,6 +34,8 @@
 
 #if WITH_EDITOR
 EScriptDomainType FUnrealCSharpFunctionLibrary::ScriptDomainType = EScriptDomainType::CoreCLR;
+
+bool FUnrealCSharpFunctionLibrary::bScriptChanged{};
 #endif
 
 #if WITH_EDITOR
@@ -1129,21 +1131,19 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 #endif
 
 #if WITH_EDITOR
-static bool GScriptFileChanged = false;
-
-void FUnrealCSharpFunctionLibrary::ResetScriptFileChanged()
+void FUnrealCSharpFunctionLibrary::ResetScriptChanged()
 {
-	GScriptFileChanged = false;
+	bScriptChanged = false;
 }
 
-void FUnrealCSharpFunctionLibrary::MarkScriptFileChanged()
+void FUnrealCSharpFunctionLibrary::MarkScriptChanged()
 {
-	GScriptFileChanged = true;
+	bScriptChanged = true;
 }
 
-bool FUnrealCSharpFunctionLibrary::HasScriptFileChanged()
+bool FUnrealCSharpFunctionLibrary::IsScriptChanged()
 {
-	return GScriptFileChanged;
+	return bScriptChanged;
 }
 #endif
 
@@ -1163,7 +1163,7 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 	}
 
 #if WITH_EDITOR
-	MarkScriptFileChanged();
+	MarkScriptChanged();
 #endif
 
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();

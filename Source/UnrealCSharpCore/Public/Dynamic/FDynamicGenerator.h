@@ -45,6 +45,8 @@ public:
 	static EDynamicType GetDynamicType(const FString& InFile, FClassReflection*& OutClass);
 
 private:
+	static const FString* FindDynamicName(const FString& InFile);
+
 	static bool IsDynamicFile(const FString& InFile);
 
 	static bool bIsFullGenerator;

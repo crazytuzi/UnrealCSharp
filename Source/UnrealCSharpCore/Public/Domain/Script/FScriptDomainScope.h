@@ -6,8 +6,7 @@
 class FScriptDomainScope
 {
 public:
-	explicit FScriptDomainScope(const TFunction<void()>& InFunction):
-		bOwnsScriptDomain(false)
+	explicit FScriptDomainScope(const TFunction<void()>& InFunction)
 	{
 		auto ScriptDomain = IScriptDomain::Get();
 
@@ -19,7 +18,7 @@ public:
 			{
 				IScriptDomain::Set(ScriptDomain);
 
-				bOwnsScriptDomain = true;
+				Domain = ScriptDomain;
 			}
 		}
 
@@ -39,15 +38,16 @@ public:
 
 	~FScriptDomainScope()
 	{
-		if (bOwnsScriptDomain)
+		if (Domain != nullptr)
 		{
-			if (const auto ScriptDomain = IScriptDomain::Get())
-			{
-				FScriptDomainFactory::Destroy(ScriptDomain);
-			}
+			FScriptDomainFactory::Destroy(Domain);
 		}
 	}
 
+	FScriptDomainScope(const FScriptDomainScope&) = delete;
+
+	FScriptDomainScope& operator=(const FScriptDomainScope&) = delete;
+
 private:
-	bool bOwnsScriptDomain;
+	IScriptDomain* Domain{};
 };

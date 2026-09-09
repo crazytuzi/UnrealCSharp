@@ -155,24 +155,23 @@ FString FCSharpCompilerRunnable::GetCompileProgress() const
 
 void FCSharpCompilerRunnable::DoWork()
 {
-	Compile([&]()
+	Compile([](const TArray<FFileChangeData>& InFileChanges)
 	{
-		FDynamicGenerator::Generator(FileChanges);
-
-		FileChanges.Empty();
+		FDynamicGenerator::Generator(InFileChanges);
 	});
 }
 
 void FCSharpCompilerRunnable::ImmediatelyDoWork(const bool bForceCompileInterop)
 {
-	Compile([]()
+	Compile([](const TArray<FFileChangeData>&)
 	{
 		FDynamicGenerator::Generator();
 	}, true, bForceCompileInterop, true);
 }
 
-void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop,
-                                      const bool bForceCompileInterop, const bool bImmediatelyReload)
+void FCSharpCompilerRunnable::Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction,
+                                      const bool bCompileInterop, const bool bForceCompileInterop,
+                                      const bool bReloadImmediately)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -194,44 +193,46 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 				return;
 			}
 
-			if (Compile())
+			TArray<FFileChangeData> FileChangesSnapshot;
+
+			const auto bSucceeded = Compile();
+
+			if (bSucceeded)
 			{
-				TArray<FFileChangeData> AnalysisFileChanges;
+				FScopeLock ScopeLock(&CriticalSection);
 
-				{
-					FScopeLock ScopeLock(&CriticalSection);
+				FileChangesSnapshot = MoveTemp(FileChanges);
+			}
 
-					AnalysisFileChanges = FileChanges;
-				}
+			FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
 
-				FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(AnalysisFileChanges);
+			if (bSucceeded)
+			{
+				const auto bHasDynamicFileChanged = FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot);
 
 				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-					[InFunction, bImmediatelyReload, this]()
+					[InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
 					{
-						if (!GExitPurge)
+						if (GExitPurge)
 						{
-							auto& CoreModule = FUnrealCSharpCoreModule::Get();
+							return;
+						}
 
-							const auto bWasActive = CoreModule.IsActive();
+						auto& UnrealCSharpCoreModule = FUnrealCSharpCoreModule::Get();
 
-							if (bWasActive && (bImmediatelyReload || FDynamicGenerator::HasDynamicFileChanged(FileChanges)))
-							{
-								CoreModule.SetActive(false);
+						if (UnrealCSharpCoreModule.IsLoaded() && (bReloadImmediately || bHasDynamicFileChanged))
+						{
+							UnrealCSharpCoreModule.Deactivate();
 
-								InFunction();
+							InFunction(FileChangesSnapshot);
 
-								CoreModule.SetActive(true);
-							}
-							else
-							{
-								InFunction();
+							UnrealCSharpCoreModule.Activate();
+						}
+						else
+						{
+							InFunction(FileChangesSnapshot);
 
-								if (bWasActive)
-								{
-									CoreModule.RequestReload();
-								}
-							}
+							UnrealCSharpCoreModule.MarkOutdated();
 						}
 					},
 					TStatId(),

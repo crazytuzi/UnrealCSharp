@@ -131,55 +131,55 @@ FString FDynamicGenerator::GetDynamicNormalizeFile(const UClass* InClass)
 
 void FDynamicGenerator::Generator(const TArray<FFileChangeData>& InFileChangeData)
 {
-	TArray<FString> FileChange;
+	TArray<FString> ChangedFiles;
+
+	ChangedFiles.Reserve(InFileChangeData.Num());
 
 	for (const auto& Data : InFileChangeData)
 	{
 		if (IsDynamicFile(Data.Filename) && IFileManager::Get().FileExists(*Data.Filename))
 		{
-			FileChange.AddUnique(Data.Filename);
+			ChangedFiles.AddUnique(Data.Filename);
 		}
 	}
 
-	if (FileChange.IsEmpty())
+	if (!ChangedFiles.IsEmpty())
 	{
-		return;
-	}
+		FDynamicGeneratorCore::BeginCodeAnalysisGenerator();
 
-	FDynamicGeneratorCore::BeginCodeAnalysisGenerator();
-
-	FScriptDomainScope([FileChange]()
-	{
-		for (const auto& File : FileChange)
+		FScriptDomainScope([ChangedFiles]()
 		{
-			switch (FClassReflection* Class; GetDynamicType(File, Class))
+			for (const auto& File : ChangedFiles)
 			{
-			case EDynamicType::Class:
+				switch (FClassReflection* Class; GetDynamicType(File, Class))
 				{
-					FDynamicClassGenerator::Generator(Class, EDynamicClassGeneratorType::FileChange);
+				case EDynamicType::Class:
+					{
+						FDynamicClassGenerator::Generator(Class, EDynamicClassGeneratorType::FileChange);
+					}
+					break;
+				case EDynamicType::Struct:
+					{
+						FDynamicStructGenerator::Generator(Class);
+					}
+					break;
+				case EDynamicType::Enum:
+					{
+						FDynamicEnumGenerator::Generator(Class);
+					}
+					break;
+				case EDynamicType::Interface:
+					{
+						FDynamicInterfaceGenerator::Generator(Class);
+					}
+					break;
+				default: ;
 				}
-				break;
-			case EDynamicType::Struct:
-				{
-					FDynamicStructGenerator::Generator(Class);
-				}
-				break;
-			case EDynamicType::Enum:
-				{
-					FDynamicEnumGenerator::Generator(Class);
-				}
-				break;
-			case EDynamicType::Interface:
-				{
-					FDynamicInterfaceGenerator::Generator(Class);
-				}
-				break;
-			default: ;
 			}
-		}
-	});
+		});
 
-	FDynamicGeneratorCore::EndCodeAnalysisGenerator();
+		FDynamicGeneratorCore::EndCodeAnalysisGenerator();
+	}
 }
 
 bool FDynamicGenerator::HasDynamicFileChanged(const TArray<FFileChangeData>& InFileChangeData)
@@ -197,15 +197,20 @@ bool FDynamicGenerator::HasDynamicFileChanged(const TArray<FFileChangeData>& InF
 
 bool FDynamicGenerator::IsDynamicFile(const FString& InFile)
 {
-	for (auto const& [Name, File] : CodeAnalysisDynamicFilesMap)
+	return FindDynamicName(InFile) != nullptr;
+}
+
+const FString* FDynamicGenerator::FindDynamicName(const FString& InFile)
+{
+	for (const auto& [Name, File] : CodeAnalysisDynamicFilesMap)
 	{
 		if (FPaths::IsSamePath(File, InFile))
 		{
-			return true;
+			return &Name;
 		}
 	}
 
-	return false;
+	return nullptr;
 }
 
 void FDynamicGenerator::OnPrePIEEnded(const bool bIsSimulating)
@@ -220,19 +225,14 @@ bool FDynamicGenerator::IsFullGenerator()
 
 EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, FClassReflection*& OutClass)
 {
-	for (auto const& [Name, File] : CodeAnalysisDynamicFilesMap)
+	if (const auto Name = FindDynamicName(InFile))
 	{
-		if (FPaths::IsSamePath(File, InFile))
+		if (auto Index = 0; Name->FindLastChar(TEXT('.'), Index))
 		{
-			if (auto Index = 0; Name.FindLastChar(TEXT('.'), Index))
-			{
-				OutClass = FReflectionRegistry::Get().GetClass(
-					Name.Left(Index), Name.Right(Name.Len() - Index - 1));
+			OutClass = FReflectionRegistry::Get().GetClass(
+				Name->Left(Index), Name->Right(Name->Len() - Index - 1));
 
-				return FDynamicGeneratorCore::GetDynamicType(Name);
-			}
-
-			break;
+			return FDynamicGeneratorCore::GetDynamicType(*Name);
 		}
 	}
 

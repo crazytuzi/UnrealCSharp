@@ -16,28 +16,47 @@ void FUnrealCSharpCoreModule::ShutdownModule()
 	// we call this function before unloading the module.
 }
 
-void FUnrealCSharpCoreModule::SetActive(const bool InbIsActive)
+void FUnrealCSharpCoreModule::Activate()
 {
-	if (bIsActive != InbIsActive)
+	if (State == EState::Inactive)
 	{
-		bIsActive = InbIsActive;
+		State = EState::Active;
 
-		bIsReloadPending = false;
-
-		if (InbIsActive)
-		{
-			FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleActive.Broadcast();
-		}
-		else
-		{
-			FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleInActive.Broadcast();
-		}
+		FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleActive.Broadcast();
 	}
 }
 
-void FUnrealCSharpCoreModule::RequestReload()
+void FUnrealCSharpCoreModule::Deactivate()
 {
-	bIsReloadPending = bIsActive;
+	if (State != EState::Inactive)
+	{
+		State = EState::Inactive;
+
+		FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleInActive.Broadcast();
+	}
+}
+
+void FUnrealCSharpCoreModule::MarkOutdated()
+{
+	if (State == EState::Active)
+	{
+		State = EState::Outdated;
+	}
+}
+
+bool FUnrealCSharpCoreModule::IsLoaded() const
+{
+	return State != EState::Inactive;
+}
+
+bool FUnrealCSharpCoreModule::IsActive() const
+{
+	return State == EState::Active;
+}
+
+bool FUnrealCSharpCoreModule::IsOutdated() const
+{
+	return State == EState::Outdated;
 }
 
 #undef LOCTEXT_NAMESPACE

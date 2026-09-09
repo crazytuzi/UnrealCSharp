@@ -42,7 +42,7 @@ public:
 	void OnAsyncLoadingFlushUpdate();
 
 #if WITH_EDITOR
-	void OnBlueprintPreCompile(class UBlueprint* InBlueprint);
+	void OnBlueprintPreCompile(UBlueprint* InBlueprint);
 
 	void OnBlueprintCompiled();
 #endif
@@ -319,14 +319,16 @@ private:
 	FDelegateHandle OnBlueprintPreCompileHandle;
 
 	FDelegateHandle OnBlueprintCompiledHandle;
-
-	TArray<TWeakObjectPtr<UClass>> RecompilingClasses;
 #endif
 
 private:
 	FCriticalSection CriticalSection;
 
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
+
+#if WITH_EDITOR
+	TArray<TWeakObjectPtr<UClass>> PendingBindClasses;
+#endif
 
 private:
 	FDynamicRegistry* DynamicRegistry;

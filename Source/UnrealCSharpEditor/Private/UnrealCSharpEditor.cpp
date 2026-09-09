@@ -131,7 +131,14 @@ void FUnrealCSharpEditorModule::StartupModule()
 			{
 				if (!Args.IsEmpty())
 				{
-					FUnrealCSharpCoreModule::Get().SetActive(Args[0] != TEXT("0"));
+					if (Args[0] != TEXT("0"))
+					{
+						FUnrealCSharpCoreModule::Get().Activate();
+					}
+					else
+					{
+						FUnrealCSharpCoreModule::Get().Deactivate();
+					}
 				}
 			}));
 
@@ -250,11 +257,11 @@ void FUnrealCSharpEditorModule::OnPostEngineInit()
 
 void FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree()
 {
-	FUnrealCSharpFunctionLibrary::ResetScriptFileChanged();
+	FUnrealCSharpFunctionLibrary::ResetScriptChanged();
 
 	FGameplayTagGenerator::Generator();
 
-	if (FUnrealCSharpFunctionLibrary::HasScriptFileChanged())
+	if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
 	{
 		FCSharpCompiler::Get().Compile();
 	}

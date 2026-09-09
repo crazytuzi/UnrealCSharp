@@ -33,8 +33,8 @@ public:
 
 	void ImmediatelyDoWork(bool bForceCompileInterop = false);
 
-	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false, bool bForceCompileInterop = false,
-	             bool bImmediatelyReload = false);
+	void Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction, bool bCompileInterop = false,
+	             bool bForceCompileInterop = false, bool bReloadImmediately = false);
 
 private:
 	static FString GetBuildConfiguration();

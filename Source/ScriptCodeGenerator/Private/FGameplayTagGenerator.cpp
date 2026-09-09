@@ -43,7 +43,7 @@ void FGameplayTagGenerator::Generator()
 		{
 			if (FileManager.Delete(*FileName))
 			{
-				FUnrealCSharpFunctionLibrary::MarkScriptFileChanged();
+				FUnrealCSharpFunctionLibrary::MarkScriptChanged();
 			}
 		}
 

@@ -75,6 +75,8 @@ private:
 
 	static bool IsCallCSharpFunction(const UFunction* InFunction);
 
+	static void RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction);
+
 	static UFunction* DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName);
 
 private:
