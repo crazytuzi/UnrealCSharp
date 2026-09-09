@@ -541,5 +541,17 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 		{
 			BindClassDefaultObject(DefaultObject);
 		}
+
+		if (CanBind(Class))
+		{
+			TArray<UObject*> Instances;
+
+			GetObjectsOfClass(Class, Instances, true);
+
+			for (const auto Instance : Instances)
+			{
+				Bind(Instance);
+			}
+		}
 	}
 }
