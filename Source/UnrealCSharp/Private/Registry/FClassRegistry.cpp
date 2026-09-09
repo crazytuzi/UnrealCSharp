@@ -242,16 +242,28 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 	{
 		if (FDomain::IsLoadSucceed())
 		{
-			const auto Object = InObjectInitializer.GetObj();
-
-			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
-				IManagedHandleIsValid(FoundManagedHandle))
+			if (const auto Object = InObjectInitializer.GetObj();
+				Object != nullptr)
 			{
-				FDynamicClassGenerator::ObjectDeferredInitializer(InObjectInitializer);
-
-				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(Object->GetClass()))
+				if (const auto ObjectClass = Object->GetClass();
+					ObjectClass != nullptr)
 				{
-					FoundClass->ConstructorObject(FoundManagedHandle);
+					if (!FDynamicClassGenerator::IsDynamicClass(ObjectClass))
+					{
+						if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
+							IManagedHandleIsValid(FoundManagedHandle))
+						{
+							if (const auto FoundClass = FReflectionRegistry::Get().GetClass(ObjectClass);
+								FoundClass != nullptr)
+							{
+								FDynamicClassGenerator::ObjectDeferredConstructor(InObjectInitializer,
+									[FoundManagedHandle, FoundClass]()
+									{
+										FoundClass->ConstructorObject(FoundManagedHandle);
+									});
+							}
+						}
+					}
 				}
 			}
 		}
