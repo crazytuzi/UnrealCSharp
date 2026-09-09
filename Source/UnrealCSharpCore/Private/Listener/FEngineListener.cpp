@@ -7,14 +7,12 @@
 FEngineListener::FEngineListener()
 {
 #if WITH_EDITOR
-	if (!IsRunningGame())
-	{
-		return;
-	}
+	if (IsRunningGame())
 #endif
-
-	OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
-		this, &FEngineListener::OnLoadingPhaseComplete);
+	{
+		OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
+			this, &FEngineListener::OnLoadingPhaseComplete);
+	}
 
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 }
@@ -35,12 +33,14 @@ FEngineListener::~FEngineListener()
 #if WITH_EDITOR
 void FEngineListener::OnPreBeginPIE(const bool)
 {
-	SetActive(true);
-}
+	auto& UnrealCSharpCoreModule = FUnrealCSharpCoreModule::Get();
 
-void FEngineListener::OnCancelPIE()
-{
-	SetActive(false);
+	if (UnrealCSharpCoreModule.IsOutdated())
+	{
+		UnrealCSharpCoreModule.Deactivate();
+	}
+
+	UnrealCSharpCoreModule.Activate();
 }
 #endif
 
@@ -69,12 +69,12 @@ void FEngineListener::SetActive(const bool InbIsActive)
 		{
 			if (UnrealCSharpSetting->IsEnableImmediatelyActive())
 			{
-				FUnrealCSharpCoreModule::Get().SetActive(true);
+				FUnrealCSharpCoreModule::Get().Activate();
 			}
 		}
 	}
 	else
 	{
-		FUnrealCSharpCoreModule::Get().SetActive(false);
+		FUnrealCSharpCoreModule::Get().Deactivate();
 	}
 }

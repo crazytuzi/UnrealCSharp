@@ -20,10 +20,27 @@ public:
 	}
 
 public:
-	void SetActive(bool InbIsActive);
+	void Activate();
+
+	void Deactivate();
+
+	void MarkOutdated();
+
+	bool IsLoaded() const;
+
+	bool IsActive() const;
+
+	bool IsOutdated() const;
 
 private:
+	enum class EState : uint8
+	{
+		Inactive,
+		Active,
+		Outdated
+	};
+
 	FEngineListener EngineListener;
 
-	bool bIsActive = false;
+	EState State = EState::Inactive;
 };

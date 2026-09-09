@@ -34,6 +34,8 @@
 
 #if WITH_EDITOR
 EScriptDomainType FUnrealCSharpFunctionLibrary::ScriptDomainType = EScriptDomainType::CoreCLR;
+
+bool FUnrealCSharpFunctionLibrary::bScriptChanged{};
 #endif
 
 #if WITH_EDITOR
@@ -1128,6 +1130,23 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 }
 #endif
 
+#if WITH_EDITOR
+void FUnrealCSharpFunctionLibrary::ResetScriptChanged()
+{
+	bScriptChanged = false;
+}
+
+void FUnrealCSharpFunctionLibrary::MarkScriptChanged()
+{
+	bScriptChanged = true;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsScriptChanged()
+{
+	return bScriptChanged;
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
 	const auto FileManager = &IFileManager::Get();
@@ -1142,6 +1161,10 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 			}
 		}
 	}
+
+#if WITH_EDITOR
+	MarkScriptChanged();
+#endif
 
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 

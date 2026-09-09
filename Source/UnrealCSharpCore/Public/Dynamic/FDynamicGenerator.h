@@ -36,6 +36,8 @@ public:
 
 	static void Generator(const TArray<FFileChangeData>& InFileChangeData);
 
+	static bool HasDynamicFileChanged(const TArray<FFileChangeData>& InFileChangeData);
+
 	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static bool IsFullGenerator();
@@ -43,6 +45,10 @@ public:
 	static EDynamicType GetDynamicType(const FString& InFile, FClassReflection*& OutClass);
 
 private:
+	static const FString* FindDynamicName(const FString& InFile);
+
+	static bool IsDynamicFile(const FString& InFile);
+
 	static bool bIsFullGenerator;
 
 	static TMap<FString, FString> CodeAnalysisDynamicFilesMap;

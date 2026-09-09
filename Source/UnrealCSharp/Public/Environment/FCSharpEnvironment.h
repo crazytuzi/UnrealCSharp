@@ -41,6 +41,12 @@ public:
 
 	void OnAsyncLoadingFlushUpdate();
 
+#if WITH_EDITOR
+	void OnBlueprintPreCompile(UBlueprint* InBlueprint);
+
+	void OnBlueprintCompiled();
+#endif
+
 public:
 	template <auto IsNeedOverride>
 	auto Bind(UStruct* InStruct) const;
@@ -309,10 +315,20 @@ private:
 
 	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;
 
+#if WITH_EDITOR
+	FDelegateHandle OnBlueprintPreCompileHandle;
+
+	FDelegateHandle OnBlueprintCompiledHandle;
+#endif
+
 private:
 	FCriticalSection CriticalSection;
 
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
+
+#if WITH_EDITOR
+	TArray<TWeakObjectPtr<UClass>> PendingBindClasses;
+#endif
 
 private:
 	FDynamicRegistry* DynamicRegistry;

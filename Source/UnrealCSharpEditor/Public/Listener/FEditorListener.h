@@ -26,7 +26,7 @@ private:
 
 	void OnEndGenerator();
 
-	void OnCompile(const TArray<FFileChangeData>& InFileChangeData);
+	void OnCompile(const bool bSucceeded);
 
 	void OnFilesLoaded();
 
@@ -50,6 +50,8 @@ private:
 	void OnAssetChanged(const FAssetData& InAssetData, const TFunction<void()>& InGenerator) const;
 
 	void CompileDirtyBlueprints();
+
+	void CompileChangedBlueprints();
 
 	bool IsCompileRequired() const;
 
@@ -88,6 +90,8 @@ private:
 
 private:
 	TArray<FFileChangeData> FileChanges;
+
+	TArray<FFileChangeData> CompilingFileChanges;
 
 	TMap<FSoftObjectPath, uint32> CrcCompiledSignatures;
 

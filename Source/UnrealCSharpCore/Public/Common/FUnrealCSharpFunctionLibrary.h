@@ -218,6 +218,14 @@ public:
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 
+#if WITH_EDITOR
+	static void ResetScriptChanged();
+
+	static void MarkScriptChanged();
+
+	static bool IsScriptChanged();
+#endif
+
 	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);
 
 	static TMap<FString, FString> LoadFileToString(const FString& InFileName);
@@ -276,5 +284,7 @@ public:
 
 private:
 	static EScriptDomainType ScriptDomainType;
+
+	static bool bScriptChanged;
 #endif
 };

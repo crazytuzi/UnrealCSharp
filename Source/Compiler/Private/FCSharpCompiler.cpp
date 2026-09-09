@@ -61,7 +61,10 @@ void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
 {
 	if (Runnable != nullptr)
 	{
-		Runnable->Compile(InFunction);
+		Runnable->Compile([InFunction](const TArray<FFileChangeData>&)
+		{
+			InFunction();
+		});
 	}
 }
 

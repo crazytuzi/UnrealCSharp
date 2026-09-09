@@ -195,6 +195,11 @@ void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 		if (UnrealCSharpEditorSetting->EnableCompileDirtyBlueprintsPreBeginPIE())
 		{
 			CompileDirtyBlueprints();
+
+			if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+			{
+				CompileChangedBlueprints();
+			}
 		}
 
 		if (UnrealCSharpEditorSetting->EnableCompilePreBeginPIE())
@@ -225,8 +230,6 @@ void FEditorListener::OnEndPIE(const bool)
 
 void FEditorListener::OnCancelPIE()
 {
-	FEngineListener::OnCancelPIE();
-
 	bIsPreparingPIE = false;
 
 	bIsPIEPlaying = false;
@@ -302,13 +305,20 @@ void FEditorListener::OnEndGenerator()
 	}
 }
 
-void FEditorListener::OnCompile(const TArray<FFileChangeData>& InFileChangeData)
+void FEditorListener::OnCompile(const bool bSucceeded)
 {
-	if (!InFileChangeData.IsEmpty())
+	if (!bSucceeded)
+	{
+		CompilingFileChanges.Reset();
+
+		return;
+	}
+
+	if (!CompilingFileChanges.IsEmpty())
 	{
 		TArray<FString> FileChange;
 
-		for (const auto& Data : InFileChangeData)
+		for (const auto& Data : CompilingFileChanges)
 		{
 			FileChange.AddUnique(Data.Filename);
 		}
@@ -323,6 +333,8 @@ void FEditorListener::OnCompile(const TArray<FFileChangeData>& InFileChangeData)
 
 		FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
 	}
+
+	CompilingFileChanges.Reset();
 }
 
 void FEditorListener::OnFilesLoaded()
@@ -350,8 +362,11 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData));
+		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
+			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData)))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptChanged();
+		}
 	});
 }
 
@@ -359,8 +374,11 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 {
 	OnAssetChanged(InAssetData, [&]
 	{
-		FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
-			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath));
+		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
+			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath)))
+		{
+			FUnrealCSharpFunctionLibrary::MarkScriptChanged();
+		}
 
 		FAssetGenerator::Generator(InAssetData);
 	});
@@ -452,9 +470,14 @@ void FEditorListener::OnBlueprintCompiled()
 		return;
 	}
 
-	auto bNeedCompile = false;
+	CompileChangedBlueprints();
+}
 
+void FEditorListener::CompileChangedBlueprints()
+{
 	FGeneratorCore::BeginGenerator(false);
+
+	FUnrealCSharpFunctionLibrary::ResetScriptChanged();
 
 	for (TObjectIterator<UBlueprint> Iterator; Iterator; ++Iterator)
 	{
@@ -478,8 +501,6 @@ void FEditorListener::OnBlueprintCompiled()
 						if (!IFileManager::Get().FileExists(
 							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
 						{
-							bNeedCompile = true;
-
 							FAssetGenerator::Generator(AssetData);
 						}
 
@@ -488,8 +509,6 @@ void FEditorListener::OnBlueprintCompiled()
 
 					if (*CrcCompiledSignature != CrcLastCompiledSignature)
 					{
-						bNeedCompile = true;
-
 						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
 
 						FAssetGenerator::Generator(AssetData);
@@ -497,11 +516,11 @@ void FEditorListener::OnBlueprintCompiled()
 				}
 			}
 		}
-
-		FGeneratorCore::EndGenerator(false);
 	}
 
-	if (bNeedCompile)
+	FGeneratorCore::EndGenerator(false);
+
+	if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
 	{
 		Compile();
 	}
@@ -520,9 +539,14 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 
 				if (FGeneratorCore::IsSupported(InAssetData))
 				{
+					FUnrealCSharpFunctionLibrary::ResetScriptChanged();
+
 					InGenerator();
 
-					FCSharpCompiler::Get().Compile();
+					if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
+					{
+						FCSharpCompiler::Get().Compile();
+					}
 				}
 
 				FGeneratorCore::EndGenerator(false);
@@ -613,6 +637,8 @@ void FEditorListener::Compile()
 {
 	if (!FileChanges.IsEmpty())
 	{
+		CompilingFileChanges = FileChanges;
+
 		FCSharpCompiler::Get().Compile(FileChanges);
 
 		FileChanges.Reset();
@@ -625,7 +651,11 @@ void FEditorListener::Compile()
 
 void FEditorListener::TickProgressWindow(const TSharedPtr<SWindow>& InWindow)
 {
+#if UE_F_SLATE_APPLICATION_IS_TICKING
 	if (InWindow.IsValid() && !FSlateApplication::Get().IsTicking())
+#else
+	if (InWindow.IsValid())
+#endif
 	{
 		FPlatformMisc::PumpMessagesForSlowTask();
 

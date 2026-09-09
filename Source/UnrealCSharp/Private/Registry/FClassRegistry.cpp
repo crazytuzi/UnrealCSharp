@@ -122,6 +122,16 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
+		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
+		{
+			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
+			{
+				Class->ClassConstructor = *FoundClassConstructor;
+
+				ClassConstructorMap.Remove(Class);
+			}
+		}
+
 		for (auto Iterator = PropertyHashMap.CreateIterator(); Iterator; ++Iterator)
 		{
 			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
@@ -130,13 +140,19 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 			}
 		}
 
-		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
+		for (auto Iterator = CSharpFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
 		{
-			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
 			{
-				Class->ClassConstructor = *FoundClassConstructor;
+				Iterator.RemoveCurrent();
+			}
+		}
 
-				ClassConstructorMap.Remove(Class);
+		for (auto Iterator = UnrealFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (std::get<0>(Iterator.Value()) == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
 			}
 		}
 
@@ -155,22 +171,14 @@ FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InP
 
 	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
 	{
-		if (const auto Property = std::get<1>(*FoundPropertyHash).Get())
-		{
-			if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(Property))
-			{
-				PropertyHashMap.Remove(InPropertyHash);
-
-				PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
-
-				return FoundPropertyDescriptor;
-			}
-		}
-		else
+		if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(
+			std::get<1>(*FoundPropertyHash)))
 		{
 			PropertyHashMap.Remove(InPropertyHash);
 
-			return nullptr;
+			PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
+
+			return FoundPropertyDescriptor;
 		}
 	}
 
@@ -201,7 +209,7 @@ void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
 void FClassRegistry::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
                                      FProperty* InProperty)
 {
-	PropertyHashMap.Add(InPropertyHash, std::make_tuple(InClassDescriptor, TFieldPath<FProperty>(InProperty)));
+	PropertyHashMap.Add(InPropertyHash, std::make_tuple(InClassDescriptor, InProperty));
 }
 
 void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
@@ -234,16 +242,28 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 	{
 		if (FDomain::IsLoadSucceed())
 		{
-			const auto Object = InObjectInitializer.GetObj();
-
-			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
-				IManagedHandleIsValid(FoundManagedHandle))
+			if (const auto Object = InObjectInitializer.GetObj();
+				Object != nullptr)
 			{
-				FDynamicClassGenerator::ObjectDeferredInitializer(InObjectInitializer);
-
-				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(Object->GetClass()))
+				if (const auto ObjectClass = Object->GetClass();
+					ObjectClass != nullptr)
 				{
-					FoundClass->ConstructorObject(FoundManagedHandle);
+					if (!FDynamicClassGenerator::IsDynamicClass(ObjectClass))
+					{
+						if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
+							IManagedHandleIsValid(FoundManagedHandle))
+						{
+							if (const auto FoundClass = FReflectionRegistry::Get().GetClass(ObjectClass);
+								FoundClass != nullptr)
+							{
+								FDynamicClassGenerator::ObjectDeferredConstructor(InObjectInitializer,
+									[FoundManagedHandle, FoundClass]()
+									{
+										FoundClass->ConstructorObject(FoundManagedHandle);
+									});
+							}
+						}
+					}
 				}
 			}
 		}

@@ -130,6 +130,8 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	if (Class == nullptr)
 	{
+		FCSharpEnvironment::GetEnvironment().RemoveClassDescriptor(InStruct);
+
 		return false;
 	}
 
@@ -365,9 +367,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 				OverrideFunctionHash, InClassDescriptor, OverrideFunction);
 		}
 
-		OriginalFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
-
-		OriginalFunction->FunctionFlags |= FUNC_Native;
+		RegisterCallCSharpNativeFunction(InClass, OriginalFunction);
 	}
 	else
 	{
@@ -385,9 +385,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		FCSharpEnvironment::GetEnvironment().AddFunctionHash<FCSharpFunctionDescriptor>(
 			FunctionHash, InClassDescriptor, NewFunction, FCSharpFunctionRegister(NewFunction, OriginalFunction));
 
-		NewFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
-
-		NewFunction->FunctionFlags |= FUNC_Native;
+		RegisterCallCSharpNativeFunction(InClass, NewFunction);
 	}
 
 	return true;
@@ -468,6 +466,25 @@ UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor,
 bool FCSharpBind::IsCallCSharpFunction(const UFunction* InFunction)
 {
 	return InFunction != nullptr && InFunction->GetNativeFunc() == &UCSharpFunction::execCallCSharp;
+}
+
+void FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction)
+{
+	if (InClass != nullptr && InFunction != nullptr)
+	{
+		InFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
+
+		InFunction->FunctionFlags |= FUNC_Native;
+
+		if (!InClass->NativeFunctionLookupTable.ContainsByPredicate(
+			[InFunction](const FNativeFunctionLookup& InNativeFunctionLookup)
+			{
+				return InNativeFunctionLookup.Name == InFunction->GetFName();
+			}))
+		{
+			InClass->AddNativeFunction(*InFunction->GetName(), &UCSharpFunction::execCallCSharp);
+		}
+	}
 }
 
 UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName)
