@@ -5,7 +5,7 @@ struct TValueWrapper
 {
 	typedef T Type;
 
-	explicit TValueWrapper(const Type& InValue):
+	explicit TValueWrapper(const Type& InValue) :
 		Value(InValue)
 	{
 	}

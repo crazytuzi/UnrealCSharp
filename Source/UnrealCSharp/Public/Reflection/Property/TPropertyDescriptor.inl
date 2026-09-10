@@ -7,7 +7,7 @@ template <typename T, auto IsPrimitive>
 class TPropertyDescriptor : public FPropertyDescriptor
 {
 public:
-	explicit TPropertyDescriptor(T* InProperty):
+	explicit TPropertyDescriptor(T* InProperty) :
 		Property(InProperty),
 		Class(FTypeBridge::GetClass(InProperty))
 	{

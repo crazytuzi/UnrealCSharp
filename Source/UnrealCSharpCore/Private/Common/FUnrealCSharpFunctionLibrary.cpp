@@ -1526,8 +1526,6 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	void* WritePipe = nullptr;
 
-	auto OutProcessID = 0u;
-
 	FString Result;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
@@ -1548,7 +1546,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		false,
 		true,
 		true,
-		&OutProcessID,
+		nullptr,
 		1,
 		WorkingDirectory,
 		WritePipe,
@@ -1568,7 +1566,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		}
 	};
 
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
 		FPlatformProcess::Sleep(0.01f);
 

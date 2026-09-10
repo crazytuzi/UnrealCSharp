@@ -4,7 +4,7 @@
 
 struct FBindingMethodRegister
 {
-	FBindingMethodRegister(const TFunction<FString()>& InMethodFunction, const void* InFunction):
+	FBindingMethodRegister(const TFunction<FString()>& InMethodFunction, const void* InFunction) :
 		MethodFunction(InMethodFunction),
 		Function(InFunction)
 	{

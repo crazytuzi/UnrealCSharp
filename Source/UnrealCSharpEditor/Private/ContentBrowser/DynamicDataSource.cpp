@@ -28,7 +28,7 @@
 
 #define LOCTEXT_NAMESPACE "UDynamicDataSource"
 
-FDeleteFileChange::FDeleteFileChange(const FString& InFilePath, const FString& InFileContent):
+FDeleteFileChange::FDeleteFileChange(const FString& InFilePath, const FString& InFileContent) :
 	FilePath(InFilePath),
 	FileContent(InFileContent)
 {

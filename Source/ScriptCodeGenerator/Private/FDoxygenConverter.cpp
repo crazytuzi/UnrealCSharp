@@ -28,7 +28,7 @@ enum class EExpect
 
 struct FTokenData
 {
-	explicit FTokenData(const ETokenKind InTokenKind, const FTextRange& InTextRange):
+	explicit FTokenData(const ETokenKind InTokenKind, const FTextRange& InTextRange) :
 		TokenKind(InTokenKind),
 		TextRange(InTextRange)
 	{
@@ -41,7 +41,7 @@ struct FTokenData
 
 struct FTagData
 {
-	explicit FTagData(const FStringView& InName):
+	explicit FTagData(const FStringView& InName) :
 		Name(InName)
 	{
 	}
@@ -66,7 +66,7 @@ struct FTagData
 class FTextReader
 {
 public:
-	explicit FTextReader(const FStringView& InText):
+	explicit FTextReader(const FStringView& InText) :
 		Text(InText),
 		bHasSaveText(false),
 		BeginIndex(0),
@@ -343,7 +343,7 @@ FStringView Slice(const FStringView& InText, const FTextRange& InTextRange)
 	return InText.SubStr(InTextRange.BeginIndex, InTextRange.Len());
 }
 
-FDoxygenConverter::FDoxygenConverter(const FString& InIndent):
+FDoxygenConverter::FDoxygenConverter(const FString& InIndent) :
 	Indent(InIndent)
 {
 }

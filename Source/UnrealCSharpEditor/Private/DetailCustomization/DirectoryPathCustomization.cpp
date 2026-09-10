@@ -10,7 +10,7 @@
 
 #define LOCTEXT_NAMESPACE "DirectoryPathCustomization"
 
-FDirectoryPathCustomization::FDirectoryPathCustomization(const FString& InAbsoluteDirectory):
+FDirectoryPathCustomization::FDirectoryPathCustomization(const FString& InAbsoluteDirectory) :
 	IPropertyTypeCustomization(),
 	AbsoluteDirectory(InAbsoluteDirectory)
 {

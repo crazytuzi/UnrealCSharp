@@ -20,7 +20,7 @@ public:
 			enum { value = IsType<U>::Value };
 		};
 
-		TMultiAddress(T InValue, const bool InNeedFree):
+		TMultiAddress(T InValue, const bool InNeedFree) :
 			TValueWrapper<T>(InValue),
 			bNeedFree(InNeedFree)
 		{

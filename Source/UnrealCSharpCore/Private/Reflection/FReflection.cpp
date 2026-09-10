@@ -3,7 +3,7 @@
 
 FReflection::FReflection(const FString& InName,
                          const TSet<FClassReflection*>& InAttributes,
-                         const TMap<FClassReflection*, TArray<FString>>& InAttributeValues):
+                         const TMap<FClassReflection*, TArray<FString>>& InAttributeValues) :
 	Name(InName),
 	Attributes(InAttributes),
 	AttributeValues(InAttributeValues)

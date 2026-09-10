@@ -58,7 +58,7 @@ public:
 
 	FFieldReflection* GetField(const FString& InName) const;
 
-	const TMap<TPair<FString, int32>, FMethodReflection*>& GetMethods() const;
+	const TMap<TTuple<FString, int32>, FMethodReflection*>& GetMethods() const;
 
 	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
 
@@ -175,5 +175,5 @@ private:
 
 	TMap<FString, FFieldReflection*> Fields;
 
-	TMap<TPair<FString, int32>, FMethodReflection*> Methods;
+	TMap<TTuple<FString, int32>, FMethodReflection*> Methods;
 };

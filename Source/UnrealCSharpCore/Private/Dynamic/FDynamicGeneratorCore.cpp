@@ -928,7 +928,7 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 	{
 		if (Method->IsUFunction())
 		{
-			auto Function = NewObject<UFunction>(InClass, FName(Pair.Key), RF_Public | RF_Transient);
+			auto Function = NewObject<UFunction>(InClass, FName(Pair.Get<0>()), RF_Public | RF_Transient);
 
 			if (Method->IsStatic())
 			{

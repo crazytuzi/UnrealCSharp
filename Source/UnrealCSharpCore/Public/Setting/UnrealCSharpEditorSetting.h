@@ -17,7 +17,7 @@ struct FProjectDirectoryPath : public FDirectoryPath
 
 	FProjectDirectoryPath() = default;
 
-	explicit FProjectDirectoryPath(const FString& InPath):
+	explicit FProjectDirectoryPath(const FString& InPath) :
 		FDirectoryPath()
 	{
 		Path = InPath;

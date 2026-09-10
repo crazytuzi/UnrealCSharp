@@ -25,13 +25,13 @@ void FGameplayTagGenerator::Generator()
 {
 	FGameplayTagTreeNode Root;
 
-	TArray<TPair<FString, FString>> Tags;
+	TArray<TTuple<FString, FString>> Tags;
 
 	CollectGameplayTags(Tags);
 
-	for (const auto& Tag : Tags)
+	for (const auto& [Tag, Comment] : Tags)
 	{
-		GeneratorTag(Root, Tag.Key, Tag.Value);
+		GeneratorTag(Root, Tag, Comment);
 	}
 
 	const auto DirectoryName = FPaths::Combine(
@@ -247,7 +247,7 @@ FString FGameplayTagGenerator::MakeUniqueName(const FString& InName, TSet<FStrin
 	return Name;
 }
 
-void FGameplayTagGenerator::CollectGameplayTags(TArray<TPair<FString, FString>>& OutTags)
+void FGameplayTagGenerator::CollectGameplayTags(TArray<TTuple<FString, FString>>& OutTags)
 {
 	TArray<TSharedPtr<FGameplayTagNode>> RootTags;
 
@@ -260,7 +260,7 @@ void FGameplayTagGenerator::CollectGameplayTags(TArray<TPair<FString, FString>>&
 }
 
 void FGameplayTagGenerator::VisitTagNodes(const TSharedPtr<FGameplayTagNode>& InNode,
-                                          TArray<TPair<FString, FString>>& OutTags)
+                                          TArray<TTuple<FString, FString>>& OutTags)
 {
 	if (InNode.IsValid())
 	{

@@ -4,7 +4,7 @@
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 
-TSet<TPair<FString, FString>> FDelegateGenerator::Delegate;
+TSet<TTuple<FString, FString>> FDelegateGenerator::Delegate;
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {

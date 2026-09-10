@@ -1,7 +1,7 @@
 #include "ContentBrowser/DynamicFileItemDataPayload.h"
 #include "ContentBrowserDataSource.h"
 
-FDynamicFileItemDataPayload::FDynamicFileItemDataPayload(const FName& InInternalPath, UClass* InClass):
+FDynamicFileItemDataPayload::FDynamicFileItemDataPayload(const FName& InInternalPath, UClass* InClass) :
 	InternalPath(InInternalPath),
 	Class(InClass),
 	AssetData(InClass)
