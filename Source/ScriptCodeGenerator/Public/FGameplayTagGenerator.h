@@ -20,8 +20,8 @@ private:
 
 	static FString MakeUniqueName(const FString& InName, TSet<FString>& InOutUsedNames);
 
-	static void CollectGameplayTags(TArray<TPair<FString, FString>>& OutTags);
+	static void CollectGameplayTags(TArray<TTuple<FString, FString>>& OutTags);
 
 	static void VisitTagNodes(const TSharedPtr<FGameplayTagNode>& InNode,
-	                          TArray<TPair<FString, FString>>& OutTags);
+	                          TArray<TTuple<FString, FString>>& OutTags);
 };

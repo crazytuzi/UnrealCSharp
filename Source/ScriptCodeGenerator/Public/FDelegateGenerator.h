@@ -14,5 +14,5 @@ private:
 
 	static void Generator(FMulticastDelegateProperty* InMulticastDelegateProperty);
 
-	static TSet<TPair<FString, FString>> Delegate;
+	static TSet<TTuple<FString, FString>> Delegate;
 };

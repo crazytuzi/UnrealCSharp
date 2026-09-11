@@ -4,7 +4,7 @@ FBindingEnum::FBindingEnum(const FString& InEnum,
                            const FString& InUnderlyingType,
                            const bool InIsProjectEnum,
                            const FBindingTypeInfo& InTypeInfo,
-                           const TMap<FString, int64>& InEnumerators):
+                           const TMap<FString, int64>& InEnumerators) :
 	Enum(InEnum),
 	UnderlyingType(InUnderlyingType),
 	bIsProjectEnum(InIsProjectEnum),

@@ -7,7 +7,7 @@
 class FDynamicBlueprintExtensionScope
 {
 public:
-	explicit FDynamicBlueprintExtensionScope(UBlueprint* InBlueprint):
+	explicit FDynamicBlueprintExtensionScope(UBlueprint* InBlueprint) :
 		Blueprint(InBlueprint)
 	{
 		if (Blueprint != nullptr)

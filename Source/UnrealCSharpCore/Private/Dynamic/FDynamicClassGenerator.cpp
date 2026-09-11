@@ -745,7 +745,7 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 
 				auto SimpleConstructionScript = BlueprintGeneratedClass->SimpleConstructionScript.Get();
 
-				TArray<TPair<USCS_Node*, FName>> NodeParents;
+				TArray<TTuple<USCS_Node*, FName>> NodeParents;
 
 				for (const auto& DefaultSubObjectInfo : DefaultSubObjectInfoMap[BlueprintGeneratedClass])
 				{

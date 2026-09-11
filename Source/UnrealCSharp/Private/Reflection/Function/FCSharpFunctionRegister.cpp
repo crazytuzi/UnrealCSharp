@@ -3,7 +3,7 @@
 FCSharpFunctionRegister::FCSharpFunctionRegister(UFunction* InFunction,
                                                  UFunction* InOriginalFunction,
                                                  const EFunctionFlags InOriginalFunctionFlags,
-                                                 const FNativeFuncPtr InOriginalNativeFuncPtr):
+                                                 const FNativeFuncPtr InOriginalNativeFuncPtr) :
 	Function(InFunction),
 	OriginalFunction(InOriginalFunction),
 	OriginalFunctionFlags(InOriginalFunctionFlags),
@@ -11,7 +11,7 @@ FCSharpFunctionRegister::FCSharpFunctionRegister(UFunction* InFunction,
 {
 }
 
-FCSharpFunctionRegister::FCSharpFunctionRegister(FCSharpFunctionRegister&& InOther):
+FCSharpFunctionRegister::FCSharpFunctionRegister(FCSharpFunctionRegister&& InOther) :
 	Function(InOther.Function),
 	OriginalFunction(InOther.OriginalFunction),
 	OriginalFunctionFlags(InOther.OriginalFunctionFlags),

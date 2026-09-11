@@ -55,13 +55,13 @@ private:
 private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
-	TMap<uint32, std::tuple<FClassDescriptor*, FProperty*>> PropertyHashMap;
+	TMap<uint32, TTuple<FClassDescriptor*, FProperty*>> PropertyHashMap;
 
 	TMap<uint32, FPropertyDescriptor*> PropertyDescriptorMap;
 
-	TMap<uint32, std::tuple<FClassDescriptor*, UFunction*, FCSharpFunctionRegister>> CSharpFunctionHashMap;
+	TMap<uint32, TTuple<FClassDescriptor*, UFunction*, FCSharpFunctionRegister>> CSharpFunctionHashMap;
 
-	TMap<uint32, std::tuple<FClassDescriptor*, UFunction*>> UnrealFunctionHashMap;
+	TMap<uint32, TTuple<FClassDescriptor*, UFunction*>> UnrealFunctionHashMap;
 
 	TMap<uint32, FCSharpFunctionDescriptor*> CSharpFunctionDescriptorMap;
 

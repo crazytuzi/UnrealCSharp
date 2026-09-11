@@ -18,7 +18,7 @@
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
 
-UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
+UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer) :
 #if WITH_EDITOR
 	Super(ObjectInitializer),
 	bIsSkipGenerateScriptCode(false),

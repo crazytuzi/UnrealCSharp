@@ -10,7 +10,7 @@ FBindingClass::FBindingClass(const FString& InBaseClass,
                              const FBindingSubscript& InSubscript,
                              const TArray<FBindingProperty>& InProperties,
                              const TArray<FBindingFunction>& InFunctions,
-                             const TArray<FBindingMethod>& InMethods):
+                             const TArray<FBindingMethod>& InMethods) :
 	BaseClass(InBaseClass),
 	Class(InClass),
 	ImplementationNameSpace(InImplementationNameSpace),

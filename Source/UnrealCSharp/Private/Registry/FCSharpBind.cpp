@@ -274,7 +274,7 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 			{
 				if (Method->IsOverride())
 				{
-					Methods.Add(Name.Key, Method);
+					Methods.Add(Name.Get<0>(), Method);
 				}
 			}
 		}

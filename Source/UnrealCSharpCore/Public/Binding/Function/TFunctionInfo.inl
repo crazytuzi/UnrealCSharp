@@ -8,14 +8,14 @@
 template <auto, auto FunctionType, typename Result, typename... Args>
 struct TFunctionInfo final : FFunctionInfo
 {
-	TFunctionInfo():
+	TFunctionInfo() :
 		FunctionInteract(EFunctionInteract::None),
 		Return{TTypeInfo<Result>::Get()},
 		Argument{TTypeInfo<Args>::Get()...}
 	{
 	}
 
-	explicit TFunctionInfo(const TArray<FString>& InParamNames, const TArray<FString>& InDefaultArguments):
+	explicit TFunctionInfo(const TArray<FString>& InParamNames, const TArray<FString>& InDefaultArguments) :
 		ParamNames(InParamNames),
 		DefaultArguments(InDefaultArguments),
 		FunctionInteract(EFunctionInteract::None),
@@ -24,7 +24,7 @@ struct TFunctionInfo final : FFunctionInfo
 	{
 	}
 
-	explicit TFunctionInfo(const EFunctionInteract InFunctionInteract):
+	explicit TFunctionInfo(const EFunctionInteract InFunctionInteract) :
 		FunctionInteract(InFunctionInteract),
 		Return{TTypeInfo<Result>::Get()},
 		Argument{TTypeInfo<Args>::Get()...}
@@ -32,7 +32,7 @@ struct TFunctionInfo final : FFunctionInfo
 	}
 
 	explicit TFunctionInfo(const TArray<FString>& InParamNames, const EFunctionInteract InFunctionInteract,
-	                       const TArray<FString>& InDefaultArguments):
+	                       const TArray<FString>& InDefaultArguments) :
 		ParamNames(InParamNames),
 		DefaultArguments(InDefaultArguments),
 		FunctionInteract(InFunctionInteract),

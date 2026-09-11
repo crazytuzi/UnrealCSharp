@@ -16,7 +16,7 @@
 #include "EditorStyleSet.h"
 #endif
 
-FCSharpCompilerRunnable::FCSharpCompilerRunnable():
+FCSharpCompilerRunnable::FCSharpCompilerRunnable() :
 	Event(nullptr),
 	bIsCompiling(false),
 	bIsGenerating(false),

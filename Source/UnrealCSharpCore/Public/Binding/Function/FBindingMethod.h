@@ -4,7 +4,7 @@ struct FBindingMethod
 {
 	FBindingMethod() = default;
 
-	FBindingMethod(const FString& InMethod, const void* InFunction):
+	FBindingMethod(const FString& InMethod, const void* InFunction) :
 		Method(InMethod),
 		Function(InFunction)
 	{

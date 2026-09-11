@@ -28,7 +28,7 @@
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "UEVersion.h"
 
-FEditorListener::FEditorListener():
+FEditorListener::FEditorListener() :
 	bIsPIEPlaying(false),
 	bIsPreparingPIE(false),
 	bIsGenerating(false)

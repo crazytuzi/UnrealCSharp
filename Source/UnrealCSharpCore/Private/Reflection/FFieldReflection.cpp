@@ -2,7 +2,7 @@
 #include "Reflection/FClassReflection.h"
 #include "Domain/Script/IScriptDomain.h"
 
-FFieldReflection::FFieldReflection(const FString& InName, const IManagedHandle InManagedField):
+FFieldReflection::FFieldReflection(const FString& InName, const IManagedHandle InManagedField) :
 	FReflection(InName),
 	ManagedField(InManagedField)
 {

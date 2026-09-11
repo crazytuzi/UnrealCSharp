@@ -4,7 +4,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
 
-FClassDescriptor::FClassDescriptor(UStruct* InStruct):
+FClassDescriptor::FClassDescriptor(UStruct* InStruct) :
 	Struct(InStruct)
 {
 	Initialize();

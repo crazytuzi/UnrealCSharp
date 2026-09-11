@@ -276,7 +276,7 @@ void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassR
 		return;
 	}
 
-	TArray<TPair<FName, int64>> InNames;
+	TArray<TTuple<FName, int64>> InNames;
 
 	for (const auto& [Name, Field] : InClassReflection->GetFields())
 	{

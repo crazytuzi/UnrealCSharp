@@ -1,7 +1,7 @@
 #include "FCSharpCompiler.h"
 #include "FCSharpCompilerRunnable.h"
 
-FCSharpCompiler::FCSharpCompiler():
+FCSharpCompiler::FCSharpCompiler() :
 	Runnable(nullptr),
 	Thread(nullptr)
 {

@@ -9,7 +9,7 @@ struct FBindingPropertyRegister : FBindingTypeInfoRegister
 	FBindingPropertyRegister(const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction,
 	                         const FString& InName,
 	                         const EBindingPropertyAccess& InPropertyAccess,
-	                         const TOptional<EPropertyInteract>& InPropertyInteract):
+	                         const TOptional<EPropertyInteract>& InPropertyInteract) :
 		FBindingTypeInfoRegister(InTypeInfoFunction),
 		Name(InName),
 		PropertyAccess(InPropertyAccess),

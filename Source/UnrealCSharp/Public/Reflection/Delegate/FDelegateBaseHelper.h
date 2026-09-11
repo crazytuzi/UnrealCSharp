@@ -3,7 +3,7 @@
 class FDelegateBaseHelper
 {
 public:
-	explicit FDelegateBaseHelper(void* InAddress):
+	explicit FDelegateBaseHelper(void* InAddress) :
 		Address(InAddress)
 	{
 	}
