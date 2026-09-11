@@ -170,7 +170,8 @@ namespace Interop
                 _ when InType == typeof(ulong) => *(ulong*)InHandle,
                 _ when InType == typeof(nuint) => *(nuint*)InHandle,
                 _ when InType == typeof(float) => *(float*)InHandle,
-                _ when InType == typeof(double) => *(double*)InHandle
+                _ when InType == typeof(double) => *(double*)InHandle,
+                _ => null!
             };
         }
 

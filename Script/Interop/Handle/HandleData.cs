@@ -115,17 +115,6 @@ namespace Interop
             return 0;
         }
 
-        public static unsafe void GetObjectPointers(nint* InHandles, nint* OutObjectPointers, int InLength)
-        {
-            if (InHandles != null && OutObjectPointers != null)
-            {
-                for (var Index = 0; Index < InLength; Index++)
-                {
-                    OutObjectPointers[Index] = GetObjectPointer(InHandles[Index]);
-                }
-            }
-        }
-
         internal static void Clear()
         {
             lock (Lock)
