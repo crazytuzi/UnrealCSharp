@@ -38,5 +38,5 @@ bool UGeneratorScriptCodeCommandlet::IsRunningGeneratorScriptCodeCommandlet()
 	FString Value;
 
 	return FParse::Value(FCommandLine::Get(), TEXT("run="), Value) &&
-		Value.Equals(TEXT("GeneratorScriptCodeCommandlet"));
+		Value.Equals(TEXT("GeneratorScriptCode"), ESearchCase::IgnoreCase);
 }
