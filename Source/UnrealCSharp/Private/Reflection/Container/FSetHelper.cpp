@@ -3,7 +3,7 @@
 #include "CppVersion.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty):
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
 	ElementPropertyDescriptor(nullptr),
 	ScriptSet(nullptr),
 	bNeedFreeData(InbNeedFreeData),

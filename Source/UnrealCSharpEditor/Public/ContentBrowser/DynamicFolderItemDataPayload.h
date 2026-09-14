@@ -5,7 +5,7 @@
 class FDynamicFolderItemDataPayload final : public IContentBrowserItemDataPayload
 {
 public:
-	explicit FDynamicFolderItemDataPayload(const FName& InInternalPath):
+	explicit FDynamicFolderItemDataPayload(const FName& InInternalPath) :
 		InternalPath(InInternalPath)
 	{
 	}

@@ -2,7 +2,7 @@
 #include "CppVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty):
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),

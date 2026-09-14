@@ -18,7 +18,7 @@ void FFunctionParamBufferAllocator::Free(void* InMemory)
 }
 
 FFunctionParamPoolBufferAllocator::FFunctionParamPoolBufferAllocator(
-	const TWeakObjectPtr<UFunction>& InFunction):
+	const TWeakObjectPtr<UFunction>& InFunction) :
 	Count(0),
 	ParamSize(InFunction->ParmsSize)
 {

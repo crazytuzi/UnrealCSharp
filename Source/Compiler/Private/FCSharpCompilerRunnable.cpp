@@ -1,4 +1,5 @@
 #include "FCSharpCompilerRunnable.h"
+#include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -6,6 +7,8 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Containers/Ticker.h"
+#include "Internationalization/Text.h"
 #include "UEVersion.h"
 #if UE_F_APP_STYLE_GET_BRUSH
 #include "Styling/AppStyle.h"
@@ -13,7 +16,7 @@
 #include "EditorStyleSet.h"
 #endif
 
-FCSharpCompilerRunnable::FCSharpCompilerRunnable():
+FCSharpCompilerRunnable::FCSharpCompilerRunnable() :
 	Event(nullptr),
 	bIsCompiling(false),
 	bIsGenerating(false),
@@ -145,26 +148,30 @@ bool FCSharpCompilerRunnable::IsCompiling() const
 	return bIsCompiling == true || !Tasks.IsEmpty();
 }
 
+FString FCSharpCompilerRunnable::GetCompileProgress() const
+{
+	return CompileProgress.GetStage();
+}
+
 void FCSharpCompilerRunnable::DoWork()
 {
-	Compile([&]()
+	Compile([](const TArray<FFileChangeData>& InFileChanges)
 	{
-		FDynamicGenerator::Generator(FileChanges);
-
-		FileChanges.Empty();
+		FDynamicGenerator::Generator(InFileChanges);
 	});
 }
 
 void FCSharpCompilerRunnable::ImmediatelyDoWork(const bool bForceCompileInterop)
 {
-	Compile([]()
+	Compile([](const TArray<FFileChangeData>&)
 	{
 		FDynamicGenerator::Generator();
-	}, true, bForceCompileInterop);
+	}, true, bForceCompileInterop, true);
 }
 
-void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop,
-                                      const bool bForceCompileInterop)
+void FCSharpCompilerRunnable::Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction,
+                                      const bool bCompileInterop, const bool bForceCompileInterop,
+                                      const bool bReloadImmediately)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -173,28 +180,67 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 		{
 			bIsCompiling = true;
 
-			if (bCompileInterop)
+			CompileProgress.SetStage(FCSharpCompileProgress::StagePreparing);
+
+			if (bCompileInterop && !CompileInterop(bForceCompileInterop))
 			{
-				CompileInterop(bForceCompileInterop);
+				CompileProgress.SetStage(FCSharpCompileProgress::StageFailed);
+
+				ShowCompileResultNotification(false);
+
+				bIsCompiling = false;
+
+				return;
 			}
 
-			Compile();
+			TArray<FFileChangeData> FileChangesSnapshot;
 
-			const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-				[InFunction, this]()
-				{
-					if (!GExitPurge)
+			const auto bSucceeded = Compile();
+
+			if (bSucceeded)
+			{
+				FScopeLock ScopeLock(&CriticalSection);
+
+				FileChangesSnapshot = MoveTemp(FileChanges);
+			}
+
+			FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
+
+			if (bSucceeded)
+			{
+				const auto bHasDynamicFileChanged = FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot);
+
+				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+					[InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
 					{
-						FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(FileChanges);
+						if (GExitPurge)
+						{
+							return;
+						}
 
-						InFunction();
-					}
-				},
-				TStatId(),
-				nullptr,
-				ENamedThreads::GameThread);
+						auto& UnrealCSharpCoreModule = FUnrealCSharpCoreModule::Get();
 
-			FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+						if (UnrealCSharpCoreModule.IsLoaded() && (bReloadImmediately || bHasDynamicFileChanged))
+						{
+							UnrealCSharpCoreModule.Deactivate();
+
+							InFunction(FileChangesSnapshot);
+
+							UnrealCSharpCoreModule.Activate();
+						}
+						else
+						{
+							InFunction(FileChangesSnapshot);
+
+							UnrealCSharpCoreModule.MarkOutdated();
+						}
+					},
+					TStatId(),
+					nullptr,
+					ENamedThreads::GameThread);
+
+				FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+			}
 
 			bIsCompiling = false;
 		}
@@ -216,18 +262,20 @@ FString FCSharpCompilerRunnable::GetBuildConfiguration()
 	return TEXT("Debug");
 }
 
-void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
+bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
 
 	if (!IFileManager::Get().FileExists(*InteropProjectPath))
 	{
-		return;
+		return true;
 	}
 
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
 		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
 	{
+		CompileProgress.SetStage(FCSharpCompileProgress::StageCompilingInterop);
+
 		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 		const auto CompileParam = FString::Printf(TEXT(
@@ -238,24 +286,41 @@ void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 		                                          bForceCompileInterop ? TEXT(" --no-incremental") : TEXT("")
 		);
 
+		auto bSucceeded = false;
+
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
-		                                          [](const int32 InReturnCode, const FString& InResult)
+		                                          [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
 		                                          {
-			                                          if (InReturnCode != 0)
+			                                          bSucceeded = InReturnCode == 0;
+
+			                                          CompileProgress.Flush();
+
+			                                          if (!bSucceeded)
 			                                          {
+				                                          UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 			                                          }
 		                                          },
-		                                          FPaths::GetPath(InteropProjectPath)
+		                                          FPaths::GetPath(InteropProjectPath),
+		                                          [this](const FString& InOutput)
+		                                          {
+			                                          CompileProgress.SetOutput(InOutput);
+		                                          }
 		);
+
+		return bSucceeded;
 	}
+
+	return true;
 }
 
-void FCSharpCompilerRunnable::Compile()
+bool FCSharpCompilerRunnable::Compile()
 {
 	if (!IFileManager::Get().FileExists(*FUnrealCSharpFunctionLibrary::GetGameProjectPath()))
 	{
-		return;
+		return false;
 	}
+
+	CompileProgress.SetStage(FCSharpCompileProgress::StageCompilingUE);
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
@@ -266,7 +331,9 @@ void FCSharpCompilerRunnable::Compile()
 
 		static const FName CompileStatusBackground("Blueprint.CompileStatus.Background");
 
-		FNotificationInfo NotificationInfo(FText::FromString(TEXT("Compilation background")));
+		const auto DefaultText = NSLOCTEXT("UnrealCSharp", "CompilingNotification", "Compiling Scripts");
+
+		FNotificationInfo NotificationInfo(DefaultText);
 
 		NotificationInfo.bUseSuccessFailIcons = true;
 
@@ -285,6 +352,33 @@ void FCSharpCompilerRunnable::Compile()
 		NotificationInfo.FadeInDuration = 0.5f;
 
 		NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
+
+		if (NotificationItem.IsValid())
+		{
+			FTSTicker::GetCoreTicker().RemoveTicker(ProgressTickerHandle);
+
+			ProgressTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateLambda(
+					[this, DefaultText, LastText = FString()](float) mutable
+					{
+						if (GExitPurge || !NotificationItem.IsValid() || !IsCompiling())
+						{
+							return false;
+						}
+
+						const auto Stage = CompileProgress.GetStage();
+
+						if (const auto Text = Stage.IsEmpty() ? DefaultText.ToString() : Stage;
+							Text != LastText)
+						{
+							LastText = Text;
+
+							NotificationItem->SetText(FText::FromString(Text));
+						}
+
+						return true;
+					}));
+		}
 	});
 
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
@@ -296,54 +390,40 @@ void FCSharpCompilerRunnable::Compile()
 	                                          *GetBuildConfiguration()
 	);
 
-	FNotificationInfo* NotificationInfo{};
+	auto bSucceeded = false;
 
-	const auto OnComplete = [&NotificationInfo](const int32 InReturnCode, const FString& InResult)
+	const auto OnComplete = [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
 	{
-		[[maybe_unused]] static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
+		bSucceeded = InReturnCode == 0;
 
-		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
+		CompileProgress.Flush();
 
-		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
+		CompileProgress.SetStage(bSucceeded
+			                         ? FCSharpCompileProgress::StageSucceeded
+			                         : FCSharpCompileProgress::StageFailed);
 
-		[[maybe_unused]] static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
-
-		if (InReturnCode == 0)
+		if (!bSucceeded)
 		{
-			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
-
-			NotificationInfo->bUseSuccessFailIcons = true;
-
-#if UE_F_APP_STYLE_GET_BRUSH
-			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusGood);
-#else
-			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusGood);
-#endif
-		}
-		else
-		{
-			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation failed")));
-
-			NotificationInfo->bUseSuccessFailIcons = true;
-
-#if UE_F_APP_STYLE_GET_BRUSH
-			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusError);
-#else
-			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);
-#endif
-
 			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 		}
+
+		ShowCompileResultNotification(bSucceeded);
 	};
 
-	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete);
+	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(),
+	                                          [this](const FString& InOutput)
+	                                          {
+		                                          CompileProgress.SetOutput(InOutput);
+	                                          });
 
-	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
+	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
 		if (GExitPurge)
 		{
 			return;
 		}
+
+		FTSTicker::GetCoreTicker().RemoveTicker(ProgressTickerHandle);
 
 		if (NotificationItem.IsValid())
 		{
@@ -351,17 +431,36 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationItem.Reset();
 		}
+	});
 
-		if (NotificationInfo != nullptr)
+	return bSucceeded;
+}
+
+void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded) const
+{
+	AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+	{
+		if (GExitPurge)
 		{
-			NotificationInfo->bFireAndForget = true;
-
-			NotificationInfo->FadeOutDuration = 2.0f;
-
-			NotificationInfo->FadeInDuration = 0.5f;
-
-			FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
+			return;
 		}
+
+		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
+
+		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
+
+		const auto NotificationInfo = new FNotificationInfo(
+			FText::FromString(bSucceeded ? TEXT("Compilation succeeded") : TEXT("Compilation failed")));
+
+		NotificationInfo->bUseSuccessFailIcons = true;
+
+#if UE_F_APP_STYLE_GET_BRUSH
+		NotificationInfo->Image = FAppStyle::GetBrush(bSucceeded ? CompileStatusGood : CompileStatusError);
+#else
+		NotificationInfo->Image = FEditorStyle::GetBrush(bSucceeded ? CompileStatusGood : CompileStatusError);
+#endif
+
+		FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
 	});
 }
 

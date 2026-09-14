@@ -745,7 +745,7 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 
 				auto SimpleConstructionScript = BlueprintGeneratedClass->SimpleConstructionScript.Get();
 
-				TArray<TPair<USCS_Node*, FName>> NodeParents;
+				TArray<TTuple<USCS_Node*, FName>> NodeParents;
 
 				for (const auto& DefaultSubObjectInfo : DefaultSubObjectInfoMap[BlueprintGeneratedClass])
 				{
@@ -830,9 +830,10 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 
 	if (OnPostClassConstructor != nullptr)
 	{
-		ObjectDeferredInitializer(InObjectInitializer);
-
-		OnPostClassConstructor(Object);
+		ObjectDeferredConstructor(InObjectInitializer, [Object]()
+		{
+			OnPostClassConstructor(Object);
+		});
 	}
 }
 
@@ -916,11 +917,16 @@ USCS_Node* FDynamicClassGenerator::NewNode(USimpleConstructionScript* InSimpleCo
 	return Node;
 }
 
-void FDynamicClassGenerator::ObjectDeferredInitializer(const FObjectInitializer& InObjectInitializer)
+void FDynamicClassGenerator::ObjectDeferredConstructor(const FObjectInitializer& InObjectInitializer,
+                                                       TFunction<void()>&& InConstructor)
 {
-	auto& ObjectInitializer = const_cast<FObjectInitializer&>(InObjectInitializer);
+	if (auto& ObjectInitializer = const_cast<FObjectInitializer&>(InObjectInitializer);
+		ObjectInitializer.GetObj() != nullptr)
+	{
+		ObjectInitializer.~FObjectInitializer();
 
-	ObjectInitializer.~FObjectInitializer();
+		ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
+	}
 
-	ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
+	InConstructor();
 }

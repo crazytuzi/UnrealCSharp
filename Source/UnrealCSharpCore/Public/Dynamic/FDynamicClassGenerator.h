@@ -115,8 +115,9 @@ private:
 	                          const FName& InName);
 
 public:
-	static UNREALCSHARPCORE_API void ObjectDeferredInitializer(const FObjectInitializer& InObjectInitializer);
-	
+	static UNREALCSHARPCORE_API void ObjectDeferredConstructor(const FObjectInitializer& InObjectInitializer,
+	                                                           TFunction<void()>&& InConstructor);
+
 public:
 	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 

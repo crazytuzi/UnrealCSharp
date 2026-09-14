@@ -4,7 +4,7 @@
 #include "Macro/FunctionMacro.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
-                                                     FCSharpFunctionRegister&& InFunctionRegister):
+                                                     FCSharpFunctionRegister&& InFunctionRegister) :
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
 	FunctionRegister(std::move(InFunctionRegister))

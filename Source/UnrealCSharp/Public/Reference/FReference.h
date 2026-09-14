@@ -5,7 +5,7 @@
 class UNREALCSHARP_API FReference
 {
 public:
-	explicit FReference(const IManagedHandle InManagedHandle):
+	explicit FReference(const IManagedHandle InManagedHandle) :
 		ManagedHandle(InManagedHandle)
 	{
 	}

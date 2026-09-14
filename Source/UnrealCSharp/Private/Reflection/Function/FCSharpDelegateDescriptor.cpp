@@ -1,7 +1,7 @@
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
+FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction) :
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPersistentBufferAllocator>(InFunction))
 {

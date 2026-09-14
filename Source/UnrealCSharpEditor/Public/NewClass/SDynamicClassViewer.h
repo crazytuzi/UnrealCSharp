@@ -10,7 +10,7 @@ struct FDynamicClassViewerNode
 
 	FString ObjectPath;
 
-	explicit FDynamicClassViewerNode(const FString& InAssetName, const FString& InObjectPath):
+	explicit FDynamicClassViewerNode(const FString& InAssetName, const FString& InObjectPath) :
 		AssetClassName(InAssetName),
 		ObjectPath(InObjectPath)
 	{

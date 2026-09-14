@@ -6,7 +6,7 @@
 
 struct FStructAddressBase : TValueWrapper<TWeakObjectPtr<UScriptStruct>>
 {
-	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress):
+	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress) :
 		TValueWrapper(InScriptStruct),
 		Address(InAddress)
 	{
@@ -26,7 +26,7 @@ private:
 	{
 		bool bNeedFree;
 
-		FStructAddress(UScriptStruct* InScriptStruct, void* InAddress, const bool InNeedFree):
+		FStructAddress(UScriptStruct* InScriptStruct, void* InAddress, const bool InNeedFree) :
 			FStructAddressBase(InScriptStruct, InAddress),
 			bNeedFree(InNeedFree)
 		{

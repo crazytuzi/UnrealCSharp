@@ -3,7 +3,7 @@
 #include "UObject/PropertyOptional.h"
 
 FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* InData,
-                                 const bool InbNeedFreeData, const bool InbNeedFreeProperty):
+                                 const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
 	OptionalProperty(InOptionalProperty),
 	ValuePropertyDescriptor(nullptr),
 	Data(nullptr),

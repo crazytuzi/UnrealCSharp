@@ -132,6 +132,30 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 			}
 		}
 
+		for (auto Iterator = PropertyHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (Iterator.Value().Get<0>() == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
+		for (auto Iterator = CSharpFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (Iterator.Value().Get<0>() == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
+		for (auto Iterator = UnrealFunctionHashMap.CreateIterator(); Iterator; ++Iterator)
+		{
+			if (Iterator.Value().Get<0>() == *FoundClassDescriptor)
+			{
+				Iterator.RemoveCurrent();
+			}
+		}
+
 		delete *FoundClassDescriptor;
 
 		ClassDescriptorMap.Remove(InStruct);
@@ -147,8 +171,8 @@ FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InP
 
 	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
 	{
-		if (const auto FoundPropertyDescriptor = std::get<0>(*FoundPropertyHash)->AddPropertyDescriptor(
-			std::get<1>(*FoundPropertyHash)))
+		if (const auto FoundPropertyDescriptor = FoundPropertyHash->Get<0>()->AddPropertyDescriptor(
+			FoundPropertyHash->Get<1>()))
 		{
 			PropertyHashMap.Remove(InPropertyHash);
 
@@ -185,7 +209,7 @@ void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
 void FClassRegistry::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
                                      FProperty* InProperty)
 {
-	PropertyHashMap.Add(InPropertyHash, std::make_tuple(InClassDescriptor, InProperty));
+	PropertyHashMap.Add(InPropertyHash, MakeTuple(InClassDescriptor, InProperty));
 }
 
 void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
@@ -218,16 +242,28 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 	{
 		if (FDomain::IsLoadSucceed())
 		{
-			const auto Object = InObjectInitializer.GetObj();
-
-			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
-				IManagedHandleIsValid(FoundManagedHandle))
+			if (const auto Object = InObjectInitializer.GetObj();
+				Object != nullptr)
 			{
-				FDynamicClassGenerator::ObjectDeferredInitializer(InObjectInitializer);
-
-				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(Object->GetClass()))
+				if (const auto ObjectClass = Object->GetClass();
+					ObjectClass != nullptr)
 				{
-					FoundClass->ConstructorObject(FoundManagedHandle);
+					if (!FDynamicClassGenerator::IsDynamicClass(ObjectClass))
+					{
+						if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
+							IManagedHandleIsValid(FoundManagedHandle))
+						{
+							if (const auto FoundClass = FReflectionRegistry::Get().GetClass(ObjectClass);
+								FoundClass != nullptr)
+							{
+								FDynamicClassGenerator::ObjectDeferredConstructor(InObjectInitializer,
+									[FoundManagedHandle, FoundClass]()
+									{
+										FoundClass->ConstructorObject(FoundManagedHandle);
+									});
+							}
+						}
+					}
 				}
 			}
 		}

@@ -18,7 +18,7 @@ public:
 #if WITH_EDITOR
 	DECLARE_MULTICAST_DELEGATE(FOnDynamicClassUpdated);
 
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCompile, const TArray<FFileChangeData>& InFileChangeData);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCompile, const bool bSucceeded);
 #endif
 
 	static FOnUnrealCSharpCoreModuleActive OnUnrealCSharpCoreModuleActive;

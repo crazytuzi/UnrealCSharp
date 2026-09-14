@@ -8,6 +8,10 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 #include "UEVersion.h"
+#if WITH_EDITOR
+#include "Editor.h"
+#include "Engine/Blueprint.h"
+#endif
 
 ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
 
@@ -83,6 +87,17 @@ void FCSharpEnvironment::Initialize()
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 
+#if WITH_EDITOR
+	if (GEditor != nullptr)
+	{
+		OnBlueprintPreCompileHandle = GEditor->OnBlueprintPreCompile().AddRaw(
+			this, &FCSharpEnvironment::OnBlueprintPreCompile);
+
+		OnBlueprintCompiledHandle = GEditor->OnBlueprintCompiled().AddRaw(
+			this, &FCSharpEnvironment::OnBlueprintCompiled);
+	}
+#endif
+
 	static TSet<int32> SignalTypes = {
 		// interrupt
 		SIGINT,
@@ -132,6 +147,27 @@ void FCSharpEnvironment::Initialize()
 void FCSharpEnvironment::Deinitialize()
 {
 	AsyncLoadingObjectArray.Empty();
+
+#if WITH_EDITOR
+	PendingBindClasses.Empty();
+
+	if (GEditor != nullptr)
+	{
+		if (OnBlueprintCompiledHandle.IsValid())
+		{
+			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledHandle);
+
+			OnBlueprintCompiledHandle.Reset();
+		}
+
+		if (OnBlueprintPreCompileHandle.IsValid())
+		{
+			GEditor->OnBlueprintPreCompile().Remove(OnBlueprintPreCompileHandle);
+
+			OnBlueprintPreCompileHandle.Reset();
+		}
+	}
+#endif
 
 	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
 	{
@@ -297,6 +333,38 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 {
 	Deinitialize();
 }
+
+#if WITH_EDITOR
+void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
+{
+	if (InBlueprint != nullptr &&
+		InBlueprint->GeneratedClass != nullptr &&
+		GetClassDescriptor(InBlueprint->GeneratedClass) != nullptr)
+	{
+		RemoveClassDescriptor(InBlueprint->GeneratedClass);
+
+		PendingBindClasses.AddUnique(InBlueprint->GeneratedClass);
+	}
+}
+
+void FCSharpEnvironment::OnBlueprintCompiled()
+{
+	for (const auto& PendingBindClass : PendingBindClasses)
+	{
+		if (const auto Class = PendingBindClass.Get())
+		{
+			RemoveClassDescriptor(Class);
+
+			if (const auto DefaultObject = Class->GetDefaultObject(false))
+			{
+				FCSharpBind::BindClassDefaultObject(DefaultObject);
+			}
+		}
+	}
+
+	PendingBindClasses.Empty();
+}
+#endif
 
 void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 {

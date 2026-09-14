@@ -30,7 +30,7 @@ THIRD_PARTY_INCLUDES_START
 #include "core/rt_result.h"
 THIRD_PARTY_INCLUDES_END
 
-TMap<const leanclr::metadata::RtMethodInfo*, TPair<int32, int32>> FLeanCLRDomain::MethodSlotSizes;
+TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> FLeanCLRDomain::MethodSlotSizes;
 
 TMap<const leanclr::metadata::RtMethodInfo*, FLeanCLRDomain::FPInvokeSignature> FLeanCLRDomain::PInvokeSignatures;
 
@@ -156,7 +156,7 @@ IManagedHandle FLeanCLRDomain::Invoke(const IManagedHandle InManagedHandle, cons
 			{
 				const auto Path = MethodInvokePaths.Find(InManagedMethod);
 
-				TPair<const leanclr::metadata::RtMethodInfo*, bool> Entry;
+				TTuple<const leanclr::metadata::RtMethodInfo*, bool> Entry;
 
 				if (Path != nullptr)
 				{
@@ -164,16 +164,16 @@ IManagedHandle FLeanCLRDomain::Invoke(const IManagedHandle InManagedHandle, cons
 				}
 				else
 				{
-					Entry.Key = Method_Get_From_Handle(HandleDataGetObjectPointerFn, InManagedMethod);
+					Entry.Get<0>() = Method_Get_From_Handle(HandleDataGetObjectPointerFn, InManagedMethod);
 
-					Entry.Value = Method_Is_ReferenceType_Constructor(Entry.Key);
+					Entry.Get<1>() = Method_Is_ReferenceType_Constructor(Entry.Get<0>());
 
 					MethodInvokePaths.Add(InManagedMethod, Entry);
 				}
 
-				if (Entry.Value)
+				if (Entry.Get<1>())
 				{
-					Object_Constructor(HandleDataGetObjectPointerFn, Entry.Key, InManagedHandle);
+					Object_Constructor(HandleDataGetObjectPointerFn, Entry.Get<0>(), InManagedHandle);
 
 					return InvalidManagedHandle;
 				}
@@ -370,7 +370,8 @@ bool FLeanCLRDomain::Method_Is_ReferenceType_Constructor(const leanclr::metadata
 		leanclr::vm::Method::get_param_count_exclude_this(InManagedMethod) == 0;
 }
 
-const TPair<int32, int32>& FLeanCLRDomain::Method_Get_Slot_Sizes(const leanclr::metadata::RtMethodInfo* InManagedMethod)
+const TTuple<int32, int32>& FLeanCLRDomain::Method_Get_Slot_Sizes(
+	const leanclr::metadata::RtMethodInfo* InManagedMethod)
 {
 	if (const auto FoundSlotSize = MethodSlotSizes.Find(InManagedMethod))
 	{

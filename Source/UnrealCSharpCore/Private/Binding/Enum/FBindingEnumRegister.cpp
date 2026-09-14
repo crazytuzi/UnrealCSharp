@@ -3,7 +3,7 @@
 FBindingEnumRegister::FBindingEnumRegister(const TFunction<FString()>& InEnumFunction,
                                            const FString& InUnderlyingType,
                                            const bool InIsProjectEnum,
-                                           const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+                                           const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction) :
 	EnumFunction(InEnumFunction),
 	UnderlyingType(InUnderlyingType),
 	bIsProjectEnum(InIsProjectEnum),

@@ -10,7 +10,7 @@ public:
 	template <typename T>
 	struct TStringAddress : TValueWrapper<T>
 	{
-		TStringAddress(T InValue, const bool InNeedFree):
+		TStringAddress(T InValue, const bool InNeedFree) :
 			TValueWrapper<T>(InValue),
 			bNeedFree(InNeedFree)
 		{

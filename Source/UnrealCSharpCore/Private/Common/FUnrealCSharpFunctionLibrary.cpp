@@ -34,6 +34,8 @@
 
 #if WITH_EDITOR
 EScriptDomainType FUnrealCSharpFunctionLibrary::ScriptDomainType = EScriptDomainType::CoreCLR;
+
+bool FUnrealCSharpFunctionLibrary::bScriptChanged{};
 #endif
 
 #if WITH_EDITOR
@@ -1128,6 +1130,23 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 }
 #endif
 
+#if WITH_EDITOR
+void FUnrealCSharpFunctionLibrary::ResetScriptChanged()
+{
+	bScriptChanged = false;
+}
+
+void FUnrealCSharpFunctionLibrary::MarkScriptChanged()
+{
+	bScriptChanged = true;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsScriptChanged()
+{
+	return bScriptChanged;
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
 	const auto FileManager = &IFileManager::Get();
@@ -1142,6 +1161,10 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 			}
 		}
 	}
+
+#if WITH_EDITOR
+	MarkScriptChanged();
+#endif
 
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -1496,13 +1519,12 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 #if WITH_EDITOR
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
-                                               const FString& InWorkingDirectory)
+                                               const FString& InWorkingDirectory,
+                                               const TFunction<void(const FString&)>& InOnOutput)
 {
 	void* ReadPipe = nullptr;
 
 	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
 
 	FString Result;
 
@@ -1524,25 +1546,43 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		false,
 		true,
 		true,
-		&OutProcessID,
+		nullptr,
 		1,
 		WorkingDirectory,
 		WritePipe,
 		ReadPipe);
 
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	const auto ReadOutput = [&]()
+	{
+		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
+			!Output.IsEmpty())
+		{
+			Result.Append(Output);
+
+			if (InOnOutput)
+			{
+				InOnOutput(Output);
+			}
+		}
+	};
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
 		FPlatformProcess::Sleep(0.01f);
 
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+		ReadOutput();
 	}
+
+	ReadOutput();
 
 	auto ReturnCode = 0;
 
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
-		InOnComplete(ReturnCode, Result);
+		ReturnCode = -1;
 	}
+
+	InOnComplete(ReturnCode, Result);
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 

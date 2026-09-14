@@ -115,7 +115,7 @@ struct FManagedReader
 	IScriptDomain* ScriptDomain;
 };
 
-FClassReflection::FClassReflection(const IManagedHandle InManagedClass, const FString& InName):
+FClassReflection::FClassReflection(const IManagedHandle InManagedClass, const FString& InName) :
 	FReflection(InName),
 	ManagedClass(InManagedClass)
 {
@@ -653,7 +653,7 @@ FFieldReflection* FClassReflection::GetField(const FString& InName) const
 	return FoundField != nullptr ? *FoundField : nullptr;
 }
 
-const TMap<TPair<FString, int32>, FMethodReflection*>& FClassReflection::GetMethods() const
+const TMap<TTuple<FString, int32>, FMethodReflection*>& FClassReflection::GetMethods() const
 {
 	EnsureMethods();
 

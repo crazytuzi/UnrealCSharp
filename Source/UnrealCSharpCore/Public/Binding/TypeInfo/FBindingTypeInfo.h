@@ -4,7 +4,7 @@
 
 struct FBindingTypeInfo
 {
-	explicit FBindingTypeInfo(FTypeInfo* InTypeInfo):
+	explicit FBindingTypeInfo(FTypeInfo* InTypeInfo) :
 		TypeInfo(InTypeInfo)
 	{
 	}

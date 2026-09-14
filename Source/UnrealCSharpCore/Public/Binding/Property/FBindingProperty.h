@@ -7,7 +7,7 @@
 struct FBindingProperty : FBindingTypeInfo
 {
 	FBindingProperty(const FBindingTypeInfo& InTypeInfo, const FString& InName,
-	                 const EBindingPropertyAccess& InPropertyAccess, const EPropertyInteract& InPropertyInteract):
+	                 const EBindingPropertyAccess& InPropertyAccess, const EPropertyInteract& InPropertyInteract) :
 		FBindingTypeInfo(InTypeInfo),
 		Name(InName),
 		PropertyAccess(InPropertyAccess),

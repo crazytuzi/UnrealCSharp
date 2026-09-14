@@ -6,7 +6,7 @@
 #if WITH_EDITOR
 struct FScriptDomainTypeScope
 {
-	explicit FScriptDomainTypeScope(const EScriptDomainType InScriptDomainType):
+	explicit FScriptDomainTypeScope(const EScriptDomainType InScriptDomainType) :
 		ScriptDomainType(FUnrealCSharpFunctionLibrary::GetScriptDomainType())
 	{
 		FUnrealCSharpFunctionLibrary::SetScriptDomainType(InScriptDomainType);

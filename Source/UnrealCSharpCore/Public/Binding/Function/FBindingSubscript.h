@@ -8,7 +8,7 @@ struct FBindingSubscript : FBindingFunction
 
 	FBindingSubscript(const FBindingFunction& InFunction,
 	                  const FString& InGetImplementationName,
-	                  const FString& InSetImplementationName):
+	                  const FString& InSetImplementationName) :
 		FBindingFunction(InFunction),
 		GetImplementationName(InGetImplementationName),
 		SetImplementationName(InSetImplementationName)

@@ -32,6 +32,8 @@
 
 #define INTEROP_NAME FString(TEXT("Interop"))
 
+#define GAMEPLAY_TAGS_NAME FString(TEXT("GameplayTags"))
+
 #define UNREAL_TYPE_SOURCE_GENERATOR_NAME FString(TEXT("UnrealTypeSourceGenerator"))
 
 #define ANALYZER_RELEASES_UN_SHIPPED_NAME FString(TEXT("AnalyzerReleases.Unshipped"))

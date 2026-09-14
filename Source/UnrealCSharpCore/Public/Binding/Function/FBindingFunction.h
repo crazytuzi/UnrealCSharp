@@ -7,7 +7,7 @@ struct FBindingFunction
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InFunctionInfo):
+	FBindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InFunctionInfo) :
 		Name(InName),
 		ImplementationName(InImplementationName),
 		FunctionInfo(InFunctionInfo)

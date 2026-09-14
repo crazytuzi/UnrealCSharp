@@ -9,7 +9,7 @@ class UNREALCSHARP_API FBindingRegistry
 private:
 	struct FBindingAddressWrapper
 	{
-		explicit FBindingAddressWrapper(void* InValue):
+		explicit FBindingAddressWrapper(void* InValue) :
 			Value(InValue)
 		{
 		}
@@ -24,7 +24,7 @@ private:
 	template <typename T>
 	struct TBindingAddressWrapper final : FBindingAddressWrapper
 	{
-		explicit TBindingAddressWrapper(T* InValue):
+		explicit TBindingAddressWrapper(T* InValue) :
 			FBindingAddressWrapper((decltype(Value))InValue)
 		{
 		}
@@ -39,7 +39,7 @@ private:
 	{
 		typedef FBindingAddressWrapper FWrapperType;
 
-		explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true):
+		explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true) :
 			AddressWrapper(InAddressWrapper),
 			bNeedFree(InNeedFree)
 		{

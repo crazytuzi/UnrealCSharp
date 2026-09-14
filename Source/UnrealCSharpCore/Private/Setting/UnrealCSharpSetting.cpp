@@ -6,7 +6,7 @@
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpSettings"
 
-UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectInitializer):
+UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer),
 	PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
 	UEName(DEFAULT_UE_NAME),

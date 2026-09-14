@@ -13,7 +13,7 @@ struct FGameContentDirectoryPath : public FDirectoryPath
 
 	FGameContentDirectoryPath() = default;
 
-	explicit FGameContentDirectoryPath(const FString& InPath):
+	explicit FGameContentDirectoryPath(const FString& InPath) :
 		FDirectoryPath()
 	{
 		Path = InPath;

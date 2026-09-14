@@ -7,7 +7,7 @@ FPropertyReflection::FPropertyReflection(const FString& InName,
                                          const IManagedHandle InManagedProperty,
                                          FClassReflection* InReflectionType,
                                          const TSet<FClassReflection*>& InAttributes,
-                                         const TMap<FClassReflection*, TArray<FString>>& InAttributeValues):
+                                         const TMap<FClassReflection*, TArray<FString>>& InAttributeValues) :
 	FReflection(InName, InAttributes, InAttributeValues),
 	ManagedProperty(InManagedProperty),
 	ReflectionType(InReflectionType)

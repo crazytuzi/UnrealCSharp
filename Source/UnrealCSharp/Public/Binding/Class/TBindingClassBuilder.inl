@@ -8,7 +8,7 @@ class TBindingClassBuilder final : public TClassBuilder<T, IsProjectClass0>
 {
 public:
 	explicit TBindingClassBuilder(const FString& InImplementationNameSpace,
-	                              const TOptional<TFunction<FString()>>& InClassFunction = {}):
+	                              const TOptional<TFunction<FString()>>& InClassFunction = {}) :
 		TClassBuilder<T, IsProjectClass0>(InImplementationNameSpace, InClassFunction)
 	{
 		if constexpr (!TIsReflectionClass<T>::Value)

@@ -218,6 +218,14 @@ public:
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 
+#if WITH_EDITOR
+	static void ResetScriptChanged();
+
+	static void MarkScriptChanged();
+
+	static bool IsScriptChanged();
+#endif
+
 	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);
 
 	static TMap<FString, FString> LoadFileToString(const FString& InFileName);
@@ -263,7 +271,8 @@ public:
 #if WITH_EDITOR
 	static void SyncProcess(const FString& InURL, const FString& InParms,
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
-	                        const FString& InWorkingDirectory = FString());
+	                        const FString& InWorkingDirectory = FString(),
+	                        const TFunction<void(const FString&)>& InOnOutput = {});
 #endif
 
 #if WITH_EDITOR
@@ -275,5 +284,7 @@ public:
 
 private:
 	static EScriptDomainType ScriptDomainType;
+
+	static bool bScriptChanged;
 #endif
 };

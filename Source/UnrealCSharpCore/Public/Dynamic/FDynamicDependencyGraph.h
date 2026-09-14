@@ -29,7 +29,7 @@ public:
 
 	struct FNode
 	{
-		FNode(const FString& InName, const TFunction<void()>& InGeneratorImplementation):
+		FNode(const FString& InName, const TFunction<void()>& InGeneratorImplementation) :
 			Name(InName),
 			State(EState::Initial),
 			GeneratorImplementation(InGeneratorImplementation)

@@ -18,16 +18,19 @@ void FDynamicRegistry::Initialize()
 {
 	FDynamicClassGenerator::OnPostClassConstructor = [](UObject* InObject)
 	{
-		if (IsInGameThread())
+		if (InObject != nullptr)
 		{
-			FCSharpEnvironment::GetEnvironment().Bind<true>(InObject);
-
-			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-				IManagedHandleIsValid(FoundManagedHandle))
+			if (IsInGameThread())
 			{
-				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InObject->GetClass()))
+				FCSharpEnvironment::GetEnvironment().Bind<true>(InObject);
+
+				if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+					IManagedHandleIsValid(FoundManagedHandle))
 				{
-					FoundClass->ConstructorObject(FoundManagedHandle);
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InObject->GetClass()))
+					{
+						FoundClass->ConstructorObject(FoundManagedHandle);
+					}
 				}
 			}
 		}

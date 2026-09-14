@@ -22,15 +22,15 @@ namespace Script.Library
             return Handle != 0 ? (UScriptStruct)HandleData.GetObject(Handle) : null;
         }
 
-        private static unsafe partial void __UStruct_RegisterImplementation(nint InDelegate, byte* InStructName);
+        private static unsafe partial void __UStruct_RegisterImplementation(nint InObject, byte* InStructName);
 
-        public static unsafe void UStruct_RegisterImplementation(object InDelegate, string InStructName)
+        public static unsafe void UStruct_RegisterImplementation(object InObject, string InStructName)
         {
             var UTF8 = InStructName != null ? Encoding.UTF8.GetBytes(InStructName + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __UStruct_RegisterImplementation(HandleData.Alloc(InDelegate), Ptr);
+                __UStruct_RegisterImplementation(HandleData.Alloc(InObject), Ptr);
             }
         }
 
@@ -41,11 +41,11 @@ namespace Script.Library
             return __UStruct_IdenticalImplementation(InScriptStruct, InA, InB) != 0;
         }
 
-        private static unsafe partial void __UStruct_UnRegisterImplementation(nint InDelegate);
+        private static unsafe partial void __UStruct_UnRegisterImplementation(nint InObject);
 
-        public static unsafe void UStruct_UnRegisterImplementation(nint InDelegate)
+        public static unsafe void UStruct_UnRegisterImplementation(nint InObject)
         {
-            __UStruct_UnRegisterImplementation(InDelegate);
+            __UStruct_UnRegisterImplementation(InObject);
         }
     }
 }

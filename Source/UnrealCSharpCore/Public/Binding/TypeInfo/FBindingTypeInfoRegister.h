@@ -5,7 +5,7 @@
 
 struct FBindingTypeInfoRegister
 {
-	explicit FBindingTypeInfoRegister(const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+	explicit FBindingTypeInfoRegister(const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction) :
 		TypeInfoFunction(InTypeInfoFunction)
 	{
 	}

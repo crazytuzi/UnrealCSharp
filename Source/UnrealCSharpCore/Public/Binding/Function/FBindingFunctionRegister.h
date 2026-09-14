@@ -9,7 +9,7 @@ struct FBindingFunctionRegister
 
 	FBindingFunctionRegister(const FString& InName,
 	                         const FString& InImplementationName,
-	                         const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction):
+	                         const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction) :
 		Name(InName),
 		ImplementationName(InImplementationName),
 		FunctionInfoFunction(InFunctionInfoFunction)

@@ -2,7 +2,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction,
-                                         const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator):
+                                         const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator) :
 	Function(InFunction),
 	ReturnPropertyDescriptor(nullptr),
 	BufferAllocator(InBufferAllocator)

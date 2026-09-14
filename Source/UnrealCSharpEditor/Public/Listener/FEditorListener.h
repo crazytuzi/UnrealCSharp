@@ -2,6 +2,8 @@
 
 #include "IDirectoryWatcher.h"
 
+class SWindow;
+
 class FEditorListener
 {
 public:
@@ -16,13 +18,15 @@ private:
 
 	void OnPrePIEEnded(const bool bIsSimulating);
 
+	void OnEndPIE(const bool bIsSimulating);
+
 	void OnCancelPIE();
 
 	void OnBeginGenerator();
 
 	void OnEndGenerator();
 
-	void OnCompile(const TArray<FFileChangeData>& InFileChangeData);
+	void OnCompile(const bool bSucceeded);
 
 	void OnFilesLoaded();
 
@@ -36,12 +40,28 @@ private:
 
 	void OnMainFrameCreationFinished(TSharedPtr<SWindow>, bool);
 
-	void OnApplicationActivationStateChanged(const bool IsActive);
+	void OnApplicationActivationStateChanged(const bool bIsActive);
 
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
+	void OnBlueprintCompiled();
+
 private:
 	void OnAssetChanged(const FAssetData& InAssetData, const TFunction<void()>& InGenerator) const;
+
+	void CompileDirtyBlueprints();
+
+	void CompileChangedBlueprints();
+
+	bool IsCompileRequired() const;
+
+	void RequestCompile();
+
+	void Compile();
+
+	static void TickProgressWindow(const TSharedPtr<SWindow>& InWindow);
+
+	static void WaitForCompile();
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
@@ -49,6 +69,8 @@ private:
 	FDelegateHandle OnPreBeginPIEDelegateHandle;
 
 	FDelegateHandle OnPrePIEEndedDelegateHandle;
+
+	FDelegateHandle OnEndPIEDelegateHandle;
 
 	FDelegateHandle OnCancelPIEDelegateHandle;
 
@@ -64,10 +86,18 @@ private:
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 
+	FDelegateHandle OnBlueprintCompiledDelegateHandle;
+
 private:
 	TArray<FFileChangeData> FileChanges;
 
+	TArray<FFileChangeData> CompilingFileChanges;
+
+	TMap<FSoftObjectPath, uint32> CrcCompiledSignatures;
+
 	bool bIsPIEPlaying;
+
+	bool bIsPreparingPIE;
 
 	bool bIsGenerating;
 };

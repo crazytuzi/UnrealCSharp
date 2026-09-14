@@ -4,7 +4,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
 
-FClassDescriptor::FClassDescriptor(UStruct* InStruct):
+FClassDescriptor::FClassDescriptor(UStruct* InStruct) :
 	Struct(InStruct)
 {
 	Initialize();
@@ -24,7 +24,10 @@ void FClassDescriptor::Initialize()
 
 	Class = FReflectionRegistry::Get().GetClass(Struct);
 
-	Class->ConstructorClass();
+	if (Class != nullptr)
+	{
+		Class->ConstructorClass();
+	}
 }
 
 void FClassDescriptor::Deinitialize()

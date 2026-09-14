@@ -7,7 +7,7 @@ FMethodReflection::FMethodReflection(const FString& InName, const int32 InParamC
                                      const bool InIsStatic, FClassReflection* InReturn,
                                      const TArray<FParamReflection*>& InParams,
                                      const TSet<FClassReflection*>& InAttributes,
-                                     const TMap<FClassReflection*, TArray<FString>>& InAttributeValues):
+                                     const TMap<FClassReflection*, TArray<FString>>& InAttributeValues) :
 	FReflection(InName, InAttributes, InAttributeValues),
 	ParamCount(InParamCount),
 	ManagedMethod(InManagedMethod),

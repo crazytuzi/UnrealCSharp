@@ -23,6 +23,8 @@ public:
 private:
 	void OnPostEngineInit();
 
+	void OnEditorRefreshGameplayTagTree();
+
 private:
 	void RegisterMenus();
 
@@ -38,6 +40,8 @@ private:
 
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
+	FDelegateHandle OnEditorRefreshGameplayTagTreeDelegateHandle;
+
 	TUniquePtr<FAutoConsoleCommand> CodeAnalysisConsoleCommand;
 
 	TUniquePtr<FAutoConsoleCommand> SolutionGeneratorConsoleCommand;
@@ -45,6 +49,8 @@ private:
 	TUniquePtr<FAutoConsoleCommand> CompileConsoleCommand;
 
 	TUniquePtr<FAutoConsoleCommand> GeneratorConsoleCommand;
+
+	TUniquePtr<FAutoConsoleCommand> SetActiveConsoleCommand;
 
 	FEditorListener EditorListener;
 

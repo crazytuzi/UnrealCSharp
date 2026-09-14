@@ -9,6 +9,8 @@
 #include "IContentBrowserDataModule.h"
 #include "Interfaces/ITargetPlatform.h"
 #include "Interfaces/ITargetPlatformManagerModule.h"
+#include "FGameplayTagGenerator.h"
+#include "GameplayTagsManager.h"
 #include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
@@ -21,6 +23,7 @@
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "FCodeAnalysis.h"
+#include "UnrealCSharpCore.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpPlayToolBar.h"
@@ -78,6 +81,12 @@ void FUnrealCSharpEditorModule::StartupModule()
 		this, &FUnrealCSharpEditorModule::OnPostEngineInit);
 #endif
 
+	if (!IsRunningCommandlet())
+	{
+		OnEditorRefreshGameplayTagTreeDelegateHandle = UGameplayTagsManager::OnEditorRefreshGameplayTagTree.AddRaw(
+			this, &FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree);
+	}
+
 	CodeAnalysisConsoleCommand = MakeUnique<FAutoConsoleCommand>(
 		TEXT("UnrealCSharp.Editor.CodeAnalysis"), TEXT(""),
 		FConsoleCommandDelegate::CreateLambda(
@@ -113,6 +122,24 @@ void FUnrealCSharpEditorModule::StartupModule()
 			[]()
 			{
 				Generator(FPlatformProperties::IniPlatformName());
+			}));
+
+	SetActiveConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.SetActive"), TEXT(""),
+		FConsoleCommandWithArgsDelegate::CreateLambda(
+			[](const TArray<FString>& Args)
+			{
+				if (!Args.IsEmpty())
+				{
+					if (Args[0] != TEXT("0"))
+					{
+						FUnrealCSharpCoreModule::Get().Activate();
+					}
+					else
+					{
+						FUnrealCSharpCoreModule::Get().Deactivate();
+					}
+				}
 			}));
 
 	UpdatePackagingSettings();
@@ -175,6 +202,11 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 		PropertyEditorModule.NotifyCustomizationModuleChanged();
 	}
 
+	if (OnEditorRefreshGameplayTagTreeDelegateHandle.IsValid())
+	{
+		UGameplayTagsManager::OnEditorRefreshGameplayTagTree.Remove(OnEditorRefreshGameplayTagTreeDelegateHandle);
+	}
+
 	if (OnPostEngineInitDelegateHandle.IsValid())
 	{
 #if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
@@ -221,6 +253,18 @@ void FUnrealCSharpEditorModule::PluginButtonClicked() const
 void FUnrealCSharpEditorModule::OnPostEngineInit()
 {
 	RegisterMenus();
+}
+
+void FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree()
+{
+	FUnrealCSharpFunctionLibrary::ResetScriptChanged();
+
+	FGameplayTagGenerator::Generator();
+
+	if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
+	{
+		FCSharpCompiler::Get().Compile();
+	}
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
@@ -282,7 +326,7 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const b
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
-	FScopedSlowTask SlowTask(12, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+	FScopedSlowTask SlowTask(13, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
 
 	SlowTask.MakeDialog();
 
@@ -315,6 +359,10 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const b
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Asset Generator"));
 
 	FAssetGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "GameplayTag Generator"));
+
+	FGameplayTagGenerator::Generator();
 
 	if (!CurrentCultureName.Equals(DefaultCultureName))
 	{

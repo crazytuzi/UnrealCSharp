@@ -7,7 +7,7 @@ FClassBuilder::FClassBuilder(const TFunction<FString()>& InClassFunction,
                              const FString& InImplementationNameSpace,
                              const TFunction<bool()>& InIsProjectClassFunction,
                              const bool InIsReflectionClass,
-                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction) :
 	ClassRegister(FBinding::Get().Register(InClassFunction,
 	                                       InImplementationNameSpace,
 	                                       InIsProjectClassFunction,
@@ -20,7 +20,7 @@ FClassBuilder::FClassBuilder(const FString& InClass,
                              const FString& InImplementationNameSpace,
                              const bool InIsProjectClass,
                              const bool InIsReflectionClass,
-                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction) :
 	FClassBuilder([InClass]() { return InClass; },
 	              InImplementationNameSpace,
 	              [InIsProjectClass]() { return InIsProjectClass; },
@@ -31,7 +31,7 @@ FClassBuilder::FClassBuilder(const FString& InClass,
 
 FClassBuilder& FClassBuilder::Function(const FString& InName,
 #if WITH_FUNCTION_INFO
-                                       const TArray<std::tuple<void*, TFunction<FFunctionInfo*()>>>& InMethod
+                                       const TArray<TTuple<void*, TFunction<FFunctionInfo*()>>>& InMethod
 #else
                                        const TArray<void*>& InMethod
 #endif

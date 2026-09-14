@@ -11,7 +11,7 @@ struct FBindingSubscriptRegister : FBindingFunctionRegister
 	                          const FString& InImplementationName,
 	                          const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction,
 	                          const FString& InGetImplementationName,
-	                          const FString& InSetImplementationName):
+	                          const FString& InSetImplementationName) :
 		FBindingFunctionRegister(InName, InImplementationName, InFunctionInfoFunction),
 		GetImplementationName(InGetImplementationName),
 		SetImplementationName(InSetImplementationName)

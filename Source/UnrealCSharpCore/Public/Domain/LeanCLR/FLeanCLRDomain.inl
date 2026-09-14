@@ -33,7 +33,7 @@ Result FLeanCLRDomain::Stack_Object_To(const leanclr::interp::RtStackObject& InS
 template <typename T>
 struct FLeanCLRDomain::TStackArgument
 {
-	explicit TStackArgument(const T& InValue):
+	explicit TStackArgument(const T& InValue) :
 		Value(Stack_Object_From(InValue))
 	{
 	}

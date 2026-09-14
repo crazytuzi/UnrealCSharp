@@ -3,7 +3,7 @@
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassInfo"
 
-FDynamicNewClassInfo::FDynamicNewClassInfo(const Super& InSuper):
+FDynamicNewClassInfo::FDynamicNewClassInfo(const Super& InSuper) :
 	Super(InSuper)
 {
 }

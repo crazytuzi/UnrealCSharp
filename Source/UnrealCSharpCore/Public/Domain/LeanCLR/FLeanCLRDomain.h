@@ -113,7 +113,7 @@ private:
 
 	static bool Method_Is_ReferenceType_Constructor(const leanclr::metadata::RtMethodInfo* InManagedMethod);
 
-	static const TPair<int32, int32>& Method_Get_Slot_Sizes(const leanclr::metadata::RtMethodInfo* InManagedMethod);
+	static const TTuple<int32, int32>& Method_Get_Slot_Sizes(const leanclr::metadata::RtMethodInfo* InManagedMethod);
 
 	static void Object_Constructor(const leanclr::metadata::RtMethodInfo* InManagedBridge,
 	                               const leanclr::metadata::RtMethodInfo* InManagedConstructor,
@@ -206,7 +206,7 @@ private:
 
 #undef LEANCLR_METHOD_MEMBER
 
-	TMap<IManagedHandle, TPair<const leanclr::metadata::RtMethodInfo*, bool>> MethodInvokePaths;
+	TMap<IManagedHandle, TTuple<const leanclr::metadata::RtMethodInfo*, bool>> MethodInvokePaths;
 
 	leanclr::metadata::RtModuleDef* InteropModule{};
 
@@ -216,7 +216,7 @@ private:
 
 	bool bIsInitialized{};
 
-	static TMap<const leanclr::metadata::RtMethodInfo*, TPair<int32, int32>> MethodSlotSizes;
+	static TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> MethodSlotSizes;
 
 	static constexpr int32 MaxPInvokeArguments = 8;
 

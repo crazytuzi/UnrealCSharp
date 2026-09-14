@@ -38,8 +38,6 @@
 
 #define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTER FString(TEXT("GetObjectPointer"))
 
-#define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTERS FString(TEXT("GetObjectPointers"))
-
 #define FUNCTION_HANDLE_DATA_ALLOC FString(TEXT("Alloc"))
 
 #define FUNCTION_LOG_BRIDGE_SET_LOG FString(TEXT("SetLog"))

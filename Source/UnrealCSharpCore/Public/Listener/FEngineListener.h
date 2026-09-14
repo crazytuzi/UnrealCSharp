@@ -12,8 +12,6 @@ public:
 #if WITH_EDITOR
 public:
 	static void OnPreBeginPIE(const bool);
-
-	static void OnCancelPIE();
 #endif
 
 private:

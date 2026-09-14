@@ -8,7 +8,7 @@ FBindingClassRegister::FBindingClassRegister(const TFunction<FString()>& InClass
                                              const FString& InImplementationNameSpace,
                                              const TFunction<bool()>& InIsProjectClassFunction,
                                              const bool InIsReflectionClass,
-                                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+                                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction) :
 	ClassFunction(InClassFunction),
 	ImplementationNameSpace(COMBINE_NAMESPACE(NAMESPACE_ROOT, InImplementationNameSpace)),
 	IsProjectClassFunction(InIsProjectClassFunction),

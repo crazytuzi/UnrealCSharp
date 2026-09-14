@@ -2,7 +2,7 @@
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
-                           const bool InbNeedFreeData, const bool InbNeedFreeProperty):
+                           const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
 	InnerPropertyDescriptor(nullptr),
 	ScriptArray(nullptr),
 	bNeedFreeData(InbNeedFreeData),

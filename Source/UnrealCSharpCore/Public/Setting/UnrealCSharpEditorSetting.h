@@ -17,7 +17,7 @@ struct FProjectDirectoryPath : public FDirectoryPath
 
 	FProjectDirectoryPath() = default;
 
-	explicit FProjectDirectoryPath(const FString& InPath):
+	explicit FProjectDirectoryPath(const FString& InPath) :
 		FDirectoryPath()
 	{
 		Path = InPath;
@@ -64,6 +64,12 @@ public:
 	bool EnableAssetChanged() const;
 
 	bool EnableDirectoryChanged() const;
+
+	bool EnableCompileOnBlueprintCompiled() const;
+
+	bool EnableCompileDirtyBlueprintsPreBeginPIE() const;
+
+	bool EnableCompilePreBeginPIE() const;
 
 	bool IsSkipGenerateEngineModules() const;
 
@@ -117,6 +123,15 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableDirectoryChanged;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompileOnBlueprintCompiled;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompileDirtyBlueprintsPreBeginPIE;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompilePreBeginPIE;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bIsSkipGenerateEngineModules;

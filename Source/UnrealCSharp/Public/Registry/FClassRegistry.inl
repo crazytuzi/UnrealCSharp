@@ -36,8 +36,8 @@ auto FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> 
 	{
 		if (const auto FoundFunctionHash = CSharpFunctionHashMap.Find(InFunctionHash))
 		{
-			if (const auto FoundFunctionDescriptor = std::get<0>(*FoundFunctionHash)->AddFunctionDescriptor<T>(
-				std::get<1>(*FoundFunctionHash), std::move(std::get<2>(*FoundFunctionHash))))
+			if (const auto FoundFunctionDescriptor = FoundFunctionHash->Get<0>()->AddFunctionDescriptor<T>(
+				FoundFunctionHash->Get<1>(), std::move(FoundFunctionHash->Get<2>())))
 			{
 				CSharpFunctionHashMap.Remove(InFunctionHash);
 
@@ -51,8 +51,8 @@ auto FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> 
 	{
 		if (const auto FoundFunctionHash = UnrealFunctionHashMap.Find(InFunctionHash))
 		{
-			if (const auto FoundFunctionDescriptor = std::get<0>(*FoundFunctionHash)->AddFunctionDescriptor<T>(
-				std::get<1>(*FoundFunctionHash)))
+			if (const auto FoundFunctionDescriptor = FoundFunctionHash->Get<0>()->AddFunctionDescriptor<T>(
+				FoundFunctionHash->Get<1>()))
 			{
 				UnrealFunctionHashMap.Remove(InFunctionHash);
 
@@ -84,10 +84,10 @@ auto FClassRegistry::AddFunctionHash(uint32 InFunctionHash, Args&&... InArgs) ->
 {
 	if constexpr (std::is_same_v<T, FCSharpFunctionDescriptor>)
 	{
-		CSharpFunctionHashMap.Add(InFunctionHash, std::make_tuple(std::forward<Args>(InArgs)...));
+		CSharpFunctionHashMap.Add(InFunctionHash, MakeTuple(std::forward<Args>(InArgs)...));
 	}
 	else if constexpr (std::is_same_v<T, FUnrealFunctionDescriptor>)
 	{
-		UnrealFunctionHashMap.Add(InFunctionHash, std::make_tuple(std::forward<Args>(InArgs)...));
+		UnrealFunctionHashMap.Add(InFunctionHash, MakeTuple(std::forward<Args>(InArgs)...));
 	}
 }
