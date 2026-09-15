@@ -1,4 +1,5 @@
 #include "Reflection/Class/FClassDescriptor.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -96,7 +97,7 @@ FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(FProperty* InProper
 	{
 		const auto NewPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
-		PropertyHashSet.Add(GetTypeHash(InProperty));
+		PropertyHashSet.Add(FUnrealCSharpFunctionLibrary::GetFieldHash(InProperty));
 
 		return NewPropertyDescriptor;
 	}

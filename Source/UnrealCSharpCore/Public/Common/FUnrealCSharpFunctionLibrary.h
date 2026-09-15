@@ -144,6 +144,12 @@ public:
 
 	static bool EnableCallOverrideFunction();
 
+	static bool EnableStableFieldHash();
+
+	static uint32 GetFieldHash(const FProperty* InProperty);
+
+	static uint32 GetFieldHash(const UFunction* InFunction);
+
 	static FString GetOverrideFunctionNamePrefix();
 
 	static FString GetOverrideFunctionNameSuffix();
@@ -287,4 +293,8 @@ private:
 
 	static bool bScriptChanged;
 #endif
+
+private:
+
+	static uint32 GetStableFieldHash(const UStruct* InOwnerStruct, const FString& InFieldName);
 };
