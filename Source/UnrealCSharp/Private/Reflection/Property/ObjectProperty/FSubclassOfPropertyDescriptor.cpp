@@ -7,10 +7,13 @@ void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, true>(
-			Class, Object, Src);
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, true>(
+				Class, Object, Src);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -18,20 +21,30 @@ void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 
 void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -54,8 +67,11 @@ bool FSubclassOfPropertyDescriptor::Identical(const void* A, const void* B, cons
 {
 	const auto ClassA = Cast<UClass>(Property->GetObjectPropertyValue(A));
 
-	const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)))->Get();
+	if (const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->StaticIdentical(ClassA, ClassB->Get(), PortFlags);
+	}
 
-	return Property->StaticIdentical(ClassA, ClassB, PortFlags);
+	return false;
 }

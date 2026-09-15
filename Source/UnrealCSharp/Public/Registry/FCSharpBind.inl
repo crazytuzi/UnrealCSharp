@@ -90,15 +90,19 @@ template <typename T>
 auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
                                      const IManagedHandle InManagedObject)
 {
-	const auto Property = FTypeBridge::Factory<>(InPropertyClassReflection, nullptr, "", EObjectFlags::RF_Transient);
+	if (const auto Property = FTypeBridge::Factory<>(
+		InPropertyClassReflection, nullptr, "", EObjectFlags::RF_Transient))
+	{
+		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-	Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+		const auto ContainerHelper = new T(Property, nullptr, true, true);
 
-	const auto ContainerHelper = new T(Property, nullptr, true, true);
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
+		return true;
+	}
 
-	return true;
+	return false;
 }
 
 template <typename T>
@@ -107,18 +111,23 @@ auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClass
 {
 	const auto KeyProperty = FTypeBridge::Factory<>(InKeyClassReflection, nullptr, "", EObjectFlags::RF_Transient);
 
-	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
 	const auto ValueProperty =
 		FTypeBridge::Factory<>(InValueClassReflection, nullptr, "", EObjectFlags::RF_Transient);
 
-	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+	if (KeyProperty != nullptr && ValueProperty != nullptr)
+	{
+		KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-	const auto ContainerHelper = new T(KeyProperty, ValueProperty, nullptr, true, true);
+		ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
+		const auto ContainerHelper = new T(KeyProperty, ValueProperty, nullptr, true, true);
 
-	return true;
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
+
+		return true;
+	}
+
+	return false;
 }
 
 template <typename T>

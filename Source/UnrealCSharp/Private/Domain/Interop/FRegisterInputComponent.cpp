@@ -55,10 +55,13 @@ namespace
 
 				const auto ObjectToBindTo = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InObjectToBindTo);
 
-				InputDelegateBinding->BindToInputComponent(FoundObject, ObjectToBindTo);
+				if (InputDelegateBinding != nullptr && ObjectToBindTo != nullptr)
+				{
+					InputDelegateBinding->BindToInputComponent(FoundObject, ObjectToBindTo);
 
-				InFunction(ObjectToBindTo->GetClass(),
-				           FCSharpEnvironment::GetEnvironment().GetString<FName>(InFunctionNameToBind));
+					InFunction(ObjectToBindTo->GetClass(),
+					           FCSharpEnvironment::GetEnvironment().GetString<FName>(InFunctionNameToBind));
+				}
 			}
 		}
 

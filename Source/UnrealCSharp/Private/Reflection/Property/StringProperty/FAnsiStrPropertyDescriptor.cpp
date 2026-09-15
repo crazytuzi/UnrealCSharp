@@ -8,10 +8,13 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(
-			Class, Object, Src);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(
+				Class, Object, Src);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -19,10 +22,15 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 
 void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -41,11 +49,12 @@ void FAnsiStrPropertyDescriptor::Set(void* Src, void* Dest) const
 
 bool FAnsiStrPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	const auto AnsiStringA = Property->GetPropertyValue(A);
+	if (const auto AnsiString = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, AnsiString, PortFlags);
+	}
 
-	const auto AnsiStringB = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
-
-	return AnsiStringA == *AnsiStringB;
+	return false;
 }
 #endif

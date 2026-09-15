@@ -25,7 +25,21 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
+	if (SrcContainer != nullptr)
+	{
+		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
+	}
+}
+
+bool FMapPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, MapHelper->GetScriptMap(), PortFlags);
+	}
+
+	return false;
 }
 
 IManagedHandle FMapPropertyDescriptor::NewRef(void* InAddress) const
@@ -34,16 +48,19 @@ IManagedHandle FMapPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
-		                                      false, false);
+			const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
+			                                      false, false);
 
-		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
-			InAddress, Property);
+			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
+				InAddress, Property);
 
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerManagedHandle, InAddress, MapHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				OwnerManagedHandle, InAddress, MapHelper, Class, Object);
+		}
 	}
 
 	return Object;
@@ -51,12 +68,17 @@ IManagedHandle FMapPropertyDescriptor::NewRef(void* InAddress) const
 
 IManagedHandle FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
-	                                      bIsCopy, false);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Class, Object);
+		const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
+		                                      bIsCopy, false);
+
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Class, Object);
+	}
 
 	return Object;
 }

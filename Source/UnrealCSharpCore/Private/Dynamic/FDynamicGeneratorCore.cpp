@@ -901,15 +901,16 @@ void FDynamicGeneratorCore::GeneratorProperty(const FClassReflection* InClassRef
 		{
 			if (Property->IsUProperty())
 			{
-				const auto CppProperty = FTypeBridge::Factory<true>(
+				if (const auto CppProperty = FTypeBridge::Factory<true>(
 					Property->GetReflectionType(), InField, FName(Name),
-					EObjectFlags::RF_Public);
+					EObjectFlags::RF_Public))
+				{
+					SetFlags(CppProperty, Property);
 
-				SetFlags(CppProperty, Property);
+					InField->AddCppProperty(CppProperty);
 
-				InField->AddCppProperty(CppProperty);
-
-				InGenerator(Property, CppProperty);
+					InGenerator(Property, CppProperty);
+				}
 			}
 		}
 	}
@@ -954,20 +955,21 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 
 			for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
 			{
-				const auto Property = FTypeBridge::Factory<true>(
+				if (const auto Property = FTypeBridge::Factory<true>(
 					Params[Index]->GetReflectionType(),
 					Function,
 					FName(Params[Index]->GetName()),
-					RF_Public | RF_Transient);
-
-				Property->SetPropertyFlags(CPF_Parm);
-
-				if (Params[Index]->IsRef())
+					RF_Public | RF_Transient))
 				{
-					Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
-				}
+					Property->SetPropertyFlags(CPF_Parm);
 
-				Function->AddCppProperty(Property);
+					if (Params[Index]->IsRef())
+					{
+						Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+					}
+
+					Function->AddCppProperty(Property);
+				}
 			}
 
 			Function->Bind();

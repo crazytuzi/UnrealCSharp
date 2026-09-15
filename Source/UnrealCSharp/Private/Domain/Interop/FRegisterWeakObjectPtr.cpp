@@ -49,7 +49,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment()
 				.GetMulti<TWeakObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->Get())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterWeakObjectPtr()

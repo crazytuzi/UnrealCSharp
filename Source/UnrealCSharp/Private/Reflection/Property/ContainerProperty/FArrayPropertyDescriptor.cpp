@@ -25,7 +25,21 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
+	if (SrcContainer != nullptr)
+	{
+		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
+	}
+}
+
+bool FArrayPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, ArrayHelper->GetScriptArray(), PortFlags);
+	}
+
+	return false;
 }
 
 IManagedHandle FArrayPropertyDescriptor::NewRef(void* InAddress) const
@@ -34,16 +48,19 @@ IManagedHandle FArrayPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
-		                                          false, false);
+			const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
+			                                          false, false);
 
-		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
-			InAddress, Property);
+			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
+				InAddress, Property);
 
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerManagedHandle, InAddress, ArrayHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				OwnerManagedHandle, InAddress, ArrayHelper, Class, Object);
+		}
 	}
 
 	return Object;
@@ -51,12 +68,17 @@ IManagedHandle FArrayPropertyDescriptor::NewRef(void* InAddress) const
 
 IManagedHandle FArrayPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
-	                                          bIsCopy, false);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Class, Object);
+		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
+		                                          bIsCopy, false);
+
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Class, Object);
+	}
 
 	return Object;
 }

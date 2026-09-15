@@ -7,7 +7,7 @@ template <auto IsSoftReference>
 FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& InOwner, const FName& InName,
                                 const EObjectFlags InObjectFlags)
 {
-	switch (const auto PropertyType = GetPropertyType(InClass); PropertyType)
+	switch (const auto PropertyType = InClass != nullptr ? GetPropertyType(InClass) : EPropertyTypeExtent::None)
 	{
 	case EPropertyTypeExtent::Byte:
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -245,26 +245,31 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 	case EPropertyTypeExtent::SubclassOfReference:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+				const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto ClassProperty = new FClassProperty(InOwner, InName);
+				const auto ClassProperty = new FClassProperty(InOwner, InName);
 #endif
 
-			ClassProperty->SetPropertyFlags(CPF_UObjectWrapper);
+				ClassProperty->SetPropertyFlags(CPF_UObjectWrapper);
 
-			SetClass<IsSoftReference>(PathName, [PathName, ClassProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, ClassProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				ClassProperty->PropertyClass = Class;
+					ClassProperty->PropertyClass = Class;
 
-				ClassProperty->MetaClass = Class;
-			});
+					ClassProperty->MetaClass = Class;
+				});
 
-			return ClassProperty;
+				return ClassProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::ObjectReference:
@@ -289,45 +294,53 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 	case EPropertyTypeExtent::Interface:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName, InObjectFlags);
+				const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName);
+				const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName);
 #endif
 
-			SetClass<IsSoftReference>(PathName, [PathName, InterfaceProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, InterfaceProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				InterfaceProperty->InterfaceClass = Class;
-			});
+					InterfaceProperty->InterfaceClass = Class;
+				});
 
-			return InterfaceProperty;
+				return InterfaceProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::Struct:
 		{
 			const auto PathName = InClass->GetPathName();
 
-			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *PathName);
-
+			if (const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *PathName))
+			{
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
+				const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto StructProperty = new FStructProperty(InOwner, InName);
+				const auto StructProperty = new FStructProperty(InOwner, InName);
 #endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
-			StructProperty->SetElementSize(InScriptStruct->GetStructureSize());
+				StructProperty->SetElementSize(InScriptStruct->GetStructureSize());
 #else
-			StructProperty->ElementSize = InScriptStruct->GetStructureSize();
+				StructProperty->ElementSize = InScriptStruct->GetStructureSize();
 #endif
 
-			StructProperty->Struct = InScriptStruct;
+				StructProperty->Struct = InScriptStruct;
 
-			return StructProperty;
+				return StructProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::Map:
@@ -391,102 +404,123 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 			const auto EnumProperty = new FEnumProperty(InOwner, InName);
 #endif
 
-			const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
-			                                        EnumProperty, "", EObjectFlags::RF_NoFlags);
-
+			if (const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
+			                                            EnumProperty, "", EObjectFlags::RF_NoFlags))
+			{
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE && UE_F_PROPERTY_GET_ELEMENT_SIZE
-			EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
+				EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
 #else
-			EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
+				EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
 #endif
 
-			EnumProperty->SetEnum(InEnum);
+				EnumProperty->SetEnum(InEnum);
 
-			EnumProperty->AddCppProperty(UnderlyingProperty);
+				EnumProperty->AddCppProperty(UnderlyingProperty);
+			}
 
 			return EnumProperty;
 		}
 
 	case EPropertyTypeExtent::WeakObjectReference:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName, InObjectFlags);
+				const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName);
+				const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName);
 #endif
 
-			SetClass<IsSoftReference>(PathName, [PathName, WeakObjectProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, WeakObjectProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				WeakObjectProperty->PropertyClass = Class;
-			});
+					WeakObjectProperty->PropertyClass = Class;
+				});
 
-			return WeakObjectProperty;
+				return WeakObjectProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::LazyObjectReference:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName, InObjectFlags);
+				const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName);
+				const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName);
 #endif
 
-			SetClass<IsSoftReference>(PathName, [PathName, LazyObjectProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, LazyObjectProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				LazyObjectProperty->PropertyClass = Class;
-			});
+					LazyObjectProperty->PropertyClass = Class;
+				});
 
-			return LazyObjectProperty;
+				return LazyObjectProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::SoftClassReference:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName, InObjectFlags);
+				const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName);
+				const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName);
 #endif
 
-			SetClass<IsSoftReference>(PathName, [PathName, SoftClassProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, SoftClassProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				SoftClassProperty->PropertyClass = Class;
+					SoftClassProperty->PropertyClass = Class;
 
-				SoftClassProperty->MetaClass = Class;
-			});
+					SoftClassProperty->MetaClass = Class;
+				});
 
-			return SoftClassProperty;
+				return SoftClassProperty;
+			}
+
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::SoftObjectReference:
 		{
-			const auto PathName = InClass->GetGenericArgument()->GetPathName();
+			if (const auto GenericArgument = InClass->GetGenericArgument())
+			{
+				const auto PathName = GenericArgument->GetPathName();
 
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName, InObjectFlags);
+				const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName, InObjectFlags);
 #else
-			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName);
+				const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName);
 #endif
 
-			SetClass<IsSoftReference>(PathName, [PathName, SoftObjectProperty]()
-			{
-				const auto Class = LoadObject<UClass>(nullptr, *PathName);
+				SetClass<IsSoftReference>(PathName, [PathName, SoftObjectProperty]()
+				{
+					const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				SoftObjectProperty->PropertyClass = Class;
-			});
+					SoftObjectProperty->PropertyClass = Class;
+				});
 
-			return SoftObjectProperty;
+				return SoftObjectProperty;
+			}
+
+			return nullptr;
 		}
 
 	default: return nullptr;

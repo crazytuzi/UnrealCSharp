@@ -7,10 +7,13 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
-			Class, Object, Src);
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
+				Class, Object, Src);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -18,20 +21,30 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -44,21 +57,25 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	const auto Interface = static_cast<FScriptInterface*>(Dest);
+	if (SrcMulti != nullptr)
+	{
+		const auto Interface = static_cast<FScriptInterface*>(Dest);
 
-	const auto Object = SrcMulti->GetObject();
+		const auto Object = SrcMulti->GetObject();
 
-	Interface->SetObject(Object);
+		Interface->SetObject(Object);
 
-	Interface->SetInterface(Object ? Object->GetInterfaceAddress(Property->InterfaceClass) : nullptr);
+		Interface->SetInterface(Object ? Object->GetInterfaceAddress(Property->InterfaceClass) : nullptr);
+	}
 }
 
 bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
+	if (const auto Interface = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, Interface, PortFlags);
+	}
 
-	const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
-
-	return Property->Identical(InterfaceA, &InterfaceB, PortFlags);
+	return false;
 }

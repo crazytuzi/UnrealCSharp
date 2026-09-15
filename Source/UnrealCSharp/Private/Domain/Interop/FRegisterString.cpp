@@ -43,7 +43,9 @@ namespace
 		{
 			const auto String = FCSharpEnvironment::GetEnvironment().GetString<FString>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(**String));
+			return String != nullptr
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(**String))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterString()

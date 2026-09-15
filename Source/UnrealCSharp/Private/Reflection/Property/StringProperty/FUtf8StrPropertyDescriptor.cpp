@@ -8,10 +8,13 @@ void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, false, true>(
-			Class, Object, Src);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, false, true>(
+				Class, Object, Src);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -19,10 +22,15 @@ void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 
 void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -41,11 +49,12 @@ void FUtf8StrPropertyDescriptor::Set(void* Src, void* Dest) const
 
 bool FUtf8StrPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	const auto Utf8StringA = Property->GetPropertyValue(A);
+	if (const auto Utf8String = FCSharpEnvironment::GetEnvironment().GetString<FUtf8String>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, Utf8String, PortFlags);
+	}
 
-	const auto Utf8StringB = FCSharpEnvironment::GetEnvironment().GetString<FUtf8String>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
-
-	return Utf8StringA == *Utf8StringB;
+	return false;
 }
 #endif

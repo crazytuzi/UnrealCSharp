@@ -64,7 +64,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 				InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterScriptInterface()

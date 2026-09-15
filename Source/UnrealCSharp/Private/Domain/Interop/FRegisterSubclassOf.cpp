@@ -48,7 +48,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
 				InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->Get())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterSubclassOf()

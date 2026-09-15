@@ -1188,29 +1188,29 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 		{
 			TSharedPtr<FJsonObject> JsonObject;
 
-			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
-
-			FJsonSerializer::Deserialize(JsonReader, JsonObject);
-
-			for (const auto& [Key, Value] : JsonObject->Values)
+			if (const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+				FJsonSerializer::Deserialize(JsonReader, JsonObject))
 			{
-				TArray<FString> Array;
-
-				const auto& JsonValueArray = Value->AsArray();
-
-				for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
+				for (const auto& [Key, Value] : JsonObject->Values)
 				{
-					if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+					TArray<FString> Array;
+
+					const auto& JsonValueArray = Value->AsArray();
+
+					for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
 					{
-						Array.Add(Element);
+						if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+						{
+							Array.Add(Element);
+						}
 					}
-				}
 
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-				Result.Add(FString(*Key), Array);
+					Result.Add(FString(*Key), Array);
 #else
-				Result.Add(Key, Array);
+					Result.Add(Key, Array);
 #endif
+				}
 			}
 		}
 	}
@@ -1228,17 +1228,17 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 		{
 			TSharedPtr<FJsonObject> JsonObject;
 
-			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
-
-			FJsonSerializer::Deserialize(JsonReader, JsonObject);
-
-			for (const auto& [Key, Value] : JsonObject->Values)
+			if (const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+				FJsonSerializer::Deserialize(JsonReader, JsonObject))
 			{
+				for (const auto& [Key, Value] : JsonObject->Values)
+				{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-				Result.Add(FString(*Key), Value->AsString());
+					Result.Add(FString(*Key), Value->AsString());
 #else
-				Result.Add(Key, Value->AsString());
+					Result.Add(Key, Value->AsString());
 #endif
+				}
 			}
 		}
 	}
@@ -1316,29 +1316,32 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 
 			TSharedPtr<FJsonObject> JsonObj;
 
-			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
+			if (FJsonSerializer::Deserialize(JsonReader, JsonObj))
 			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					EngineModuleList.AddUnique(FString(*Key));
+						EngineModuleList.AddUnique(FString(*Key));
 #else
-					EngineModuleList.AddUnique(Key);
+						EngineModuleList.AddUnique(Key);
 #endif
+					}
 				}
-			}
 
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
-			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					EngineModuleList.AddUnique(FString(*Key));
+						EngineModuleList.AddUnique(FString(*Key));
 #else
-					EngineModuleList.AddUnique(Key);
+						EngineModuleList.AddUnique(Key);
 #endif
+					}
 				}
 			}
 		}
@@ -1361,29 +1364,32 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 
 			TSharedPtr<FJsonObject> JsonObj;
 
-			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
+			if (FJsonSerializer::Deserialize(JsonReader, JsonObj))
 			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					ProjectModuleList.AddUnique(FString(*Key));
+						ProjectModuleList.AddUnique(FString(*Key));
 #else
-					ProjectModuleList.AddUnique(Key);
+						ProjectModuleList.AddUnique(Key);
 #endif
+					}
 				}
-			}
 
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
-			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					ProjectModuleList.AddUnique(FString(*Key));
+						ProjectModuleList.AddUnique(FString(*Key));
 #else
-					ProjectModuleList.AddUnique(Key);
+						ProjectModuleList.AddUnique(Key);
 #endif
+					}
 				}
 			}
 		}

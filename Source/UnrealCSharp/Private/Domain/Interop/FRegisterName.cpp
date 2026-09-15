@@ -43,19 +43,24 @@ namespace
 		{
 			const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Name->ToString()));
+			return Name != nullptr
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Name->ToString()))
+				       : InvalidManagedHandle;
 		}
 
 		static IManagedHandle NAME_NoneImplementation()
 		{
-			const auto FoundClass = TPropertyClass<FName, FName>::Get();
+			if (const auto FoundClass = TPropertyClass<FName, FName>::Get())
+			{
+				const auto Object = FoundClass->NewObject();
 
-			const auto Object = FoundClass->NewObject();
+				FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
+					FoundClass, Object, new FName(NAME_None));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
-				FoundClass, Object, new FName(NAME_None));
+				return Object;
+			}
 
-			return Object;
+			return InvalidManagedHandle;
 		}
 
 		FRegisterName()

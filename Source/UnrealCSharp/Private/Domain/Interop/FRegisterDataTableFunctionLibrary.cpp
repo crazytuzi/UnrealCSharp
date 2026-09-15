@@ -12,29 +12,31 @@ namespace
 		                                                   const IManagedHandle RowName,
 		                                                   IManagedHandle* OutRow)
 		{
-			if (const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName))
+			if (OutRow != nullptr)
 			{
-				if (InRowName->IsNone())
+				if (const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName))
 				{
-					return 0;
-				}
+					if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
+						UDataTable>(InManagedHandle))
+					{
+						FCSharpEnvironment::GetEnvironment().Bind<false>(DataTable->RowStruct.Get());
 
-				if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
-					UDataTable>(InManagedHandle))
-				{
-					FCSharpEnvironment::GetEnvironment().Bind<false>(DataTable->RowStruct.Get());
+						const auto FindRowData = DataTable->GetRowMap().Find(*InRowName);
 
-					const auto Class = FReflectionRegistry::Get().GetClass(DataTable->RowStruct);
+						if (const auto Class = FReflectionRegistry::Get().GetClass(DataTable->RowStruct);
+							!InRowName->IsNone() && FindRowData != nullptr &&
+							*FindRowData != nullptr && Class != nullptr)
+						{
+							*OutRow = Class->InitObject();
 
-					*OutRow = Class->InitObject();
+							if (const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(*OutRow))
+							{
+								DataTable->RowStruct->CopyScriptStruct(OutRowData, *FindRowData);
 
-					const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
-
-					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(*OutRow);
-
-					DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
-
-					return 1;
+								return 1;
+							}
+						}
+					}
 				}
 			}
 

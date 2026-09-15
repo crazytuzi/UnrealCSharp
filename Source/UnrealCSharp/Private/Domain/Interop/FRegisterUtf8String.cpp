@@ -47,7 +47,9 @@ namespace
 		{
 			const auto Utf8String = FCSharpEnvironment::GetEnvironment().GetString<FUtf8String>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FUtf8String(*Utf8String)));
+			return Utf8String != nullptr
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FUtf8String(*Utf8String)))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterUtf8String()

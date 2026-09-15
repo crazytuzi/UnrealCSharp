@@ -7,10 +7,13 @@ void FNamePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMe
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FName, false, true>(
-			Class, Object, Src);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, false, true>(
+				Class, Object, Src);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -18,10 +21,15 @@ void FNamePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMe
 
 void FNamePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -40,10 +48,11 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 
 bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	const auto NameA = Property->GetPropertyValue(A);
+	if (const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, Name, PortFlags);
+	}
 
-	const auto NameB = FCSharpEnvironment::GetEnvironment().GetString<FName>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
-
-	return NameA == *NameB;
+	return false;
 }

@@ -25,7 +25,21 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
+	if (SrcContainer != nullptr)
+	{
+		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
+	}
+}
+
+bool FSetPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, SetHelper->GetScriptSet(), PortFlags);
+	}
+
+	return false;
 }
 
 IManagedHandle FSetPropertyDescriptor::NewRef(void* InAddress) const
@@ -34,16 +48,19 @@ IManagedHandle FSetPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
-		                                      false, false);
+			const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
+			                                      false, false);
 
-		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
-			InAddress, Property);
+			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
+				InAddress, Property);
 
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerManagedHandle, InAddress, SetHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				OwnerManagedHandle, InAddress, SetHelper, Class, Object);
+		}
 	}
 
 	return Object;
@@ -51,12 +68,17 @@ IManagedHandle FSetPropertyDescriptor::NewRef(void* InAddress) const
 
 IManagedHandle FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
-	                                      bIsCopy, false);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Class, Object);
+		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
+		                                      bIsCopy, false);
+
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Class, Object);
+	}
 
 	return Object;
 }

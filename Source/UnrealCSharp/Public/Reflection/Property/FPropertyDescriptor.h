@@ -62,6 +62,8 @@ public:
 
 	virtual void DestroyValue(void* Dest) const;
 
+	static void GetDefaultValue(const FPropertyDescriptor* InPropertyDescriptor, void* Dest);
+
 	FORCEINLINE FString GetName() const;
 
 	FORCEINLINE void InitializeValue_InContainer(void* Dest) const;

@@ -13,9 +13,10 @@ namespace
 	{
 		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
-
-			FCSharpBind::Bind<FSetHelper>(Class, Class->GetGenericArgument(), InManagedObject);
+			if (const auto Class = FReflectionRegistry::Get().GetClass(InManagedType))
+			{
+				FCSharpBind::Bind<FSetHelper>(Class, Class->GetGenericArgument(), InManagedObject);
+			}
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -107,9 +108,14 @@ namespace
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
-				const auto Value = SetHelper->GetEnumerator(InIndex);
-
-				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Value = SetHelper->GetEnumerator(InIndex))
+				{
+					SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(SetHelper->GetElementPropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
 		}
 

@@ -27,7 +27,21 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 	const auto DestScriptDelegate = Property->GetPropertyValuePtr(Dest);
 
-	DestScriptDelegate->BindUFunction(SrcDelegateHelper->GetUObject(), SrcDelegateHelper->GetFunctionName());
+	if (SrcDelegateHelper != nullptr)
+	{
+		DestScriptDelegate->BindUFunction(SrcDelegateHelper->GetUObject(), SrcDelegateHelper->GetFunctionName());
+	}
+}
+
+bool FDelegatePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, DelegateHelper->GetAddress(), PortFlags);
+	}
+
+	return false;
 }
 
 IManagedHandle FDelegatePropertyDescriptor::NewRef(void* InAddress) const
@@ -36,16 +50,19 @@ IManagedHandle FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
-		                                                Property->SignatureFunction);
+		if (Class != nullptr)
+		{
+			const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
+			                                                Property->SignatureFunction);
 
-		Object = Class->NewObject();
+			Object = Class->NewObject();
 
-		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
-			InAddress, Property);
+			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
+				InAddress, Property);
 
-		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerManagedHandle, InAddress,
-		                                                          DelegateHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerManagedHandle, InAddress,
+			                                                          DelegateHelper, Class, Object);
+		}
 	}
 
 	return Object;
@@ -53,12 +70,17 @@ IManagedHandle FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 
 IManagedHandle FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 {
-	const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
-	                                                Property->SignatureFunction);
+	auto Object = InvalidManagedHandle;
 
-	const auto Object = Class->NewObject();
+	if (Class != nullptr)
+	{
+		const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
+		                                                Property->SignatureFunction);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class, Object);
+		Object = Class->NewObject();
+
+		FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class, Object);
+	}
 
 	return Object;
 }

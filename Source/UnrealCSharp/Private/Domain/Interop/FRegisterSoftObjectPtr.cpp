@@ -49,7 +49,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().
 				GetMulti<TSoftObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->Get())
+				       : InvalidManagedHandle;
 		}
 
 		static IManagedHandle LoadSynchronousImplementation(const IManagedHandle InManagedHandle)
@@ -57,7 +59,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().
 				GetMulti<TSoftObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterSoftObjectPtr()

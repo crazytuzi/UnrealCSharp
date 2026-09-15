@@ -126,19 +126,20 @@ namespace
 			{
 				const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
-				const auto FoundTransform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
-					InTransform);
+				if (const auto FoundTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
+					UScriptStruct, FTransform>(InTransform))
+				{
+					const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+						FActorSpawnParameters>(InActorSpawnParameters);
 
-				const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
-					FActorSpawnParameters>(InActorSpawnParameters);
+					const auto Actor = FoundWorld->SpawnActor<AActor>(FoundClass,
+					                                                  *FoundTransform,
+					                                                  FoundActorSpawnParameters != nullptr
+						                                                  ? *FoundActorSpawnParameters
+						                                                  : FActorSpawnParameters());
 
-				const auto Actor = FoundWorld->SpawnActor<AActor>(FoundClass,
-				                                                  *FoundTransform,
-				                                                  FoundActorSpawnParameters != nullptr
-					                                                  ? *FoundActorSpawnParameters
-					                                                  : FActorSpawnParameters());
-
-				return FCSharpEnvironment::GetEnvironment().Bind(Actor);
+					return FCSharpEnvironment::GetEnvironment().Bind(Actor);
+				}
 			}
 
 			return InvalidManagedHandle;

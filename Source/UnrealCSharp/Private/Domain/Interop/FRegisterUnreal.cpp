@@ -53,18 +53,21 @@ namespace
 
 			const auto ObjectClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(Class);
 
-			const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name);
+			if (const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name))
+			{
+				const auto ObjectTemplate = FCSharpEnvironment::GetEnvironment().GetObject(Template);
 
-			const auto ObjectTemplate = FCSharpEnvironment::GetEnvironment().GetObject(Template);
+				const auto Object = NewObject<UObject>(ObjectOuter,
+				                                       ObjectClass,
+				                                       *ObjectName,
+				                                       Flags,
+				                                       ObjectTemplate,
+				                                       bCopyTransientsFromClassDefaults != 0);
 
-			const auto Object = NewObject<UObject>(ObjectOuter,
-			                                       ObjectClass,
-			                                       *ObjectName,
-			                                       Flags,
-			                                       ObjectTemplate,
-			                                       bCopyTransientsFromClassDefaults != 0);
+				return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			}
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return InvalidManagedHandle;
 		}
 
 		static IManagedHandle DuplicateObjectImplementation(const IManagedHandle SourceObject,
@@ -75,13 +78,16 @@ namespace
 
 			const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
 
-			const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name);
+			if (const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name))
+			{
+				const auto Object = DuplicateObject<UObject>(ObjectSourceObject,
+				                                             ObjectOuter,
+				                                             *ObjectName);
 
-			const auto Object = DuplicateObject<UObject>(ObjectSourceObject,
-			                                             ObjectOuter,
-			                                             *ObjectName);
+				return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			}
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return InvalidManagedHandle;
 		}
 
 		static IManagedHandle LoadObjectImplementation(const IManagedHandle Outer,
@@ -135,34 +141,37 @@ namespace
 		static IManagedHandle CreateWidgetImplementation(const IManagedHandle InOwningObject,
 		                                                 const IManagedHandle InUserWidgetClass)
 		{
-			const auto OwningObject = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InOwningObject);
+			if (const auto OwningObject = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InOwningObject))
+			{
+				const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InUserWidgetClass);
 
-			const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InUserWidgetClass);
+				UUserWidget* UserWidget{};
 
-			UUserWidget* UserWidget = nullptr;
+				if (OwningObject->IsA(UWidget::StaticClass()))
+				{
+					UserWidget = CreateWidget(Cast<UWidget>(OwningObject), Class);
+				}
+				else if (OwningObject->IsA(UWidgetTree::StaticClass()))
+				{
+					UserWidget = CreateWidget(Cast<UWidgetTree>(OwningObject), Class);
+				}
+				else if (OwningObject->IsA(APlayerController::StaticClass()))
+				{
+					UserWidget = CreateWidget(Cast<APlayerController>(OwningObject), Class);
+				}
+				else if (OwningObject->IsA(UGameInstance::StaticClass()))
+				{
+					UserWidget = CreateWidget(Cast<UGameInstance>(OwningObject), Class);
+				}
+				else if (OwningObject->IsA(UWorld::StaticClass()))
+				{
+					UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
+				}
 
-			if (OwningObject->IsA(UWidget::StaticClass()))
-			{
-				UserWidget = CreateWidget(Cast<UWidget>(OwningObject), Class);
-			}
-			else if (OwningObject->IsA(UWidgetTree::StaticClass()))
-			{
-				UserWidget = CreateWidget(Cast<UWidgetTree>(OwningObject), Class);
-			}
-			else if (OwningObject->IsA(APlayerController::StaticClass()))
-			{
-				UserWidget = CreateWidget(Cast<APlayerController>(OwningObject), Class);
-			}
-			else if (OwningObject->IsA(UGameInstance::StaticClass()))
-			{
-				UserWidget = CreateWidget(Cast<UGameInstance>(OwningObject), Class);
-			}
-			else if (OwningObject->IsA(UWorld::StaticClass()))
-			{
-				UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
+				return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
 			}
 
-			return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
+			return InvalidManagedHandle;
 		}
 
 		static IManagedHandle GWorldImplementation()
