@@ -12,6 +12,7 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	UEName(DEFAULT_UE_NAME),
 	GameName(DEFAULT_GAME_NAME),
 	bEnableCallOverrideFunction(true),
+	bEnableStableFieldHash(false),
 	OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
 	OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
 	WindowsScriptDomainType(EScriptDomainType::CoreCLR),
@@ -77,6 +78,11 @@ const TArray<FCustomProject>& UUnrealCSharpSetting::GetCustomProjects() const
 bool UUnrealCSharpSetting::EnableCallOverrideFunction() const
 {
 	return bEnableCallOverrideFunction;
+}
+
+bool UUnrealCSharpSetting::EnableStableFieldHash() const
+{
+	return bEnableStableFieldHash;
 }
 
 const FString& UUnrealCSharpSetting::GetOverrideFunctionNamePrefix() const

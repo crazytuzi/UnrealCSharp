@@ -105,6 +105,8 @@ public:
 
 	bool EnableCallOverrideFunction() const;
 
+	bool EnableStableFieldHash() const;
+
 	const FString& GetOverrideFunctionNamePrefix() const;
 
 	const FString& GetOverrideFunctionNameSuffix() const;
@@ -140,6 +142,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Override)
 	bool bEnableCallOverrideFunction;
+
+	UPROPERTY(Config, EditAnywhere, Category = Hash, meta = (ConfigRestartRequired = true))
+	bool bEnableStableFieldHash;
 
 	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
 	FString OverrideFunctionNamePrefix;
