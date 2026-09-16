@@ -80,7 +80,7 @@ typedef void (*field_bridge_set_static_value_fn)(IManagedHandle, const uint8*, I
 
 typedef IManagedHandle (*field_bridge_get_static_value_fn)(IManagedHandle, const uint8*);
 
-typedef void (*method_bridge_register_binding_fn)(const uint8* const*, const PTRINT*, int32);
+typedef void (*method_bridge_register_binding_fn)(const uint8* const*, const PTRINT*, const int32*, int32);
 
 typedef IManagedHandle (*method_bridge_invoke_fn)(IManagedHandle, IManagedHandle, int32, IManagedHandle*);
 
@@ -163,7 +163,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 	\
 	Op(TypeBridgeGetFunctionPointer, type_bridge_get_function_pointer_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER, 3) \
 	\
-	Op(MethodBridgeRegisterBinding, method_bridge_register_binding_fn, CLASS_METHOD_BRIDGE, FUNCTION_METHOD_BRIDGE_REGISTER_BINDING, 3)
+	Op(MethodBridgeRegisterBinding, method_bridge_register_binding_fn, CLASS_METHOD_BRIDGE, FUNCTION_METHOD_BRIDGE_REGISTER_BINDING, 4)
 
 #define UTILS_BRIDGE_METHODS(Op) \
 	Op(UtilsIsOverride, utils_is_override_fn, COMBINE_FULL_NAME(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS), FUNCTION_UTILS_IS_OVERRIDE, 1) \

@@ -221,6 +221,8 @@ private:
 	static constexpr int32 MaxPInvokeArguments = 8;
 
 	static TMap<const leanclr::metadata::RtMethodInfo*, FPInvokeSignature> PInvokeSignatures;
+
+	static TMap<UPTRINT, int32> PInvokeParamCounts;
 };
 
 #include "FLeanCLRDomain.inl"

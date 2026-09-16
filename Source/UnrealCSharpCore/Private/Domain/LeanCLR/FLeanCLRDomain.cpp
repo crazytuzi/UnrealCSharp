@@ -34,6 +34,8 @@ TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> FLeanCLRDomai
 
 TMap<const leanclr::metadata::RtMethodInfo*, FLeanCLRDomain::FPInvokeSignature> FLeanCLRDomain::PInvokeSignatures;
 
+TMap<UPTRINT, int32> FLeanCLRDomain::PInvokeParamCounts;
+
 void FLeanCLRDomain::Initialize()
 {
 	if (bIsInitialized)
@@ -543,6 +545,14 @@ leanclr::RtErr FLeanCLRDomain::PInvoke_Classify(const leanclr::metadata::RtMetho
 		return leanclr::RtErr::ExecutionEngine;
 	}
 
+	if (const auto FoundParamCount = PInvokeParamCounts.Find(reinterpret_cast<UPTRINT>(Entry->func)))
+	{
+		if (*FoundParamCount != INDEX_NONE && *FoundParamCount != InManagedMethod->parameter_count)
+		{
+			return leanclr::RtErr::ExecutionEngine;
+		}
+	}
+
 	auto ReturnReduceResult = leanclr::interp::InterpDefs::get_reduce_type_and_size_by_typesig(
 		InManagedMethod->return_type);
 
@@ -878,6 +888,9 @@ void FLeanCLRDomain::RegisterBinding() const
 		for (const auto& Method : Class->GetMethods())
 		{
 			RegisterPInvoke(Method.GetMethod(), Method.GetFunction());
+
+			PInvokeParamCounts.Add(reinterpret_cast<UPTRINT>(const_cast<void*>(Method.GetFunction())),
+			                       Method.GetParamCount());
 		}
 	}
 

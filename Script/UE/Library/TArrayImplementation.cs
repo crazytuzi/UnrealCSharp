@@ -69,39 +69,39 @@ namespace Script.Library
             return __TArray_MaxImplementation(InArray);
         }
 
-        private static unsafe partial void __TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer);
+        private static unsafe partial void __TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer, int InBufferSize);
 
-        public static void TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer)
+        public static void TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer, int InBufferSize)
         {
-            __TArray_GetImplementation(InArray, InIndex, ReturnBuffer);
+            __TArray_GetImplementation(InArray, InIndex, ReturnBuffer, InBufferSize);
         }
 
-        private static unsafe partial void __TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer);
+        private static unsafe partial void __TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer, int InBufferSize);
 
-        public static void TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer)
+        public static void TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer, int InBufferSize)
         {
-            __TArray_SetImplementation(InArray, InIndex, InValueBuffer);
+            __TArray_SetImplementation(InArray, InIndex, InValueBuffer, InBufferSize);
         }
 
-        private static unsafe partial int __TArray_FindImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_FindImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_FindImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_FindImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_FindImplementation(InArray, InValueBuffer);
+            return __TArray_FindImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
-        private static unsafe partial int __TArray_FindLastImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_FindLastImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_FindLastImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_FindLastImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_FindLastImplementation(InArray, InValueBuffer);
+            return __TArray_FindLastImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
-        private static unsafe partial byte __TArray_ContainsImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial byte __TArray_ContainsImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static bool TArray_ContainsImplementation(nint InArray, byte* InValueBuffer)
+        public static bool TArray_ContainsImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_ContainsImplementation(InArray, InValueBuffer) != 0;
+            return __TArray_ContainsImplementation(InArray, InValueBuffer, InBufferSize) != 0;
         }
 
         private static unsafe partial int __TArray_AddUninitializedImplementation(nint InArray, int InCount);
@@ -154,11 +154,11 @@ namespace Script.Library
             __TArray_SetNumImplementation(InArray, InNewNum, (byte)(bAllowShrinking ? 1 : 0));
         }
 
-        private static unsafe partial int __TArray_AddImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_AddImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_AddImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_AddImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_AddImplementation(InArray, InValueBuffer);
+            return __TArray_AddImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
         private static unsafe partial int __TArray_AddZeroedImplementation(nint InArray, int InCount);
@@ -168,25 +168,25 @@ namespace Script.Library
             return __TArray_AddZeroedImplementation(InArray, InCount);
         }
 
-        private static unsafe partial int __TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_AddUniqueImplementation(InArray, InValueBuffer);
+            return __TArray_AddUniqueImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
-        private static unsafe partial int __TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_RemoveSingleImplementation(InArray, InValueBuffer);
+            return __TArray_RemoveSingleImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
-        private static unsafe partial int __TArray_RemoveImplementation(nint InArray, byte* InValueBuffer);
+        private static unsafe partial int __TArray_RemoveImplementation(nint InArray, byte* InValueBuffer, int InBufferSize);
 
-        public static int TArray_RemoveImplementation(nint InArray, byte* InValueBuffer)
+        public static int TArray_RemoveImplementation(nint InArray, byte* InValueBuffer, int InBufferSize)
         {
-            return __TArray_RemoveImplementation(InArray, InValueBuffer);
+            return __TArray_RemoveImplementation(InArray, InValueBuffer, InBufferSize);
         }
 
         private static unsafe partial void __TArray_SwapMemoryImplementation(nint InArray, int InFirstIndexToSwap, int InSecondIndexToSwap);
@@ -216,7 +216,7 @@ namespace Script.Library
         {
             var ValueBuffer = stackalloc byte[sizeof(nint)];
 
-            __TArray_GetImplementation(InArray, InIndex, ValueBuffer);
+            __TArray_GetImplementation(InArray, InIndex, ValueBuffer, sizeof(nint));
 
             var Handle = *(nint*)ValueBuffer;
 

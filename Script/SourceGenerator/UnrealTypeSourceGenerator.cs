@@ -915,7 +915,7 @@ namespace SourceGenerator
                     "\n" +
                     $"\t\t{accessibility} static unsafe partial {returnType} {method.Name}({parameters}) =>\n" +
                     $"\t\t\t((delegate* unmanaged[Cdecl]<{pointerType}>)global::Interop.MethodBridge.GetMethod(\n" +
-                    $"\t\t\t\tref {slot}, \"{key}\"))({arguments});\n" +
+                    $"\t\t\t\tref {slot}, \"{key}\", {method.Parameters.Length}))({arguments});\n" +
                     "#endif\n\n";
             }
 

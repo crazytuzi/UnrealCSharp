@@ -38,7 +38,8 @@ public:
 	                     const FString& InImplementationName,
 	                     const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction);
 
-	void BindingMethod(const FString& InImplementationName, const void* InFunction);
+	void BindingMethod(const FString& InImplementationName, const void* InFunction,
+	                   int32 InParamCount = INDEX_NONE);
 
 	void Inheritance(const TFunction<FString()>& InBaseClassFunction,
 	                 const FString& InImplementationNameSpace,

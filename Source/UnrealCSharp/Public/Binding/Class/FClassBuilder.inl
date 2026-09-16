@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Template/TGetFunctionParamCount.inl"
+
 template <typename T>
 auto FClassBuilder::Function(const FString& InName,
                              T InMethod
@@ -16,6 +18,7 @@ auto FClassBuilder::Function(const FString& InName,
 #if WITH_FUNCTION_INFO
 	                , InFunctionInfoFunction
 #endif
+	                , TGetFunctionParamCount(InMethod)
 	);
 }
 
@@ -50,7 +53,8 @@ auto FClassBuilder::Property(const FString& InName,
 }
 
 template <typename T>
-auto FClassBuilder::Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod)
+auto FClassBuilder::Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod,
+                             const int32 InParamCount)
 {
-	ClassRegister->BindingMethod(InImplementationName, InMethod.Value.Pointer);
+	ClassRegister->BindingMethod(InImplementationName, InMethod.Value.Pointer, InParamCount);
 }

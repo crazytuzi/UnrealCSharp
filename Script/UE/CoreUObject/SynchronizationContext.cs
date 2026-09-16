@@ -87,6 +87,8 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
                 WaitHandle = ResetEvent
             });
         }
+
+        ResetEvent.WaitOne();
     }
 
     private int ThreadId;

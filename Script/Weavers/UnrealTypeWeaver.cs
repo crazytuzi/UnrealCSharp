@@ -387,7 +387,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -490,7 +490,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -606,7 +606,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -709,7 +709,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -863,7 +863,7 @@ namespace Weavers
             return Instruction.Create(OpCodes.Ldind_Ref);
         }
 
-        private static sbyte GetTypeSize(TypeReference Type)
+        private static int GetTypeSize(TypeReference Type)
         {
             switch (Type.MetadataType)
             {
@@ -899,7 +899,14 @@ namespace Weavers
                 }
             }
 
-            return (sbyte)IntPtr.Size;
+            return IntPtr.Size;
+        }
+
+        private static Instruction GetLdcI4(int InValue)
+        {
+            return InValue >= sbyte.MinValue && InValue <= sbyte.MaxValue
+                ? Instruction.Create(OpCodes.Ldc_I4_S, (sbyte)InValue)
+                : Instruction.Create(OpCodes.Ldc_I4, InValue);
         }
 
         private void ModifyRpcMethod(TypeDefinition Type, MethodDefinition Method)
@@ -915,7 +922,7 @@ namespace Weavers
 
             if (Method.Parameters.Count > 0)
             {
-                sbyte BufferSize = 0;
+                int BufferSize = 0;
 
                 foreach (var param in Method.Parameters)
                 {
@@ -930,7 +937,7 @@ namespace Weavers
 
                 Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
 
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                Method.Body.GetILProcessor().Append(GetLdcI4(BufferSize));
 
                 Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -946,7 +953,7 @@ namespace Weavers
 
                     if (BufferSize != 0)
                     {
-                        Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                        Method.Body.GetILProcessor().Append(GetLdcI4(BufferSize));
 
                         Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Add));
                     }

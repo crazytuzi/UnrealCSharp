@@ -608,6 +608,8 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 
 		TArray<PTRINT> Methods;
 
+		TArray<int32> ParamCounts;
+
 		for (const auto& Class : FBinding::Get().Register().GetClasses())
 		{
 			for (const auto& Method : Class->GetMethods())
@@ -625,10 +627,13 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 				MethodNames.Add(reinterpret_cast<const uint8*>(Name.GetData()));
 
 				Methods.Add(reinterpret_cast<PTRINT>(const_cast<void*>(Method.GetFunction())));
+
+				ParamCounts.Add(Method.GetParamCount());
 			}
 		}
 
-		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), MethodNames.Num());
+		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
+		                              MethodNames.Num());
 	}
 }
 #endif

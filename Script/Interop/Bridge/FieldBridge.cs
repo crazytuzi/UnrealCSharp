@@ -48,8 +48,9 @@ public static class FieldBridge
 
     private static object? LongToField(long InValue, Type InField) => InField switch
     {
-        { IsValueType: false } => InValue != 0 ? InValue : null,
+        { IsValueType: false } => InValue != 0 ? HandleData.GetObject((nint)InValue) : null,
         { IsEnum: true } => Enum.ToObject(InField, InValue),
+        _ when InField == typeof(bool) => InValue != 0,
         _ when InField == typeof(nint) => (nint)InValue,
         _ when InField == typeof(nuint) => (nuint)InValue,
         _ => Convert.ChangeType(InValue, InField)
@@ -60,6 +61,7 @@ public static class FieldBridge
         null => 0,
         nint v => v,
         nuint v => (long)v,
-        _ => Convert.ToInt64(InValue)
+        _ when InValue.GetType().IsValueType => Convert.ToInt64(InValue),
+        _ => HandleData.Alloc(InValue)
     };
 }

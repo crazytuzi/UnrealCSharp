@@ -109,7 +109,7 @@ public static class TypeBridge
                 var String = new Span<byte>(OutString, InStringSize);
 
                 var Length = Encoding.UTF8.GetBytes(
-                    Namespace.AsSpan(0, Math.Min(Namespace.Length, InStringSize - 1)), String);
+                    Namespace.AsSpan(0, GetUTF8CharCount(Namespace, InStringSize - 1)), String);
 
                 String[Length] = 0;
 
@@ -132,7 +132,7 @@ public static class TypeBridge
                 var String = new Span<byte>(OutString, InStringSize);
 
                 var Length = Encoding.UTF8.GetBytes(
-                    Name.AsSpan(0, Math.Min(Name.Length, InStringSize - 1)), String);
+                    Name.AsSpan(0, GetUTF8CharCount(Name, InStringSize - 1)), String);
 
                 String[Length] = 0;
 
@@ -159,7 +159,7 @@ public static class TypeBridge
                 var String = new Span<byte>(OutString, InStringSize);
 
                 var Length = Encoding.UTF8.GetBytes(
-                    FullName.AsSpan(0, Math.Min(FullName.Length, InStringSize - 1)), String);
+                    FullName.AsSpan(0, GetUTF8CharCount(FullName, InStringSize - 1)), String);
 
                 String[Length] = 0;
 
@@ -496,6 +496,49 @@ public static class TypeBridge
         }
 
         return null;
+    }
+
+    private static int GetUTF8CharCount(string InString, int InByteCount)
+    {
+        var ByteCount = 0;
+
+        var Index = 0;
+
+        while (Index < InString.Length)
+        {
+            var Character = InString[Index];
+
+            int CharacterSize;
+
+            if (Character < 0x80)
+            {
+                CharacterSize = 1;
+            }
+            else if (Character < 0x800)
+            {
+                CharacterSize = 2;
+            }
+            else if (char.IsHighSurrogate(Character) && Index + 1 < InString.Length &&
+                     char.IsLowSurrogate(InString[Index + 1]))
+            {
+                CharacterSize = 4;
+            }
+            else
+            {
+                CharacterSize = 3;
+            }
+
+            if (ByteCount + CharacterSize > InByteCount)
+            {
+                break;
+            }
+
+            ByteCount += CharacterSize;
+
+            Index += CharacterSize == 4 ? 2 : 1;
+        }
+
+        return Index;
     }
 
     internal static void Clear()

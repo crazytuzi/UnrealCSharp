@@ -52,11 +52,13 @@ public:
 #if WITH_FUNCTION_INFO
 	                        , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {}
 #endif
+	                        , int32 InParamCount = INDEX_NONE
 	);
 
 protected:
 	template <typename T>
-	auto Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod);
+	auto Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod,
+	              int32 InParamCount = INDEX_NONE);
 
 private:
 	FString GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const;
