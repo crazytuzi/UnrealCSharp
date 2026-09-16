@@ -154,6 +154,8 @@ void FDynamicDependencyGraph::Generator()
 
 			FString OutNode;
 
+			TMap<FString, int32> PendingCounts;
+
 			while (NodeQueue.Dequeue(OutNode))
 			{
 				if (NodeArray[NodeMap[OutNode]].IsCompleted())
@@ -194,9 +196,12 @@ void FDynamicDependencyGraph::Generator()
 
 				if (bIsPending)
 				{
-					NodeQueue.Enqueue(OutNode);
+					if (PendingCounts.FindOrAdd(OutNode)++ < NodeArray.Num())
+					{
+						NodeQueue.Enqueue(OutNode);
 
-					continue;
+						continue;
+					}
 				}
 
 				if (bIsCompleted)

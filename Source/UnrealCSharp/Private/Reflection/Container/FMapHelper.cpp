@@ -67,7 +67,10 @@ void FMapHelper::Deinitialize()
 
 void FMapHelper::Empty(const int32 InExpectedNumElements) const
 {
-	ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
+	if (InExpectedNumElements >= 0)
+	{
+		ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
+	}
 }
 
 int32 FMapHelper::Num() const

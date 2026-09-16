@@ -18,7 +18,8 @@ private:
 private:
 	void BuildAction();
 
-	TSharedRef<FExtender> GenerateBlueprintExtender(UBlueprint* InBlueprint);
+	TSharedRef<FExtender> GenerateBlueprintExtender(const TSharedRef<FUICommandList> InCommandList,
+	                                                const TArray<UObject*> InContextSensitiveObjects);
 
 private:
 	void SetCodeAnalysisOverrideFilesMap();

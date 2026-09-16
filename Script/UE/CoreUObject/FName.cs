@@ -40,7 +40,7 @@ namespace Script.CoreUObject
         public override int GetHashCode() => (int)HandleData.GetHandle(this);
 
         public override string ToString() =>
-            FNameImplementation.FName_ToStringImplementation(HandleData.GetHandle(this));
+            FNameImplementation.FName_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
 
         public static FName NAME_None => FNameImplementation.FName_NAME_NoneImplementation();
     }

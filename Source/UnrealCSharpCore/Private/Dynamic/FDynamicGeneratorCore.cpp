@@ -196,13 +196,16 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 		return;
 	}
 
-	for (const auto& [PLACEHOLDER, Method] : InClassReflection->GetMethods())
+	for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
 	{
-		if (Method->IsUFunction())
+		for (const auto Method : Methods)
 		{
-			for (const auto Param : Method->GetParams())
+			if (Method->IsUFunction())
 			{
-				GeneratorField(Param, Param->GetReflectionType(), OutNode);
+				for (const auto Param : Method->GetParams())
+				{
+					GeneratorField(Param, Param->GetReflectionType(), OutNode);
+				}
 			}
 		}
 	}
@@ -925,66 +928,69 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 		return;
 	}
 
-	for (const auto& [Pair, Method] : InClassReflection->GetMethods())
+	for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
 	{
-		if (Method->IsUFunction())
+		for (const auto Method : Methods)
 		{
-			auto Function = NewObject<UFunction>(InClass, FName(Pair.Get<0>()), RF_Public | RF_Transient);
-
-			if (Method->IsStatic())
+			if (Method->IsUFunction())
 			{
-				Function->FunctionFlags |= FUNC_Static;
-			}
+				auto Function = NewObject<UFunction>(InClass, FName(Method->GetName()), RF_Public | RF_Transient);
 
-			Function->MinAlignment = 1;
-
-			if (const auto Return = Method->GetReturn())
-			{
-				if (const auto Property = FTypeBridge::Factory<true>(Return, Function, "",
-				                                                     RF_Public | RF_Transient))
+				if (Method->IsStatic())
 				{
-					Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
-
-					Function->AddCppProperty(Property);
-
-					Function->FunctionFlags |= FUNC_HasOutParms;
+					Function->FunctionFlags |= FUNC_Static;
 				}
-			}
 
-			const auto& Params = Method->GetParams();
+				Function->MinAlignment = 1;
 
-			for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
-			{
-				if (const auto Property = FTypeBridge::Factory<true>(
-					Params[Index]->GetReflectionType(),
-					Function,
-					FName(Params[Index]->GetName()),
-					RF_Public | RF_Transient))
+				if (const auto Return = Method->GetReturn())
 				{
-					Property->SetPropertyFlags(CPF_Parm);
-
-					if (Params[Index]->IsRef())
+					if (const auto Property = FTypeBridge::Factory<true>(Return, Function, "",
+					                                                     RF_Public | RF_Transient))
 					{
-						Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
+
+						Function->AddCppProperty(Property);
+
+						Function->FunctionFlags |= FUNC_HasOutParms;
 					}
-
-					Function->AddCppProperty(Property);
 				}
+
+				const auto& Params = Method->GetParams();
+
+				for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
+				{
+					if (const auto Property = FTypeBridge::Factory<true>(
+						Params[Index]->GetReflectionType(),
+						Function,
+						FName(Params[Index]->GetName()),
+						RF_Public | RF_Transient))
+					{
+						Property->SetPropertyFlags(CPF_Parm);
+
+						if (Params[Index]->IsRef())
+						{
+							Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+						}
+
+						Function->AddCppProperty(Property);
+					}
+				}
+
+				Function->Bind();
+
+				Function->StaticLink(true);
+
+				Function->Next = InClass->Children;
+
+				InClass->Children = Function;
+
+				SetFlags(Function, Method);
+
+				InClass->AddFunctionToFunctionMap(Function, FName(Method->GetName()));
+
+				InGenerator(Method, Function);
 			}
-
-			Function->Bind();
-
-			Function->StaticLink(true);
-
-			Function->Next = InClass->Children;
-
-			InClass->Children = Function;
-
-			SetFlags(Function, Method);
-
-			InClass->AddFunctionToFunctionMap(Function, FName(Method->GetName()));
-
-			InGenerator(Method, Function);
 		}
 	}
 }

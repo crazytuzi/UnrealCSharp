@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMacro/BufferMacro.h"
-#include "TBufferOffset.inl"
+#include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Domain/Script/IManagedHandle.h"
 
 template <typename Type, typename... Args0>
@@ -33,7 +33,7 @@ struct TOut
 				*reinterpret_cast<void**>(Buffer) = std::get<Index>(Argument).Set();
 			}
 
-			Buffer += std::get<Index>(TBufferOffset<Args0...>()());
+			Buffer += TTypeInfo<std::decay_t<T>>::Get()->GetBufferSize();
 		}
 
 		Get<Index + 1, Args1...>();

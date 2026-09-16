@@ -57,7 +57,10 @@ void FSetHelper::Deinitialize()
 
 void FSetHelper::Empty(const int32 InExpectedNumElements) const
 {
-	ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
+	if (InExpectedNumElements >= 0)
+	{
+		ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
+	}
 }
 
 int32 FSetHelper::Num() const

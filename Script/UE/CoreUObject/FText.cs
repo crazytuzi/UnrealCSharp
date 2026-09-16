@@ -43,6 +43,6 @@ namespace Script.CoreUObject
         public override int GetHashCode() => (int)HandleData.GetHandle(this);
 
         public override string ToString() =>
-            FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this));
+            FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
     }
 }

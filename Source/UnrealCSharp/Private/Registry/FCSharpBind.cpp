@@ -266,43 +266,16 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 			}
 		}
 
-		TMap<FString, FMethodReflection*> Methods;
-
-		for (const auto& [Name, Method] : Class->GetMethods())
-		{
-			if (Method != nullptr)
-			{
-				if (Method->IsOverride())
-				{
-					Methods.Add(Name.Get<0>(), Method);
-				}
-			}
-		}
-
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& [MethodName, Method] : Methods)
+			const auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
+				                                ? Function->NumParms - 1
+				                                : Function->NumParms;
+
+			if (const auto Method = Class->GetMethod(FunctionName, FunctionParamCount);
+				Method != nullptr && Method->IsOverride())
 			{
-				if (Method != nullptr)
-				{
-					if (FunctionName == MethodName)
-					{
-						const auto MethodParamCount = Method->GetParamCount();
-
-						auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
-							                          ? Function->NumParms - 1
-							                          : Function->NumParms;
-
-						if (MethodParamCount == FunctionParamCount)
-						{
-							Bind(NewClassDescriptor, FoundClass, MethodName, Function);
-
-							Methods.Remove(MethodName);
-
-							break;
-						}
-					}
-				}
+				Bind(NewClassDescriptor, FoundClass, FunctionName, Function);
 			}
 		}
 	}

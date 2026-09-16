@@ -175,6 +175,19 @@ FEditorListener::~FEditorListener()
 			FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
 #endif
 		}
+
+		if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		{
+			AssetRegistryModule->Get().OnFilesLoaded().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetAdded().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetRemoved().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetRenamed().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetUpdatedOnDisk().RemoveAll(this);
+		}
 	}
 }
 

@@ -623,7 +623,7 @@ FString FGeneratorCore::GetOutParam(const bool bIsPrimitive, const FString& InNa
 		                         *InOffset
 		       )
 		       : FString::Printf(TEXT(
-			       "\n%s%s = (%s)HandleData.GetObject(*(nint*)%s%s);\n"
+			       "\n%s%s = (%s)HandleData.GetObject(*(nint*)(%s%s));\n"
 		       ),
 		                         *InIndent,
 		                         *InName,

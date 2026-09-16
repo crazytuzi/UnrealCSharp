@@ -23,13 +23,7 @@ void FUnrealCSharpBlueprintToolBar::Initialize()
 	auto& BlueprintEditorModule = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
 
 	BlueprintEditorModule.GetMenuExtensibilityManager()->GetExtenderDelegates().Add(
-		FAssetEditorExtender::CreateLambda(
-			[&](const TSharedRef<FUICommandList> InCommandList, const TArray<UObject*> InContextSensitiveObjects)
-			{
-				return GenerateBlueprintExtender(InContextSensitiveObjects.IsEmpty()
-					                                 ? nullptr
-					                                 : Cast<UBlueprint>(InContextSensitiveObjects[0]));
-			}));
+		FAssetEditorExtender::CreateRaw(this, &FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender));
 
 	SetCodeAnalysisOverrideFilesMap();
 
@@ -44,6 +38,17 @@ void FUnrealCSharpBlueprintToolBar::Deinitialize()
 	if (OnEndGeneratorDelegateHandle.IsValid())
 	{
 		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorDelegateHandle);
+	}
+
+	if (FModuleManager::Get().IsModuleLoaded("Kismet"))
+	{
+		auto& BlueprintEditorModule = FModuleManager::GetModuleChecked<FBlueprintEditorModule>("Kismet");
+
+		BlueprintEditorModule.GetMenuExtensibilityManager()->GetExtenderDelegates().RemoveAll(
+			[this](const FAssetEditorExtender& InExtender)
+			{
+				return InExtender.IsBoundToObject(this);
+			});
 	}
 }
 
@@ -154,8 +159,16 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 		}), FCanExecuteAction());
 }
 
-TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(UBlueprint* InBlueprint)
+TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(
+	const TSharedRef<FUICommandList> InCommandList, const TArray<UObject*> InContextSensitiveObjects)
 {
+	UBlueprint* InBlueprint{};
+
+	if (!InContextSensitiveObjects.IsEmpty())
+	{
+		InBlueprint = Cast<UBlueprint>(InContextSensitiveObjects[0]);
+	}
+
 	TSharedRef<FExtender> Extender(new FExtender());
 
 	const auto ExtensionDelegate = FToolBarExtensionDelegate::CreateLambda(
@@ -165,7 +178,7 @@ TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(U
 
 			ToolbarBuilder.AddComboButton(
 				FUIAction(),
-				FOnGetContent::CreateLambda([&]()
+				FOnGetContent::CreateLambda([this, InBlueprint]()
 				{
 					Blueprint = InBlueprint;
 

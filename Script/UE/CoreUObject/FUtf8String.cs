@@ -42,7 +42,7 @@ namespace Script.CoreUObject
         public override int GetHashCode() => (int)HandleData.GetHandle(this);
 
         public override string ToString() =>
-            FUtf8StringImplementation.FUtf8String_ToStringImplementation(HandleData.GetHandle(this));
+            FUtf8StringImplementation.FUtf8String_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
     }
 }
 #endif
