@@ -113,6 +113,8 @@ public:
 
 	UAssemblyLoader* GetAssemblyLoader() const;
 
+	bool EnableFieldHash() const;
+
 	const TArray<FBindClass>& GetBindClass() const;
 
 	bool IsEnableDebug() const;
@@ -164,6 +166,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;
+
+	UPROPERTY(Config, EditAnywhere, Category = Bind)
+	bool bEnableFieldHash;
 
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
 	TArray<FBindClass> BindClass;

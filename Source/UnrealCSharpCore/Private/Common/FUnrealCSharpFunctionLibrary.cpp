@@ -853,6 +853,26 @@ bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
 	return false;
 }
 
+bool FUnrealCSharpFunctionLibrary::EnableStableFieldHash()
+{
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->EnableFieldHash();
+	}
+
+	return false;
+}
+
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const FProperty* InProperty)
+{
+	return GetHash(InProperty, InProperty != nullptr ? InProperty->GetOwnerStruct() : nullptr);
+}
+
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const UFunction* InFunction)
+{
+	return GetHash(InFunction, InFunction != nullptr ? Cast<UStruct>(InFunction->GetOuter()) : nullptr);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionNamePrefix()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())

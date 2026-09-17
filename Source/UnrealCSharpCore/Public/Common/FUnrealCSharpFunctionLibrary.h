@@ -144,6 +144,12 @@ public:
 
 	static bool EnableCallOverrideFunction();
 
+	static bool EnableStableFieldHash();
+
+	static uint32 GetHash(const FProperty* InProperty);
+
+	static uint32 GetHash(const UFunction* InFunction);
+
 	static FString GetOverrideFunctionNamePrefix();
 
 	static FString GetOverrideFunctionNameSuffix();
@@ -289,4 +295,20 @@ private:
 
 	static bool bScriptChanged;
 #endif
+
+private:
+	template <typename T>
+	static uint32 GetHash(const T* InField, [[maybe_unused]] const UStruct* InStruct)
+	{
+#if WITH_FIELD_HASH
+		return FCrc::StrCrc32(*FString::Printf(TEXT(
+			"%s::%s"
+		),
+		                                       InStruct != nullptr ? *InStruct->GetName() : TEXT(""),
+		                                       InField != nullptr ? *InField->GetName() : TEXT("")
+		).ToLower());
+#else
+		return GetTypeHash(InField);
+#endif
+	}
 };

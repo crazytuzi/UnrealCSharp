@@ -20,6 +20,7 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	AndroidScriptDomainType(EScriptDomainType::Mono),
 	IOSScriptDomainType(EScriptDomainType::Mono),
 	AssemblyLoader(UAssemblyLoader::StaticClass()),
+	bEnableFieldHash(true),
 	bEnableDebug(false),
 	Port(0),
 	bEnableImmediatelyActive(true),
@@ -125,6 +126,11 @@ UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
 		                              ? AssemblyLoader.Get()
 		                              : UAssemblyLoader::StaticClass())
 		->GetDefaultObject());
+}
+
+bool UUnrealCSharpSetting::EnableFieldHash() const
+{
+	return bEnableFieldHash;
 }
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const
