@@ -10,6 +10,9 @@
 #include "Reflection/FReflectionRegistry.h"
 #include "Macro/FunctionMacro.h"
 #include "UEVersion.h"
+#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
+#include "Blueprint/UserWidget.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
@@ -461,6 +464,69 @@ void FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* I
 			}))
 		{
 			InClass->AddNativeFunction(*InFunction->GetName(), &UCSharpFunction::execCallCSharp);
+		}
+
+		EnableScriptTick(InClass, InFunction);
+	}
+}
+
+void FCSharpBind::EnableScriptTick(UClass* InClass, const UFunction* InFunction)
+{
+	static const FName ReceiveTickName(TEXT("ReceiveTick"));
+
+	static const FName WidgetTickName(TEXT("Tick"));
+
+	const auto FunctionName = InFunction->GetFName();
+
+	const auto bReceiveTickReachable = InClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint) ||
+		!InClass->HasAnyClassFlags(CLASS_Native);
+
+	if (FunctionName == ReceiveTickName && bReceiveTickReachable && InClass->IsChildOf<AActor>())
+	{
+		if (const auto DefaultActor = Cast<AActor>(InClass->GetDefaultObject()))
+		{
+			DefaultActor->PrimaryActorTick.bCanEverTick = true;
+		}
+
+		TArray<UObject*> Instances;
+
+		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
+
+		for (const auto Instance : Instances)
+		{
+			CastChecked<AActor>(Instance)->PrimaryActorTick.bCanEverTick = true;
+		}
+	}
+	else if (FunctionName == ReceiveTickName && bReceiveTickReachable && InClass->IsChildOf<UActorComponent>())
+	{
+		if (const auto DefaultComponent = Cast<UActorComponent>(InClass->GetDefaultObject()))
+		{
+			DefaultComponent->PrimaryComponentTick.bCanEverTick = true;
+		}
+
+		TArray<UObject*> Instances;
+
+		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
+
+		for (const auto Instance : Instances)
+		{
+			CastChecked<UActorComponent>(Instance)->PrimaryComponentTick.bCanEverTick = true;
+		}
+	}
+	else if (FunctionName == WidgetTickName && InClass->IsChildOf<UUserWidget>())
+	{
+		if (const auto DefaultWidget = Cast<UUserWidget>(InClass->GetDefaultObject()))
+		{
+			DefaultWidget->bHasScriptImplementedTick = true;
+		}
+
+		TArray<UObject*> Instances;
+
+		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
+
+		for (const auto Instance : Instances)
+		{
+			CastChecked<UUserWidget>(Instance)->bHasScriptImplementedTick = true;
 		}
 	}
 }

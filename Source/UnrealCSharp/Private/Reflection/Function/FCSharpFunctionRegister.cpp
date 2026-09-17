@@ -56,6 +56,12 @@ FCSharpFunctionRegister::~FCSharpFunctionRegister()
 				Class->RemoveFunctionFromFunctionMap(FunctionRemove);
 			}
 
+			FunctionRemove->Rename(
+				*MakeUniqueObjectName(GetTransientPackage(), FunctionRemove->GetClass(),
+				                      *FString::Printf(TEXT("TRASH_%s"), *FunctionRemove->GetName())).ToString(),
+				GetTransientPackage(),
+				REN_DontCreateRedirectors | REN_NonTransactional | REN_DoNotDirty);
+
 			if (FunctionRemove->IsRooted())
 			{
 				FunctionRemove->RemoveFromRoot();

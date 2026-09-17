@@ -94,7 +94,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 		Method,
 		FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
 			? InvalidManagedHandle
-			: FCSharpEnvironment::GetEnvironment().GetObject(InContext),
+			: FCSharpEnvironment::GetEnvironment().Bind(InContext),
 		[this, Params, &ReferenceParam](const int32 Index) -> void*
 		{
 			if (ReferencePropertyIndexes.Contains(Index))
