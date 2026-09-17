@@ -5,8 +5,11 @@
 class UNREALCSHARP_API FMapHelper
 {
 public:
+	using FDataDeleter = void (*)(void*);
+
 	explicit FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
-	                    bool InbNeedFreeData, bool InbNeedFreeProperty);
+	                    bool InbNeedFreeData, bool InbNeedFreeProperty,
+	                    FDataDeleter InDataDeleter = nullptr);
 
 	~FMapHelper();
 
@@ -64,4 +67,6 @@ private:
 	bool bNeedFreeData;
 
 	bool bNeedFreeProperty;
+
+	FDataDeleter DataDeleter;
 };

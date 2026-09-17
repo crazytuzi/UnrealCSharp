@@ -752,7 +752,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 				else
 				{
 					const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
-					                                      new std::decay_t<T>(*InMember), true, true);
+					                                      new std::decay_t<T>(*InMember), true, true,
+					                                      [](void* InData)
+					                                      {
+						                                      delete static_cast<std::decay_t<T>*>(InData);
+					                                      });
 
 					FCSharpEnvironment::GetEnvironment().AddContainerReference(
 						MapHelper, FoundClass, SrcManagedHandle);
@@ -837,7 +841,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 				}
 				else
 				{
-					const auto SetHelper = new FSetHelper(Property, new std::decay_t<T>(*InMember), true, true);
+					const auto SetHelper = new FSetHelper(Property, new std::decay_t<T>(*InMember), true, true,
+					                                      [](void* InData)
+					                                      {
+						                                      delete static_cast<std::decay_t<T>*>(InData);
+					                                      });
 
 					FCSharpEnvironment::GetEnvironment().AddContainerReference(
 						SetHelper, FoundClass, SrcManagedHandle);
@@ -927,7 +935,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 				}
 				else
 				{
-					const auto ArrayHelper = new FArrayHelper(Property, new std::decay_t<T>(*InMember), true, true);
+					const auto ArrayHelper = new FArrayHelper(Property, new std::decay_t<T>(*InMember), true, true,
+					                                          [](void* InData)
+					                                          {
+						                                          delete static_cast<std::decay_t<T>*>(InData);
+					                                          });
 
 					FCSharpEnvironment::GetEnvironment().AddContainerReference(
 						ArrayHelper, FoundClass, SrcManagedHandle);

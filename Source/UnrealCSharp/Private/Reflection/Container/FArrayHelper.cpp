@@ -2,11 +2,13 @@
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
-                           const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                           const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                           const FDataDeleter InDataDeleter) :
 	InnerPropertyDescriptor(nullptr),
 	ScriptArray(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter)
 {
 	InnerPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
@@ -33,7 +35,14 @@ void FArrayHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptArray != nullptr)
 	{
-		delete ScriptArray;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptArray);
+		}
+		else
+		{
+			delete ScriptArray;
+		}
 
 		ScriptArray = nullptr;
 	}
@@ -134,7 +143,11 @@ void FArrayHelper::Set(const int32 Index, void* InValue) const
 {
 	if (auto ScriptArrayHelper = CreateHelperFormInnerProperty(); ScriptArrayHelper.IsValidIndex(Index))
 	{
-		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+		const auto Dest = ScriptArrayHelper.GetRawPtr(Index);
+
+		InnerPropertyDescriptor->DestroyValue(Dest);
+
+		InnerPropertyDescriptor->Set(InValue, Dest);
 	}
 }
 

@@ -33,7 +33,7 @@ FCSharpCompiler& FCSharpCompiler::Get()
 	return Compiler;
 }
 
-void FCSharpCompiler::Compile() const
+void FCSharpCompiler::AsyncCompile() const
 {
 	if (Runnable != nullptr)
 	{
@@ -41,20 +41,17 @@ void FCSharpCompiler::Compile() const
 	}
 }
 
-void FCSharpCompiler::ImmediatelyCompile(const bool bForceCompileInterop) const
-{
-	if (Runnable != nullptr)
-	{
-		Runnable->ImmediatelyDoWork(bForceCompileInterop);
-	}
-}
-
-void FCSharpCompiler::Compile(const TArray<FFileChangeData>& InFileChangeData) const
+void FCSharpCompiler::AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const
 {
 	if (Runnable != nullptr)
 	{
 		Runnable->EnqueueTask(InFileChangeData);
 	}
+}
+
+bool FCSharpCompiler::SyncCompile() const
+{
+	return Runnable != nullptr ? Runnable->SyncCompile() : false;
 }
 
 void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
@@ -65,6 +62,14 @@ void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
 		{
 			InFunction();
 		});
+	}
+}
+
+void FCSharpCompiler::ImmediatelyCompile(const bool bForceCompileInterop) const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->ImmediatelyDoWork(bForceCompileInterop);
 	}
 }
 

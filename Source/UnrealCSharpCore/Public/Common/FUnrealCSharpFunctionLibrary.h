@@ -232,6 +232,8 @@ public:
 
 #if WITH_EDITOR
 	static TArray<FString> GetChangedDirectories();
+
+	static bool IsScriptPublishOutdated();
 #endif
 
 	static FString Encode(const FString& InName, bool bIsNative = true, bool bEncodeWideString = false);

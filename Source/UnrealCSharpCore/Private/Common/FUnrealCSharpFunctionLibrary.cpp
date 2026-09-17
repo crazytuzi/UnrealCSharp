@@ -1255,6 +1255,36 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 	       Append(GetCustomProjectsDirectory()).
 	       Build();
 }
+
+bool FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated()
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	const auto SharedPropsPath = FPaths::Combine(GetFullScriptDirectory(), SHARED_NAME + PROPS_SUFFIX);
+
+	if (!PlatformFile.FileExists(*SharedPropsPath))
+	{
+		return false;
+	}
+
+	const auto SharedPropsTimestamp = PlatformFile.GetTimeStamp(*SharedPropsPath);
+
+	const TArray<FString> AssemblyPaths{
+		GetFullUEPublishPath(),
+		GetFullGamePublishPath()
+	};
+
+	for (const auto& AssemblyPath : AssemblyPaths)
+	{
+		if (!PlatformFile.FileExists(*AssemblyPath) ||
+			PlatformFile.GetTimeStamp(*AssemblyPath) < SharedPropsTimestamp)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 #endif
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bIsNative, const bool bEncodeWideString)

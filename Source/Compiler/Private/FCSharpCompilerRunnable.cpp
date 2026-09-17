@@ -169,6 +169,50 @@ void FCSharpCompilerRunnable::ImmediatelyDoWork(const bool bForceCompileInterop)
 	}, true, bForceCompileInterop, true);
 }
 
+bool FCSharpCompilerRunnable::SyncCompile()
+{
+	if (CompileInterop(false))
+	{
+		FString Result;
+
+		return CompileGame(Result, [](const FString&)
+		{
+		});
+	}
+
+	return false;
+}
+
+bool FCSharpCompilerRunnable::CompileGame(FString& OutResult, const TFunction<void(const FString&)>& InOnOutput)
+{
+	if (!IFileManager::Get().FileExists(*FUnrealCSharpFunctionLibrary::GetGameProjectPath()))
+	{
+		return false;
+	}
+
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
+	const auto CompileParam = FString::Printf(TEXT(
+		"build \"%s\" --nologo -c %s"
+	),
+	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
+	                                          *GetBuildConfiguration()
+	);
+
+	auto bSucceeded = false;
+
+	const auto OnComplete = [&bSucceeded, &OutResult](const int32 InReturnCode, const FString& InResult)
+	{
+		bSucceeded = InReturnCode == 0;
+
+		OutResult = InResult;
+	};
+
+	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(), InOnOutput);
+
+	return bSucceeded;
+}
+
 void FCSharpCompilerRunnable::Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction,
                                       const bool bCompileInterop, const bool bForceCompileInterop,
                                       const bool bReloadImmediately)
@@ -381,40 +425,25 @@ bool FCSharpCompilerRunnable::Compile()
 		}
 	});
 
-	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+	FString Result;
 
-	const auto CompileParam = FString::Printf(TEXT(
-		"build \"%s\" --nologo -c %s"
-	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
-	                                          *GetBuildConfiguration()
-	);
-
-	auto bSucceeded = false;
-
-	const auto OnComplete = [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
+	const auto bSucceeded = CompileGame(Result, [this](const FString& InOutput)
 	{
-		bSucceeded = InReturnCode == 0;
+		CompileProgress.SetOutput(InOutput);
+	});
 
-		CompileProgress.Flush();
+	CompileProgress.Flush();
 
-		CompileProgress.SetStage(bSucceeded
-			                         ? FCSharpCompileProgress::StageSucceeded
-			                         : FCSharpCompileProgress::StageFailed);
+	CompileProgress.SetStage(bSucceeded
+		                         ? FCSharpCompileProgress::StageSucceeded
+		                         : FCSharpCompileProgress::StageFailed);
 
-		if (!bSucceeded)
-		{
-			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
-		}
+	if (!bSucceeded)
+	{
+		UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
+	}
 
-		ShowCompileResultNotification(bSucceeded);
-	};
-
-	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(),
-	                                          [this](const FString& InOutput)
-	                                          {
-		                                          CompileProgress.SetOutput(InOutput);
-	                                          });
+	ShowCompileResultNotification(bSucceeded);
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{

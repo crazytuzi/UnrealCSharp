@@ -2,12 +2,14 @@
 #include "CppVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                       const FDataDeleter InDataDeleter) :
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter)
 {
 	if (InData != nullptr)
 	{
@@ -44,7 +46,14 @@ void FMapHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptMap != nullptr)
 	{
-		delete ScriptMap;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptMap);
+		}
+		else
+		{
+			delete ScriptMap;
+		}
 
 		ScriptMap = nullptr;
 	}
@@ -69,6 +78,18 @@ void FMapHelper::Empty(const int32 InExpectedNumElements) const
 {
 	if (InExpectedNumElements >= 0)
 	{
+		for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+		{
+			if (ScriptMap->IsValidIndex(Index))
+			{
+				const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
+
+				KeyPropertyDescriptor->DestroyValue(Data);
+
+				ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+			}
+		}
+
 		ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
 	}
 }
@@ -205,7 +226,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 #if STD_CPP_20
 		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
 #else
-		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
+		                  ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
 #endif
 		                  {
 			                  return KeyPropertyDescriptor->GetValueTypeHash(Src);

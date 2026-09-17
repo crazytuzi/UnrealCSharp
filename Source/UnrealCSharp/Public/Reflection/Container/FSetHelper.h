@@ -5,8 +5,11 @@
 class UNREALCSHARP_API FSetHelper
 {
 public:
+	using FDataDeleter = void (*)(void*);
+
 	explicit FSetHelper(FProperty* InProperty, void* InData,
-	                    bool InbNeedFreeData, bool InbNeedFreeProperty);
+	                    bool InbNeedFreeData, bool InbNeedFreeProperty,
+	                    FDataDeleter InDataDeleter = nullptr);
 
 	~FSetHelper();
 
@@ -50,4 +53,6 @@ private:
 	bool bNeedFreeData;
 
 	bool bNeedFreeProperty;
+
+	FDataDeleter DataDeleter;
 };

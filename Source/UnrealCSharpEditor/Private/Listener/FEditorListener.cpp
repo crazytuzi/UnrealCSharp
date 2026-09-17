@@ -558,7 +558,7 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 
 					if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
 					{
-						FCSharpCompiler::Get().Compile();
+						FCSharpCompiler::Get().AsyncCompile();
 					}
 				}
 
@@ -603,6 +603,11 @@ bool FEditorListener::IsCompileRequired() const
 		{
 			FallbackTimestamp = FMath::Min(FallbackTimestamp, PlatformFile.GetTimeStamp(*AssemblyPath));
 		}
+	}
+
+	if (FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+	{
+		return true;
 	}
 
 	for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
@@ -652,13 +657,13 @@ void FEditorListener::Compile()
 	{
 		CompilingFileChanges = FileChanges;
 
-		FCSharpCompiler::Get().Compile(FileChanges);
+		FCSharpCompiler::Get().AsyncCompile(FileChanges);
 
 		FileChanges.Reset();
 	}
 	else
 	{
-		FCSharpCompiler::Get().Compile();
+		FCSharpCompiler::Get().AsyncCompile();
 	}
 }
 

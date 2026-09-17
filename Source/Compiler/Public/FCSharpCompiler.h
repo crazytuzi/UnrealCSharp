@@ -13,13 +13,15 @@ public:
 	static FCSharpCompiler& Get();
 
 public:
-	void Compile() const;
+	void AsyncCompile() const;
 
-	void ImmediatelyCompile(bool bForceCompileInterop = false) const;
+	void AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const;
 
-	void Compile(const TArray<FFileChangeData>& InFileChangeData) const;
+	bool SyncCompile() const;
 
 	void Compile(const TFunction<void()>& InFunction) const;
+
+	void ImmediatelyCompile(bool bForceCompileInterop = false) const;
 
 	bool IsCompiling() const;
 

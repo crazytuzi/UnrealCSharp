@@ -67,7 +67,12 @@ void FEngineListener::SetActive(const bool InbIsActive)
 		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 			UUnrealCSharpSetting>())
 		{
+#if WITH_EDITOR
+			if (UnrealCSharpSetting->IsEnableImmediatelyActive() &&
+				!FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+#else
 			if (UnrealCSharpSetting->IsEnableImmediatelyActive())
+#endif
 			{
 				FUnrealCSharpCoreModule::Get().Activate();
 			}

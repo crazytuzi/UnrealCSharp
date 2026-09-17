@@ -33,6 +33,8 @@ public:
 
 	void ImmediatelyDoWork(bool bForceCompileInterop = false);
 
+	bool SyncCompile();
+
 	void Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction, bool bCompileInterop = false,
 	             bool bForceCompileInterop = false, bool bReloadImmediately = false);
 
@@ -42,6 +44,8 @@ private:
 	bool CompileInterop(bool bForceCompileInterop);
 
 	bool Compile();
+
+	bool CompileGame(FString& OutResult, const TFunction<void(const FString&)>& InOnOutput);
 
 	void ShowCompileResultNotification(bool bSucceeded) const;
 

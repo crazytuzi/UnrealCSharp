@@ -41,13 +41,18 @@ void FCSharpBind::Deinitialize()
 
 IManagedHandle FCSharpBind::Bind(UObject* InObject)
 {
-	if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-		IManagedHandleIsValid(FoundManagedHandle))
+	if (InObject != nullptr)
 	{
-		return FoundManagedHandle;
+		if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+			IManagedHandleIsValid(FoundManagedHandle))
+		{
+			return FoundManagedHandle;
+		}
+
+		return Bind<false>(InObject);
 	}
 
-	return Bind<false>(InObject);
+	return InvalidManagedHandle;
 }
 
 IManagedHandle FCSharpBind::Bind(UClass* InClass)

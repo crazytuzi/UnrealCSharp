@@ -3,11 +3,13 @@
 #include "CppVersion.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                       const FDataDeleter InDataDeleter) :
 	ElementPropertyDescriptor(nullptr),
 	ScriptSet(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter)
 {
 	if (InData != nullptr)
 	{
@@ -40,7 +42,14 @@ void FSetHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptSet != nullptr)
 	{
-		delete ScriptSet;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptSet);
+		}
+		else
+		{
+			delete ScriptSet;
+		}
 
 		ScriptSet = nullptr;
 	}
@@ -59,6 +68,16 @@ void FSetHelper::Empty(const int32 InExpectedNumElements) const
 {
 	if (InExpectedNumElements >= 0)
 	{
+		for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+		{
+			if (ScriptSet->IsValidIndex(Index))
+			{
+				const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+
+				ElementPropertyDescriptor->DestroyValue(Data);
+			}
+		}
+
 		ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
 	}
 }
@@ -107,7 +126,7 @@ void FSetHelper::Add(void* InValue) const
 #if STD_CPP_20
 		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
 #else
-		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
+		                  ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
 #endif
 		                  {
 			                  return ElementPropertyDescriptor->GetValueTypeHash(Src);

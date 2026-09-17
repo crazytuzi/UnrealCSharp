@@ -52,9 +52,15 @@ void* FObjectRegistry::GetAddress(const IManagedHandle InManagedHandle, UStruct*
 
 IManagedHandle FObjectRegistry::GetObject(const UObject* InObject)
 {
-	const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject);
+	if (InObject != nullptr)
+	{
+		if (const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject))
+		{
+			return *FoundManagedHandle;
+		}
+	}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+	return InvalidManagedHandle;
 }
 
 UObject* FObjectRegistry::GetObject(const IManagedHandle InManagedHandle)
@@ -64,9 +70,15 @@ UObject* FObjectRegistry::GetObject(const IManagedHandle InManagedHandle)
 
 IManagedHandle FObjectRegistry::GetManagedHandle(const UObject* InObject)
 {
-	const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject);
+	if (InObject != nullptr)
+	{
+		if (const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject))
+		{
+			return *FoundManagedHandle;
+		}
+	}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+	return InvalidManagedHandle;
 }
 
 bool FObjectRegistry::AddReference(const FClassReflection* InClass, UObject* InObject,
@@ -81,17 +93,20 @@ bool FObjectRegistry::AddReference(const FClassReflection* InClass, UObject* InO
 
 bool FObjectRegistry::RemoveReference(const UObject* InObject)
 {
-	if (const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject))
+	if (InObject != nullptr)
 	{
-		Object2ManagedHandle.Remove(InObject);
+		if (const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject))
+		{
+			Object2ManagedHandle.Remove(InObject);
 
-		ManagedHandle2Object.Remove(*FoundManagedHandle);
+			ManagedHandle2Object.Remove(*FoundManagedHandle);
 
-		FDomain::GCHandle_Free(*FoundManagedHandle);
+			FDomain::GCHandle_Free(*FoundManagedHandle);
 
-		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundManagedHandle);
+			(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundManagedHandle);
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
