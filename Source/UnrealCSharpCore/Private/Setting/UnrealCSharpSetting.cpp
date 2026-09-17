@@ -12,7 +12,6 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	UEName(DEFAULT_UE_NAME),
 	GameName(DEFAULT_GAME_NAME),
 	bEnableCallOverrideFunction(true),
-	bEnableStableFieldHash(false),
 	OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
 	OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
 	WindowsScriptDomainType(EScriptDomainType::CoreCLR),
@@ -21,6 +20,7 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	AndroidScriptDomainType(EScriptDomainType::Mono),
 	IOSScriptDomainType(EScriptDomainType::Mono),
 	AssemblyLoader(UAssemblyLoader::StaticClass()),
+	bEnableFieldHash(true),
 	bEnableDebug(false),
 	Port(0),
 	bEnableImmediatelyActive(true),
@@ -80,11 +80,6 @@ bool UUnrealCSharpSetting::EnableCallOverrideFunction() const
 	return bEnableCallOverrideFunction;
 }
 
-bool UUnrealCSharpSetting::EnableStableFieldHash() const
-{
-	return bEnableStableFieldHash;
-}
-
 const FString& UUnrealCSharpSetting::GetOverrideFunctionNamePrefix() const
 {
 	return OverrideFunctionNamePrefix;
@@ -131,6 +126,11 @@ UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
 		                              ? AssemblyLoader.Get()
 		                              : UAssemblyLoader::StaticClass())
 		->GetDefaultObject());
+}
+
+bool UUnrealCSharpSetting::EnableFieldHash() const
+{
+	return bEnableFieldHash;
 }
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const

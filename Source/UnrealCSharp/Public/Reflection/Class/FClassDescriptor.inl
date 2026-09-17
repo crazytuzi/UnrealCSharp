@@ -9,7 +9,7 @@ auto FClassDescriptor::AddFunctionDescriptor(UFunction* InFunction, Args&&... In
 	{
 		const auto NewFunctionDescriptor = new T(InFunction, std::forward<Args>(InArgs)...);
 
-		FunctionHashSet.Add(FUnrealCSharpFunctionLibrary::GetFieldHash(InFunction));
+		FunctionHashSet.Add(FUnrealCSharpFunctionLibrary::GetHash(InFunction));
 
 		return NewFunctionDescriptor;
 	}

@@ -105,8 +105,6 @@ public:
 
 	bool EnableCallOverrideFunction() const;
 
-	bool EnableStableFieldHash() const;
-
 	const FString& GetOverrideFunctionNamePrefix() const;
 
 	const FString& GetOverrideFunctionNameSuffix() const;
@@ -114,6 +112,8 @@ public:
 	EScriptDomainType GetScriptDomainType(const FString& InPlatformName) const;
 
 	UAssemblyLoader* GetAssemblyLoader() const;
+
+	bool EnableFieldHash() const;
 
 	const TArray<FBindClass>& GetBindClass() const;
 
@@ -143,9 +143,6 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Override)
 	bool bEnableCallOverrideFunction;
 
-	UPROPERTY(Config, EditAnywhere, Category = Hash, meta = (ConfigRestartRequired = true))
-	bool bEnableStableFieldHash;
-
 	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
 	FString OverrideFunctionNamePrefix;
 
@@ -169,6 +166,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;
+
+	UPROPERTY(Config, EditAnywhere, Category = Bind)
+	bool bEnableFieldHash;
 
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
 	TArray<FBindClass> BindClass;

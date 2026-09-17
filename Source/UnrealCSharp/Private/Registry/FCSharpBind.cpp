@@ -167,7 +167,7 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 		{
 			if (Field == PropertyName)
 			{
-				auto FieldHash = FUnrealCSharpFunctionLibrary::GetFieldHash(Property);
+				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
 
 				if (auto FoundField = Class->GetField(FString::Printf(TEXT(
 					"__%s"
@@ -219,7 +219,7 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 			{
 				if (Field == FunctionName)
 				{
-					auto FieldHash = FUnrealCSharpFunctionLibrary::GetFieldHash(Function);
+					auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
 
 					if (auto FoundField = Class->GetField(FString::Printf(TEXT(
 						"__%s"
@@ -296,7 +296,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		return false;
 	}
 
-	if (InClassDescriptor->HasFunctionDescriptor(FUnrealCSharpFunctionLibrary::GetFieldHash(InFunction)))
+	if (InClassDescriptor->HasFunctionDescriptor(FUnrealCSharpFunctionLibrary::GetHash(InFunction)))
 	{
 		return false;
 	}
@@ -316,7 +316,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		const auto OverrideFunction = DuplicateFunction(OriginalFunction, InClass, *NewFunctionName);
 
-		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetFieldHash(OriginalFunction);
+		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetHash(OriginalFunction);
 
 		FCSharpEnvironment::GetEnvironment().AddFunctionHash<FCSharpFunctionDescriptor>(
 			FunctionHash, InClassDescriptor, OriginalFunction,
@@ -327,7 +327,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		{
 			const auto& OverrideMethodName = FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(InMethodName);
 
-			auto OverrideFunctionHash = FUnrealCSharpFunctionLibrary::GetFieldHash(OverrideFunction);
+			auto OverrideFunctionHash = FUnrealCSharpFunctionLibrary::GetHash(OverrideFunction);
 
 			if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InClass))
 			{
@@ -358,7 +358,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
 
-		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetFieldHash(NewFunction);
+		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetHash(NewFunction);
 
 		FCSharpEnvironment::GetEnvironment().AddFunctionHash<FCSharpFunctionDescriptor>(
 			FunctionHash, InClassDescriptor, NewFunction, FCSharpFunctionRegister(NewFunction, OriginalFunction));

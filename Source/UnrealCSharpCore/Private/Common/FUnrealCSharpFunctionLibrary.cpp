@@ -1,5 +1,4 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Misc/Crc.h"
 #include "Misc/FileHelper.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
@@ -858,42 +857,20 @@ bool FUnrealCSharpFunctionLibrary::EnableStableFieldHash()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		return UnrealCSharpSetting->EnableStableFieldHash();
+		return UnrealCSharpSetting->EnableFieldHash();
 	}
 
 	return false;
 }
 
-uint32 FUnrealCSharpFunctionLibrary::GetFieldHash(const FProperty* InProperty)
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const FProperty* InProperty)
 {
-	if (!EnableStableFieldHash() || InProperty == nullptr)
-	{
-		return GetTypeHash(InProperty);
-	}
-
-	return GetStableFieldHash(InProperty->GetOwnerStruct(), InProperty->GetName());
+	return GetHash(InProperty, InProperty != nullptr ? InProperty->GetOwnerStruct() : nullptr);
 }
 
-uint32 FUnrealCSharpFunctionLibrary::GetFieldHash(const UFunction* InFunction)
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const UFunction* InFunction)
 {
-	if (!EnableStableFieldHash() || InFunction == nullptr)
-	{
-		return GetTypeHash(InFunction);
-	}
-
-	return GetStableFieldHash(InFunction->GetOuterUClass(), InFunction->GetName());
-}
-
-uint32 FUnrealCSharpFunctionLibrary::GetStableFieldHash(const UStruct* InOwnerStruct,
-	                                                    const FString& InFieldName)
-{
-	FString StableFieldName = FString::Printf(TEXT("%s::%s"),
-	                                         InOwnerStruct != nullptr ? *InOwnerStruct->GetName() : TEXT(""),
-	                                         *InFieldName);
-
-	StableFieldName.ToLowerInline();
-
-	return FCrc::StrCrc32(*StableFieldName);
+	return GetHash(InFunction, InFunction != nullptr ? Cast<UStruct>(InFunction->GetOuter()) : nullptr);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionNamePrefix()

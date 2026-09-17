@@ -105,6 +105,8 @@ public class UnrealCSharpCore : ModuleRules
 
 		EnableExport();
 
+		EnableFieldHash();
+
 		WithDomain();
 	}
 
@@ -229,6 +231,37 @@ public class UnrealCSharpCore : ModuleRules
 		}
 
 		PublicDefinitions.Add($"WITH_BINDING={(GetBoolValue("bEnableExport", false) ? "1" : "0")}");
+	}
+
+	private void EnableFieldHash()
+	{
+		var SettingFilePath = Path.Combine(Target.ProjectFile.Directory.FullName,
+			"Config",
+			"DefaultUnrealCSharpSetting.ini");
+
+		var SettingConfigFile = File.Exists(SettingFilePath)
+			? new ConfigFile(new FileReference(SettingFilePath))
+			: new ConfigFile();
+
+		var SettingSection = "/Script/UnrealCSharpCore.UnrealCSharpSetting";
+
+		bool GetBoolValue(string key, bool defaultValue)
+		{
+			if (SettingConfigFile.TryGetSection(SettingSection, out var SettingConfigSection))
+			{
+				var SettingConfigHierarchySection = new ConfigHierarchySection(
+					new List<ConfigFileSection> { SettingConfigSection });
+
+				if (SettingConfigHierarchySection.TryGetValue(key, out var Value))
+				{
+					return bool.Parse(Value.ToLower());
+				}
+			}
+
+			return defaultValue;
+		}
+
+		PublicDefinitions.Add($"WITH_FIELD_HASH={(GetBoolValue("bEnableFieldHash", true) ? "1" : "0")}");
 	}
 
 	private void WithDomain()

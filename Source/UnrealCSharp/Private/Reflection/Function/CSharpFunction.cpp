@@ -6,7 +6,7 @@
 DEFINE_FUNCTION(UCSharpFunction::execCallCSharp)
 {
 	if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
-		FCSharpFunctionDescriptor>(FUnrealCSharpFunctionLibrary::GetFieldHash(Stack.CurrentNativeFunction)))
+		FCSharpFunctionDescriptor>(FUnrealCSharpFunctionLibrary::GetHash(Stack.CurrentNativeFunction)))
 	{
 		FunctionDescriptor->CallCSharp(Context, Stack, RESULT_PARAM);
 	}

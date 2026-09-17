@@ -97,7 +97,7 @@ FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(FProperty* InProper
 	{
 		const auto NewPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
-		PropertyHashSet.Add(FUnrealCSharpFunctionLibrary::GetFieldHash(InProperty));
+		PropertyHashSet.Add(FUnrealCSharpFunctionLibrary::GetHash(InProperty));
 
 		return NewPropertyDescriptor;
 	}

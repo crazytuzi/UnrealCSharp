@@ -146,9 +146,9 @@ public:
 
 	static bool EnableStableFieldHash();
 
-	static uint32 GetFieldHash(const FProperty* InProperty);
+	static uint32 GetHash(const FProperty* InProperty);
 
-	static uint32 GetFieldHash(const UFunction* InFunction);
+	static uint32 GetHash(const UFunction* InFunction);
 
 	static FString GetOverrideFunctionNamePrefix();
 
@@ -297,6 +297,18 @@ private:
 #endif
 
 private:
-
-	static uint32 GetStableFieldHash(const UStruct* InOwnerStruct, const FString& InFieldName);
+	template <typename T>
+	static uint32 GetHash(const T* InField, [[maybe_unused]] const UStruct* InStruct)
+	{
+#if WITH_FIELD_HASH
+		return FCrc::StrCrc32(*FString::Printf(TEXT(
+			"%s::%s"
+		),
+		                                       InStruct != nullptr ? *InStruct->GetName() : TEXT(""),
+		                                       InField != nullptr ? *InField->GetName() : TEXT("")
+		).ToLower());
+#else
+		return GetTypeHash(InField);
+#endif
+	}
 };
