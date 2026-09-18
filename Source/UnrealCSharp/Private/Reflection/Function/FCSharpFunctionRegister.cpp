@@ -49,21 +49,30 @@ FCSharpFunctionRegister::~FCSharpFunctionRegister()
 			FunctionRemove = InCallCSharpFunction;
 		}
 
-		if (FunctionRemove != nullptr)
+		if (const auto Class = Cast<UClass>(FunctionRemove->GetOuter()))
 		{
-			if (const auto Class = Cast<UClass>(FunctionRemove->GetOuter()))
-			{
-				Class->RemoveFunctionFromFunctionMap(FunctionRemove);
-			}
+			Class->RemoveFunctionFromFunctionMap(FunctionRemove);
+		}
 
-			if (FunctionRemove->IsRooted())
-			{
-				FunctionRemove->RemoveFromRoot();
-			}
-			else
-			{
-				FunctionRemove->MarkAsGarbage();
-			}
+		FunctionRemove->Rename(
+			*MakeUniqueObjectName(
+				GetTransientPackage(),
+				FunctionRemove->GetClass(),
+				*FString::Printf(TEXT(
+					"TRASH_%s"
+				),
+				                 *FunctionRemove->GetName()
+				)).ToString(),
+			GetTransientPackage(),
+			REN_DontCreateRedirectors | REN_NonTransactional | REN_DoNotDirty);
+
+		if (FunctionRemove->IsRooted())
+		{
+			FunctionRemove->RemoveFromRoot();
+		}
+		else
+		{
+			FunctionRemove->MarkAsGarbage();
 		}
 	}
 
