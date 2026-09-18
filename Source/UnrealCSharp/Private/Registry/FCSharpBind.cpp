@@ -1,4 +1,7 @@
 #include "Registry/FCSharpBind.h"
+#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Domain/Script/IManagedHandle.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/CSharpFunction.h"
@@ -10,9 +13,6 @@
 #include "Reflection/FReflectionRegistry.h"
 #include "Macro/FunctionMacro.h"
 #include "UEVersion.h"
-#include "GameFramework/Actor.h"
-#include "Components/ActorComponent.h"
-#include "Blueprint/UserWidget.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
@@ -466,67 +466,90 @@ void FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* I
 			InClass->AddNativeFunction(*InFunction->GetName(), &UCSharpFunction::execCallCSharp);
 		}
 
-		EnableScriptTick(InClass, InFunction);
+		RegisterScriptTick(InClass, InFunction);
 	}
 }
 
-void FCSharpBind::EnableScriptTick(UClass* InClass, const UFunction* InFunction)
+void FCSharpBind::RegisterScriptTick(const UClass* InClass, const UFunction* InFunction)
 {
-	static const FName ReceiveTickName(TEXT("ReceiveTick"));
-
-	static const FName WidgetTickName(TEXT("Tick"));
-
-	const auto FunctionName = InFunction->GetFName();
-
-	const auto bReceiveTickReachable = InClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint) ||
-		!InClass->HasAnyClassFlags(CLASS_Native);
-
-	if (FunctionName == ReceiveTickName && bReceiveTickReachable && InClass->IsChildOf<AActor>())
+	if (InClass != nullptr && InFunction != nullptr)
 	{
-		if (const auto DefaultActor = Cast<AActor>(InClass->GetDefaultObject()))
+		static const FName ReceiveTickName(GET_FUNCTION_NAME_CHECKED(AActor, ReceiveTick));
+
+		static const FName TickName(GET_FUNCTION_NAME_CHECKED(UUserWidget, Tick));
+
+		static const FName OnPaintName(GET_FUNCTION_NAME_CHECKED(UUserWidget, OnPaint));
+
+		const auto FunctionName = InFunction->GetFName();
+
+		const auto bIsReceiveTick = FunctionName == ReceiveTickName &&
+			(InClass->IsChildOf<AActor>() || InClass->IsChildOf<UActorComponent>()) &&
+			(InClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint) || !InClass->HasAnyClassFlags(CLASS_Native));
+
+		const auto bIsTick = FunctionName == TickName && InClass->IsChildOf<UUserWidget>();
+
+		const auto bIsOnPaint = FunctionName == OnPaintName && InClass->IsChildOf<UUserWidget>();
+
+		if (bIsReceiveTick || bIsTick || bIsOnPaint)
 		{
-			DefaultActor->PrimaryActorTick.bCanEverTick = true;
-		}
+			auto RegisterScriptTickImplementation = [bIsReceiveTick, bIsTick, bIsOnPaint](UObject* InObject)
+			{
+				if (InObject != nullptr && !InObject->HasAnyInternalFlags(EInternalObjectFlags::Garbage))
+				{
+					if (bIsReceiveTick)
+					{
+						if (const auto Actor = Cast<AActor>(InObject))
+						{
+							Actor->PrimaryActorTick.bCanEverTick = true;
 
-		TArray<UObject*> Instances;
+							if (!Actor->IsTemplate() &&
+								Actor->GetLevel() != nullptr &&
+								!Actor->PrimaryActorTick.IsTickFunctionRegistered())
+							{
+								Actor->RegisterAllActorTickFunctions(false, false);
 
-		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
+								Actor->RegisterAllActorTickFunctions(true, false);
+							}
+						}
+						else if (const auto ActorComponent = Cast<UActorComponent>(InObject))
+						{
+							ActorComponent->PrimaryComponentTick.bCanEverTick = true;
 
-		for (const auto Instance : Instances)
-		{
-			CastChecked<AActor>(Instance)->PrimaryActorTick.bCanEverTick = true;
-		}
-	}
-	else if (FunctionName == ReceiveTickName && bReceiveTickReachable && InClass->IsChildOf<UActorComponent>())
-	{
-		if (const auto DefaultComponent = Cast<UActorComponent>(InClass->GetDefaultObject()))
-		{
-			DefaultComponent->PrimaryComponentTick.bCanEverTick = true;
-		}
+							if (!ActorComponent->IsTemplate() &&
+								!ActorComponent->PrimaryComponentTick.IsTickFunctionRegistered())
+							{
+								ActorComponent->RegisterAllComponentTickFunctions(false);
 
-		TArray<UObject*> Instances;
+								ActorComponent->RegisterAllComponentTickFunctions(true);
+							}
+						}
+					}
+					else if (bIsTick || bIsOnPaint)
+					{
+						if (const auto Widget = Cast<UUserWidget>(InObject))
+						{
+							const auto bHasScriptImplementedTick = Widget->bHasScriptImplementedTick != 0;
 
-		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
+							if (bIsTick)
+							{
+								Widget->bHasScriptImplementedTick = true;
+							}
 
-		for (const auto Instance : Instances)
-		{
-			CastChecked<UActorComponent>(Instance)->PrimaryComponentTick.bCanEverTick = true;
-		}
-	}
-	else if (FunctionName == WidgetTickName && InClass->IsChildOf<UUserWidget>())
-	{
-		if (const auto DefaultWidget = Cast<UUserWidget>(InClass->GetDefaultObject()))
-		{
-			DefaultWidget->bHasScriptImplementedTick = true;
-		}
+							if (bIsOnPaint)
+							{
+								Widget->bHasScriptImplementedPaint = true;
+							}
 
-		TArray<UObject*> Instances;
+							if (bIsTick && !bHasScriptImplementedTick)
+							{
+								Widget->UpdateCanTick();
+							}
+						}
+					}
+				}
+			};
 
-		GetObjectsOfClass(InClass, Instances, true, RF_ClassDefaultObject);
-
-		for (const auto Instance : Instances)
-		{
-			CastChecked<UUserWidget>(Instance)->bHasScriptImplementedTick = true;
+			ForEachObjectOfClass(InClass, RegisterScriptTickImplementation, false, RF_NoFlags);
 		}
 	}
 }

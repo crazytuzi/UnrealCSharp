@@ -77,7 +77,7 @@ private:
 
 	static void RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction);
 
-	static void EnableScriptTick(UClass* InClass, const UFunction* InFunction);
+	static void RegisterScriptTick(const UClass* InClass, const UFunction* InFunction);
 
 	static UFunction* DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName);
 
