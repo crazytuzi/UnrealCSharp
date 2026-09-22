@@ -360,7 +360,25 @@
           "stars": 2
         }
       ]
+    },
+    {
+      "timestamp": "2026-09-22T03:25:56.937Z",
+      "totalStars": 796,
+      "repos": [
+        {
+          "fullName": "crazytuzi/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "crazytuzi",
+          "stars": 794
+        },
+        {
+          "fullName": "UnrealCSharp/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "UnrealCSharp",
+          "stars": 2
+        }
+      ]
     }
   ],
-  "starsAtLastNotification": 795
+  "starsAtLastNotification": 796
 }
