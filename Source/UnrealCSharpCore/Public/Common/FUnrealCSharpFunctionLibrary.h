@@ -144,8 +144,6 @@ public:
 
 	static bool EnableCallOverrideFunction();
 
-	static bool EnableStableFieldHash();
-
 	static uint32 GetHash(const FProperty* InProperty);
 
 	static uint32 GetHash(const UFunction* InFunction);

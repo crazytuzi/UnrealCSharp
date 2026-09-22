@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Reflection/Class/FClassDescriptor.h"
+#include "Reflection/Function/FCSharpFunctionOwnerClassInfo.h"
 
 class UNREALCSHARP_API FCSharpBind
 {
@@ -45,6 +46,12 @@ public:
 
 	static bool BindClassDefaultObject(UObject* InObject);
 
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	static void SuspendDummyOwnerClasses();
+
+	static void ResumeDummyOwnerClasses();
+#endif
+
 private:
 	template <auto IsNeedOverride>
 	static auto BindImplementation(UObject* InObject) -> IManagedHandle;
@@ -75,7 +82,19 @@ private:
 
 	static bool IsCallCSharpFunction(const UFunction* InFunction);
 
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	static FCSharpFunctionOwnerClassInfo RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction);
+#else
 	static void RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction);
+#endif
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	static UClass* GetOrCreateDummyOwnerClass(UClass* InClass);
+
+	static UClass* GetOrCreateDummyOwnerClass(UFunction* InFunction);
+
+	static UClass* GetOriginalOwnerClass(const UFunction* InFunction);
+#endif
 
 	static void RegisterScriptTick(const UClass* InClass, const UFunction* InFunction);
 
@@ -86,6 +105,12 @@ private:
 
 private:
 	static TSet<TWeakObjectPtr<UStruct>> NotOverrideTypes;
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	static TMap<TWeakObjectPtr<UClass>, TWeakObjectPtr<UClass>> OriginalOwnerClass2DummyOwnerClass;
+
+	static const TCHAR* const DummyOwnerClassNamePrefix;
+#endif
 
 	FDelegateHandle OnCSharpEnvironmentInitializeDelegateHandle;
 };

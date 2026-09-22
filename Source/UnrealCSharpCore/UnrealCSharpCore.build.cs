@@ -107,6 +107,8 @@ public class UnrealCSharpCore : ModuleRules
 
 		EnableFieldHash();
 
+		EnableOverrideBlueprintNativeEvent();
+
 		WithDomain();
 	}
 
@@ -262,6 +264,42 @@ public class UnrealCSharpCore : ModuleRules
 		}
 
 		PublicDefinitions.Add($"WITH_FIELD_HASH={(GetBoolValue("bEnableFieldHash", true) ? "1" : "0")}");
+	}
+
+	private void EnableOverrideBlueprintNativeEvent()
+	{
+#if UE_5_5_OR_LATER
+		var SettingFilePath = Path.Combine(Target.ProjectFile.Directory.FullName,
+			"Config",
+			"DefaultUnrealCSharpSetting.ini");
+
+		var SettingConfigFile = File.Exists(SettingFilePath)
+			? new ConfigFile(new FileReference(SettingFilePath))
+			: new ConfigFile();
+
+		var SettingSection = "/Script/UnrealCSharpCore.UnrealCSharpSetting";
+
+		bool GetBoolValue(string key, bool defaultValue)
+		{
+			if (SettingConfigFile.TryGetSection(SettingSection, out var SettingConfigSection))
+			{
+				var SettingConfigHierarchySection = new ConfigHierarchySection(
+					new List<ConfigFileSection> { SettingConfigSection });
+
+				if (SettingConfigHierarchySection.TryGetValue(key, out var Value))
+				{
+					return bool.Parse(Value.ToLower());
+				}
+			}
+
+			return defaultValue;
+		}
+
+		PublicDefinitions.Add(
+			$"WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT={(GetBoolValue("bEnableOverrideBlueprintNativeEvent", true) ? "1" : "0")}");
+#else
+		PublicDefinitions.Add("WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT=0");
+#endif
 	}
 
 	private void WithDomain()

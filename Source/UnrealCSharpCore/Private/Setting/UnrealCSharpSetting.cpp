@@ -11,6 +11,7 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
 	UEName(DEFAULT_UE_NAME),
 	GameName(DEFAULT_GAME_NAME),
+	bEnableOverrideBlueprintNativeEvent(true),
 	bEnableCallOverrideFunction(true),
 	OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
 	OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
@@ -126,11 +127,6 @@ UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
 		                              ? AssemblyLoader.Get()
 		                              : UAssemblyLoader::StaticClass())
 		->GetDefaultObject());
-}
-
-bool UUnrealCSharpSetting::EnableFieldHash() const
-{
-	return bEnableFieldHash;
 }
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const

@@ -853,16 +853,6 @@ bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
 	return false;
 }
 
-bool FUnrealCSharpFunctionLibrary::EnableStableFieldHash()
-{
-	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
-	{
-		return UnrealCSharpSetting->EnableFieldHash();
-	}
-
-	return false;
-}
-
 uint32 FUnrealCSharpFunctionLibrary::GetHash(const FProperty* InProperty)
 {
 	return GetHash(InProperty, InProperty != nullptr ? InProperty->GetOwnerStruct() : nullptr);
@@ -1549,7 +1539,7 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 		Class = Class->GetSuperClass();
 	}
 
-	return Function->IsNative() && OwnerClass->IsNative();
+	return Function != nullptr ? Function->IsNative() && OwnerClass->IsNative() : false;
 }
 
 void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass)

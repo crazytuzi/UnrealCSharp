@@ -5,11 +5,25 @@
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
                                                      FCSharpFunctionRegister&& InFunctionRegister) :
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	Super(InFunction,
+	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction),
+	      InFunctionRegister.GetOriginalOwnerClass()),
+#else
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
+#endif
 	FunctionRegister(std::move(InFunctionRegister))
 {
-	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InFunction->GetOwnerClass()))
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	const auto OriginalOwnerClass = FunctionRegister.GetOriginalOwnerClass();
+
+	const auto OwnerClass = OriginalOwnerClass != nullptr ? OriginalOwnerClass : InFunction->GetOwnerClass();
+#else
+	const auto OwnerClass = InFunction->GetOwnerClass();
+#endif
+
+	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(OwnerClass))
 	{
 		Method = FoundClass->GetParentMethod(InFunction->HasAnyFunctionFlags(FUNC_Net)
 			                                     ? FString::Printf(TEXT(

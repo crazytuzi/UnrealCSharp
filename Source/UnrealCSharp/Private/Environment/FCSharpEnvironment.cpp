@@ -337,6 +337,10 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 #if WITH_EDITOR
 void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 {
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::SuspendDummyOwnerClasses();
+#endif
+
 	if (InBlueprint != nullptr &&
 		InBlueprint->GeneratedClass != nullptr &&
 		GetClassDescriptor(InBlueprint->GeneratedClass) != nullptr)
@@ -349,6 +353,10 @@ void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 
 void FCSharpEnvironment::OnBlueprintCompiled()
 {
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::ResumeDummyOwnerClasses();
+#endif
+
 	for (const auto& PendingBindClass : PendingBindClasses)
 	{
 		if (const auto Class = PendingBindClass.Get())
@@ -363,6 +371,10 @@ void FCSharpEnvironment::OnBlueprintCompiled()
 	}
 
 	PendingBindClasses.Empty();
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::ResumeDummyOwnerClasses();
+#endif
 }
 #endif
 

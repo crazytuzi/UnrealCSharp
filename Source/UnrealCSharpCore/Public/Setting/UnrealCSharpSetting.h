@@ -113,8 +113,6 @@ public:
 
 	UAssemblyLoader* GetAssemblyLoader() const;
 
-	bool EnableFieldHash() const;
-
 	const TArray<FBindClass>& GetBindClass() const;
 
 	bool IsEnableDebug() const;
@@ -139,6 +137,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Publish)
 	TArray<FCustomProject> CustomProjects;
+
+	UPROPERTY(Config, EditAnywhere, Category = Override)
+	bool bEnableOverrideBlueprintNativeEvent;
 
 	UPROPERTY(Config, EditAnywhere, Category = Override)
 	bool bEnableCallOverrideFunction;
