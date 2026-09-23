@@ -38,6 +38,8 @@ public:
 
 	virtual FString StringToFString(const IManagedHandle InManagedHandle) = 0;
 
+	virtual bool IsAlive(const IManagedHandle InManagedHandle) = 0;
+
 	virtual void Free(const IManagedHandle InManagedHandle) = 0;
 
 	virtual IManagedHandle NewArray(const FString& InNamespace, const FString& InName, int32 InLength) = 0;

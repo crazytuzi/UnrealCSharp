@@ -67,7 +67,7 @@ struct TStringPropertyValue
 		{
 			if (const auto FoundClass = TPropertyClass<T, T>::Get())
 			{
-				SrcManagedHandle = FoundClass->NewObject();
+				SrcManagedHandle = FoundClass->NewObject(true);
 
 				FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, true>(
 					FoundClass, SrcManagedHandle, InMember);
@@ -82,7 +82,7 @@ struct TStringPropertyValue
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			auto SrcManagedHandle = FoundClass->NewObject();
+			auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			if constexpr (IsReference)
 			{
@@ -120,7 +120,7 @@ struct TMultiPropertyValue
 		{
 			if (const auto FoundClass = TPropertyClass<T, T>::Get())
 			{
-				SrcManagedHandle = FoundClass->NewObject();
+				SrcManagedHandle = FoundClass->NewObject(true);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, true>(
 					FoundClass, SrcManagedHandle, InMember);
@@ -135,7 +135,7 @@ struct TMultiPropertyValue
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			auto SrcManagedHandle = FoundClass->NewObject();
+			auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			if constexpr (IsReference)
 			{
@@ -190,7 +190,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			const auto SrcManagedHandle = FoundClass->NewObject();
+			const auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			if constexpr (IsReference)
 			{
@@ -245,7 +245,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			const auto SrcManagedHandle = FoundClass->NewObject();
+			const auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			if constexpr (IsReference)
 			{
@@ -283,7 +283,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 		{
 			if (const auto FoundClass = TPropertyClass<T, T>::Get())
 			{
-				SrcManagedHandle = FoundClass->NewObject();
+				SrcManagedHandle = FoundClass->NewObject(true);
 
 				FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
@@ -300,7 +300,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			auto SrcManagedHandle = FoundClass->NewObject();
+			auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
@@ -343,7 +343,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 		{
 			if (const auto FoundClass = TPropertyClass<T, T>::Get())
 			{
-				SrcManagedHandle = FoundClass->NewObject();
+				SrcManagedHandle = FoundClass->NewObject(true);
 
 				FCSharpEnvironment::GetEnvironment().Bind<false>(
 					TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());
@@ -362,7 +362,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 	{
 		if (const auto FoundClass = TPropertyClass<T, T>::Get())
 		{
-			const auto SrcManagedHandle = FoundClass->NewObject();
+			const auto SrcManagedHandle = FoundClass->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());

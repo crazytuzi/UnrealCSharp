@@ -55,7 +55,7 @@ IManagedHandle FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 			const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
 			                                                Property->SignatureFunction);
 
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
 				InAddress, Property);

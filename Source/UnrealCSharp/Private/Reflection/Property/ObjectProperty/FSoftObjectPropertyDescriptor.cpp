@@ -9,7 +9,7 @@ void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, false, true>(
 				Class, Object, Src);
@@ -25,7 +25,7 @@ void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, false, false>(
 			Class, Object, Src);
@@ -40,7 +40,7 @@ void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, true, false>(
 			Class, Object, Src);

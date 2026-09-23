@@ -9,7 +9,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
 				Class, Object, Src);
@@ -25,7 +25,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, false>(
 			Class, Object, Src);
@@ -40,7 +40,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
 			Class, Object, Src);

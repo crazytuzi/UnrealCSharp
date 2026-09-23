@@ -50,7 +50,7 @@ IManagedHandle FSetPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
 			                                      false, false);

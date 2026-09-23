@@ -10,7 +10,7 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(
 				Class, Object, Src);
@@ -26,7 +26,7 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(
 			Class, Object, Src);

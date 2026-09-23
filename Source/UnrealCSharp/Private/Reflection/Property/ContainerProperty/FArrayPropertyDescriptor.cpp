@@ -50,7 +50,7 @@ IManagedHandle FArrayPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
 			                                          false, false);

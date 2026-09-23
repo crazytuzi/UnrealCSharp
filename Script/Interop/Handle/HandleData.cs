@@ -22,9 +22,23 @@ namespace Interop
         private static readonly ConditionalWeakTable<object, HandleReference> ObjectToHandleReference = new();
 
         [UnmanagedCallersOnly]
+        public static int IsAlive(nint InHandle)
+        {
+            if (InHandle != 0)
+            {
+                lock (Lock)
+                {
+                    return Handles.TryGetValue(InHandle, out var OutHandle) && OutHandle.Target != null ? 1 : 0;
+                }
+            }
+
+            return 0;
+        }
+
+        [UnmanagedCallersOnly]
         public static void Free(nint InHandle) => FreeImplementation(InHandle);
 
-        public static nint Alloc(object InObject, bool bPinned = false, bool bWeak = false)
+        public static nint Alloc(object InObject, bool bIsWeak = false)
         {
             lock (Lock)
             {
@@ -36,12 +50,7 @@ namespace Interop
                 if (!Handles.TryGetValue(HandleReference.Value, out _))
                 {
                     Handles[HandleReference.Value] =
-                        GCHandle.Alloc(InObject,
-                            bPinned
-                                ? GCHandleType.Pinned
-                                : bWeak
-                                    ? GCHandleType.Weak
-                                    : GCHandleType.Normal);
+                        GCHandle.Alloc(InObject, bIsWeak ? GCHandleType.Weak : GCHandleType.Normal);
                 }
 
                 return HandleReference.Value;

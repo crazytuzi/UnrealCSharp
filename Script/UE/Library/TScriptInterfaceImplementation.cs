@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
             nint InObject, Type InType) where T : IInterface
         {
-            __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface), InObject,
+            __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface, true), InObject,
                 HandleData.Alloc(InType));
         }
 

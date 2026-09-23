@@ -67,7 +67,7 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) con
 				const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
 				Property->SignatureFunction);
 
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
 				InAddress, Property);

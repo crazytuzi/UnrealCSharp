@@ -6,6 +6,8 @@ typedef IManagedHandle (*assembly_loader_Load_from_stream_fn)(const uint8*, int3
 
 typedef void (*assembly_loader_unload_fn)();
 
+typedef int32 (*handle_data_is_alive_fn)(PTRINT);
+
 typedef void (*handle_data_free_fn)(PTRINT);
 
 typedef void (*log_bridge_set_log_fn)(PTRINT);
@@ -107,6 +109,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 #define COMMON_BRIDGE_METHODS(Op) \
 	Op(AssemblyLoaderUnload, assembly_loader_unload_fn, CLASS_ASSEMBLY_LOADER, FUNCTION_ASSEMBLY_LOADER_UNLOAD, 0) \
 	\
+	Op(HandleDataIsAlive, handle_data_is_alive_fn, CLASS_HANDLE_DATA, FUNCTION_HANDLE_DATA_IS_ALIVE, 1) \
 	Op(HandleDataFree, handle_data_free_fn, CLASS_HANDLE_DATA, FUNCTION_HANDLE_DATA_FREE, 1) \
 	\
 	Op(TypeBridgeGetClass, type_bridge_get_class_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_CLASS, 1) \

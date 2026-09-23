@@ -10,8 +10,7 @@ namespace Script.Library
 
         public static void FMulticastDelegate_RegisterImplementation(object InDelegate, Type InType)
         {
-            __FMulticastDelegate_RegisterImplementation(HandleData.Alloc(InDelegate, false, true),
-                HandleData.Alloc(InType));
+            __FMulticastDelegate_RegisterImplementation(HandleData.Alloc(InDelegate, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __FMulticastDelegate_UnRegisterImplementation(nint InDelegate);

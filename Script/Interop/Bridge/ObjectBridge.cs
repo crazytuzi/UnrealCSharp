@@ -13,7 +13,7 @@ public static class ObjectBridge
         {
             var Object = RuntimeHelpers.GetUninitializedObject(Type);
 
-            return HandleData.Alloc(Object, false, bIsWeak != 0);
+            return HandleData.Alloc(Object, bIsWeak != 0);
         }
 
         return 0;

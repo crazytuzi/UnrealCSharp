@@ -27,9 +27,19 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 	static auto GetObject(Class* InRegistry, const typename FDelegateValueMapping::FAddressType InAddress)
 		-> IManagedHandle
 	{
-		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
+		if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress))
+		{
+			if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+			{
+				return *FoundManagedHandle;
+			}
 
-		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+			(void)RemoveReference(InRegistry, *FoundManagedHandle);
+
+			(InRegistry->*Address2ManagedHandle).Remove(InAddress);
+		}
+
+		return InvalidManagedHandle;
 	}
 
 	static auto AddReference(Class* InRegistry, typename FDelegateValueMapping::ValueType InValue,

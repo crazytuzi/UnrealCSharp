@@ -11,14 +11,14 @@ namespace Script.Library
 
         public static unsafe void TOptional_Register1Implementation<T>(TOptional<T> InOptional, Type InType)
         {
-            __TOptional_Register1Implementation(HandleData.Alloc(InOptional), HandleData.Alloc(InType));
+            __TOptional_Register1Implementation(HandleData.Alloc(InOptional, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __TOptional_Register2Implementation(nint InOptional, nint InValue, nint InType);
 
         public static unsafe void TOptional_Register2Implementation<T>(TOptional<T> InOptional, T InValue, Type InType)
         {
-            __TOptional_Register2Implementation(HandleData.Alloc(InOptional),
+            __TOptional_Register2Implementation(HandleData.Alloc(InOptional, true),
                 HandleData.Alloc(InValue), HandleData.Alloc(InType));
         }
 

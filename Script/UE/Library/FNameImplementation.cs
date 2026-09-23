@@ -14,7 +14,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __FName_RegisterImplementation(HandleData.Alloc(InName), Ptr);
+                __FName_RegisterImplementation(HandleData.Alloc(InName, true), Ptr);
             }
         }
 

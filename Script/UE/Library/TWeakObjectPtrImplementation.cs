@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TWeakObjectPtr_RegisterImplementation<T>(TWeakObjectPtr<T> InWeakObjectPtr,
             nint InObject, Type InType) where T : UObject
         {
-            __TWeakObjectPtr_RegisterImplementation(HandleData.Alloc(InWeakObjectPtr), InObject,
+            __TWeakObjectPtr_RegisterImplementation(HandleData.Alloc(InWeakObjectPtr, true), InObject,
                 HandleData.Alloc(InType));
         }
 

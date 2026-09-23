@@ -334,6 +334,15 @@ FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle
 }
 #endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_IS_ALIVE
+bool SCRIPT_DOMAIN_TYPE::IsAlive(const IManagedHandle InManagedHandle)
+{
+	return IManagedHandleIsValid(InManagedHandle) && HandleDataIsAliveFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(int32, HandleDataIsAliveFn, InManagedHandle.Value) != 0
+		       : true;
+}
+#endif
+
 #ifndef SCRIPT_DOMAIN_CUSTOM_FREE
 void SCRIPT_DOMAIN_TYPE::Free(const IManagedHandle InManagedHandle)
 {

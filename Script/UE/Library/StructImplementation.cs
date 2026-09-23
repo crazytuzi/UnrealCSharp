@@ -30,7 +30,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __UStruct_RegisterImplementation(HandleData.Alloc(InObject), Ptr);
+                __UStruct_RegisterImplementation(HandleData.Alloc(InObject, true), Ptr);
             }
         }
 

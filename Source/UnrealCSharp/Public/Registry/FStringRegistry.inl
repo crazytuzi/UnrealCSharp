@@ -30,9 +30,19 @@ struct FStringRegistry::TStringRegistryImplementation<
 	static auto GetObject(Class* InRegistry, typename FStringValueMapping::FAddressType InAddress)
 		-> IManagedHandle
 	{
-		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
+		if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress))
+		{
+			if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+			{
+				return *FoundManagedHandle;
+			}
 
-		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+			(void)RemoveReference(InRegistry, *FoundManagedHandle);
+
+			(InRegistry->*Address2ManagedHandle).Remove(InAddress);
+		}
+
+		return InvalidManagedHandle;
 	}
 
 	template <auto IsNeedFree, auto IsMember>

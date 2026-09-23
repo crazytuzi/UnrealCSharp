@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TLazyObjectPtr_RegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr,
             nint InObject, Type InType) where T : UObject
         {
-            __TLazyObjectPtr_RegisterImplementation(HandleData.Alloc(InLazyObjectPtr), InObject,
+            __TLazyObjectPtr_RegisterImplementation(HandleData.Alloc(InLazyObjectPtr, true), InObject,
                 HandleData.Alloc(InType));
         }
 

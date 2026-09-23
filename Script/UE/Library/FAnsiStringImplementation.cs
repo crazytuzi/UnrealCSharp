@@ -14,7 +14,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __FAnsiString_RegisterImplementation(HandleData.Alloc(InString), Ptr);
+                __FAnsiString_RegisterImplementation(HandleData.Alloc(InString, true), Ptr);
             }
         }
 

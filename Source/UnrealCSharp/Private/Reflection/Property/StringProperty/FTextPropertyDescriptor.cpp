@@ -9,7 +9,7 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMe
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, false, true>(
 				Class, Object, Src);
@@ -25,7 +25,7 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FRe
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(
 			Class, Object, Src);

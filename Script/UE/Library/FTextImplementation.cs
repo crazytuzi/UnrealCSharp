@@ -22,7 +22,7 @@ namespace Script.Library
 
             fixed (byte* BufferPtr = Buffer, TextNamespacePtr = TextNamespace, PackageNamespacePtr = PackageNamespace)
             {
-                __FText_RegisterImplementation(HandleData.Alloc(InText), BufferPtr, TextNamespacePtr,
+                __FText_RegisterImplementation(HandleData.Alloc(InText, true), BufferPtr, TextNamespacePtr,
                     PackageNamespacePtr, (byte)(bRequiresQuotes ? 1 : 0));
             }
         }

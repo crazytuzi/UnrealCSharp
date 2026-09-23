@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf,
             nint InClass, Type InType) where T : UObject
         {
-            __TSubclassOf_RegisterImplementation(HandleData.Alloc(InSubclassOf), InClass,
+            __TSubclassOf_RegisterImplementation(HandleData.Alloc(InSubclassOf, true), InClass,
                 HandleData.Alloc(InType));
         }
 

@@ -55,11 +55,21 @@ void* FStructRegistry::GetAddress(const IManagedHandle InManagedHandle, UStruct*
 
 IManagedHandle FStructRegistry::GetObject(UScriptStruct* InScriptStruct, const void* InStruct)
 {
-	const auto FoundManagedHandle = StructAddress2ManagedHandle.Find({
+	if (const auto FoundManagedHandle = StructAddress2ManagedHandle.Find({
 		InScriptStruct, const_cast<void*>(InStruct)
-	});
+	}))
+	{
+		if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+		{
+			return *FoundManagedHandle;
+		}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+		(void)RemoveReference(*FoundManagedHandle);
+
+		StructAddress2ManagedHandle.Remove({InScriptStruct, const_cast<void*>(InStruct)});
+	}
+
+	return InvalidManagedHandle;
 }
 
 void* FStructRegistry::GetStruct(const IManagedHandle InManagedHandle)
@@ -69,11 +79,21 @@ void* FStructRegistry::GetStruct(const IManagedHandle InManagedHandle)
 
 IManagedHandle FStructRegistry::GetManagedHandle(UScriptStruct* InScriptStruct, const void* InStruct)
 {
-	const auto FoundManagedHandle = StructAddress2ManagedHandle.Find({
+	if (const auto FoundManagedHandle = StructAddress2ManagedHandle.Find({
 		InScriptStruct, const_cast<void*>(InStruct)
-	});
+	}))
+	{
+		if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+		{
+			return *FoundManagedHandle;
+		}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+		(void)RemoveReference(*FoundManagedHandle);
+
+		StructAddress2ManagedHandle.Remove({InScriptStruct, const_cast<void*>(InStruct)});
+	}
+
+	return InvalidManagedHandle;
 }
 
 bool FStructRegistry::AddReference(const IManagedHandle InOwner, UScriptStruct* InScriptStruct,

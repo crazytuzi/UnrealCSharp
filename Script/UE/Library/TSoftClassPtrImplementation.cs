@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TSoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
             nint InClass, Type InType) where T : UObject
         {
-            __TSoftClassPtr_RegisterImplementation(HandleData.Alloc(InSoftClassPtr), InClass,
+            __TSoftClassPtr_RegisterImplementation(HandleData.Alloc(InSoftClassPtr, true), InClass,
                 HandleData.Alloc(InType));
         }
 

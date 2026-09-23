@@ -44,6 +44,8 @@ public:
 
 	virtual FString StringToFString(const IManagedHandle InManagedHandle) override;
 
+	virtual bool IsAlive(const IManagedHandle InManagedHandle) override;
+
 	virtual void Free(const IManagedHandle InManagedHandle) override;
 
 	virtual IManagedHandle NewArray(const FString& InNamespace, const FString& InName, int32 InLength) override;

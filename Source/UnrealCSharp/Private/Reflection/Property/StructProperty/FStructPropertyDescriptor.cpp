@@ -9,13 +9,16 @@ FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	auto Object = InvalidManagedHandle;
+	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(Property->Struct, Src);
 
-	if (Class != nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject(true);
 
-		FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src, Object);
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src, Object);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -27,7 +30,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::F
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, Src, Object);
 	}
@@ -71,7 +74,7 @@ IManagedHandle FStructPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
 				InAddress, Property);

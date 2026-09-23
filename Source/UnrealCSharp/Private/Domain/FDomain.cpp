@@ -91,6 +91,16 @@ FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 	return FString();
 }
 
+bool FDomain::GCHandle_IsAlive(const IManagedHandle InManagedHandle)
+{
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->IsAlive(InManagedHandle);
+	}
+
+	return true;
+}
+
 void FDomain::GCHandle_Free(const IManagedHandle InManagedHandle)
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())

@@ -50,7 +50,7 @@ IManagedHandle FMapPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		if (Class != nullptr)
 		{
-			Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
 			const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
 			                                      false, false);
