@@ -10,7 +10,7 @@ namespace Script.Library
 
         public static void TArray_RegisterImplementation<T>(TArray<T> InArray, Type InType)
         {
-            __TArray_RegisterImplementation(HandleData.Alloc(InArray), HandleData.Alloc(InType));
+            __TArray_RegisterImplementation(HandleData.Alloc(InArray, false, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial byte __TArray_IdenticalImplementation(nint InA, nint InB);

@@ -2,6 +2,7 @@
 
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
+#include "TOwnedValue.inl"
 #include "Domain/Script/IManagedHandle.h"
 
 struct FStructAddressBase : TValueWrapper<TWeakObjectPtr<UScriptStruct>>
@@ -22,14 +23,31 @@ static uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase);
 class UNREALCSHARP_API FStructRegistry
 {
 private:
-	struct FStructAddress : FStructAddressBase
+	struct FStructAddress : FStructAddressBase, TOwnedValue<FStructAddress>
 	{
-		bool bNeedFree;
-
 		FStructAddress(UScriptStruct* InScriptStruct, void* InAddress, const bool InNeedFree) :
 			FStructAddressBase(InScriptStruct, InAddress),
-			bNeedFree(InNeedFree)
+			TOwnedValue<FStructAddress>(InNeedFree)
 		{
+		}
+
+	private:
+		template <typename>
+		friend struct TOwnedValue;
+
+		void FreeImplementation()
+		{
+			if (Value.IsValid())
+			{
+				if (!(Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				{
+					Value->DestroyStruct(Address);
+				}
+
+				FMemory::Free(Address);
+			}
+
+			Address = nullptr;
 		}
 	};
 

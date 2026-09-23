@@ -1041,11 +1041,11 @@ EDynamicType FDynamicGeneratorCore::GetDynamicType(const FString& InName)
 	return EDynamicType::None;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetClassMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> ClassMetaDataAttributes = {
+	TArray<FClassReflection*> ClassMetaDataAttributes = {
 		ReflectionRegistry.GetHideCategoriesAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetBlueprintSpawnableComponentAttributeClass(),
@@ -1072,11 +1072,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttribut
 	return ClassMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetStructMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> StructMetaDataAttributes = {
+	TArray<FClassReflection*> StructMetaDataAttributes = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetHasNativeBreakAttributeClass(),
 		ReflectionRegistry.GetHasNativeMakeAttributeClass(),
@@ -1087,11 +1087,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttribu
 	return StructMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetEnumMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> EnumMetaDataAttrs = {
+	TArray<FClassReflection*> EnumMetaDataAttrs = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetBitflagsAttributeClass(),
 		ReflectionRegistry.GetUseEnumValuesAsMaskValuesInEditorAttributeClass()
@@ -1100,11 +1100,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttribute
 	return EnumMetaDataAttrs;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetInterfaceMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> InterfaceMetaDataAttributes = {
+	TArray<FClassReflection*> InterfaceMetaDataAttributes = {
 		ReflectionRegistry.GetConversionRootAttributeClass(),
 		ReflectionRegistry.GetCannotImplementInterfaceInBlueprintAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass()
@@ -1113,11 +1113,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttr
 	return InterfaceMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetPropertyMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> PropertyMetaDataAttributes = {
+	TArray<FClassReflection*> PropertyMetaDataAttributes = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetDeprecationMessageAttributeClass(),
 		ReflectionRegistry.GetDisplayNameAttributeClass(),
@@ -1206,11 +1206,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttri
 	return PropertyMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetFunctionMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetFunctionMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> FunctionMetaDataAttributes = {
+	TArray<FClassReflection*> FunctionMetaDataAttributes = {
 		ReflectionRegistry.GetCallInEditorAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetCategoryAttributeClass(),

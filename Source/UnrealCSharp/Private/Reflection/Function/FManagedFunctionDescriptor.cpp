@@ -64,6 +64,8 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 		FDomain::GCHandle_Free(ReturnValue);
 	}
 
+	const auto ManagedHandles = CompoundManagedHandles;
+
 	for (const auto Index : OutPropertyIndexes)
 	{
 		if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
@@ -80,6 +82,11 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 							IManagedHandleIsValid(ManagedHandle))
 						{
 							OutPropertyDescriptor->Set(&ManagedHandle, OutAddress);
+
+							if (ManagedHandles[CompoundPropertyIndex] != ManagedHandle)
+							{
+								FDomain::GCHandle_Free(ManagedHandle);
+							}
 						}
 					}
 				}

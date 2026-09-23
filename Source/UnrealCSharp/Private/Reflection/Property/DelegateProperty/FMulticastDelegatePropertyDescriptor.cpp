@@ -90,7 +90,7 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress)
 			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
 			Property->SignatureFunction);
 
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Class, Object);
 	}

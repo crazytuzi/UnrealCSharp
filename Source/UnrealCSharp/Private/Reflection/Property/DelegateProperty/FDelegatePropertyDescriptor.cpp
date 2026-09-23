@@ -77,7 +77,7 @@ IManagedHandle FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 		const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
 		                                                Property->SignatureFunction);
 
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class, Object);
 	}

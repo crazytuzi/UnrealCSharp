@@ -2,21 +2,31 @@
 
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
+#include "TOwnedValue.inl"
 #include "UEVersion.h"
 
 class UNREALCSHARP_API FStringRegistry
 {
 public:
 	template <typename T>
-	struct TStringAddress : TValueWrapper<T>
+	struct TStringAddress : TValueWrapper<T>, TOwnedValue<TStringAddress<T>>
 	{
 		TStringAddress(T InValue, const bool InNeedFree) :
 			TValueWrapper<T>(InValue),
-			bNeedFree(InNeedFree)
+			TOwnedValue<TStringAddress<T>>(InNeedFree)
 		{
 		}
 
-		bool bNeedFree;
+	private:
+		template <typename>
+		friend struct TOwnedValue;
+
+		void FreeImplementation()
+		{
+			FMemory::Free(TValueWrapper<T>::Value);
+
+			TValueWrapper<T>::Value = nullptr;
+		}
 	};
 
 	typedef TStringAddress<FName*> FNameAddress;

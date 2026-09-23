@@ -10,7 +10,7 @@ namespace Script.Library
 
         public static void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InType)
         {
-            __TMap_RegisterImplementation(HandleData.Alloc(InMap), HandleData.Alloc(InType));
+            __TMap_RegisterImplementation(HandleData.Alloc(InMap, false, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __TMap_UnRegisterImplementation(nint InMap);

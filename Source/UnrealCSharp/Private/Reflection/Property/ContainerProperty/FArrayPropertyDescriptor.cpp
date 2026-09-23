@@ -72,7 +72,7 @@ IManagedHandle FArrayPropertyDescriptor::NewWeakRef(void* InAddress, const bool 
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
 		                                          bIsCopy, false);

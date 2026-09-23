@@ -71,10 +71,10 @@ FString SCRIPT_DOMAIN_TYPE::GetFullName(const IManagedHandle InManagedClass)
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_NEW_OBJECT
-IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass)
+IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass, const bool bIsWeak)
 {
 	return ObjectBridgeNewObjectFn != nullptr
-		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass)
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass, bIsWeak ? 1 : 0)
 		       : InvalidManagedHandle;
 }
 #endif

@@ -718,11 +718,11 @@ FMethodReflection* FClassReflection::GetParentMethod(const FString& InName, cons
 	return nullptr;
 }
 
-IManagedHandle FClassReflection::NewObject() const
+IManagedHandle FClassReflection::NewObject(const bool bIsWeak) const
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		return ScriptDomain->NewObject(ManagedClass);
+		return ScriptDomain->NewObject(ManagedClass, bIsWeak);
 	}
 
 	return InvalidManagedHandle;

@@ -10,7 +10,7 @@ namespace Script.Library
 
         public static void TSet_RegisterImplementation<T>(TSet<T> InSet, Type InType)
         {
-            __TSet_RegisterImplementation(HandleData.Alloc(InSet), HandleData.Alloc(InType));
+            __TSet_RegisterImplementation(HandleData.Alloc(InSet, false, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __TSet_UnRegisterImplementation(nint InSet);

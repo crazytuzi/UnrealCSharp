@@ -47,7 +47,16 @@ namespace Script.Library
         {
             var Handle = __FText_ToStringImplementation(InText);
 
-            return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Result = (string)HandleData.GetObject(Handle);
+
+                HandleData.FreeImplementation(Handle);
+
+                return Result;
+            }
+
+            return null;
         }
     }
 }

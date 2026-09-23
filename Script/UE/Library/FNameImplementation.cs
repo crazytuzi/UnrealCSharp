@@ -38,7 +38,16 @@ namespace Script.Library
         {
             var Handle = __FName_ToStringImplementation(InName);
 
-            return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Result = (string)HandleData.GetObject(Handle);
+
+                HandleData.FreeImplementation(Handle);
+
+                return Result;
+            }
+
+            return null;
         }
 
         private static unsafe partial nint __FName_NAME_NoneImplementation();

@@ -145,6 +145,8 @@ private:
 				else if (InManagedHandles[Index] != InShadowManagedHandles[Index])
 				{
 					std::get<Index>(InArgs) = TPropertyValue<Type, Type>::Get(InManagedHandles[Index]);
+
+					FDomain::GCHandle_Free(InManagedHandles[Index]);
 				}
 			}
 		}(), ...);

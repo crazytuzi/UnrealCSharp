@@ -28,7 +28,7 @@ public:
 
 	virtual FString GetFullName(const IManagedHandle InManagedClass) override;
 
-	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) override;
+	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass, const bool bIsWeak = false) override;
 
 	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) override;
 

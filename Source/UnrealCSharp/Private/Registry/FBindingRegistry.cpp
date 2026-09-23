@@ -24,12 +24,9 @@ void FBindingRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			delete Value.AddressWrapper;
+		delete Value.AddressWrapper;
 
-			Value.AddressWrapper = nullptr;
-		}
+		Value.AddressWrapper = nullptr;
 	}
 
 	ManagedHandle2BindingAddress.Empty();
@@ -59,12 +56,9 @@ bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 
 		FDomain::GCHandle_Free(InManagedHandle);
 
-		if (FoundValue->bNeedFree)
-		{
-			delete FoundValue->AddressWrapper;
+		delete FoundValue->AddressWrapper;
 
-			FoundValue->AddressWrapper = nullptr;
-		}
+		FoundValue->AddressWrapper = nullptr;
 
 		ManagedHandle2BindingAddress.Remove(InManagedHandle);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Domain/FDomain.h"
 #include "Reflection/FClassReflection.h"
 
 template <
@@ -63,14 +64,11 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 				}
 			}
 
-			if (FoundValue->bNeedFree)
-			{
-				FMemory::Free(FoundValue->Value);
-
-				FoundValue->Value = nullptr;
-			}
+			FoundValue->Free();
 
 			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
+
+			FDomain::GCHandle_Free(InManagedHandle);
 
 			return true;
 		}

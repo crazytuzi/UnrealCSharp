@@ -72,7 +72,7 @@ IManagedHandle FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bI
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
 		                                      bIsCopy, false);

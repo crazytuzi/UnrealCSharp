@@ -99,17 +99,17 @@ public:
 #if WITH_EDITOR
 	static EDynamicType GetDynamicType(const FString& InName);
 
-	static const TArray<FClassReflection*>& GetClassMetaDataAttributes();
+	static TArray<FClassReflection*> GetClassMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetStructMetaDataAttributes();
+	static TArray<FClassReflection*> GetStructMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetEnumMetaDataAttributes();
+	static TArray<FClassReflection*> GetEnumMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetInterfaceMetaDataAttributes();
+	static TArray<FClassReflection*> GetInterfaceMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetPropertyMetaDataAttributes();
+	static TArray<FClassReflection*> GetPropertyMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetFunctionMetaDataAttributes();
+	static TArray<FClassReflection*> GetFunctionMetaDataAttributes();
 #endif
 
 private:

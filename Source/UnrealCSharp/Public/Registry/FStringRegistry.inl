@@ -64,12 +64,7 @@ struct FStringRegistry::TStringRegistryImplementation<
 				}
 			}
 
-			if (FoundValue->bNeedFree)
-			{
-				FMemory::Free(FoundValue->Value);
-
-				FoundValue->Value = nullptr;
-			}
+			FoundValue->Free();
 
 			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
 

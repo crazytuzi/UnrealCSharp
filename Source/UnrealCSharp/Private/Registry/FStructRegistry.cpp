@@ -26,20 +26,7 @@ void FStructRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			if (Value.Value.IsValid())
-			{
-				if (!(Value.Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
-				{
-					Value.Value->DestroyStruct(Value.Address);
-				}
-
-				FMemory::Free(Value.Address);
-			}
-
-			Value.Address = nullptr;
-		}
+		Value.Free();
 	}
 
 	ManagedHandle2StructAddress.Empty();
@@ -123,20 +110,7 @@ bool FStructRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 			}
 		}
 
-		if (FoundValue->bNeedFree)
-		{
-			if (FoundValue->Value.IsValid())
-			{
-				if (!(FoundValue->Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
-				{
-					FoundValue->Value->DestroyStruct(FoundValue->Address);
-				}
-
-				FMemory::Free(FoundValue->Address);
-			}
-
-			FoundValue->Address = nullptr;
-		}
+		FoundValue->Free();
 
 		ManagedHandle2StructAddress.Remove(InManagedHandle);
 

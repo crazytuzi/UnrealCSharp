@@ -74,7 +74,7 @@ typedef int32 (*type_bridge_unbox_float_fn)(IManagedHandle, float*);
 
 typedef int32 (*type_bridge_unbox_double_fn)(IManagedHandle, double*);
 
-typedef IManagedHandle (*object_bridge_new_object_fn)(IManagedHandle);
+typedef IManagedHandle (*object_bridge_new_object_fn)(IManagedHandle, int32);
 
 typedef void (*field_bridge_set_static_value_fn)(IManagedHandle, const uint8*, IManagedHandle);
 
@@ -142,7 +142,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 	Op(TypeBridgeUnboxFloat, type_bridge_unbox_float_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT, 2) \
 	Op(TypeBridgeUnboxDouble, type_bridge_unbox_double_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE, 2) \
 	\
-	Op(ObjectBridgeNewObject, object_bridge_new_object_fn, CLASS_OBJECT_BRIDGE, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 1) \
+	Op(ObjectBridgeNewObject, object_bridge_new_object_fn, CLASS_OBJECT_BRIDGE, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 2) \
 	\
 	Op(FieldBridgeSetStaticValue, field_bridge_set_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE, 3) \
 	Op(FieldBridgeGetStaticValue, field_bridge_get_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE, 2) \

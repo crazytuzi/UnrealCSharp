@@ -24,7 +24,7 @@ namespace Interop
         [UnmanagedCallersOnly]
         public static void Free(nint InHandle) => FreeImplementation(InHandle);
 
-        public static nint Alloc(object InObject, bool bPinned = false)
+        public static nint Alloc(object InObject, bool bPinned = false, bool bWeak = false)
         {
             lock (Lock)
             {
@@ -36,7 +36,12 @@ namespace Interop
                 if (!Handles.TryGetValue(HandleReference.Value, out _))
                 {
                     Handles[HandleReference.Value] =
-                        GCHandle.Alloc(InObject, bPinned ? GCHandleType.Pinned : GCHandleType.Normal);
+                        GCHandle.Alloc(InObject,
+                            bPinned
+                                ? GCHandleType.Pinned
+                                : bWeak
+                                    ? GCHandleType.Weak
+                                    : GCHandleType.Normal);
                 }
 
                 return HandleReference.Value;

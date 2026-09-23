@@ -67,7 +67,7 @@ public:
 	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
 public:
-	IManagedHandle NewObject() const;
+	IManagedHandle NewObject(const bool bIsWeak = false) const;
 
 	IManagedHandle InitObject(int32 InParamCount = 0, void** InParams = nullptr) const;
 

@@ -739,7 +739,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 
 				ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-				auto SrcManagedHandle = FoundClass->NewObject();
+				auto SrcManagedHandle = FoundClass->NewObject(true);
 
 				if constexpr (IsReference)
 				{
@@ -830,7 +830,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			{
 				Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-				auto SrcManagedHandle = FoundClass->NewObject();
+				auto SrcManagedHandle = FoundClass->NewObject(true);
 
 				if constexpr (IsReference)
 				{
@@ -924,7 +924,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			{
 				Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-				auto SrcManagedHandle = FoundClass->NewObject();
+				auto SrcManagedHandle = FoundClass->NewObject(true);
 
 				if constexpr (IsReference)
 				{

@@ -23,12 +23,7 @@ void FStringRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	NameManagedHandle2Address.Empty();
@@ -41,12 +36,7 @@ void FStringRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	StringManagedHandle2Address.Empty();
@@ -60,12 +50,7 @@ void FStringRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	Utf8StringManagedHandle2Address.Empty();
@@ -80,12 +65,7 @@ void FStringRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	AnsiStringManagedHandle2Address.Empty();
@@ -99,12 +79,7 @@ void FStringRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	TextManagedHandle2Address.Empty();

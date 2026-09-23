@@ -10,7 +10,7 @@ namespace Script.Library
 
         public static void FDelegate_RegisterImplementation(object InDelegate, Type InType)
         {
-            __FDelegate_RegisterImplementation(HandleData.Alloc(InDelegate), HandleData.Alloc(InType));
+            __FDelegate_RegisterImplementation(HandleData.Alloc(InDelegate, false, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __FDelegate_UnRegisterImplementation(nint InDelegate);

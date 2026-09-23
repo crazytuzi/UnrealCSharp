@@ -70,6 +70,8 @@ bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 
 		ManagedHandle2Helper.Remove(InManagedHandle);
 
+		FDomain::GCHandle_Free(InManagedHandle);
+
 		return true;
 	}
 

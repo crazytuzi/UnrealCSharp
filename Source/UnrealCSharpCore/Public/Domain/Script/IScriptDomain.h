@@ -28,7 +28,7 @@ public:
 
 	virtual FString GetFullName(const IManagedHandle InManagedClass) = 0;
 
-	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) = 0;
+	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass, const bool bIsWeak = false) = 0;
 
 	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) = 0;
 

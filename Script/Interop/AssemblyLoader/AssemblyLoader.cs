@@ -30,12 +30,12 @@ namespace Interop
         [UnmanagedCallersOnly]
         public static void Unload()
         {
+            HandleData.Clear();
+
+            TypeBridge.Clear();
+
             if (Context != null)
             {
-                HandleData.Clear();
-
-                TypeBridge.Clear();
-
                 var ContextWeakReference = new WeakReference(Context);
 
                 try

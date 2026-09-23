@@ -72,7 +72,7 @@ IManagedHandle FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bI
 
 	if (Class != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = Class->NewObject(true);
 
 		const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
 		                                      bIsCopy, false);
