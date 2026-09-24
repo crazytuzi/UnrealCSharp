@@ -1172,10 +1172,6 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 		}
 	}
 
-#if WITH_EDITOR
-	MarkScriptChanged();
-#endif
-
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
 	if (const auto DirectoryName = FPaths::GetPath(InFileName);
@@ -1184,8 +1180,18 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
 
-	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
-	                                     FileManager, FILEWRITE_None);
+	const auto bIsSaved = FFileHelper::SaveStringToFile(InString, *InFileName,
+	                                                    FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+	                                                    FileManager, FILEWRITE_None);
+
+	if (bIsSaved)
+	{
+#if WITH_EDITOR
+		MarkScriptChanged();
+#endif
+	}
+
+	return bIsSaved;
 }
 
 TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)

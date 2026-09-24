@@ -191,7 +191,7 @@ public static class TypeBridge
         {
             if (HandleData.GetObject(InKeyType) is Type Key)
             {
-                if (HandleData.GetObject(InKeyType) is Type Value)
+                if (HandleData.GetObject(InValueType) is Type Value)
                 {
                     return HandleData.Alloc(Generic.MakeGenericType(Key, Value));
                 }

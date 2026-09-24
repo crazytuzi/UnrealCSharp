@@ -705,6 +705,61 @@ const FString& FGeneratorCore::GetGeneratorHeaderComment()
 	return GeneratorHeaderComment;
 }
 
+FString FGeneratorCore::GetEscapedStringLiteral(const FString& InString)
+{
+	FString Result;
+
+	Result.Reserve(InString.Len());
+
+	for (const auto Char : InString)
+	{
+		switch (Char)
+		{
+		case TEXT('\\'):
+			Result += TEXT("\\\\");
+			break;
+		case TEXT('"'):
+			Result += TEXT("\\\"");
+			break;
+		case TEXT('\n'):
+			Result += TEXT("\\n");
+			break;
+		case TEXT('\r'):
+			Result += TEXT("\\r");
+			break;
+		case TEXT('\t'):
+			Result += TEXT("\\t");
+			break;
+		default:
+			Result.AppendChar(Char);
+			break;
+		}
+	}
+
+	return Result;
+}
+
+FString FGeneratorCore::GetTextStringLiteral(const FString& InMetaData)
+{
+	static const TCHAR* Prefixes[] = {TEXT("INVTEXT("), TEXT("TEXT(")};
+
+	for (const auto Prefix : Prefixes)
+	{
+		if (InMetaData.StartsWith(Prefix) && InMetaData.EndsWith(TEXT(")")))
+		{
+			const auto Length = FCString::Strlen(Prefix);
+
+			if (const auto Value = InMetaData.Mid(Length, InMetaData.Len() - Length - 1);
+				Value.Len() >= 2 && Value.StartsWith(TEXT("\"")) && Value.EndsWith(TEXT("\"")))
+			{
+				return Value.Mid(1, Value.Len() - 2);
+			}
+		}
+	}
+
+	return GetEscapedStringLiteral(InMetaData);
+}
+
 void FGeneratorCore::AddGeneratorFile(const FString& InFile)
 {
 	GeneratorFiles.Add(InFile);

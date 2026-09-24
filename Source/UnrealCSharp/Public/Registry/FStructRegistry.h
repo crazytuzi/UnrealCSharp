@@ -37,17 +37,17 @@ private:
 
 		void FreeImplementation()
 		{
-			if (Value.IsValid())
+			if (Address != nullptr)
 			{
-				if (!(Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				if (Value.IsValid() && !(Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
 				{
 					Value->DestroyStruct(Address);
 				}
 
 				FMemory::Free(Address);
-			}
 
-			Address = nullptr;
+				Address = nullptr;
+			}
 		}
 	};
 

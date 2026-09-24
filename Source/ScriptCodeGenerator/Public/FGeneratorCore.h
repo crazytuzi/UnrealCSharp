@@ -46,6 +46,10 @@ public:
 
 	static const FString& GetGeneratorHeaderComment();
 
+	static FString GetEscapedStringLiteral(const FString& InString);
+
+	static FString GetTextStringLiteral(const FString& InMetaData);
+
 	static void AddGeneratorFile(const FString& InFile);
 
 	static bool IsSkip(const UField* InField);

@@ -264,6 +264,24 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 		return;
 	}
 
+	const auto GetLifetimeCondition = [](const FString& InValue)
+	{
+		if (InValue.IsNumeric())
+		{
+			return static_cast<ELifetimeCondition>(FCString::Atoi(*InValue));
+		}
+
+		if (const auto Enum = StaticEnum<ELifetimeCondition>())
+		{
+			if (const auto Value = Enum->GetValueByNameString(InValue); Value != INDEX_NONE)
+			{
+				return static_cast<ELifetimeCondition>(Value);
+			}
+		}
+
+		return COND_None;
+	};
+
 #if WITH_EDITOR
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditAnywhereAttributeClass()))
 	{
@@ -283,6 +301,11 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleAnywhereAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst);
+	}
+
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleDefaultsOnlyAttributeClass()))
+	{
+		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst | CPF_DisableEditOnInstance);
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleInstanceOnlyAttributeClass()))
@@ -370,9 +393,8 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 	{
 		InProperty->SetPropertyFlags(CPF_Net);
 
-		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
-			UKismetStringLibrary::Conv_StringToInt(
-				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0))));
+		InProperty->SetBlueprintReplicationCondition(GetLifetimeCondition(
+			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedAttributeClass(), 0)));
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass()))
@@ -382,9 +404,8 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 		InProperty->RepNotifyFunc = FName(
 			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0));
 
-		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
-			UKismetStringLibrary::Conv_StringToInt(
-				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 1))));
+		InProperty->SetBlueprintReplicationCondition(GetLifetimeCondition(
+			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 1)));
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNotReplicatedAttributeClass()))

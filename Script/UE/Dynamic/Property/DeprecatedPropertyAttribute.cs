@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class DeprecatedPropertyAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public DeprecatedPropertyAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

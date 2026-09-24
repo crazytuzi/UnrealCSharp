@@ -1315,7 +1315,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			"\t\t\t\t%s \?\?= new FName(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *InMetaData
+		                       *FGeneratorCore::GetEscapedStringLiteral(InMetaData)
 		);
 	}
 
@@ -1408,7 +1408,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			"\t\t\t\t%s \?\?= new FString(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *InMetaData
+		                       *FGeneratorCore::GetEscapedStringLiteral(InMetaData)
 		);
 	}
 
@@ -1419,7 +1419,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			"\t\t\t\t%s \?\?= new FUtf8String(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *InMetaData
+		                       *FGeneratorCore::GetEscapedStringLiteral(InMetaData)
 		);
 	}
 #endif
@@ -1431,7 +1431,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			"\t\t\t\t%s \?\?= new FAnsiString(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *InMetaData
+		                       *FGeneratorCore::GetEscapedStringLiteral(InMetaData)
 		);
 	}
 #endif
@@ -1442,7 +1442,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			"\t\t\t\t%s \?\?= new FText(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *InMetaData.Replace(TEXT("\""), TEXT("\\\""))
+		                       *FGeneratorCore::GetTextStringLiteral(InMetaData)
 		);
 	}
 

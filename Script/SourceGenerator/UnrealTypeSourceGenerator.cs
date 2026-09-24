@@ -47,9 +47,28 @@ namespace SourceGenerator
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-        private static string GetPathName(string Name)
+        public static readonly DiagnosticDescriptor ErrorFunctionNameMustBeUnique = new DiagnosticDescriptor(
+            "UC_ERROR_06",
+            "UFunction must be unique", "{0}",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor ErrorPropertyNameMustBeUnique = new DiagnosticDescriptor(
+            "UC_ERROR_07",
+            "UProperty must be unique", "{0}",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        internal static string GetEngineName(string Name)
         {
-            return "/Script/CoreUObject." + (Name.EndsWith("_C") ? Name : Name.Substring(1));
+            return Name.EndsWith("_C") ? Name : Name.Substring(1);
+        }
+
+        internal static string GetPathName(string Name)
+        {
+            return "/Script/CoreUObject." + GetEngineName(Name);
         }
 
         public void Execute(GeneratorExecutionContext Context)
@@ -258,7 +277,8 @@ namespace SourceGenerator
 
         public readonly List<InterfaceInfo> Interfaces = new List<InterfaceInfo>();
 
-        public HashSet<string> Types = new HashSet<string>();
+        public Dictionary<string, UniqueTypeInfo> Types =
+            new Dictionary<string, UniqueTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
         public void OnVisitSyntaxNode(SyntaxNode Node)
         {
@@ -282,7 +302,7 @@ namespace SourceGenerator
                     return;
                 }
 
-                if (!IsUnique(enumDeclarationSyntax, name))
+                if (!IsUnique(enumDeclarationSyntax, name, "Enum"))
                 {
                     return;
                 }
@@ -325,7 +345,7 @@ namespace SourceGenerator
                     return;
                 }
 
-                if (!IsUnique(interfaceDeclarationSyntax, name))
+                if (!IsUnique(interfaceDeclarationSyntax, name, "Interface"))
                 {
                     return;
                 }
@@ -359,6 +379,13 @@ namespace SourceGenerator
                                 interfaceDeclarationSyntax.Identifier.Span),
                             "interface", name, currentFileName));
                     }
+                }
+
+                var functionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var method in interfaceDeclarationSyntax.Members.OfType<MethodDeclarationSyntax>())
+                {
+                    ValidateFunctionNameUnique(method, name, functionNames, Errors);
                 }
 
                 if (hasError == false)
@@ -411,7 +438,7 @@ namespace SourceGenerator
 
             if (bIsUClass || bIsUStruct)
             {
-                if (!IsUnique(Syntax, name))
+                if (!IsUnique(Syntax, name, bIsUClass ? "Class" : "Struct"))
                 {
                     return;
                 }
@@ -538,6 +565,35 @@ namespace SourceGenerator
 
             var methods = Syntax.Members.OfType<MethodDeclarationSyntax>().ToArray();
 
+            if (bIsUClass || bIsUStruct)
+            {
+                var functionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                var propertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var method in methods)
+                {
+                    ValidateFunctionNameUnique(method, name, functionNames, Errors);
+                }
+
+                foreach (var member in Syntax.Members)
+                {
+                    if (member is PropertyDeclarationSyntax propertyDeclarationSyntax)
+                    {
+                        ValidatePropertyNameUnique(propertyDeclarationSyntax, propertyDeclarationSyntax.Identifier, name,
+                            propertyNames, Errors);
+                    }
+                    else if (member is FieldDeclarationSyntax fieldDeclarationSyntax)
+                    {
+                        foreach (var variable in fieldDeclarationSyntax.Declaration.Variables)
+                        {
+                            ValidatePropertyNameUnique(fieldDeclarationSyntax, variable.Identifier, name, propertyNames,
+                                Errors);
+                        }
+                    }
+                }
+            }
+
             var bHasStaticClass = methods.Any(Method => Method.Identifier.ToString() == "StaticClass");
 
             var bHasStaticStruct = methods.Any(Method => Method.Identifier.ToString() == "StaticStruct");
@@ -657,10 +713,31 @@ namespace SourceGenerator
             type.HasOperatorNotEqualTo |= bHasOperatorNotEqualTo;
         }
 
-        private bool IsUnique(BaseTypeDeclarationSyntax Syntax, string Name)
+        private bool IsUnique(BaseTypeDeclarationSyntax Syntax, string Name, string Kind)
         {
-            if (Types.Add(Name))
+            var location = Syntax.GetLocation();
+
+            var filePath = location.SourceTree?.FilePath ?? "";
+
+            var lineNumber = location.GetLineSpan().StartLinePosition.Line + 1;
+
+            var engineName = UnrealTypeSourceGenerator.GetEngineName(Name);
+
+            if (Types.TryGetValue(engineName, out var existingType) == false)
             {
+                Types[engineName] = new UniqueTypeInfo
+                {
+                    Name = Name,
+
+                    EngineName = engineName,
+
+                    Kind = Kind,
+
+                    FilePath = filePath,
+
+                    LineNumber = lineNumber
+                };
+
                 return true;
             }
 
@@ -668,7 +745,8 @@ namespace SourceGenerator
                 Location.Create(
                     Syntax.SyntaxTree,
                     Syntax.Span),
-                $"{Name} must be unique"));
+                $"{Kind} '{Name}' shares engine name '{engineName}' with " +
+                $"{existingType.Kind.ToLowerInvariant()} '{existingType.Name}' in {existingType.FilePath}({existingType.LineNumber})"));
 
             return false;
         }
@@ -689,6 +767,61 @@ namespace SourceGenerator
             }
 
             return null;
+        }
+
+        private static AttributeSyntax GetAttributeFromMember(MemberDeclarationSyntax Syntax, string Name)
+        {
+            foreach (var attributeList in Syntax.AttributeLists)
+            {
+                foreach (var attribute in attributeList.Attributes)
+                {
+                    var attributeName = attribute.Name.ToString();
+
+                    if (attributeName == Name || attributeName == Name + "Attribute")
+                    {
+                        return attribute;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static void ValidateFunctionNameUnique(MethodDeclarationSyntax Syntax, string TypeName,
+                                                    HashSet<string> FunctionNames, List<Diagnostic> Errors)
+        {
+            if (GetAttributeFromMember(Syntax, "UFunction") == null)
+            {
+                return;
+            }
+
+            if (FunctionNames.Add(Syntax.Identifier.Text) == false)
+            {
+                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFunctionNameMustBeUnique,
+                    Location.Create(
+                        Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                        Syntax.Identifier.Span),
+                    $"'{Syntax.Identifier.Text}' conflicts with 'Function {UnrealTypeSourceGenerator.GetPathName(TypeName)}:{Syntax.Identifier.Text}'"));
+            }
+        }
+
+        private static void ValidatePropertyNameUnique(MemberDeclarationSyntax Syntax, SyntaxToken Identifier,
+                                                    string TypeName, HashSet<string> PropertyNames,
+                                                    List<Diagnostic> Errors)
+        {
+            if (GetAttributeFromMember(Syntax, "UProperty") == null)
+            {
+                return;
+            }
+
+            if (PropertyNames.Add(Identifier.Text) == false)
+            {
+                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorPropertyNameMustBeUnique,
+                    Location.Create(
+                        Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                        Identifier.Span),
+                    $"Member variable declaration: '{Identifier.Text}' cannot be defined in '{TypeName}' as it is already defined in scope '{TypeName}' (shadowing is not allowed)"));
+            }
         }
 
         private static List<string> MergeUsing(List<string> UsingListA, List<string> UsingListB)
@@ -740,6 +873,19 @@ namespace SourceGenerator
         UStruct,
         UInterface,
         Other
+    }
+
+    public class UniqueTypeInfo
+    {
+        public string Name { get; set; }
+
+        public string EngineName { get; set; }
+
+        public string Kind { get; set; }
+
+        public string FilePath { get; set; }
+
+        public int LineNumber { get; set; }
     }
 
     public class InterfaceInfo

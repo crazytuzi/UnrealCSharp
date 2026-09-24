@@ -307,10 +307,8 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		{
 			RemoveClassDescriptor(InStruct);
 		}
-		else
-		{
-			(void)RemoveObjectReference(InObject);
-		}
+
+		(void)RemoveObjectReference(InObject);
 
 		{
 			FScopeLock Lock(&CriticalSection);
@@ -536,10 +534,9 @@ void FCSharpEnvironment::RemovePropertyDescriptor(const uint32 InPropertyHash) c
 	}
 }
 
-bool FCSharpEnvironment::AddObjectReference(const FClassReflection* InClass, UObject* InObject,
-                                            const IManagedHandle InManagedHandle) const
+IManagedHandle FCSharpEnvironment::AddObjectReference(UObject* InObject, const IManagedHandle InManagedHandle) const
 {
-	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InClass, InObject, InManagedHandle) : false;
+	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InManagedHandle) : InvalidManagedHandle;
 }
 
 IManagedHandle FCSharpEnvironment::GetObject(const UObject* InObject) const

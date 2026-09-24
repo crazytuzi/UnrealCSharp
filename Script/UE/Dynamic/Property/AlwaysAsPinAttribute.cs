@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class AlwaysAsPinAttribute : Attribute
     {
-        public AlwaysAsPinAttribute()
-        {
-            Value = "true";
-        }
-
-        public AlwaysAsPinAttribute(string InValue)
+        public AlwaysAsPinAttribute(string InValue = "true")
         {
             Value = InValue;
         }

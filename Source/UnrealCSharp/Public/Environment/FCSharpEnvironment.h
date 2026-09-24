@@ -95,7 +95,7 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const IManagedHandle InManagedHandle) const;
 
-	bool AddObjectReference(const FClassReflection* InClass, UObject* InObject, IManagedHandle InManagedHandle) const;
+	IManagedHandle AddObjectReference(UObject* InObject, IManagedHandle InManagedHandle) const;
 
 	IManagedHandle GetObject(const UObject* InObject) const;
 

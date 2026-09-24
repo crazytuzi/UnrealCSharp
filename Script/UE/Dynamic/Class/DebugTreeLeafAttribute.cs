@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class DebugTreeLeafAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public DebugTreeLeafAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

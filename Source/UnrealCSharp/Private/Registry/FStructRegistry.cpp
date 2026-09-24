@@ -116,23 +116,23 @@ bool FStructRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 {
 	if (const auto FoundValue = ManagedHandle2StructAddress.Find(InManagedHandle))
 	{
-		if (const auto FoundManagedHandle = StructAddress2ManagedHandle.Find(
-			{FoundValue->Value.Get(), FoundValue->Address}))
+		FDomain::GCHandle_Free(InManagedHandle);
+
+		if (const auto FoundManagedHandle = StructAddress2ManagedHandle.Find({
+			FoundValue->Value.Get(), FoundValue->Address
+		}))
 		{
 			if (*FoundManagedHandle == InManagedHandle)
 			{
-				FDomain::GCHandle_Free(*FoundManagedHandle);
-
-				(void)FCSharpEnvironment::GetEnvironment().RemoveReference(InManagedHandle);
-
-				StructAddress2ManagedHandle.Remove(
-					{FoundValue->Value.Get(), FoundValue->Address});
+				StructAddress2ManagedHandle.Remove({FoundValue->Value.Get(), FoundValue->Address});
 			}
 		}
 
 		FoundValue->Free();
 
 		ManagedHandle2StructAddress.Remove(InManagedHandle);
+
+		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(InManagedHandle);
 
 		return true;
 	}

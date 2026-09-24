@@ -156,29 +156,27 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
                                       const TArray<TFunction<void(FString& OutResult)>>& InFunction,
                                       const ECopyTemplate InCopyTemplate)
 {
-	FString SrcResult;
-
-	FFileHelper::LoadFileToString(SrcResult, *Src);
-
-	for (const auto& Function : InFunction)
+	if (FString SrcResult; FFileHelper::LoadFileToString(SrcResult, *Src))
 	{
-		Function(SrcResult);
-	}
+		for (const auto& Function : InFunction)
+		{
+			Function(SrcResult);
+		}
 
-	if (auto& FileManager = IFileManager::Get();
-		!FileManager.FileExists(*Dest) || InCopyTemplate == ECopyTemplate::ReplaceExisting)
-	{
-		FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
-	}
-	else if (InCopyTemplate == ECopyTemplate::ReplaceChanged)
-	{
-		FString DestResult;
-
-		FFileHelper::LoadFileToString(DestResult, *Dest);
-
-		if (DestResult != SrcResult)
+		if (auto& FileManager = IFileManager::Get();
+			!FileManager.FileExists(*Dest) || InCopyTemplate == ECopyTemplate::ReplaceExisting)
 		{
 			FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+		}
+		else if (InCopyTemplate == ECopyTemplate::ReplaceChanged)
+		{
+			if (FString DestResult; FFileHelper::LoadFileToString(DestResult, *Dest))
+			{
+				if (DestResult != SrcResult)
+				{
+					FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+				}
+			}
 		}
 	}
 }

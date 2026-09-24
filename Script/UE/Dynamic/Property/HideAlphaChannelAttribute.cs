@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class HideAlphaChannelAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public HideAlphaChannelAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

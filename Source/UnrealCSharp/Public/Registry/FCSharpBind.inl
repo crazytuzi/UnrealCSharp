@@ -81,9 +81,7 @@ auto FCSharpBind::BindImplementation(UObject* InObject) -> IManagedHandle
 
 	const auto NewObject = FoundClass->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddObjectReference(FoundClass, InObject, NewObject);
-
-	return NewObject;
+	return FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewObject);
 }
 
 template <typename T>

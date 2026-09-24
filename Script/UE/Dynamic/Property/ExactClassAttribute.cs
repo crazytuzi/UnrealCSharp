@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ExactClassAttribute : Attribute
     {
-        public ExactClassAttribute()
-        {
-            Value = "true";
-        }
-
-        public ExactClassAttribute(string InValue)
+        public ExactClassAttribute(string InValue = "true")
         {
             Value = InValue;
         }

@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class BlueprintBaseOnlyAttribute : Attribute
     {
-        public BlueprintBaseOnlyAttribute()
-        {
-            Value = "true";
-        }
-
-        public BlueprintBaseOnlyAttribute(string InValue)
+        public BlueprintBaseOnlyAttribute(string InValue = "true")
         {
             Value = InValue;
         }

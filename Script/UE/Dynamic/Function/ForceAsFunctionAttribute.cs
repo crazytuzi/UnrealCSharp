@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class ForceAsFunctionAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public ForceAsFunctionAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

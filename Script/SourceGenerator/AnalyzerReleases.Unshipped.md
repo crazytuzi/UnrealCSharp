@@ -7,3 +7,5 @@
 | UC_ERROR03 | UnrealCSharp | Error    | The file name where the dynamic class and dynamic struct are located must be consistent with the class name (excluding A, U, or F) |
 | UC_ERROR04 | UnrealCSharp | Error    | UClass must have a base class |
 | UC_ERROR05 | UnrealCSharp | Error    | Type must be unique |
+| UC_ERROR06 | UnrealCSharp | Error    | UFunction must be unique |
+| UC_ERROR07 | UnrealCSharp | Error    | UProperty must be unique |

@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class AllowPreserveRatioAttribute : Attribute
     {
-        public AllowPreserveRatioAttribute()
-        {
-            Value = "true";
-        }
-
-        public AllowPreserveRatioAttribute(string InValue)
+        public AllowPreserveRatioAttribute(string InValue = "true")
         {
             Value = InValue;
         }
