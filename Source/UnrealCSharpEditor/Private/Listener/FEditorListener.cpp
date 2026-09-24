@@ -753,7 +753,7 @@ void FEditorListener::WaitForCompile()
 			TickProgressWindow(ProgressWindow);
 		}
 
-		FPlatformProcess::SleepNoStats(0.0005f);
+		FPlatformProcess::SleepNoStats(FCSharpCompiler::PollIntervalSeconds);
 
 		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
 

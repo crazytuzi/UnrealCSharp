@@ -45,12 +45,16 @@ public:
 	static EDynamicType GetDynamicType(const FString& InFile, FClassReflection*& OutClass);
 
 private:
-	static const FString* FindDynamicName(const FString& InFile);
+	static FString FindDynamicName(const FString& InFile);
 
 	static bool IsDynamicFile(const FString& InFile);
 
+	static TSharedPtr<const TMap<FString, FString>, ESPMode::ThreadSafe> GetCodeAnalysisDynamicFilesMap();
+
 	static bool bIsFullGenerator;
 
-	static TMap<FString, FString> CodeAnalysisDynamicFilesMap;
+	static FCriticalSection CriticalSection;
+
+	static TSharedPtr<const TMap<FString, FString>, ESPMode::ThreadSafe> CodeAnalysisDynamicFilesMap;
 #endif
 };

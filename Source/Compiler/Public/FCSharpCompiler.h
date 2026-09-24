@@ -27,6 +27,11 @@ public:
 
 	FString GetCompileProgress() const;
 
+public:
+	static constexpr int32 PollsPerSecond = 120;
+
+	static constexpr float PollIntervalSeconds = 1.0f / PollsPerSecond;
+
 private:
 	class FCSharpCompilerRunnable* Runnable;
 

@@ -1566,7 +1566,8 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
                                                const FString& InWorkingDirectory,
-                                               const TFunction<void(const FString&)>& InOnOutput)
+                                               const TFunction<void(const FString&)>& InOnOutput,
+                                               const TFunction<bool()>& InIsStopped)
 {
 	void* ReadPipe = nullptr;
 
@@ -1598,7 +1599,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
-	const auto ReadOutput = [&]()
+	const auto ReadOutput = [&]() -> bool
 	{
 		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
 			!Output.IsEmpty())
@@ -1609,21 +1610,61 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 			{
 				InOnOutput(Output);
 			}
+
+			return true;
 		}
+
+		return false;
 	};
+
+	const auto StartTime = FPlatformTime::Seconds();
+
+	auto LastOutputTime = StartTime;
+
+	auto bCancelled = false;
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
-		FPlatformProcess::Sleep(0.01f);
+		constexpr auto SyncProcessSilenceTimeoutSeconds = 120.0;
 
-		ReadOutput();
+		constexpr auto SyncProcessTimeoutSeconds = 600.0;
+
+		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
+
+		const auto Now = FPlatformTime::Seconds();
+
+		const auto bIsStopped = InIsStopped && InIsStopped();
+
+		const auto bIsTimeout = Now - StartTime > SyncProcessTimeoutSeconds;
+
+		const auto bIsSilenceTimeout = Now - LastOutputTime > SyncProcessSilenceTimeoutSeconds;
+
+		if (bIsStopped || bIsTimeout || bIsSilenceTimeout)
+		{
+			bCancelled = true;
+
+			FPlatformProcess::TerminateProc(ProcessHandle, true);
+
+			break;
+		}
+
+		FPlatformProcess::SleepNoStats(SyncProcessPollIntervalSeconds);
+
+		if (ReadOutput())
+		{
+			LastOutputTime = FPlatformTime::Seconds();
+		}
 	}
 
 	ReadOutput();
 
 	auto ReturnCode = 0;
 
-	if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	if (bCancelled)
+	{
+		ReturnCode = -2;
+	}
+	else if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
 		ReturnCode = -1;
 	}

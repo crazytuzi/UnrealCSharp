@@ -47,6 +47,13 @@ private:
 
 	bool CompileGame(FString& OutResult, const TFunction<void(const FString&)>& InOnOutput);
 
+	void CompileInternal(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction, bool bCompileInterop,
+	                     bool bForceCompileInterop, bool bReloadImmediately);
+
+	void AcquireCompile();
+
+	void ReleaseCompile();
+
 	void ShowCompileResultNotification(bool bSucceeded) const;
 
 private:
@@ -55,27 +62,36 @@ private:
 	void OnEndGenerator();
 
 private:
+	struct FCSharpCompileNotification
+	{
+		FCSharpCompileProgress Progress;
+
+		TSharedPtr<SNotificationItem> NotificationItem;
+
+		FTSTicker::FDelegateHandle ProgressTickerHandle;
+
+		std::atomic<bool> bIsCompiling{false};
+
+		std::atomic<bool> bIsAlive{true};
+	};
+
 	FDelegateHandle OnBeginGeneratorDelegateHandle;
 
 	FDelegateHandle OnEndGeneratorDelegateHandle;
 
-	FTSTicker::FDelegateHandle ProgressTickerHandle;
-
-	TQueue<bool> Tasks;
-
 	TArray<FFileChangeData> FileChanges;
 
-	FCriticalSection CriticalSection;
+	mutable FCriticalSection CriticalSection;
 
 	FEvent* Event;
 
 	std::atomic<bool> bIsCompiling;
 
-	bool bIsGenerating;
+	std::atomic<bool> bIsGenerating;
 
-	bool bIsStopped;
+	std::atomic<bool> bIsStopped;
 
-	FCSharpCompileProgress CompileProgress;
+	std::atomic<bool> bIsPending;
 
-	TSharedPtr<SNotificationItem> NotificationItem;
+	const TSharedRef<FCSharpCompileNotification> CompileNotification = MakeShared<FCSharpCompileNotification>();
 };

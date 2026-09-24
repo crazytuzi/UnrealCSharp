@@ -12,7 +12,9 @@
 #if WITH_EDITOR
 bool FDynamicGenerator::bIsFullGenerator{};
 
-TMap<FString, FString> FDynamicGenerator::CodeAnalysisDynamicFilesMap{};
+FCriticalSection FDynamicGenerator::CriticalSection{};
+
+TSharedPtr<const TMap<FString, FString>, ESPMode::ThreadSafe> FDynamicGenerator::CodeAnalysisDynamicFilesMap{};
 #endif
 
 void FDynamicGenerator::Generator()
@@ -96,12 +98,15 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 
 void FDynamicGenerator::SetCodeAnalysisDynamicFilesMap()
 {
-	CodeAnalysisDynamicFilesMap = FUnrealCSharpFunctionLibrary::LoadFileToString(FString::Printf(TEXT(
-		"%s/%s.json"
-	),
-		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		*DYNAMIC_FILE
-	));
+	FScopeLock ScopeLock(&CriticalSection);
+
+	CodeAnalysisDynamicFilesMap = MakeShared<TMap<FString, FString>, ESPMode::ThreadSafe>(
+		FUnrealCSharpFunctionLibrary::LoadFileToString(FString::Printf(TEXT(
+			"%s/%s.json"
+		),
+		                                                               *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		                                                               *DYNAMIC_FILE
+		)));
 }
 
 FString FDynamicGenerator::GetDynamicFile(const UClass* InClass)
@@ -115,9 +120,15 @@ FString FDynamicGenerator::GetDynamicFile(const UClass* InClass)
 
 FString FDynamicGenerator::GetDynamicFile(const FString& InName)
 {
-	const auto FoundDynamicFile = CodeAnalysisDynamicFilesMap.Find(InName);
+	if (const auto FoundCodeAnalysisDynamicFilesMap = GetCodeAnalysisDynamicFilesMap())
+	{
+		if (const auto FoundDynamicFile = FoundCodeAnalysisDynamicFilesMap->Find(InName))
+		{
+			return *FoundDynamicFile;
+		}
+	}
 
-	return FoundDynamicFile != nullptr ? *FoundDynamicFile : FString{};
+	return {};
 }
 
 FString FDynamicGenerator::GetDynamicNormalizeFile(const UClass* InClass)
@@ -195,24 +206,6 @@ bool FDynamicGenerator::HasDynamicFileChanged(const TArray<FFileChangeData>& InF
 	return false;
 }
 
-bool FDynamicGenerator::IsDynamicFile(const FString& InFile)
-{
-	return FindDynamicName(InFile) != nullptr;
-}
-
-const FString* FDynamicGenerator::FindDynamicName(const FString& InFile)
-{
-	for (const auto& [Name, File] : CodeAnalysisDynamicFilesMap)
-	{
-		if (FPaths::IsSamePath(File, InFile))
-		{
-			return &Name;
-		}
-	}
-
-	return nullptr;
-}
-
 void FDynamicGenerator::OnPrePIEEnded(const bool bIsSimulating)
 {
 	FDynamicClassGenerator::OnPrePIEEnded(bIsSimulating);
@@ -225,17 +218,46 @@ bool FDynamicGenerator::IsFullGenerator()
 
 EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, FClassReflection*& OutClass)
 {
-	if (const auto Name = FindDynamicName(InFile))
+	if (const auto Name = FindDynamicName(InFile);
+		!Name.IsEmpty())
 	{
-		if (auto Index = 0; Name->FindLastChar(TEXT('.'), Index))
+		if (auto Index = 0; Name.FindLastChar(TEXT('.'), Index))
 		{
 			OutClass = FReflectionRegistry::Get().GetClass(
-				Name->Left(Index), Name->Right(Name->Len() - Index - 1));
+				Name.Left(Index), Name.Right(Name.Len() - Index - 1));
 
-			return FDynamicGeneratorCore::GetDynamicType(*Name);
+			return FDynamicGeneratorCore::GetDynamicType(Name);
 		}
 	}
 
 	return EDynamicType::None;
+}
+
+FString FDynamicGenerator::FindDynamicName(const FString& InFile)
+{
+	if (const auto FoundCodeAnalysisDynamicFilesMap = GetCodeAnalysisDynamicFilesMap())
+	{
+		for (const auto& [Name, File] : *FoundCodeAnalysisDynamicFilesMap)
+		{
+			if (FPaths::IsSamePath(File, InFile))
+			{
+				return Name;
+			}
+		}
+	}
+
+	return {};
+}
+
+bool FDynamicGenerator::IsDynamicFile(const FString& InFile)
+{
+	return !FindDynamicName(InFile).IsEmpty();
+}
+
+TSharedPtr<const TMap<FString, FString>, ESPMode::ThreadSafe> FDynamicGenerator::GetCodeAnalysisDynamicFilesMap()
+{
+	FScopeLock ScopeLock(&CriticalSection);
+
+	return CodeAnalysisDynamicFilesMap;
 }
 #endif
