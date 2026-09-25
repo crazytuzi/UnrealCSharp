@@ -291,8 +291,10 @@ namespace
 				return;
 			}
 
-			if (InClass->FindFunctionByName(*InFunctionName))
+			if (const auto FoundFunction = InClass->FindFunctionByName(*InFunctionName))
 			{
+				FoundFunction->RemoveFromRoot();
+
 				return;
 			}
 

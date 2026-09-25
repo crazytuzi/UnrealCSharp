@@ -84,7 +84,7 @@ private:
 
 	FDelegateHandle OnApplicationActivationStateChangedDelegateHandle;
 
-	FDelegateHandle OnDirectoryChangedDelegateHandle;
+	TMap<FString, FDelegateHandle> OnDirectoryChangedDelegateHandles;
 
 	FDelegateHandle OnBlueprintCompiledDelegateHandle;
 

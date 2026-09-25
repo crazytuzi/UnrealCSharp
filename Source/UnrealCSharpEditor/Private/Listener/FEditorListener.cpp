@@ -88,12 +88,16 @@ FEditorListener::FEditorListener() :
 
 		for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 		{
+			FDelegateHandle OnDirectoryChangedDelegateHandle;
+
 			DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
 				Directory,
 				IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
 				OnDirectoryChangedDelegateHandle,
 				IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
 			);
+
+			OnDirectoryChangedDelegateHandles.Add(Directory, OnDirectoryChangedDelegateHandle);
 		}
 	}
 }
@@ -107,16 +111,18 @@ FEditorListener::~FEditorListener()
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
 		}
 
-		if (OnDirectoryChangedDelegateHandle.IsValid())
+		if (!OnDirectoryChangedDelegateHandles.IsEmpty())
 		{
 			auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 				TEXT("DirectoryWatcher"));
 
-			for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+			for (const auto& [Directory, OnDirectoryChangedDelegateHandle] : OnDirectoryChangedDelegateHandles)
 			{
 				DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
 					Directory, OnDirectoryChangedDelegateHandle);
 			}
+
+			OnDirectoryChangedDelegateHandles.Empty();
 		}
 
 		if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
