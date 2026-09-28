@@ -7,10 +7,11 @@ FMulticastDelegateHelper::FMulticastDelegateHelper() :
 }
 
 FMulticastDelegateHelper::FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate,
-                                                   UFunction* InSignatureFunction) :
+                                                   UFunction* InSignatureFunction,
+                                                   FMulticastDelegateProperty* InProperty, void* InAddress) :
 	FDelegateBaseHelper(InMulticastDelegate)
 {
-	Initialize(InMulticastDelegate, InSignatureFunction);
+	Initialize(InMulticastDelegate, InSignatureFunction, InProperty, InAddress);
 }
 
 FMulticastDelegateHelper::~FMulticastDelegateHelper()
@@ -18,7 +19,9 @@ FMulticastDelegateHelper::~FMulticastDelegateHelper()
 	Deinitialize();
 }
 
-void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction)
+void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastDelegate,
+                                          UFunction* InSignatureFunction,
+                                          FMulticastDelegateProperty* InProperty, void* InAddress)
 {
 	MulticastDelegateHandler = NewObject<UMulticastDelegateHandler>();
 
@@ -27,7 +30,8 @@ void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastD
 	MulticastDelegateHandler->Initialize(InMulticastDelegate,
 	                                     InSignatureFunction != nullptr
 		                                     ? InSignatureFunction
-		                                     : MulticastDelegateHandler->GetCallBack());
+		                                     : MulticastDelegateHandler->GetCallBack(),
+	                                     InProperty, InAddress);
 }
 
 void FMulticastDelegateHelper::Deinitialize()

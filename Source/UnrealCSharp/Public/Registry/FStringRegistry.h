@@ -21,8 +21,16 @@ public:
 		template <typename>
 		friend struct TOwnedValue;
 
+		template <typename U>
+		static void DestroyValue(U* InValue)
+		{
+			InValue->~U();
+		}
+
 		void FreeImplementation()
 		{
+			DestroyValue(TValueWrapper<T>::Value);
+
 			FMemory::Free(TValueWrapper<T>::Value);
 
 			TValueWrapper<T>::Value = nullptr;

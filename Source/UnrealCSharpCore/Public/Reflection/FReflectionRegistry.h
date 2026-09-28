@@ -92,6 +92,8 @@ public:
 
 	FClassReflection* GetTArrayClass() const;
 
+	FClassReflection* GetTFieldPathClass() const;
+
 #if UE_F_OPTIONAL_PROPERTY
 	FClassReflection* GetTOptionalClass() const;
 #endif
@@ -670,6 +672,8 @@ private:
 	FClassReflection* TSetClass{};
 
 	FClassReflection* TArrayClass{};
+
+	FClassReflection* TFieldPathClass{};
 
 #if UE_F_OPTIONAL_PROPERTY
 	FClassReflection* TOptionalClass{};

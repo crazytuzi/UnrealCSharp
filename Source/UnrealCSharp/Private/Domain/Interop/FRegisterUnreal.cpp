@@ -143,32 +143,33 @@ namespace
 		{
 			if (const auto OwningObject = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InOwningObject))
 			{
-				const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InUserWidgetClass);
+				if (const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InUserWidgetClass))
+				{
+					UUserWidget* UserWidget{};
 
-				UUserWidget* UserWidget{};
+					if (OwningObject->IsA(UWidget::StaticClass()))
+					{
+						UserWidget = CreateWidget(Cast<UWidget>(OwningObject), Class);
+					}
+					else if (OwningObject->IsA(UWidgetTree::StaticClass()))
+					{
+						UserWidget = CreateWidget(Cast<UWidgetTree>(OwningObject), Class);
+					}
+					else if (OwningObject->IsA(APlayerController::StaticClass()))
+					{
+						UserWidget = CreateWidget(Cast<APlayerController>(OwningObject), Class);
+					}
+					else if (OwningObject->IsA(UGameInstance::StaticClass()))
+					{
+						UserWidget = CreateWidget(Cast<UGameInstance>(OwningObject), Class);
+					}
+					else if (OwningObject->IsA(UWorld::StaticClass()))
+					{
+						UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
+					}
 
-				if (OwningObject->IsA(UWidget::StaticClass()))
-				{
-					UserWidget = CreateWidget(Cast<UWidget>(OwningObject), Class);
+					return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
 				}
-				else if (OwningObject->IsA(UWidgetTree::StaticClass()))
-				{
-					UserWidget = CreateWidget(Cast<UWidgetTree>(OwningObject), Class);
-				}
-				else if (OwningObject->IsA(APlayerController::StaticClass()))
-				{
-					UserWidget = CreateWidget(Cast<APlayerController>(OwningObject), Class);
-				}
-				else if (OwningObject->IsA(UGameInstance::StaticClass()))
-				{
-					UserWidget = CreateWidget(Cast<UGameInstance>(OwningObject), Class);
-				}
-				else if (OwningObject->IsA(UWorld::StaticClass()))
-				{
-					UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
-				}
-
-				return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
 			}
 
 			return InvalidManagedHandle;

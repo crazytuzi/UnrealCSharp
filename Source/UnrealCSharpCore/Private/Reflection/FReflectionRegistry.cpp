@@ -94,6 +94,9 @@ void FReflectionRegistry::Initialize()
 	TArrayClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY);
 
+	TFieldPathClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_FIELD_PATH);
+
 #if UE_F_OPTIONAL_PROPERTY
 	TOptionalClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL);
@@ -1126,6 +1129,11 @@ FClassReflection* FReflectionRegistry::GetTSetClass() const
 FClassReflection* FReflectionRegistry::GetTArrayClass() const
 {
 	return TArrayClass;
+}
+
+FClassReflection* FReflectionRegistry::GetTFieldPathClass() const
+{
+	return TFieldPathClass;
 }
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -2406,4 +2414,3 @@ FClassReflection* FReflectionRegistry::GetArrayParamAttributeClass() const
 	return ArrayParamAttributeClass;
 }
 #endif
-

@@ -78,6 +78,8 @@ void FCSharpEnvironment::Initialize()
 
 	StringRegistry = new FStringRegistry();
 
+	FieldPathRegistry = new FFieldPathRegistry();
+
 	BindingRegistry = new FBindingRegistry();
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -195,6 +197,13 @@ void FCSharpEnvironment::Deinitialize()
 		delete StringRegistry;
 
 		StringRegistry = nullptr;
+	}
+
+	if (FieldPathRegistry != nullptr)
+	{
+		delete FieldPathRegistry;
+
+		FieldPathRegistry = nullptr;
 	}
 
 	if (MultiRegistry != nullptr)
@@ -570,6 +579,31 @@ IManagedHandle FCSharpEnvironment::GetObject(UScriptStruct* InScriptStruct, cons
 bool FCSharpEnvironment::RemoveStructReference(const IManagedHandle InManagedHandle) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InManagedHandle) : false;
+}
+
+IManagedHandle FCSharpEnvironment::GetFieldPathObject(const void* InAddress) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetManagedHandle(InAddress) : InvalidManagedHandle;
+}
+
+FFieldPath* FCSharpEnvironment::GetFieldPath(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetFieldPath(InManagedHandle) : nullptr;
+}
+
+FField* FCSharpEnvironment::GetField(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetField(InManagedHandle) : nullptr;
+}
+
+IManagedHandle FCSharpEnvironment::GetFieldObject(FField* InField) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetFieldObject(InField) : InvalidManagedHandle;
+}
+
+bool FCSharpEnvironment::RemoveFieldPathReference(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->RemoveReference(InManagedHandle) : false;
 }
 
 IManagedHandle FCSharpEnvironment::GeManagedHandle(const UObject* InObject) const

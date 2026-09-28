@@ -60,9 +60,12 @@ public:
 	template <typename BufferAllocatorType, typename EmptyBufferAllocatorType = FFunctionParamEmptyBufferAllocator>
 	static TSharedRef<FFunctionParamBufferAllocator> Factory(const TWeakObjectPtr<UFunction>& InFunction)
 	{
-		if (InFunction->ParmsSize > 0)
+		if (const auto FoundFunction = InFunction.Get())
 		{
-			return MakeShared<BufferAllocatorType>(InFunction);
+			if (FoundFunction->ParmsSize > 0)
+			{
+				return MakeShared<BufferAllocatorType>(InFunction);
+			}
 		}
 
 		static EmptyBufferAllocatorType EmptyBufferAllocator;

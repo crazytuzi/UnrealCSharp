@@ -9,7 +9,7 @@ namespace
 	{
 		static FMatrix MultipliesImplementation(const FMatrix& In, const FMatrix::FReal Other)
 		{
-			return &In != nullptr ? In * Other : decltype(In * Other)();
+			return In * Other;
 		}
 
 		FRegisterMatrix()

@@ -20,8 +20,12 @@ void FFunctionParamBufferAllocator::Free(void* InMemory)
 FFunctionParamPoolBufferAllocator::FFunctionParamPoolBufferAllocator(
 	const TWeakObjectPtr<UFunction>& InFunction) :
 	Count(0),
-	ParamSize(InFunction->ParmsSize)
+	ParamSize(0)
 {
+	if (const auto FoundFunction = InFunction.Get())
+	{
+		ParamSize = FoundFunction->ParmsSize;
+	}
 }
 
 FFunctionParamPoolBufferAllocator::~FFunctionParamPoolBufferAllocator()
@@ -56,11 +60,15 @@ void FFunctionParamPoolBufferAllocator::Free(void* InMemory)
 }
 
 FFunctionParamPersistentBufferAllocator::FFunctionParamPersistentBufferAllocator(
-	const TWeakObjectPtr<UFunction>& InFunction)
+	const TWeakObjectPtr<UFunction>& InFunction) :
+	Params(nullptr)
 {
-	Params = FMemory::Malloc(InFunction->ParmsSize, 16);
+	if (const auto FoundFunction = InFunction.Get())
+	{
+		Params = FMemory::Malloc(FoundFunction->ParmsSize, 16);
 
-	FMemory::Memzero(Params, InFunction->ParmsSize);
+		FMemory::Memzero(Params, FoundFunction->ParmsSize);
+	}
 }
 
 FFunctionParamPersistentBufferAllocator::~FFunctionParamPersistentBufferAllocator()

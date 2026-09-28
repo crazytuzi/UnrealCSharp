@@ -342,10 +342,9 @@ FClassReflection* FTypeBridge::GetClass(FProperty* InProperty)
 		return GetClass(SetProperty);
 	}
 
-	// @TODO
-	if (CastField<FFieldPathProperty>(InProperty))
+	if (const auto FieldPathProperty = CastField<FFieldPathProperty>(InProperty))
 	{
-		return nullptr;
+		return GetClass(FieldPathProperty);
 	}
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -583,6 +582,36 @@ FClassReflection* FTypeBridge::GetClass(const FSetProperty* InProperty)
 		const auto FoundClass = GetClass(InProperty->ElementProp);
 
 		return MakeGenericTypeInstance(FoundGenericClass, FoundClass);
+	}
+
+	return nullptr;
+}
+
+FClassReflection* FTypeBridge::GetClass(const FFieldPathProperty* InProperty)
+{
+	if (InProperty != nullptr)
+	{
+		const auto FoundGenericClass = FReflectionRegistry::Get().GetTFieldPathClass();
+
+		const auto FoundClass = GetClass(InProperty->PropertyClass);
+
+		return MakeGenericTypeInstance(FoundGenericClass, FoundClass);
+	}
+
+	return nullptr;
+}
+
+FClassReflection* FTypeBridge::GetClass(const FFieldClass* InFieldClass)
+{
+	if (InFieldClass != nullptr)
+	{
+		return FReflectionRegistry::Get().GetClass(
+			COMBINE_NAMESPACE(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_REFLECTION),
+			                  NAMESPACE_REFLECTION_PROPERTY),
+			FString::Printf(TEXT(
+				"F%s"
+			),
+			                *InFieldClass->GetName()));
 	}
 
 	return nullptr;

@@ -4,12 +4,12 @@
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, Src);
 }
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, nullptr);
 }
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
@@ -26,8 +26,6 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
-
 	if (SrcMulticastDelegateHelper != nullptr)
 	{
 		FScriptDelegate ScriptDelegate;
@@ -35,7 +33,18 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 		ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
 		                             SrcMulticastDelegateHelper->GetFunctionName());
 
-		MulticastScriptDelegate->Add(ScriptDelegate);
+		if (const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest)))
+		{
+			MulticastScriptDelegate->Add(ScriptDelegate);
+		}
+		else if (ScriptDelegate.IsBound())
+		{
+			FMulticastScriptDelegate MulticastDelegate;
+
+			MulticastDelegate.Add(ScriptDelegate);
+
+			Property->SetMulticastDelegate(Dest, MulticastDelegate);
+		}
 	}
 }
 
@@ -65,7 +74,7 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) con
 		{
 			const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
 				const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
-				Property->SignatureFunction);
+				Property->SignatureFunction, Property, InAddress);
 
 			Object = Class->NewObject(true);
 
@@ -80,7 +89,7 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) con
 	return Object;
 }
 
-IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
+IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress, void* InPropertyAddress) const
 {
 	auto Object = InvalidManagedHandle;
 
@@ -88,7 +97,7 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress)
 	{
 		const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
 			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
-			Property->SignatureFunction);
+			Property->SignatureFunction, Property, InPropertyAddress);
 
 		Object = Class->NewObject(true);
 

@@ -49,7 +49,7 @@ namespace
 			const auto AnsiString = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InManagedHandle);
 
 			return AnsiString != nullptr
-				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FAnsiString(*AnsiString)))
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FString(**AnsiString)))
 				       : InvalidManagedHandle;
 		}
 

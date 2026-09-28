@@ -8,82 +8,82 @@ namespace
 	{
 		static FVector::FReal BitOrImplementation(const FVector& In, const FVector& V)
 		{
-			return &In != nullptr && (&V != nullptr) ? In | V : decltype(In | V)();
+			return In | V;
 		}
 
 		static FVector MinusImplementation(const FVector& In, const int32 Bias)
 		{
-			return &In != nullptr ? In - Bias : decltype(In - Bias)();
+			return In - Bias;
 		}
 
 		static FVector MinusImplementation(const FVector& In, const float Bias)
 		{
-			return &In != nullptr ? In - Bias : decltype(In - Bias)();
+			return In - Bias;
 		}
 
 		static FVector MinusImplementation(const FVector& In, const double Bias)
 		{
-			return &In != nullptr ? In - Bias : decltype(In - Bias)();
+			return In - Bias;
 		}
 
 		static FVector PlusImplementation(const FVector& In, const int32 Bias)
 		{
-			return &In != nullptr ? In + Bias : decltype(In + Bias)();
+			return In + Bias;
 		}
 
 		static FVector PlusImplementation(const FVector& In, const float Bias)
 		{
-			return &In != nullptr ? In + Bias : decltype(In + Bias)();
+			return In + Bias;
 		}
 
 		static FVector PlusImplementation(const FVector& In, const double Bias)
 		{
-			return &In != nullptr ? In + Bias : decltype(In + Bias)();
+			return In + Bias;
 		}
 
 		static FVector MultipliesImplementation(const FVector& In, const int32 Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		static FVector MultipliesImplementation(const FVector& In, const float Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		static FVector MultipliesImplementation(const FVector& In, const double Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		static FVector MultipliesImplementation(const int32 Scale, const FVector& In)
 		{
-			return &In != nullptr ? Scale * In : decltype(Scale * In)();
+			return Scale * In;
 		}
 
 		static FVector MultipliesImplementation(const float Scale, const FVector& In)
 		{
-			return &In != nullptr ? Scale * In : decltype(Scale * In)();
+			return Scale * In;
 		}
 
 		static FVector MultipliesImplementation(const double Scale, const FVector& In)
 		{
-			return &In != nullptr ? Scale * In : decltype(Scale * In)();
+			return Scale * In;
 		}
 
 		static FVector DividesImplementation(const FVector& In, const int32 Scale)
 		{
-			return &In != nullptr ? In / Scale : decltype(In / Scale)();
+			return In / Scale;
 		}
 
 		static FVector DividesImplementation(const FVector& In, const float Scale)
 		{
-			return &In != nullptr ? In / Scale : decltype(In / Scale)();
+			return In / Scale;
 		}
 
 		static FVector DividesImplementation(const FVector& In, const double Scale)
 		{
-			return &In != nullptr ? In / Scale : decltype(In / Scale)();
+			return In / Scale;
 		}
 
 		FRegisterVector()

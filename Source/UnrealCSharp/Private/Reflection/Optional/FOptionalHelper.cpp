@@ -88,6 +88,8 @@ void FOptionalHelper::Set(void* InValue) const
 {
 	OptionalProperty->MarkSetAndGetInitializedValuePointerToReplace(Data);
 
+	ValuePropertyDescriptor->DestroyValue(Data);
+
 	ValuePropertyDescriptor->Set(InValue, Data);
 }
 

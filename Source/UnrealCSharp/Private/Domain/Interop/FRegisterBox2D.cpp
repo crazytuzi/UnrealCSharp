@@ -10,7 +10,7 @@ namespace
 	{
 		static FBox2D PlusImplementation(const FBox2D& In, const FVector2D& Other)
 		{
-			return &In != nullptr && (&Other != nullptr) ? In + Other : decltype(In + Other)();
+			return In + Other;
 		}
 
 		FRegisterBox2D()

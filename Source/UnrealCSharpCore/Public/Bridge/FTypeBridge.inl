@@ -396,29 +396,32 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetPathName();
 
-			const auto InEnum = LoadObject<UEnum>(nullptr, *PathName);
-
-#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
-#else
-			const auto EnumProperty = new FEnumProperty(InOwner, InName);
-#endif
-
-			if (const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
-			                                            EnumProperty, "", EObjectFlags::RF_NoFlags))
+			if (const auto InEnum = LoadObject<UEnum>(nullptr, *PathName))
 			{
-#if UE_F_PROPERTY_SET_ELEMENT_SIZE && UE_F_PROPERTY_GET_ELEMENT_SIZE
-				EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+				const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
 #else
-				EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
+				const auto EnumProperty = new FEnumProperty(InOwner, InName);
 #endif
 
-				EnumProperty->SetEnum(InEnum);
+				if (const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
+				                                            EnumProperty, "", EObjectFlags::RF_NoFlags))
+				{
+#if UE_F_PROPERTY_SET_ELEMENT_SIZE && UE_F_PROPERTY_GET_ELEMENT_SIZE
+					EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
+#else
+					EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
+#endif
 
-				EnumProperty->AddCppProperty(UnderlyingProperty);
+					EnumProperty->SetEnum(InEnum);
+
+					EnumProperty->AddCppProperty(UnderlyingProperty);
+				}
+
+				return EnumProperty;
 			}
 
-			return EnumProperty;
+			return nullptr;
 		}
 
 	case EPropertyTypeExtent::WeakObjectReference:

@@ -8,12 +8,12 @@ namespace
 	{
 		static FFrameTime MultipliesImplementation(const FFrameTime& In, const float Scalar)
 		{
-			return &In != nullptr ? In * Scalar : decltype(In * Scalar)();
+			return In * Scalar;
 		}
 
 		static FFrameTime DividesImplementation(const FFrameTime& In, const float Scalar)
 		{
-			return &In != nullptr ? In / Scalar : decltype(In / Scalar)();
+			return In / Scalar;
 		}
 
 		FRegisterFrameTime()

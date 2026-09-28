@@ -25,5 +25,5 @@ protected:
 private:
 	IManagedHandle NewRef(void* InAddress) const;
 
-	IManagedHandle NewWeakRef(void* InAddress) const;
+	IManagedHandle NewWeakRef(void* InAddress, void* InPropertyAddress) const;
 };

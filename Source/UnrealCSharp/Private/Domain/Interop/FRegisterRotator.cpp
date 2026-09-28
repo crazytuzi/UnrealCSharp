@@ -9,17 +9,17 @@ namespace
 	{
 		static FRotator MultipliesImplementation(const FRotator& In, const int32 Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		static FRotator MultipliesImplementation(const FRotator& In, const float Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		static FRotator MultipliesImplementation(const FRotator& In, const double Scale)
 		{
-			return &In != nullptr ? In * Scale : decltype(In * Scale)();
+			return In * Scale;
 		}
 
 		FRegisterRotator()

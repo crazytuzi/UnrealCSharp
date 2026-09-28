@@ -118,9 +118,13 @@ namespace
 
 			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
-				const auto Value = OptionalHelper->Get();
+				if (OptionalHelper->IsSet())
+				{
+					const auto Value = OptionalHelper->Get();
 
-				OptionalHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+					OptionalHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue),
+					                                                  FPropertyArgument::FMember());
+				}
 			}
 
 			return ReturnValue;
