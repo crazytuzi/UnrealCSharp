@@ -20,18 +20,29 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FDelegateHelper>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FDelegateHelper>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static void BindImplementation(const IManagedHandle InManagedHandle,
 		                               const IManagedHandle InObject,
 		                               const IManagedHandle InManagedType,
-		                               const IManagedHandle InManagedMethod)
+		                               const char* InMethodName,
+		                               const int32 InParamCount)
 		{
+			const auto MethodName = InMethodName != nullptr ? FString(UTF8_TO_TCHAR(InMethodName)) : FString(TEXT(""));
+
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
 			{
@@ -39,7 +50,7 @@ namespace
 				{
 					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(MethodName, InParamCount))
 						{
 							DelegateHelper->Bind(FoundObject, FoundMethod);
 						}

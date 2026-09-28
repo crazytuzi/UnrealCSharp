@@ -52,11 +52,23 @@ namespace Script.Library
 
         private static unsafe partial nint __TOptional_GetImplementation(nint InOptional);
 
-        public static unsafe object TOptional_GetImplementation(nint InOptional)
+        public static unsafe T TOptional_GetImplementation<T>(nint InOptional)
         {
             var Handle = __TOptional_GetImplementation(InOptional);
 
-            return Handle != 0 ? HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Object = HandleData.GetObject(Handle);
+
+                if (typeof(T).IsValueType)
+                {
+                    HandleData.FreeImplementation(Handle);
+                }
+
+                return (T)Object;
+            }
+
+            return default;
         }
 
         private static unsafe partial void __TOptional_SetImplementation(nint InOptional, nint InValue);

@@ -37,10 +37,17 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FUtf8String>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FUtf8String>(InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)

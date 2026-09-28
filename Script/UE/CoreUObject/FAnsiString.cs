@@ -1,16 +1,31 @@
+using System;
 #if UE_5_6_OR_LATER
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FAnsiString
+    public class FAnsiString : IDisposable
     {
         public FAnsiString()
         {
         }
 
-        ~FAnsiString() => FAnsiStringImplementation.FAnsiString_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FAnsiString() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FAnsiStringImplementation.FAnsiString_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FAnsiString(string InValue) =>
             FAnsiStringImplementation.FAnsiString_RegisterImplementation(this, InValue);

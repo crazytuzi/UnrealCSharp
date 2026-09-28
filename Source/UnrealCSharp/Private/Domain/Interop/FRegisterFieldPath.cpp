@@ -38,10 +38,17 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveFieldPathReference(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveFieldPathReference(InManagedHandle);
+				});
+			}
 		}
 
 		static void ResetImplementation(const IManagedHandle InManagedHandle)

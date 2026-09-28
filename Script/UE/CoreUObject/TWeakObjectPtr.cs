@@ -1,22 +1,36 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TWeakObjectPtr<T> where T : UObject
+    public class TWeakObjectPtr<T> : IDisposable where T : UObject
     {
         public TWeakObjectPtr()
         {
         }
 
-        ~TWeakObjectPtr() =>
-            TWeakObjectPtrImplementation.TWeakObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TWeakObjectPtr() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TWeakObjectPtrImplementation.TWeakObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public TWeakObjectPtr(T InObject) =>
             TWeakObjectPtrImplementation.TWeakObjectPtr_RegisterImplementation(
                 this, HandleData.GetHandle(InObject), GetType());
 
-        public static implicit operator TWeakObjectPtr<T>(T InObject) => new(InObject);
+        public static explicit operator TWeakObjectPtr<T>(T InObject) => new(InObject);
 
         public static bool operator ==(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B)
         {

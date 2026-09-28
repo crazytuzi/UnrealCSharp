@@ -1,15 +1,30 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FName
+    public class FName : IDisposable
     {
         public FName()
         {
         }
 
-        ~FName() => FNameImplementation.FName_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FName() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FNameImplementation.FName_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FName(string InValue) => FNameImplementation.FName_RegisterImplementation(this, InValue);
 

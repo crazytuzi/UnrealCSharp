@@ -160,8 +160,8 @@ namespace
 				                                           TArray<FString>{"A", "B"}))
 				.Function("Dot", BINDING_FUNCTION(&FVector::Dot,
 				                                  TArray<FString>{"V"}))
-				.Function("Dot", BINDING_FUNCTION(&FVector::DotProduct,
-				                                  TArray<FString>{"A", "B"}))
+				.Function("DotProduct", BINDING_FUNCTION(&FVector::DotProduct,
+				                                         TArray<FString>{"A", "B"}))
 				.Function("Equals", BINDING_FUNCTION(&FVector::Equals,
 				                                     TArray<FString>{"V", "Tolerance"}, KINDA_SMALL_NUMBER))
 				.Function("AllComponentsEqual", BINDING_FUNCTION(&FVector::AllComponentsEqual,

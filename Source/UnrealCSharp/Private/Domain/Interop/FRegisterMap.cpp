@@ -23,11 +23,19 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static void EmptyImplementation(const IManagedHandle InManagedHandle, const int32 InExpectedNumElements)

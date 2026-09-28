@@ -683,24 +683,6 @@ FMethodReflection* FClassReflection::GetMethod(const FString& InName, const int3
 	return nullptr;
 }
 
-FMethodReflection* FClassReflection::GetMethod(const IManagedHandle InManagedMethod)
-{
-	EnsureMethods();
-
-	for (const auto& [PLACEHOLDER, FoundMethods] : Methods)
-	{
-		for (const auto Method : FoundMethods)
-		{
-			if (Method->GetManagedMethod() == InManagedMethod)
-			{
-				return Method;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
 FMethodReflection* FClassReflection::GetParentMethod(const FString& InName, const int32 InParamCount) const
 {
 	auto Class = this;

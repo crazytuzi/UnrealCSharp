@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Text;
 using Interop;
 
 namespace Script.Library
@@ -27,40 +28,64 @@ namespace Script.Library
             return __FMulticastDelegate_IsBoundImplementation(InDelegate) != 0;
         }
 
-        private static unsafe partial byte __FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
+        private static unsafe partial byte __FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject,
+            nint InType, byte* InMethodName, int InParamCount);
 
-        public static bool FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject,
+        public static unsafe bool FMulticastDelegate_ContainsImplementation(nint InDelegate, nint InObject,
             Type InType, MethodInfo InMethodInfo)
         {
-            return __FMulticastDelegate_ContainsImplementation(InDelegate, InObject,
-                HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo)) != 0;
+            var UTF8 = Encoding.UTF8.GetBytes(InMethodInfo.Name + '\0');
+
+            fixed (byte* Ptr = UTF8)
+            {
+                return __FMulticastDelegate_ContainsImplementation(InDelegate, InObject,
+                    HandleData.Alloc(InType), Ptr, InMethodInfo.GetParameters().Length) != 0;
+            }
         }
 
-        private static unsafe partial void __FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
+        private static unsafe partial void __FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject,
+            nint InType, byte* InMethodName, int InParamCount);
 
-        public static void FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject, Type InType,
+        public static unsafe void FMulticastDelegate_AddImplementation(nint InDelegate, nint InObject, Type InType,
             MethodInfo InMethodInfo)
         {
-            __FMulticastDelegate_AddImplementation(InDelegate, InObject, HandleData.Alloc(InType),
-                HandleData.Alloc(InMethodInfo));
+            var UTF8 = Encoding.UTF8.GetBytes(InMethodInfo.Name + '\0');
+
+            fixed (byte* Ptr = UTF8)
+            {
+                __FMulticastDelegate_AddImplementation(InDelegate, InObject, HandleData.Alloc(InType), Ptr,
+                    InMethodInfo.GetParameters().Length);
+            }
         }
 
-        private static unsafe partial void __FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
+        private static unsafe partial void __FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject,
+            nint InType, byte* InMethodName, int InParamCount);
 
-        public static void FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject,
+        public static unsafe void FMulticastDelegate_AddUniqueImplementation(nint InDelegate, nint InObject,
             Type InType, MethodInfo InMethodInfo)
         {
-            __FMulticastDelegate_AddUniqueImplementation(InDelegate, InObject,
-                HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo));
+            var UTF8 = Encoding.UTF8.GetBytes(InMethodInfo.Name + '\0');
+
+            fixed (byte* Ptr = UTF8)
+            {
+                __FMulticastDelegate_AddUniqueImplementation(InDelegate, InObject, HandleData.Alloc(InType), Ptr,
+                    InMethodInfo.GetParameters().Length);
+            }
         }
 
-        private static unsafe partial void __FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
+        private static unsafe partial void __FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject,
+            nint InType, byte* InMethodName, int InParamCount);
 
-        public static void FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject, Type InType,
+        public static unsafe void FMulticastDelegate_RemoveImplementation(nint InDelegate, nint InObject, Type InType,
             MethodInfo InMethodInfo)
         {
-            __FMulticastDelegate_RemoveImplementation(InDelegate, InObject, HandleData.Alloc(InType),
-                HandleData.Alloc(InMethodInfo));
+            var UTF8 = Encoding.UTF8.GetBytes(InMethodInfo.Name + '\0');
+
+            fixed (byte* Ptr = UTF8)
+            {
+                __FMulticastDelegate_RemoveImplementation(InDelegate, InObject, HandleData.Alloc(InType), Ptr,
+                    InMethodInfo.GetParameters().Length);
+            }
         }
 
         private static unsafe partial void __FMulticastDelegate_RemoveAllImplementation(nint InDelegate, nint InObject);

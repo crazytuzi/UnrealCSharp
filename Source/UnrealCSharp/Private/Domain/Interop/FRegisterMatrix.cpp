@@ -75,7 +75,7 @@ namespace
 				                                      TArray<FString>{"Axis0", "Axis1", "Axis2", "Origin"}))
 				.Function("GetColumn", BINDING_FUNCTION(&FMatrix::GetColumn,
 				                                        TArray<FString>{"i"}))
-				.Function("GetColumn", BINDING_FUNCTION(&FMatrix::SetColumn,
+				.Function("SetColumn", BINDING_FUNCTION(&FMatrix::SetColumn,
 				                                        TArray<FString>{"i", "Value"}))
 				.Function("Rotator", BINDING_FUNCTION(&FMatrix::Rotator))
 				.Function("ToQuat", BINDING_FUNCTION(&FMatrix::ToQuat))

@@ -1,15 +1,30 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FText
+    public class FText : IDisposable
     {
         public FText()
         {
         }
 
-        ~FText() => FTextImplementation.FText_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FText() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FTextImplementation.FText_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FText(string InBuffer, string InTextNamespace = null, string InPackageNamespace = null,
             bool bRequiresQuotes = false) =>

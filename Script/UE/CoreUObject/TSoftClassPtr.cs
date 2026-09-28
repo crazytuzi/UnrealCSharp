@@ -1,22 +1,36 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TSoftClassPtr<T> where T : UObject
+    public class TSoftClassPtr<T> : IDisposable where T : UObject
     {
         public TSoftClassPtr()
         {
         }
 
-        ~TSoftClassPtr() =>
-            TSoftClassPtrImplementation.TSoftClassPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TSoftClassPtr() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TSoftClassPtrImplementation.TSoftClassPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public TSoftClassPtr(UClass InClass) =>
             TSoftClassPtrImplementation.TSoftClassPtr_RegisterImplementation(
                 this, HandleData.GetHandle(InClass), GetType());
 
-        public static implicit operator TSoftClassPtr<T>(UClass InClass) => new(InClass);
+        public static explicit operator TSoftClassPtr<T>(UClass InClass) => new(InClass);
 
         public static bool operator ==(TSoftClassPtr<T> A, TSoftClassPtr<T> B)
         {

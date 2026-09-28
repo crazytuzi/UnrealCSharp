@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
@@ -5,11 +6,25 @@ using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TSet<T> : IEnumerable<T>
+    public class TSet<T> : IEnumerable<T>, IDisposable
     {
         public TSet() => TSetImplementation.TSet_RegisterImplementation(this, GetType());
 
-        ~TSet() => TSetImplementation.TSet_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TSet() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TSetImplementation.TSet_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public IEnumerator<T> GetEnumerator()
         {

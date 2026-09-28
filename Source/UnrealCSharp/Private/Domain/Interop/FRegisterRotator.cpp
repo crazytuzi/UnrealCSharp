@@ -43,7 +43,7 @@ namespace
 				.Function("IsNearlyZero", BINDING_FUNCTION(&FRotator::IsNearlyZero,
 				                                           TArray<FString>{"Tolerance"}, KINDA_SMALL_NUMBER))
 				.Function("IsZero", BINDING_FUNCTION(&FRotator::IsZero))
-				.Function("Equals", BINDING_FUNCTION(&FRotator::IsNearlyZero,
+				.Function("Equals", BINDING_FUNCTION(&FRotator::Equals,
 				                                     TArray<FString>{"R", "Tolerance"}, KINDA_SMALL_NUMBER))
 				.Function("Add", BINDING_FUNCTION(&FRotator::Add,
 				                                  TArray<FString>{"DeltaPitch", "DeltaYaw", "DeltaRoll"}))
@@ -62,7 +62,7 @@ namespace
 				.Function("GetDenormalized", BINDING_FUNCTION(&FRotator::GetDenormalized))
 				.Function("GetComponentForAxis", BINDING_FUNCTION(&FRotator::GetComponentForAxis,
 				                                                  TArray<FString>{"Axis"}))
-				.Function("SetComponentForAxis", BINDING_FUNCTION(&FRotator::GetComponentForAxis,
+				.Function("SetComponentForAxis", BINDING_FUNCTION(&FRotator::SetComponentForAxis,
 				                                                  TArray<FString>{"Axis", "Component"}))
 				.Function("Normalize", BINDING_FUNCTION(&FRotator::Normalize))
 				.Function("GetWindingAndRemainder", BINDING_FUNCTION(&FRotator::GetWindingAndRemainder,

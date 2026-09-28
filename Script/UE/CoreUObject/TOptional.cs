@@ -1,17 +1,32 @@
+using System;
 #if UE_5_3_OR_LATER
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TOptional<T>
+    public class TOptional<T> : IDisposable
     {
         public TOptional() => TOptionalImplementation.TOptional_Register1Implementation(this, GetType());
 
         public TOptional(T InObject) =>
             TOptionalImplementation.TOptional_Register2Implementation(this, InObject, GetType());
 
-        ~TOptional() => TOptionalImplementation.TOptional_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TOptional() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TOptionalImplementation.TOptional_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public static bool operator ==(TOptional<T> A, TOptional<T> B)
         {
@@ -41,7 +56,7 @@ namespace Script.CoreUObject
 
         public bool IsSet() => TOptionalImplementation.TOptional_IsSetImplementation(HandleData.GetHandle(this));
 
-        public T Get() => (T)TOptionalImplementation.TOptional_GetImplementation(HandleData.GetHandle(this));
+        public T Get() => TOptionalImplementation.TOptional_GetImplementation<T>(HandleData.GetHandle(this));
 
         public void Set(T InValue) =>
             TOptionalImplementation.TOptional_SetImplementation(HandleData.GetHandle(this), InValue);

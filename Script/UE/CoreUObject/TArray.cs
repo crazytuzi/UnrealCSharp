@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
@@ -10,11 +11,25 @@ namespace Script.CoreUObject
         public static int INDEX_NONE => TArrayImplementation.TArray_INDEX_NONEImplementation();
     }
 
-    public class TArray<T> : IEnumerable<T>
+    public class TArray<T> : IEnumerable<T>, IDisposable
     {
         public TArray() => TArrayImplementation.TArray_RegisterImplementation(this, GetType());
 
-        ~TArray() => TArrayImplementation.TArray_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TArray() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TArrayImplementation.TArray_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public static bool operator ==(TArray<T> A, TArray<T> B)
         {

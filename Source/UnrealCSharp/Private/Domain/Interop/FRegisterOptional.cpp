@@ -71,6 +71,8 @@ namespace
 					}
 				}
 			}
+
+			FDomain::GCHandle_Free(InValue);
 		}
 
 		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
@@ -88,10 +90,17 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveOptionalReference(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveOptionalReference(InManagedHandle);
+				});
+			}
 		}
 
 		static void ResetImplementation(const IManagedHandle InManagedHandle)
@@ -145,6 +154,8 @@ namespace
 					OptionalHelper->Set(&ManagedHandle);
 				}
 			}
+
+			FDomain::GCHandle_Free(InValue);
 		}
 
 		FRegisterOptional()

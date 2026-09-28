@@ -1,22 +1,36 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TLazyObjectPtr<T> where T : UObject
+    public class TLazyObjectPtr<T> : IDisposable where T : UObject
     {
         public TLazyObjectPtr()
         {
         }
 
-        ~TLazyObjectPtr() =>
-            TLazyObjectPtrImplementation.TLazyObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TLazyObjectPtr() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TLazyObjectPtrImplementation.TLazyObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public TLazyObjectPtr(T InObject) =>
             TLazyObjectPtrImplementation.TLazyObjectPtr_RegisterImplementation(
                 this, HandleData.GetHandle(InObject), GetType());
 
-        public static implicit operator TLazyObjectPtr<T>(T InObject) => new(InObject);
+        public static explicit operator TLazyObjectPtr<T>(T InObject) => new(InObject);
 
         public static bool operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B)
         {

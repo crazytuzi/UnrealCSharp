@@ -62,8 +62,6 @@ public:
 
 	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
 
-	FMethodReflection* GetMethod(const IManagedHandle InManagedMethod);
-
 	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
 public:

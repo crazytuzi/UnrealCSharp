@@ -19,8 +19,6 @@ namespace
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, EForceInit))
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const FVector2D&, const FVector2D&),
 				             TArray<FString>{"InMin", "InMax"})
-				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const FVector2D*, const int32),
-				             TArray<FString>{"Points", "Count"})
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const TArray<FVector2D>&),
 				             TArray<FString>{"Points"})
 				.Plus()

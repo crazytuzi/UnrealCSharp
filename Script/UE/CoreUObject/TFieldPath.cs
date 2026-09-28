@@ -1,10 +1,11 @@
+using System;
 using Script.Library;
 using Script.Reflection.Property;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TFieldPath<T> where T : FField
+    public class TFieldPath<T> : IDisposable where T : FField
     {
         public TFieldPath() =>
             TFieldPathImplementation.TFieldPath_Register1Implementation(HandleData.Alloc(this, true));
@@ -12,7 +13,21 @@ namespace Script.CoreUObject
         public TFieldPath(T InObject) => TFieldPathImplementation.TFieldPath_Register2Implementation(
             HandleData.Alloc(this, true), HandleData.GetHandle(InObject));
 
-        ~TFieldPath() => TFieldPathImplementation.TFieldPath_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TFieldPath() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TFieldPathImplementation.TFieldPath_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public bool IsValid() => TFieldPathImplementation.TFieldPath_IsValidImplementation(HandleData.GetHandle(this));
 
