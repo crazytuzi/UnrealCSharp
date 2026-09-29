@@ -214,6 +214,10 @@ void SetClass(const FString& InPathName, const TFunction<void()>& InSetClass)
 				});
 			}
 		}
+		else
+		{
+			InSetClass();
+		}
 	}
 	else
 	{

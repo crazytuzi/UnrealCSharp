@@ -36,6 +36,8 @@ void FDynamicGenerator::Generator()
 		FDynamicGeneratorCore::Generator();
 	});
 
+	FDynamicGeneratorCore::Empty();
+
 #if WITH_EDITOR
 	bIsFullGenerator = false;
 #endif

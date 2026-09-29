@@ -685,6 +685,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	UsingNameSpaces.Remove(NameSpaceContent[0]);
 
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
@@ -970,6 +972,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	}
 
 	UsingNameSpaceContent += TEXT("using Interop;\n");
+
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{

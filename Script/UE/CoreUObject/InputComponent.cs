@@ -18,30 +18,41 @@ namespace Script.Engine
 
             if (InputActionDelegateBinding != null)
             {
-                foreach (var InputActionDelegate in InputActionDelegateBinding.InputActionDelegateBindings)
+                var Bindings = InputActionDelegateBinding.InputActionDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputActionDelegate = Bindings[BindingIndex];
+
                     if (InputActionDelegate.InputActionName == InActionName &&
                         InputActionDelegate.InputKeyEvent == InKeyEvent &&
                         InputActionDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputActionDelegateBinding
+                if (Index < 0)
                 {
-                    InputActionName = InActionName,
-                    InputKeyEvent = InKeyEvent,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputActionDelegateBinding
+                    {
+                        InputActionName = InActionName,
+                        InputKeyEvent = InKeyEvent,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputActionDelegateBinding.InputActionDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindActionImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputActionDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -54,28 +65,39 @@ namespace Script.Engine
 
             if (InputAxisDelegateBinding != null)
             {
-                foreach (var InputAxisDelegate in InputAxisDelegateBinding.InputAxisDelegateBindings)
+                var Bindings = InputAxisDelegateBinding.InputAxisDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputAxisDelegate = Bindings[BindingIndex];
+
                     if (InputAxisDelegate.InputAxisName == InAxisName &&
                         InputAxisDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputAxisDelegateBinding
+                if (Index < 0)
                 {
-                    InputAxisName = InAxisName,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputAxisDelegateBinding
+                    {
+                        InputAxisName = InAxisName,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputAxisDelegateBinding.InputAxisDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindAxisImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputAxisDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -88,28 +110,39 @@ namespace Script.Engine
 
             if (InputAxisKeyDelegateBinding != null)
             {
-                foreach (var InputAxisKeyDelegate in InputAxisKeyDelegateBinding.InputAxisKeyDelegateBindings)
+                var Bindings = InputAxisKeyDelegateBinding.InputAxisKeyDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputAxisKeyDelegate = Bindings[BindingIndex];
+
                     if (InputAxisKeyDelegate.AxisKey == InKey &&
                         InputAxisKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputAxisKeyDelegateBinding
+                if (Index < 0)
                 {
-                    AxisKey = InKey,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputAxisKeyDelegateBinding
+                    {
+                        AxisKey = InKey,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputAxisKeyDelegateBinding.InputAxisKeyDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindAxisKeyImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputAxisKeyDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -122,30 +155,41 @@ namespace Script.Engine
 
             if (InputKeyDelegateBinding != null)
             {
-                foreach (var InputKeyDelegate in InputKeyDelegateBinding.InputKeyDelegateBindings)
+                var Bindings = InputKeyDelegateBinding.InputKeyDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputKeyDelegate = Bindings[BindingIndex];
+
                     if (InputKeyDelegate.InputChord == InInputChord &&
                         InputKeyDelegate.InputKeyEvent == InKeyEvent &&
                         InputKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputKeyDelegateBinding
+                if (Index < 0)
                 {
-                    InputChord = InInputChord,
-                    InputKeyEvent = InKeyEvent,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputKeyDelegateBinding
+                    {
+                        InputChord = InInputChord,
+                        InputKeyEvent = InKeyEvent,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputKeyDelegateBinding.InputKeyDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindKeyImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputKeyDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -173,28 +217,39 @@ namespace Script.Engine
 
             if (InputTouchDelegateBinding != null)
             {
-                foreach (var InputTouchDelegate in InputTouchDelegateBinding.InputTouchDelegateBindings)
+                var Bindings = InputTouchDelegateBinding.InputTouchDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputTouchDelegate = Bindings[BindingIndex];
+
                     if (InputTouchDelegate.InputKeyEvent == InKeyEvent &&
                         InputTouchDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputTouchDelegateBinding
+                if (Index < 0)
                 {
-                    InputKeyEvent = InKeyEvent,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputTouchDelegateBinding
+                    {
+                        InputKeyEvent = InKeyEvent,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputTouchDelegateBinding.InputTouchDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindTouchImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputTouchDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -207,28 +262,39 @@ namespace Script.Engine
 
             if (InputVectorAxisDelegateBinding != null)
             {
-                foreach (var InputAxisKeyDelegate in InputVectorAxisDelegateBinding.InputAxisKeyDelegateBindings)
+                var Bindings = InputVectorAxisDelegateBinding.InputAxisKeyDelegateBindings;
+
+                var Index = -1;
+
+                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
                 {
+                    var InputAxisKeyDelegate = Bindings[BindingIndex];
+
                     if (InputAxisKeyDelegate.AxisKey == InKey &&
                         InputAxisKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        return;
+                        Index = BindingIndex;
+
+                        break;
                     }
                 }
 
-                var Binding = new FBlueprintInputAxisKeyDelegateBinding
+                if (Index < 0)
                 {
-                    AxisKey = InKey,
-                    FunctionNameToBind = InAction.Method.Name
-                };
+                    Bindings.Add(new FBlueprintInputAxisKeyDelegateBinding
+                    {
+                        AxisKey = InKey,
+                        FunctionNameToBind = InAction.Method.Name
+                    });
 
-                InputVectorAxisDelegateBinding.InputAxisKeyDelegateBindings.Add(Binding);
+                    Index = Bindings.Num() - 1;
+                }
 
                 UInputComponentImplementation.UInputComponent_BindVectorAxisImplementation(
                     HandleData.GetHandle(this),
                     HandleData.GetHandle(InputVectorAxisDelegateBinding),
                     HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
+                    Index);
             }
         }
 
@@ -254,7 +320,11 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            UInputComponentImplementation.UInputComponent_UnbindActionImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(InActionName),
+                (int)InKeyEvent);
         }
 
         public void RemoveAxis(FName InAxisName, UObject InObject, Action<float> InAction)
@@ -278,7 +348,12 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            using var FunctionName = new FName(InAction.Method.Name);
+
+            UInputComponentImplementation.UInputComponent_UnbindAxisImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(FunctionName));
         }
 
         public void RemoveAxisKey(FKey InKey, UObject InObject, Action<float> InAction)
@@ -302,7 +377,12 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            using var FunctionName = new FName(InAction.Method.Name);
+
+            UInputComponentImplementation.UInputComponent_UnbindAxisKeyImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(FunctionName));
         }
 
         public void RemoveKey(FInputChord InInputChord, EInputEvent InKeyEvent, UObject InObject, Action<FKey> InAction)
@@ -327,7 +407,11 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            UInputComponentImplementation.UInputComponent_UnbindKeyImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(InInputChord),
+                (int)InKeyEvent);
         }
 
         public void RemoveKey(FKey InKey, EInputEvent InKeyEvent, UObject InObject, Action<FKey> InAction)
@@ -366,7 +450,12 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            using var FunctionName = new FName(InAction.Method.Name);
+
+            UInputComponentImplementation.UInputComponent_UnbindTouchImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(FunctionName));
         }
 
         public void RemoveVectorAxis(FKey InKey, UObject InObject, Action<FVector> InAction)
@@ -390,7 +479,12 @@ namespace Script.Engine
                 }
             }
 
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
+            using var FunctionName = new FName(InAction.Method.Name);
+
+            UInputComponentImplementation.UInputComponent_UnbindVectorAxisImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InObject),
+                HandleData.GetHandle(FunctionName));
         }
 
         public void ClearBindingValues(UObject InObject)

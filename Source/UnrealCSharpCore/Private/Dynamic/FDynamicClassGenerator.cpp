@@ -173,6 +173,8 @@ void FDynamicClassGenerator::Generator(FClassReflection* InClassReflection,
 	{
 		OldClass = DynamicClassMap[ClassName];
 
+		DynamicClassMap.Remove(ClassName);
+
 		DynamicClassSet.Remove(OldClass);
 
 		if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(OldClass))
@@ -540,6 +542,12 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 	}
 	else
 	{
+		NamespaceMap.Remove(InOldClass);
+
+		DefaultSubObjectInfoMap.Remove(InOldClass);
+
+		DefaultValueMap.Remove(InOldClass);
+
 		InOldClass->RemoveFromRoot();
 
 		InOldClass->MarkAsGarbage();

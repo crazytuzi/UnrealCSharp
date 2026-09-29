@@ -1078,8 +1078,6 @@ void FGeneratorCore::BeginGenerator(const bool bIsFull)
 
 void FGeneratorCore::EndGenerator(const bool bIsFull)
 {
-	bIsSkipGenerateEngineModules = false;
-
 	bIsGenerateAllModules = false;
 
 	SupportedModule.Empty();
@@ -1098,6 +1096,8 @@ void FGeneratorCore::EndGenerator(const bool bIsFull)
 	{
 		DeleteRemainGeneratorFiles();
 	}
+
+	bIsSkipGenerateEngineModules = false;
 
 	GeneratorFiles.Empty();
 }
@@ -1128,7 +1128,10 @@ void FGeneratorCore::DeleteRemainGeneratorFiles()
 		}
 	};
 
-	DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+	if (!bIsSkipGenerateEngineModules)
+	{
+		DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+	}
 
 	DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
 }

@@ -15,6 +15,13 @@ void FDynamicDependencyGraph::AddNode(const FNode& InNode)
 	NodeMap.Emplace(InNode.Name, NodeArray.Num() - 1);
 }
 
+void FDynamicDependencyGraph::Empty()
+{
+	NodeArray.Empty();
+
+	NodeMap.Empty();
+}
+
 bool FDynamicDependencyGraph::IsCompleted(const FString& InName)
 {
 	static auto A = ACTOR_PREFIX;

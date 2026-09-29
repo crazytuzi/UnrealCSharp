@@ -19,9 +19,13 @@ void FUnrealFunctionDescriptor::Call1(UObject* InObject, RETURN_BUFFER_SIGNATURE
 	{
 		const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
+		PROCESS_INITIALIZE()
+
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -35,6 +39,8 @@ void FUnrealFunctionDescriptor::Call2(UObject* InObject, IN_BUFFER_SIGNATURE) co
 		PROCESS_SCRIPT_IN()
 
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
+
+		PROCESS_FREE()
 	}
 }
 
@@ -50,6 +56,8 @@ void FUnrealFunctionDescriptor::Call3(UObject* InObject, IN_BUFFER_SIGNATURE, RE
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -60,9 +68,13 @@ void FUnrealFunctionDescriptor::Call4(UObject* InObject, OUT_BUFFER_SIGNATURE) c
 	{
 		const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
+		PROCESS_INITIALIZE()
+
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
 
 		PROCESS_OUT()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -73,11 +85,15 @@ void FUnrealFunctionDescriptor::Call5(UObject* InObject, OUT_BUFFER_SIGNATURE, R
 	{
 		const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
+		PROCESS_INITIALIZE()
+
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
 
 		PROCESS_OUT()
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -93,6 +109,8 @@ void FUnrealFunctionDescriptor::Call6(UObject* InObject, IN_BUFFER_SIGNATURE, OU
 		InObject->UObject::ProcessEvent(FoundFunction, Params);
 
 		PROCESS_OUT()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -111,6 +129,8 @@ void FUnrealFunctionDescriptor::Call7(UObject* InObject, IN_BUFFER_SIGNATURE, OU
 		PROCESS_OUT()
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -134,9 +154,13 @@ void FUnrealFunctionDescriptor::Call9(UObject* InObject, RETURN_BUFFER_SIGNATURE
 
 		FFrame Stack(InObject, FoundFunction, Params, nullptr, FoundFunction->ChildProperties);
 
+		PROCESS_INITIALIZE()
+
 		FoundFunction->Invoke(InObject, Stack, ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -152,6 +176,8 @@ void FUnrealFunctionDescriptor::Call10(UObject* InObject, IN_BUFFER_SIGNATURE) c
 		PROCESS_NATIVE_REFERENCE_IN()
 
 		FoundFunction->Invoke(InObject, Stack, nullptr);
+
+		PROCESS_FREE()
 	}
 }
 
@@ -169,6 +195,8 @@ void FUnrealFunctionDescriptor::Call11(UObject* InObject, IN_BUFFER_SIGNATURE, R
 		FoundFunction->Invoke(InObject, Stack, ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -186,6 +214,8 @@ void FUnrealFunctionDescriptor::Call14(UObject* InObject, IN_BUFFER_SIGNATURE, O
 		FoundFunction->Invoke(InObject, Stack, nullptr);
 
 		PROCESS_OUT()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -206,6 +236,8 @@ void FUnrealFunctionDescriptor::Call15(UObject* InObject, IN_BUFFER_SIGNATURE, O
 		PROCESS_OUT()
 
 		PROCESS_RETURN()
+
+		PROCESS_FREE()
 	}
 }
 
@@ -255,10 +287,7 @@ void FUnrealFunctionDescriptor::Call18(UObject* InObject, IN_BUFFER_SIGNATURE) c
 			InObject->CallRemoteFunction(FoundFunction, Params, nullptr, nullptr);
 		}
 
-		if (Params != nullptr)
-		{
-			BufferAllocator->Free(Params);
-		}
+		PROCESS_FREE()
 	}
 }
 
@@ -308,9 +337,6 @@ void FUnrealFunctionDescriptor::Call26(UObject* InObject, IN_BUFFER_SIGNATURE) c
 			InObject->CallRemoteFunction(FoundFunction, Params, nullptr, nullptr);
 		}
 
-		if (Params != nullptr)
-		{
-			BufferAllocator->Free(Params);
-		}
+		PROCESS_FREE()
 	}
 }

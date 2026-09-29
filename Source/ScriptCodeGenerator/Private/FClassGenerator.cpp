@@ -64,7 +64,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);
 
-	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
+	auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FGeneratorCore::GetPathNameAttribute(InClass));
 
 	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
 
@@ -458,7 +459,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		if (FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment())
 		{
-			auto Comment = Function->GetMetaData(TEXT("Comment"));
+			auto Comment = Function->GetMetaData(TEXT("Comment"))
+			                       .Replace(TEXT("&"), TEXT("&amp;"))
+			                       .Replace(TEXT("<"), TEXT("&lt;"))
+			                       .Replace(TEXT(">"), TEXT("&gt;"));
 
 			if (!Comment.IsEmpty())
 			{
@@ -818,7 +822,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Remove(TEXT(""));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"

@@ -30,6 +30,8 @@ public:
 
 	static void Generator();
 
+	static void Empty();
+
 	static void GeneratorField(FReflection* InReflection, const FClassReflection* InClassReflection,
 	                           FDynamicDependencyGraph::FNode& OutNode);
 

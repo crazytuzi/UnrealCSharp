@@ -79,6 +79,11 @@ void FDynamicGeneratorCore::Generator()
 	FDynamicDependencyGraph::Get().Generator();
 }
 
+void FDynamicGeneratorCore::Empty()
+{
+	FDynamicDependencyGraph::Get().Empty();
+}
+
 void FDynamicGeneratorCore::GeneratorField(FReflection* InReflection,
                                            const FClassReflection* InClassReflection,
                                            FDynamicDependencyGraph::FNode& OutNode)

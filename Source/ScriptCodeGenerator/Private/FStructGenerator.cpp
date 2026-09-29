@@ -69,7 +69,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct);
 
-	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
+	auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FGeneratorCore::GetPathNameAttribute(InScriptStruct));
 
 	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
 
@@ -298,7 +299,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	UsingNameSpaces.Remove(TEXT(""));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
