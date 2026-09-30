@@ -18,7 +18,9 @@ FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* In
 	}
 	else
 	{
-		Data = FMemory::Malloc(ValuePropertyDescriptor->GetSize(), ValuePropertyDescriptor->GetMinAlignment());
+		Data = FMemory::Malloc(
+			Align(ValuePropertyDescriptor->GetSize() + 1, ValuePropertyDescriptor->GetMinAlignment()),
+			ValuePropertyDescriptor->GetMinAlignment());
 
 		InOptionalProperty->InitializeValueInternal(Data);
 	}
@@ -37,6 +39,11 @@ void FOptionalHelper::Deinitialize()
 {
 	if (bNeedFreeData && Data != nullptr)
 	{
+		if (OptionalProperty != nullptr)
+		{
+			OptionalProperty->MarkUnset(Data);
+		}
+
 		FMemory::Free(Data);
 
 		Data = nullptr;

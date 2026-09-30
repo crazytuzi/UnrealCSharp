@@ -28,7 +28,7 @@ namespace Script.CoreUObject
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (var Index = 0; Index < Num(); Index++)
+            for (var Index = 0; Index < GetMaxIndex(); Index++)
             {
                 if (IsValidIndex(Index))
                 {
@@ -39,13 +39,7 @@ namespace Script.CoreUObject
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (var Index = 0; Index < Num(); Index++)
-            {
-                if (IsValidIndex(Index))
-                {
-                    yield return this[Index];
-                }
-            }
+            return GetEnumerator();
         }
 
         public void Empty(int InExpectedNumElements = 0) =>

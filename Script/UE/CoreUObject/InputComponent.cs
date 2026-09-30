@@ -16,44 +16,41 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputActionDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputActionDelegateBinding
+            {
+                InputActionName = InActionName,
+                InputKeyEvent = InKeyEvent,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputActionDelegateBinding != null)
             {
                 var Bindings = InputActionDelegateBinding.InputActionDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputActionDelegate in Bindings)
                 {
-                    var InputActionDelegate = Bindings[BindingIndex];
-
                     if (InputActionDelegate.InputActionName == InActionName &&
                         InputActionDelegate.InputKeyEvent == InKeyEvent &&
                         InputActionDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputActionDelegateBinding
-                    {
-                        InputActionName = InActionName,
-                        InputKeyEvent = InKeyEvent,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindActionImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputActionDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindActionImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void BindAxis(FName InAxisName, UObject InObject, Action<float> InAction)
@@ -63,42 +60,39 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputAxisDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputAxisDelegateBinding
+            {
+                InputAxisName = InAxisName,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputAxisDelegateBinding != null)
             {
                 var Bindings = InputAxisDelegateBinding.InputAxisDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputAxisDelegate in Bindings)
                 {
-                    var InputAxisDelegate = Bindings[BindingIndex];
-
                     if (InputAxisDelegate.InputAxisName == InAxisName &&
                         InputAxisDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputAxisDelegateBinding
-                    {
-                        InputAxisName = InAxisName,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindAxisImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputAxisDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindAxisImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void BindAxisKey(FKey InKey, UObject InObject, Action<float> InAction)
@@ -108,42 +102,39 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputAxisKeyDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputAxisKeyDelegateBinding
+            {
+                AxisKey = InKey,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputAxisKeyDelegateBinding != null)
             {
                 var Bindings = InputAxisKeyDelegateBinding.InputAxisKeyDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputAxisKeyDelegate in Bindings)
                 {
-                    var InputAxisKeyDelegate = Bindings[BindingIndex];
-
                     if (InputAxisKeyDelegate.AxisKey == InKey &&
                         InputAxisKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputAxisKeyDelegateBinding
-                    {
-                        AxisKey = InKey,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindAxisKeyImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputAxisKeyDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindAxisKeyImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void BindKey(FInputChord InInputChord, EInputEvent InKeyEvent, UObject InObject, Action<FKey> InAction)
@@ -153,44 +144,41 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputKeyDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputKeyDelegateBinding
+            {
+                InputChord = InInputChord,
+                InputKeyEvent = InKeyEvent,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputKeyDelegateBinding != null)
             {
                 var Bindings = InputKeyDelegateBinding.InputKeyDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputKeyDelegate in Bindings)
                 {
-                    var InputKeyDelegate = Bindings[BindingIndex];
-
                     if (InputKeyDelegate.InputChord == InInputChord &&
                         InputKeyDelegate.InputKeyEvent == InKeyEvent &&
                         InputKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputKeyDelegateBinding
-                    {
-                        InputChord = InInputChord,
-                        InputKeyEvent = InKeyEvent,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindKeyImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputKeyDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindKeyImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void BindKey(FKey InKey, EInputEvent InKeyEvent, UObject InObject, Action<FKey> InAction)
@@ -215,42 +203,39 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputTouchDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputTouchDelegateBinding
+            {
+                InputKeyEvent = InKeyEvent,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputTouchDelegateBinding != null)
             {
                 var Bindings = InputTouchDelegateBinding.InputTouchDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputTouchDelegate in Bindings)
                 {
-                    var InputTouchDelegate = Bindings[BindingIndex];
-
                     if (InputTouchDelegate.InputKeyEvent == InKeyEvent &&
                         InputTouchDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputTouchDelegateBinding
-                    {
-                        InputKeyEvent = InKeyEvent,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindTouchImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputTouchDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindTouchImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void BindVectorAxis(FKey InKey, UObject InObject, Action<FVector> InAction)
@@ -260,42 +245,39 @@ namespace Script.Engine
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UInputVectorAxisDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintInputAxisKeyDelegateBinding
+            {
+                AxisKey = InKey,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (InputVectorAxisDelegateBinding != null)
             {
                 var Bindings = InputVectorAxisDelegateBinding.InputAxisKeyDelegateBindings;
 
-                var Index = -1;
+                var IsDuplicated = false;
 
-                for (var BindingIndex = 0; BindingIndex < Bindings.Num(); ++BindingIndex)
+                foreach (var InputAxisKeyDelegate in Bindings)
                 {
-                    var InputAxisKeyDelegate = Bindings[BindingIndex];
-
                     if (InputAxisKeyDelegate.AxisKey == InKey &&
                         InputAxisKeyDelegate.FunctionNameToBind.ToString() == InAction.Method.Name)
                     {
-                        Index = BindingIndex;
+                        IsDuplicated = true;
 
                         break;
                     }
                 }
 
-                if (Index < 0)
+                if (!IsDuplicated)
                 {
-                    Bindings.Add(new FBlueprintInputAxisKeyDelegateBinding
-                    {
-                        AxisKey = InKey,
-                        FunctionNameToBind = InAction.Method.Name
-                    });
-
-                    Index = Bindings.Num() - 1;
+                    Bindings.Add(Binding);
                 }
-
-                UInputComponentImplementation.UInputComponent_BindVectorAxisImplementation(
-                    HandleData.GetHandle(this),
-                    HandleData.GetHandle(InputVectorAxisDelegateBinding),
-                    HandleData.GetHandle(InObject),
-                    Index);
             }
+
+            UInputComponentImplementation.UInputComponent_BindVectorAxisImplementation(
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(Binding),
+                HandleData.GetHandle(InObject));
         }
 
         public void RemoveAction(FName InActionName, EInputEvent InKeyEvent, UObject InObject, Action<FKey> InAction)
@@ -487,7 +469,7 @@ namespace Script.Engine
                 HandleData.GetHandle(FunctionName));
         }
 
-        public void ClearBindingValues(UObject InObject)
+        public void ClearBindingValues()
         {
             UInputComponentImplementation.UInputComponent_ClearBindingValuesImplementation(HandleData.GetHandle(this));
         }

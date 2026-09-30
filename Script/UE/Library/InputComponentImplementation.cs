@@ -15,58 +15,57 @@ namespace Script.Library
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : null;
         }
 
-        private static unsafe partial void __UInputComponent_BindActionImplementation(nint InObject, nint InInputActionDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindActionImplementation(nint InObject, nint InBlueprintInputActionDelegateBinding, nint InObjectToBindTo);
 
         public static unsafe void UInputComponent_BindActionImplementation(nint InObject,
-            nint InInputActionDelegateBinding, nint InObjectToBindTo, int InIndex)
+            nint InBlueprintInputActionDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindActionImplementation(InObject, InInputActionDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindActionImplementation(InObject, InBlueprintInputActionDelegateBinding,
+                InObjectToBindTo);
         }
 
-        private static unsafe partial void __UInputComponent_BindAxisImplementation(nint InObject, nint InInputAxisDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindAxisImplementation(nint InObject, nint InBlueprintInputAxisDelegateBinding, nint InObjectToBindTo);
 
-        public static unsafe void UInputComponent_BindAxisImplementation(nint InObject, nint InInputAxisDelegateBinding,
-            nint InObjectToBindTo, int InIndex)
+        public static unsafe void UInputComponent_BindAxisImplementation(nint InObject,
+            nint InBlueprintInputAxisDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindAxisImplementation(InObject, InInputAxisDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindAxisImplementation(InObject, InBlueprintInputAxisDelegateBinding,
+                InObjectToBindTo);
         }
 
-        private static unsafe partial void __UInputComponent_BindAxisKeyImplementation(nint InObject, nint InInputAxisKeyDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindAxisKeyImplementation(nint InObject, nint InBlueprintInputAxisKeyDelegateBinding, nint InObjectToBindTo);
 
         public static unsafe void UInputComponent_BindAxisKeyImplementation(nint InObject,
-            nint InInputAxisKeyDelegateBinding, nint InObjectToBindTo, int InIndex)
+            nint InBlueprintInputAxisKeyDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindAxisKeyImplementation(InObject, InInputAxisKeyDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindAxisKeyImplementation(InObject, InBlueprintInputAxisKeyDelegateBinding,
+                InObjectToBindTo);
         }
 
-        private static unsafe partial void __UInputComponent_BindKeyImplementation(nint InObject, nint InInputKeyDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindKeyImplementation(nint InObject, nint InBlueprintInputKeyDelegateBinding, nint InObjectToBindTo);
 
-        public static unsafe void UInputComponent_BindKeyImplementation(nint InObject, nint InInputKeyDelegateBinding,
-            nint InObjectToBindTo, int InIndex)
+        public static unsafe void UInputComponent_BindKeyImplementation(nint InObject,
+            nint InBlueprintInputKeyDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindKeyImplementation(InObject, InInputKeyDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindKeyImplementation(InObject, InBlueprintInputKeyDelegateBinding, InObjectToBindTo);
         }
 
-        private static unsafe partial void __UInputComponent_BindTouchImplementation(nint InObject, nint InInputTouchDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindTouchImplementation(nint InObject, nint InBlueprintInputTouchDelegateBinding, nint InObjectToBindTo);
 
         public static unsafe void UInputComponent_BindTouchImplementation(nint InObject,
-            nint InInputTouchDelegateBinding, nint InObjectToBindTo, int InIndex)
+            nint InBlueprintInputTouchDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindTouchImplementation(InObject, InInputTouchDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindTouchImplementation(InObject, InBlueprintInputTouchDelegateBinding,
+                InObjectToBindTo);
         }
 
-        private static unsafe partial void __UInputComponent_BindVectorAxisImplementation(nint InObject, nint InInputVectorAxisDelegateBinding, nint InObjectToBindTo, int InIndex);
+        private static unsafe partial void __UInputComponent_BindVectorAxisImplementation(nint InObject, nint InBlueprintInputAxisKeyDelegateBinding, nint InObjectToBindTo);
 
         public static unsafe void UInputComponent_BindVectorAxisImplementation(nint InObject,
-            nint InInputVectorAxisDelegateBinding, nint InObjectToBindTo, int InIndex)
+            nint InBlueprintInputAxisKeyDelegateBinding, nint InObjectToBindTo)
         {
-            __UInputComponent_BindVectorAxisImplementation(InObject, InInputVectorAxisDelegateBinding, InObjectToBindTo,
-                InIndex);
+            __UInputComponent_BindVectorAxisImplementation(InObject, InBlueprintInputAxisKeyDelegateBinding,
+                InObjectToBindTo);
         }
 
         private static unsafe partial void __UInputComponent_UnbindActionImplementation(nint InObject, nint InObjectToBindTo, nint InActionName, int InKeyEvent);

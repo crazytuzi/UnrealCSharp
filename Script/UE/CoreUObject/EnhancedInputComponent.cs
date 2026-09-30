@@ -22,6 +22,13 @@ namespace Script.EnhancedInput
                     HandleData.GetHandle(InObject.GetClass()),
                     HandleData.GetHandle(UEnhancedInputActionDelegateBinding.StaticClass()));
 
+            var Binding = new FBlueprintEnhancedInputActionBinding
+            {
+                InputAction = InInputAction,
+                TriggerEvent = InTriggerEvent,
+                FunctionNameToBind = InAction.Method.Name
+            };
+
             if (EnhancedInputActionDelegateBinding != null)
             {
                 foreach (var InputActionDelegate in EnhancedInputActionDelegateBinding.InputActionDelegateBindings)
@@ -34,21 +41,12 @@ namespace Script.EnhancedInput
                     }
                 }
 
-                var Binding = new FBlueprintEnhancedInputActionBinding
-                {
-                    InputAction = InInputAction,
-                    TriggerEvent = InTriggerEvent,
-                    FunctionNameToBind = InAction.Method.Name
-                };
-
                 EnhancedInputActionDelegateBinding.InputActionDelegateBindings.Add(Binding);
-
-                return UEnhancedInputComponentImplementation.UEnhancedInputComponent_BindActionImplementation(
-                    HandleData.GetHandle(this), HandleData.GetHandle(Binding), HandleData.GetHandle(InObject),
-                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
 
-            return null;
+            return UEnhancedInputComponentImplementation.UEnhancedInputComponent_BindActionImplementation(
+                HandleData.GetHandle(this), HandleData.GetHandle(Binding), HandleData.GetHandle(InObject),
+                HandleData.GetHandle(Binding.FunctionNameToBind));
         }
 
         public void RemoveAction(UObject InObject, FEnhancedInputActionEventBinding InEnhancedInputActionEventBinding,
@@ -77,8 +75,6 @@ namespace Script.EnhancedInput
             UEnhancedInputComponentImplementation.UEnhancedInputComponent_RemoveBindingImplementation(
                 HandleData.GetHandle(this),
                 HandleData.GetHandle(InEnhancedInputActionEventBinding));
-
-            InObject.GetClass().RemoveFunction(InAction.Method.Name);
         }
     }
 }

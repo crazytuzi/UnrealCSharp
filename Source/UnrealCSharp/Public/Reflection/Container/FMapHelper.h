@@ -56,6 +56,9 @@ public:
 	void* GetEnumeratorValue(int32 InIndex) const;
 
 private:
+	void EnsureRehash() const;
+
+private:
 	FPropertyDescriptor* KeyPropertyDescriptor;
 
 	FPropertyDescriptor* ValuePropertyDescriptor;
@@ -69,4 +72,6 @@ private:
 	bool bNeedFreeProperty;
 
 	FDataDeleter DataDeleter;
+
+	mutable bool bNeedRehash;
 };

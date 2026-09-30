@@ -117,30 +117,23 @@ namespace
 			}
 		}
 
-		template <typename TBinding, typename TBindings, typename TEntry, typename TProcess>
+		template <typename TEntry, typename TProcess>
 		static void BindImplementation(const IManagedHandle InManagedHandle,
-		                               const IManagedHandle InInputDelegateBinding,
+		                               const IManagedHandle InBlueprintInputDelegateBinding,
 		                               const IManagedHandle InObjectToBindTo,
-		                               const int32 InIndex,
-		                               TArray<TEntry> TBindings::* InBindings,
 		                               const TProcess& InProcess)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UInputComponent>(
 				InManagedHandle))
 			{
-				const auto InputDelegateBinding = FCSharpEnvironment::GetEnvironment().GetObject<TBinding>(
-					InInputDelegateBinding);
+				const auto FoundInputBinding = FCSharpEnvironment::GetEnvironment().GetStruct<TEntry>(
+					InBlueprintInputDelegateBinding);
 
 				const auto ObjectToBindTo = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InObjectToBindTo);
 
-				if (InputDelegateBinding != nullptr && ObjectToBindTo != nullptr)
+				if (FoundInputBinding != nullptr && ObjectToBindTo != nullptr)
 				{
-					const auto& Bindings = InputDelegateBinding->*InBindings;
-
-					if (Bindings.IsValidIndex(InIndex))
-					{
-						InProcess(FoundObject, ObjectToBindTo, Bindings[InIndex]);
-					}
+					InProcess(FoundObject, ObjectToBindTo, *FoundInputBinding);
 				}
 			}
 		}
@@ -164,16 +157,13 @@ namespace
 		}
 
 		static void BindActionImplementation(const IManagedHandle InManagedHandle,
-		                                     const IManagedHandle InInputActionDelegateBinding,
-		                                     const IManagedHandle InObjectToBindTo,
-		                                     const int32 InIndex)
+		                                     const IManagedHandle InBlueprintInputActionDelegateBinding,
+		                                     const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputActionDelegateBinding>(
+			BindImplementation<FBlueprintInputActionDelegateBinding>(
 				InManagedHandle,
-				InInputActionDelegateBinding,
+				InBlueprintInputActionDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputActionDelegateBinding::InputActionDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputActionDelegateBinding& InBinding)
 				{
@@ -217,16 +207,13 @@ namespace
 		}
 
 		static void BindAxisImplementation(const IManagedHandle InManagedHandle,
-		                                   const IManagedHandle InInputAxisDelegateBinding,
-		                                   const IManagedHandle InObjectToBindTo,
-		                                   const int32 InIndex)
+		                                   const IManagedHandle InBlueprintInputAxisDelegateBinding,
+		                                   const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputAxisDelegateBinding>(
+			BindImplementation<FBlueprintInputAxisDelegateBinding>(
 				InManagedHandle,
-				InInputAxisDelegateBinding,
+				InBlueprintInputAxisDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputAxisDelegateBinding::InputAxisDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputAxisDelegateBinding& InBinding)
 				{
@@ -262,16 +249,13 @@ namespace
 		}
 
 		static void BindAxisKeyImplementation(const IManagedHandle InManagedHandle,
-		                                      const IManagedHandle InInputAxisKeyDelegateBinding,
-		                                      const IManagedHandle InObjectToBindTo,
-		                                      const int32 InIndex)
+		                                      const IManagedHandle InBlueprintInputAxisKeyDelegateBinding,
+		                                      const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputAxisKeyDelegateBinding>(
+			BindImplementation<FBlueprintInputAxisKeyDelegateBinding>(
 				InManagedHandle,
-				InInputAxisKeyDelegateBinding,
+				InBlueprintInputAxisKeyDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputAxisKeyDelegateBinding::InputAxisKeyDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputAxisKeyDelegateBinding& InBinding)
 				{
@@ -308,16 +292,13 @@ namespace
 		}
 
 		static void BindKeyImplementation(const IManagedHandle InManagedHandle,
-		                                  const IManagedHandle InInputKeyDelegateBinding,
-		                                  const IManagedHandle InObjectToBindTo,
-		                                  const int32 InIndex)
+		                                  const IManagedHandle InBlueprintInputKeyDelegateBinding,
+		                                  const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputKeyDelegateBinding>(
+			BindImplementation<FBlueprintInputKeyDelegateBinding>(
 				InManagedHandle,
-				InInputKeyDelegateBinding,
+				InBlueprintInputKeyDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputKeyDelegateBinding::InputKeyDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputKeyDelegateBinding& InBinding)
 				{
@@ -360,16 +341,13 @@ namespace
 		}
 
 		static void BindTouchImplementation(const IManagedHandle InManagedHandle,
-		                                    const IManagedHandle InInputTouchDelegateBinding,
-		                                    const IManagedHandle InObjectToBindTo,
-		                                    const int32 InIndex)
+		                                    const IManagedHandle InBlueprintInputTouchDelegateBinding,
+		                                    const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputTouchDelegateBinding>(
+			BindImplementation<FBlueprintInputTouchDelegateBinding>(
 				InManagedHandle,
-				InInputTouchDelegateBinding,
+				InBlueprintInputTouchDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputTouchDelegateBinding::InputTouchDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputTouchDelegateBinding& InBinding)
 				{
@@ -436,16 +414,13 @@ namespace
 		}
 
 		static void BindVectorAxisImplementation(const IManagedHandle InManagedHandle,
-		                                         const IManagedHandle InInputVectorAxisDelegateBinding,
-		                                         const IManagedHandle InObjectToBindTo,
-		                                         const int32 InIndex)
+		                                         const IManagedHandle InBlueprintInputAxisKeyDelegateBinding,
+		                                         const IManagedHandle InObjectToBindTo)
 		{
-			BindImplementation<UInputVectorAxisDelegateBinding>(
+			BindImplementation<FBlueprintInputAxisKeyDelegateBinding>(
 				InManagedHandle,
-				InInputVectorAxisDelegateBinding,
+				InBlueprintInputAxisKeyDelegateBinding,
 				InObjectToBindTo,
-				InIndex,
-				&UInputVectorAxisDelegateBinding::InputAxisKeyDelegateBindings,
 				[](UInputComponent* InFoundObject, UObject* InObjectToBindTo,
 				   const FBlueprintInputAxisKeyDelegateBinding& InBinding)
 				{

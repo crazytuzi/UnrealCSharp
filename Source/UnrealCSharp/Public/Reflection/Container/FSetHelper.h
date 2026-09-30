@@ -44,6 +44,9 @@ public:
 	void* GetEnumerator(int32 InIndex) const;
 
 private:
+	void EnsureRehash() const;
+
+private:
 	FPropertyDescriptor* ElementPropertyDescriptor;
 
 	FScriptSet* ScriptSet;
@@ -55,4 +58,6 @@ private:
 	bool bNeedFreeProperty;
 
 	FDataDeleter DataDeleter;
+
+	mutable bool bNeedRehash;
 };

@@ -41,6 +41,11 @@ void FArrayHelper::Deinitialize()
 		}
 		else
 		{
+			if (InnerPropertyDescriptor != nullptr)
+			{
+				Empty(0);
+			}
+
 			delete ScriptArray;
 		}
 
