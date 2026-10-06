@@ -96,8 +96,6 @@ namespace
 
 			InClass->Children = Function;
 
-			Function->AddToRoot();
-
 			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
 			                                                     InClass,
@@ -165,6 +163,23 @@ namespace
 			});
 		}
 
+		static bool HasActionEventBinding(const UEnhancedInputComponent* InEnhancedInputComponent,
+		                                  const UInputAction* InInputAction, const ETriggerEvent InTriggerEvent,
+		                                  const UObject* InObject)
+		{
+			for (const auto& ActionEventBinding : InEnhancedInputComponent->GetActionEventBindings())
+			{
+				if (ActionEventBinding->GetAction() == InInputAction &&
+					ActionEventBinding->GetTriggerEvent() == InTriggerEvent &&
+					ActionEventBinding->GetUObject() == InObject)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		static IManagedHandle BindActionImplementation(const IManagedHandle InManagedHandle,
 		                                               const IManagedHandle InBlueprintEnhancedInputActionBinding,
 		                                               const IManagedHandle InObjectToBindTo,
@@ -189,6 +204,11 @@ namespace
 				{
 					const auto [InputAction, TriggerEvent, FunctionNameToBind] = *FoundInputBinding;
 
+					if (HasActionEventBinding(FoundObject, InputAction, TriggerEvent, ObjectToBindTo))
+					{
+						return InvalidManagedHandle;
+					}
+
 					const auto& EnhancedInputActionEventBinding = FoundObject->BindAction(
 						InputAction,
 						TriggerEvent,
@@ -211,6 +231,17 @@ namespace
 			return InvalidManagedHandle;
 		}
 
+		static int32 GetNumActionEventBindingsImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UEnhancedInputComponent>(
+				InManagedHandle))
+			{
+				return FoundObject->GetActionEventBindings().Num();
+			}
+
+			return 0;
+		}
+
 		static void RemoveBindingImplementation(const IManagedHandle InManagedHandle,
 		                                        const IManagedHandle InEnhancedInputActionEventBinding)
 		{
@@ -230,7 +261,8 @@ namespace
 			TBindingClassBuilder<UEnhancedInputComponent>(NAMESPACE_LIBRARY)
 				.Function("GetDynamicBindingObject", GetDynamicBindingObjectImplementation)
 				.Function("BindAction", BindActionImplementation)
-				.Function("RemoveBinding", RemoveBindingImplementation);
+				.Function("RemoveBinding", RemoveBindingImplementation)
+				.Function("GetNumActionEventBindings", GetNumActionEventBindingsImplementation);
 		}
 	};
 

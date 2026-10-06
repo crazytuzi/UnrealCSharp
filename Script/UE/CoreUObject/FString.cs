@@ -52,7 +52,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FString;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FStringImplementation.FString_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
             FStringImplementation.FString_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;

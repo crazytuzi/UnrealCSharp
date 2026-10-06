@@ -6,8 +6,12 @@
 #include "FGeneratorCore.h"
 #include "VSVersion.h"
 
+bool FSolutionGenerator::bIsCopyTemplateFailed;
+
 void FSolutionGenerator::Generator()
 {
+	bIsCopyTemplateFailed = false;
+
 	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory();
 
 	const auto ScriptPath = FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory();
@@ -146,9 +150,12 @@ void FSolutionGenerator::CopySharedProps()
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src, const bool bReplaceExistingFile)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
+	if (!bIsCopyTemplateFailed)
 	{
-		FileManager.Copy(*Dest, *Src);
+		if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
+		{
+			bIsCopyTemplateFailed = FileManager.Copy(*Dest, *Src) != COPY_OK;
+		}
 	}
 }
 
@@ -156,25 +163,28 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
                                       const TArray<TFunction<void(FString& OutResult)>>& InFunction,
                                       const ECopyTemplate InCopyTemplate)
 {
-	if (FString SrcResult; FFileHelper::LoadFileToString(SrcResult, *Src))
+	if (!bIsCopyTemplateFailed)
 	{
-		for (const auto& Function : InFunction)
+		if (FString SrcResult; FFileHelper::LoadFileToString(SrcResult, *Src))
 		{
-			Function(SrcResult);
-		}
-
-		if (auto& FileManager = IFileManager::Get();
-			!FileManager.FileExists(*Dest) || InCopyTemplate == ECopyTemplate::ReplaceExisting)
-		{
-			FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
-		}
-		else if (InCopyTemplate == ECopyTemplate::ReplaceChanged)
-		{
-			if (FString DestResult; FFileHelper::LoadFileToString(DestResult, *Dest))
+			for (const auto& Function : InFunction)
 			{
-				if (DestResult != SrcResult)
+				Function(SrcResult);
+			}
+
+			if (auto& FileManager = IFileManager::Get();
+				!FileManager.FileExists(*Dest) || InCopyTemplate == ECopyTemplate::ReplaceExisting)
+			{
+				bIsCopyTemplateFailed = !FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+			}
+			else if (InCopyTemplate == ECopyTemplate::ReplaceChanged)
+			{
+				if (FString DestResult; FFileHelper::LoadFileToString(DestResult, *Dest))
 				{
-					FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+					if (DestResult != SrcResult)
+					{
+						bIsCopyTemplateFailed = !FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+					}
 				}
 			}
 		}

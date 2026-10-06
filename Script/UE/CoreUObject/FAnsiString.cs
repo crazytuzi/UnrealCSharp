@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FAnsiString;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FAnsiStringImplementation.FAnsiString_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
             FAnsiStringImplementation.FAnsiString_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;

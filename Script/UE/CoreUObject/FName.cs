@@ -52,7 +52,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FName;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FNameImplementation.FName_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
             FNameImplementation.FName_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;

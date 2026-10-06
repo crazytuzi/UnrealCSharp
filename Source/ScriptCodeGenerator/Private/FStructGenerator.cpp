@@ -166,7 +166,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"\n"
 		"\t\tpublic static bool operator !=(%s A, %s B) => !(A == B);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-		"\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n"
+		"\t\tpublic override int GetHashCode() => UStructImplementation.UStruct_GetTypeHashImplementation(HandleData.GetHandle(StaticStruct()), HandleData.GetHandle(this));\n"
 	),
 	                                   *ClassContent,
 	                                   *ClassContent,

@@ -2,6 +2,8 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
+#include "UObject/UnrealType.h"
+#include "Templates/TypeHash.h"
 #include "Async/Async.h"
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
@@ -44,6 +46,78 @@ namespace
 			return 0;
 		}
 
+		static bool StructHash(const UStruct* InStruct, const void* InValue, uint32& OutHash)
+		{
+			for (auto Property = InStruct->PropertyLink; Property != nullptr; Property = Property->PropertyLinkNext)
+			{
+				const auto Value = Property->ContainerPtrToValuePtr<void>(const_cast<void*>(InValue));
+
+				if (const auto StructProperty = CastField<FStructProperty>(Property))
+				{
+					if (!StructHash(StructProperty->Struct, Value, OutHash))
+					{
+						return false;
+					}
+				}
+				else if (Property->HasAnyPropertyFlags(CPF_HasGetValueTypeHash))
+				{
+					if (const auto FloatProperty = CastField<FFloatProperty>(Property))
+					{
+						OutHash = HashCombineFast(OutHash, *static_cast<const float*>(Value) == 0.0f
+							                                   ? 0
+							                                   : FloatProperty->GetValueTypeHash(Value));
+					}
+					else if (const auto DoubleProperty = CastField<FDoubleProperty>(Property))
+					{
+						OutHash = HashCombineFast(OutHash, *static_cast<const double*>(Value) == 0.0
+							                                   ? 0
+							                                   : DoubleProperty->GetValueTypeHash(Value));
+					}
+					else if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
+					{
+						OutHash = HashCombineFast(OutHash, static_cast<const FWeakObjectPtr*>(Value)->IsValid()
+							                                   ? WeakObjectProperty->GetValueTypeHash(Value)
+							                                   : 0);
+					}
+					else
+					{
+						OutHash = HashCombineFast(OutHash, Property->GetValueTypeHash(Value));
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		static int32 GetTypeHashImplementation(const IManagedHandle InScriptStruct,
+		                                       const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundScriptStruct = FCSharpEnvironment::GetEnvironment().GetObject<
+				UScriptStruct>(InScriptStruct))
+			{
+				if (const auto FoundStruct = FCSharpEnvironment::GetEnvironment().GetStruct<>(InManagedHandle))
+				{
+					if (auto Hash = 0u; StructHash(FoundScriptStruct, FoundStruct, Hash))
+					{
+						return static_cast<int32>(Hash);
+					}
+
+					if (const auto CppStructOps = FoundScriptStruct->GetCppStructOps();
+						(FoundScriptStruct->StructFlags & STRUCT_IdenticalNative) != 0 &&
+						CppStructOps != nullptr && CppStructOps->HasGetTypeHash())
+					{
+						return static_cast<int32>(FoundScriptStruct->GetStructTypeHash(FoundStruct));
+					}
+				}
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -65,6 +139,7 @@ namespace
 				.Function("StaticStruct", StaticStructImplementation)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation);
 		}
 	};

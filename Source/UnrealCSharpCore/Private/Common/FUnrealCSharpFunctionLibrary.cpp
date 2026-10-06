@@ -1046,6 +1046,11 @@ FString FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath()
 #endif
 }
 
+FString FUnrealCSharpFunctionLibrary::GetFullInteropBuildDirectory()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::ProjectIntermediateDir() / PLUGIN_NAME);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFullUEPublishPath()
 {
 	return GetFullPublishDirectory() / GetUEName() + DLL_SUFFIX;

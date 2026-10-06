@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TScriptInterface<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TScriptInterfaceImplementation.TScriptInterface_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public U GetObject<U>() where U : UObject =>
             TScriptInterfaceImplementation.TScriptInterface_GetObjectImplementation<U>(HandleData.GetHandle(this));

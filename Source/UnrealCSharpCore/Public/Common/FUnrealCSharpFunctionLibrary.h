@@ -190,6 +190,8 @@ public:
 
 	static FString GetFullInteropPublishPath();
 
+	static FString GetFullInteropBuildDirectory();
+
 	static FString GetFullUEPublishPath();
 
 	static FString GetFullGamePublishPath();

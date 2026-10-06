@@ -35,6 +35,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundSoftClassPtr = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TSoftClassPtr<UObject>>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundSoftClassPtr));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -77,6 +88,7 @@ namespace
 			FClassBuilder(TEXT("TSoftClassPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Get", GetImplementation)
 				.Function("LoadSynchronous", LoadSynchronousImplementation);

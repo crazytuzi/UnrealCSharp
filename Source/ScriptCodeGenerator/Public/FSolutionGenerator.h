@@ -60,4 +60,7 @@ private:
 	static void AddSolutionGeneratorHeaderComment(FString& OutResult);
 
 	static void AddCSharpGeneratorHeaderComment(FString& OutResult);
+
+private:
+	static bool bIsCopyTemplateFailed;
 };

@@ -83,6 +83,8 @@ namespace SourceGenerator
                 return;
             }
 
+            unrealTypeReceiver.ValidateInheritanceChain();
+
             foreach (var error in unrealTypeReceiver.Errors)
             {
                 Context.ReportDiagnostic(error);
@@ -273,6 +275,9 @@ namespace SourceGenerator
 
         public readonly Dictionary<string, TypeInfo> TypeInfos = new Dictionary<string, TypeInfo>();
 
+        public readonly Dictionary<string, List<ClassDeclarationSyntax>> ClassDeclarations =
+            new Dictionary<string, List<ClassDeclarationSyntax>>(StringComparer.Ordinal);
+
         public readonly List<Diagnostic> Errors = new List<Diagnostic>();
 
         public readonly List<InterfaceInfo> Interfaces = new List<InterfaceInfo>();
@@ -284,6 +289,16 @@ namespace SourceGenerator
         {
             if (Node is ClassDeclarationSyntax classDeclarationSyntax)
             {
+                if (ClassDeclarations.TryGetValue(classDeclarationSyntax.Identifier.Text, out var declarations) ==
+                    false)
+                {
+                    declarations = new List<ClassDeclarationSyntax>();
+
+                    ClassDeclarations.Add(classDeclarationSyntax.Identifier.Text, declarations);
+                }
+
+                declarations.Add(classDeclarationSyntax);
+
                 ProcessClass(classDeclarationSyntax);
             }
             else if (Node is EnumDeclarationSyntax enumDeclarationSyntax)
@@ -821,6 +836,106 @@ namespace SourceGenerator
                         Identifier.SyntaxTree ?? throw new InvalidOperationException(),
                         Identifier.Span),
                     $"Member variable declaration: '{Identifier.Text}' cannot be defined in '{TypeName}' as it is already defined in scope '{TypeName}' (shadowing is not allowed)"));
+            }
+        }
+
+        private static IEnumerable<SyntaxToken> GetPropertyIdentifiers(ClassDeclarationSyntax Syntax)
+        {
+            foreach (var member in Syntax.Members)
+            {
+                if (member is PropertyDeclarationSyntax propertyDeclarationSyntax)
+                {
+                    if (GetAttributeFromMember(propertyDeclarationSyntax, "UProperty") != null)
+                    {
+                        yield return propertyDeclarationSyntax.Identifier;
+                    }
+                }
+                else if (member is FieldDeclarationSyntax fieldDeclarationSyntax)
+                {
+                    if (GetAttributeFromMember(fieldDeclarationSyntax, "UProperty") != null)
+                    {
+                        foreach (var variable in fieldDeclarationSyntax.Declaration.Variables)
+                        {
+                            yield return variable.Identifier;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CollectBasePropertyNames(ClassDeclarationSyntax Syntax,
+                                              Dictionary<string, string> BasePropertyNames,
+                                              HashSet<string> VisitedTypeNames)
+        {
+            if (Syntax.BaseList != null)
+            {
+                var baseType = Syntax.BaseList.Types.FirstOrDefault();
+
+                if (baseType != null)
+                {
+                    var baseTypeName = baseType.Type.GetText().ToString().Trim();
+
+                    if (VisitedTypeNames.Add(baseTypeName) &&
+                        ClassDeclarations.TryGetValue(baseTypeName, out var baseDeclarations))
+                    {
+                        foreach (var declaration in baseDeclarations)
+                        {
+                            foreach (var identifier in GetPropertyIdentifiers(declaration))
+                            {
+                                if (BasePropertyNames.ContainsKey(identifier.Text) == false)
+                                {
+                                    BasePropertyNames.Add(identifier.Text, baseTypeName);
+                                }
+                            }
+                        }
+
+                        CollectBasePropertyNames(baseDeclarations[0], BasePropertyNames, VisitedTypeNames);
+                    }
+                }
+            }
+        }
+
+        public void ValidateInheritanceChain()
+        {
+            foreach (var declarations in ClassDeclarations.Values)
+            {
+                var declaration = declarations[0];
+
+                if (GetAttributeFromClass(declaration, "UClass") == null)
+                {
+                    continue;
+                }
+
+                var typeName = declaration.Identifier.Text;
+
+                var basePropertyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                var visitedTypeNames = new HashSet<string>(StringComparer.Ordinal);
+
+                visitedTypeNames.Add(typeName);
+
+                CollectBasePropertyNames(declaration, basePropertyNames, visitedTypeNames);
+
+                if (basePropertyNames.Count == 0)
+                {
+                    continue;
+                }
+
+                foreach (var typeDeclaration in declarations)
+                {
+                    foreach (var identifier in GetPropertyIdentifiers(typeDeclaration))
+                    {
+                        var syntaxTree = identifier.SyntaxTree;
+
+                        if (syntaxTree != null &&
+                            basePropertyNames.TryGetValue(identifier.Text, out var scopeTypeName))
+                        {
+                            Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorPropertyNameMustBeUnique,
+                                Location.Create(syntaxTree, identifier.Span),
+                                $"Member variable declaration: '{identifier.Text}' cannot be defined in '{typeName}' as it is already defined in scope '{scopeTypeName}' (shadowing is not allowed)"));
+                        }
+                    }
+                }
             }
         }
 

@@ -25,6 +25,13 @@ namespace Script.Library
             return __FUtf8String_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __FUtf8String_GetTypeHashImplementation(nint InString);
+
+        public static unsafe int FUtf8String_GetTypeHashImplementation(nint InString)
+        {
+            return __FUtf8String_GetTypeHashImplementation(InString);
+        }
+
         private static unsafe partial void __FUtf8String_UnRegisterImplementation(nint InString);
 
         public static unsafe void FUtf8String_UnRegisterImplementation(nint InString)

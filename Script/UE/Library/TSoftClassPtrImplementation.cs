@@ -22,6 +22,13 @@ namespace Script.Library
             return __TSoftClassPtr_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __TSoftClassPtr_GetTypeHashImplementation(nint InSoftClassPtr);
+
+        public static unsafe int TSoftClassPtr_GetTypeHashImplementation(nint InSoftClassPtr)
+        {
+            return __TSoftClassPtr_GetTypeHashImplementation(InSoftClassPtr);
+        }
+
         private static unsafe partial void __TSoftClassPtr_UnRegisterImplementation(nint InSoftClassPtr);
 
         public static unsafe void TSoftClassPtr_UnRegisterImplementation(nint InSoftClassPtr)

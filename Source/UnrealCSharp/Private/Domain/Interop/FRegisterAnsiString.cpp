@@ -35,6 +35,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundAnsiString = FCSharpEnvironment::GetEnvironment().
+				GetString<FAnsiString>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundAnsiString));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -66,6 +77,7 @@ namespace
 			FClassBuilder(TEXT("FAnsiString"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("ToString", ToStringImplementation);
 		}

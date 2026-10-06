@@ -22,6 +22,13 @@ namespace Script.Library
             return __TWeakObjectPtr_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __TWeakObjectPtr_GetTypeHashImplementation(nint InWeakObjectPtr);
+
+        public static unsafe int TWeakObjectPtr_GetTypeHashImplementation(nint InWeakObjectPtr)
+        {
+            return __TWeakObjectPtr_GetTypeHashImplementation(InWeakObjectPtr);
+        }
+
         private static unsafe partial void __TWeakObjectPtr_UnRegisterImplementation(nint InWeakObjectPtr);
 
         public static unsafe void TWeakObjectPtr_UnRegisterImplementation(nint InWeakObjectPtr)

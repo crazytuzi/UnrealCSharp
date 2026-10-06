@@ -25,6 +25,13 @@ namespace Script.Library
             return __FAnsiString_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __FAnsiString_GetTypeHashImplementation(nint InString);
+
+        public static unsafe int FAnsiString_GetTypeHashImplementation(nint InString)
+        {
+            return __FAnsiString_GetTypeHashImplementation(InString);
+        }
+
         private static unsafe partial void __FAnsiString_UnRegisterImplementation(nint InString);
 
         public static unsafe void FAnsiString_UnRegisterImplementation(nint InString)

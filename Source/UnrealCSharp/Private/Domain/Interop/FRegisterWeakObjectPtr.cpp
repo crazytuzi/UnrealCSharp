@@ -35,6 +35,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundWeakObjectPtr = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TWeakObjectPtr<UObject>>(InManagedHandle))
+			{
+				return FoundWeakObjectPtr->IsValid() ? static_cast<int32>(GetTypeHash(*FoundWeakObjectPtr)) : 0;
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -67,6 +78,7 @@ namespace
 			FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Get", GetImplementation);
 		}

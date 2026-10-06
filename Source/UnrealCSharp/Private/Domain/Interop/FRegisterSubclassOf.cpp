@@ -35,6 +35,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundSubclassOf = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
+				InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundSubclassOf));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -66,6 +77,7 @@ namespace
 			FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Get", GetImplementation);
 		}

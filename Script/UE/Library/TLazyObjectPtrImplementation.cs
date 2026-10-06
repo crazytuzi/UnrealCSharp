@@ -22,6 +22,13 @@ namespace Script.Library
             return __TLazyObjectPtr_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __TLazyObjectPtr_GetTypeHashImplementation(nint InLazyObjectPtr);
+
+        public static unsafe int TLazyObjectPtr_GetTypeHashImplementation(nint InLazyObjectPtr)
+        {
+            return __TLazyObjectPtr_GetTypeHashImplementation(InLazyObjectPtr);
+        }
+
         private static unsafe partial void __TLazyObjectPtr_UnRegisterImplementation(nint InLazyObjectPtr);
 
         public static unsafe void TLazyObjectPtr_UnRegisterImplementation(nint InLazyObjectPtr)

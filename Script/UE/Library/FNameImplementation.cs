@@ -25,6 +25,13 @@ namespace Script.Library
             return __FName_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __FName_GetTypeHashImplementation(nint InName);
+
+        public static unsafe int FName_GetTypeHashImplementation(nint InName)
+        {
+            return __FName_GetTypeHashImplementation(InName);
+        }
+
         private static unsafe partial void __FName_UnRegisterImplementation(nint InName);
 
         public static unsafe void FName_UnRegisterImplementation(nint InName)

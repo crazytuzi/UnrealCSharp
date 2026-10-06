@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TSoftClassPtr<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TSoftClassPtrImplementation.TSoftClassPtr_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public UClass Get() => TSoftClassPtrImplementation.TSoftClassPtr_GetImplementation(HandleData.GetHandle(this));
 

@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TWeakObjectPtr<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TWeakObjectPtrImplementation.TWeakObjectPtr_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public T Get() => TWeakObjectPtrImplementation.TWeakObjectPtr_GetImplementation<T>(HandleData.GetHandle(this));
     }

@@ -41,6 +41,13 @@ namespace Script.Library
             return __UStruct_IdenticalImplementation(InScriptStruct, InA, InB) != 0;
         }
 
+        private static unsafe partial int __UStruct_GetTypeHashImplementation(nint InScriptStruct, nint InStruct);
+
+        public static unsafe int UStruct_GetTypeHashImplementation(nint InScriptStruct, nint InStruct)
+        {
+            return __UStruct_GetTypeHashImplementation(InScriptStruct, InStruct);
+        }
+
         private static unsafe partial void __UStruct_UnRegisterImplementation(nint InObject);
 
         public static unsafe void UStruct_UnRegisterImplementation(nint InObject)

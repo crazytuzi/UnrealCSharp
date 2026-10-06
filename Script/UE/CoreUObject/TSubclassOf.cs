@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TSubclassOf<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TSubclassOfImplementation.TSubclassOf_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public UClass Get() => TSubclassOfImplementation.TSubclassOf_GetImplementation(HandleData.GetHandle(this));
     }

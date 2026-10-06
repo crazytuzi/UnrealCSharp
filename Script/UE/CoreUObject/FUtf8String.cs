@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FUtf8String;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FUtf8StringImplementation.FUtf8String_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
             FUtf8StringImplementation.FUtf8String_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;

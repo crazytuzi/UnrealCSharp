@@ -35,6 +35,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundUtf8String = FCSharpEnvironment::GetEnvironment().
+				GetString<FUtf8String>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundUtf8String));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -64,6 +75,7 @@ namespace
 			FClassBuilder(TEXT("FUtf8String"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("ToString", ToStringImplementation);
 		}

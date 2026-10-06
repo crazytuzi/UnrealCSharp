@@ -8,6 +8,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "UEVersion.h"
+#include "CoreGlobals.h"
 #if UE_F_OPTIONAL_PROPERTY
 #include "UObject/PropertyOptional.h"
 #endif
@@ -1128,10 +1129,13 @@ void FGeneratorCore::DeleteRemainGeneratorFiles()
 		}
 	};
 
-	if (!bIsSkipGenerateEngineModules)
+	if (!IsRunningCommandlet())
 	{
-		DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
-	}
+		if (!bIsSkipGenerateEngineModules)
+		{
+			DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+		}
 
-	DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
+		DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
+	}
 }

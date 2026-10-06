@@ -672,7 +672,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	{
 		FunctionContent += FString::Printf(TEXT(
 			"\n\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-			"\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n"
+			"\t\tpublic override int GetHashCode() => 0;\n"
 		),
 		                                   *ClassContent
 		);

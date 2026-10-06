@@ -247,12 +247,17 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 
 		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
+		const auto InteropBuildDirectory = FUnrealCSharpFunctionLibrary::GetFullInteropBuildDirectory();
+
+		const auto InteropBuildPath = InteropBuildDirectory / FPaths::GetCleanFilename(InteropPath);
+
 		const auto CompileParam = FString::Printf(TEXT(
-			"build \"%s\" --nologo -c %s%s"
+			"build \"%s\" --nologo -c %s%s --disable-build-servers -p:OutputPath=\"%s\""
 		),
-		                                          *FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
+		                                          *InteropProjectPath,
 		                                          *GetBuildConfiguration(),
-		                                          bForceCompileInterop ? TEXT(" --no-incremental") : TEXT("")
+		                                          bForceCompileInterop ? TEXT(" --no-incremental") : TEXT(""),
+		                                          *InteropBuildDirectory
 		);
 
 		auto bSucceeded = false;
@@ -280,10 +285,74 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 		                                          }
 		);
 
+		if (bSucceeded)
+		{
+			const auto InteropBackupPath = InteropBuildDirectory / FString::Printf(TEXT(
+				"%s.%s.backup"
+			),
+				*FPaths::GetCleanFilename(InteropPath),
+				*FDateTime::Now().ToString(TEXT("%Y%m%d%H%M%S"))
+			);
+
+			bSucceeded = PublishInterop(InteropBuildPath, InteropPath, InteropBackupPath);
+		}
+
 		return bSucceeded;
 	}
 
 	return true;
+}
+
+bool FCSharpCompilerRunnable::PublishInterop(const FString& InSourcePath, const FString& InTargetPath,
+                                             const FString& InBackupPath)
+{
+	if (!IFileManager::Get().FileExists(*InSourcePath))
+	{
+		return false;
+	}
+
+	if (IFileManager::Get().FileExists(*InTargetPath))
+	{
+		if (IFileManager::Get().FileExists(*InBackupPath) ||
+			!IFileManager::Get().Move(*InBackupPath, *InTargetPath, false))
+		{
+			return false;
+		}
+	}
+
+	return IFileManager::Get().Move(*InTargetPath, *InSourcePath, false);
+}
+
+void FCSharpCompilerRunnable::ShutdownBuildServer()
+{
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	auto ProcessHandle = FPlatformProcess::CreateProc(
+		*CompileTool,
+		TEXT("build-server shutdown"),
+		true,
+		false,
+		false,
+		nullptr,
+		0,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	if (ProcessHandle.IsValid())
+	{
+		FPlatformProcess::WaitForProc(ProcessHandle);
+	}
+
+	FPlatformProcess::CloseProc(ProcessHandle);
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 }
 
 bool FCSharpCompilerRunnable::Compile()
@@ -413,27 +482,43 @@ bool FCSharpCompilerRunnable::CompileGame(FString& OutResult, const TFunction<vo
 
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto CompileParam = FString::Printf(TEXT(
-		"build \"%s\" --nologo -c %s"
-	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
-	                                          *GetBuildConfiguration()
-	);
-
-	auto bSucceeded = false;
-
-	const auto OnComplete = [&bSucceeded, &OutResult](const int32 InReturnCode, const FString& InResult)
+	const auto BuildGame = [this, &OutResult, &InOnOutput](const bool bDisableBuildServers)
 	{
-		bSucceeded = InReturnCode == 0;
+		auto bBuildSucceeded = false;
 
-		OutResult = InResult;
+		const auto CompileParam = FString::Printf(TEXT(
+			"build \"%s\" --nologo -c %s%s"
+		),
+		                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
+		                                          *GetBuildConfiguration(),
+		                                          bDisableBuildServers ? TEXT(" --disable-build-servers") : TEXT("")
+		);
+
+		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
+		                                          [&bBuildSucceeded, &OutResult](const int32 InReturnCode,
+		                                          const FString& InResult)
+		                                          {
+			                                          bBuildSucceeded = InReturnCode == 0;
+
+			                                          OutResult = InResult;
+		                                          },
+		                                          FString(), InOnOutput,
+		                                          [this]()
+		                                          {
+			                                          return bIsStopped || GExitPurge;
+		                                          });
+
+		return bBuildSucceeded;
 	};
 
-	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete, FString(), InOnOutput,
-	                                          [this]()
-	                                          {
-		                                          return bIsStopped || GExitPurge;
-	                                          });
+	auto bSucceeded = BuildGame(true);
+
+	if (!bSucceeded && !bIsStopped && !GExitPurge)
+	{
+		ShutdownBuildServer();
+
+		bSucceeded = BuildGame(false);
+	}
 
 	return bSucceeded;
 }
@@ -449,13 +534,9 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 		{
 			CompileNotification->Progress.SetStage(FCSharpCompileProgress::StagePreparing);
 
-			if (bCompileInterop && !CompileInterop(bForceCompileInterop))
+			if (bCompileInterop)
 			{
-				CompileNotification->Progress.SetStage(FCSharpCompileProgress::StageFailed);
-
-				ShowCompileResultNotification(false);
-
-				return;
+				CompileInterop(bForceCompileInterop);
 			}
 
 			TArray<FFileChangeData> FileChangesSnapshot;

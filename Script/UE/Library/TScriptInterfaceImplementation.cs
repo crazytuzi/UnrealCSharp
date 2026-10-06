@@ -22,6 +22,13 @@ namespace Script.Library
             return __TScriptInterface_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __TScriptInterface_GetTypeHashImplementation(nint InScriptInterface);
+
+        public static unsafe int TScriptInterface_GetTypeHashImplementation(nint InScriptInterface)
+        {
+            return __TScriptInterface_GetTypeHashImplementation(InScriptInterface);
+        }
+
         private static unsafe partial void __TScriptInterface_UnRegisterImplementation(nint InScriptInterface);
 
         public static unsafe void TScriptInterface_UnRegisterImplementation(nint InScriptInterface)

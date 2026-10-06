@@ -4,6 +4,7 @@
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
+#include "Templates/TypeHash.h"
 #include "UEVersion.h"
 
 namespace
@@ -50,6 +51,17 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundScriptInterface = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TScriptInterface<IInterface>>(InManagedHandle))
+			{
+				return static_cast<int32>(PointerHash(FoundScriptInterface->GetObject()));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (IsInGameThread())
@@ -82,6 +94,7 @@ namespace
 			FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("GetObject", GetObjectImplementation);
 		}

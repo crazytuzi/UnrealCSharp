@@ -54,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TLazyObjectPtr<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TLazyObjectPtrImplementation.TLazyObjectPtr_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public T Get() => TLazyObjectPtrImplementation.TLazyObjectPtr_GetImplementation<T>(HandleData.GetHandle(this));
     }

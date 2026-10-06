@@ -55,7 +55,7 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FText;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() => 0;
 
         public override string ToString() =>
             FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;

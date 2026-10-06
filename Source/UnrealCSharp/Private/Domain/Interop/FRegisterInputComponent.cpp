@@ -602,8 +602,6 @@ namespace
 
 			InClass->Children = Function;
 
-			Function->AddToRoot();
-
 			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
 			                                                     InClass,

@@ -43,6 +43,10 @@ private:
 
 	bool CompileInterop(bool bForceCompileInterop);
 
+	static bool PublishInterop(const FString& InSourcePath, const FString& InTargetPath, const FString& InBackupPath);
+
+	static void ShutdownBuildServer();
+
 	bool Compile();
 
 	bool CompileGame(FString& OutResult, const TFunction<void(const FString&)>& InOnOutput);
