@@ -24,12 +24,9 @@ void FBindingRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			delete Value.AddressWrapper;
+		delete Value.AddressWrapper;
 
-			Value.AddressWrapper = nullptr;
-		}
+		Value.AddressWrapper = nullptr;
 	}
 
 	ManagedHandle2BindingAddress.Empty();
@@ -39,9 +36,19 @@ void FBindingRegistry::Deinitialize()
 
 IManagedHandle FBindingRegistry::GetObject(const FBindingValueMapping::FAddressType InAddress)
 {
-	const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(InAddress);
+	if (const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(InAddress))
+	{
+		if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+		{
+			return *FoundManagedHandle;
+		}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+		(void)RemoveReference(*FoundManagedHandle);
+
+		BindingAddress2ManagedHandle.Remove(InAddress);
+	}
+
+	return InvalidManagedHandle;
 }
 
 bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
@@ -59,12 +66,9 @@ bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 
 		FDomain::GCHandle_Free(InManagedHandle);
 
-		if (FoundValue->bNeedFree)
-		{
-			delete FoundValue->AddressWrapper;
+		delete FoundValue->AddressWrapper;
 
-			FoundValue->AddressWrapper = nullptr;
-		}
+		FoundValue->AddressWrapper = nullptr;
 
 		ManagedHandle2BindingAddress.Remove(InManagedHandle);
 

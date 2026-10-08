@@ -1,15 +1,30 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FString
+    public class FString : IDisposable
     {
         public FString()
         {
         }
 
-        ~FString() => FStringImplementation.FString_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FString() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FStringImplementation.FString_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FString(string InValue) => FStringImplementation.FString_RegisterImplementation(this, InValue);
 
@@ -37,9 +52,10 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FString;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FStringImplementation.FString_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
-            FStringImplementation.FString_ToStringImplementation(HandleData.GetHandle(this));
+            FStringImplementation.FString_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
     }
 }

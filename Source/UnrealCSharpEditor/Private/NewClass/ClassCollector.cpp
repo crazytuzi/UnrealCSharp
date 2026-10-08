@@ -92,6 +92,8 @@ FClassCollector::~FClassCollector()
 	if (OnEndFrameDelegateHandle.IsValid())
 	{
 		FCoreDelegates::OnEndFrame.Remove(OnEndFrameDelegateHandle);
+
+		OnEndFrameDelegateHandle.Reset();
 	}
 
 	if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
@@ -139,11 +141,16 @@ void FClassCollector::RequestPopulateClassHierarchy()
 
 	LastRequestFrame = GFrameNumber;
 
-	OnEndFrameDelegateHandle = FCoreDelegates::OnEndFrame.AddStatic(&FClassCollector::PopulateClassHierarchy);
+	if (!OnEndFrameDelegateHandle.IsValid())
+	{
+		OnEndFrameDelegateHandle = FCoreDelegates::OnEndFrame.AddStatic(&FClassCollector::PopulateClassHierarchy);
+	}
 }
 
 void FClassCollector::PopulateClassHierarchy()
 {
+	OnEndFrameDelegateHandle.Reset();
+
 	PopulateClassInMemory();
 
 	PopulateClassByAsset();

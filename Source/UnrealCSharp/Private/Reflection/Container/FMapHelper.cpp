@@ -2,12 +2,15 @@
 #include "CppVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                       const FDataDeleter InDataDeleter) :
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter),
+	bNeedRehash(false)
 {
 	if (InData != nullptr)
 	{
@@ -29,6 +32,8 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 		                                              ValuePropertyDescriptor->GetSize(),
 		                                              ValuePropertyDescriptor->GetMinAlignment());
 	}
+
+	Initialize();
 }
 
 FMapHelper::~FMapHelper()
@@ -44,7 +49,19 @@ void FMapHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptMap != nullptr)
 	{
-		delete ScriptMap;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptMap);
+		}
+		else
+		{
+			if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr)
+			{
+				Empty(0);
+			}
+
+			delete ScriptMap;
+		}
 
 		ScriptMap = nullptr;
 	}
@@ -65,9 +82,39 @@ void FMapHelper::Deinitialize()
 	}
 }
 
+void FMapHelper::EnsureRehash() const
+{
+	if (bNeedRehash)
+	{
+		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
+		{
+			return KeyPropertyDescriptor->GetValueTypeHash(Src);
+		});
+
+		bNeedRehash = false;
+	}
+}
+
 void FMapHelper::Empty(const int32 InExpectedNumElements) const
 {
-	ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
+	if (InExpectedNumElements >= 0)
+	{
+		for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+		{
+			if (ScriptMap->IsValidIndex(Index))
+			{
+				const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
+
+				KeyPropertyDescriptor->DestroyValue(Data);
+
+				ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+			}
+		}
+
+		ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
+
+		bNeedRehash = false;
+	}
 }
 
 int32 FMapHelper::Num() const
@@ -119,6 +166,8 @@ int32 FMapHelper::Remove(const void* InKey) const
 		KeyPropertyDescriptor->DestroyValue(Data);
 
 		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+
+		EnsureRehash();
 
 		ScriptMap->RemoveAt(KeyIndex, ScriptMapLayout);
 	}
@@ -199,14 +248,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 
 		KeyPropertyDescriptor->Set(InKey, Data);
 
-#if STD_CPP_20
-		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
-#else
-		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
-#endif
-		                  {
-			                  return KeyPropertyDescriptor->GetValueTypeHash(Src);
-		                  });
+		bNeedRehash = true;
 	}
 	else
 	{

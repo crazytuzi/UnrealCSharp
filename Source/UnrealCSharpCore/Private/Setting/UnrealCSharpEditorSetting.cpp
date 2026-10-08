@@ -1,4 +1,4 @@
-#include "Setting/UnrealCSharpEditorSetting.h"
+﻿#include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif
@@ -360,11 +360,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetClassList()
 	}
 
 	return ClassArray;
-}
-
-const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
-{
-	return ClassBlacklist;
 }
 
 ESolutionConfiguration UUnrealCSharpEditorSetting::GetEditorConfiguration() const

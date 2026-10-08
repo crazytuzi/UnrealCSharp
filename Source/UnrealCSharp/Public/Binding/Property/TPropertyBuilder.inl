@@ -29,8 +29,11 @@ struct TPrimitivePropertyBuilder
 {
 	static auto Get(std::decay_t<Result>& InValue)
 	{
-		return TPropertyClass<Result, Result>::Get()->BoxValue(
-			const_cast<std::remove_const_t<std::decay_t<Result>>*>(&InValue));
+		const auto FoundClass = TPropertyClass<Result, Result>::Get();
+
+		return FoundClass != nullptr
+			       ? FoundClass->BoxValue(const_cast<std::remove_const_t<std::decay_t<Result>>*>(&InValue))
+			       : IManagedHandle{};
 	}
 
 	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)

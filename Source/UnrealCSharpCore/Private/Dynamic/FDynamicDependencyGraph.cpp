@@ -15,6 +15,13 @@ void FDynamicDependencyGraph::AddNode(const FNode& InNode)
 	NodeMap.Emplace(InNode.Name, NodeArray.Num() - 1);
 }
 
+void FDynamicDependencyGraph::Empty()
+{
+	NodeArray.Empty();
+
+	NodeMap.Empty();
+}
+
 bool FDynamicDependencyGraph::IsCompleted(const FString& InName)
 {
 	static auto A = ACTOR_PREFIX;
@@ -154,6 +161,8 @@ void FDynamicDependencyGraph::Generator()
 
 			FString OutNode;
 
+			TMap<FString, int32> PendingCounts;
+
 			while (NodeQueue.Dequeue(OutNode))
 			{
 				if (NodeArray[NodeMap[OutNode]].IsCompleted())
@@ -194,9 +203,12 @@ void FDynamicDependencyGraph::Generator()
 
 				if (bIsPending)
 				{
-					NodeQueue.Enqueue(OutNode);
+					if (PendingCounts.FindOrAdd(OutNode)++ < NodeArray.Num())
+					{
+						NodeQueue.Enqueue(OutNode);
 
-					continue;
+						continue;
+					}
 				}
 
 				if (bIsCompleted)

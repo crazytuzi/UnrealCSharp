@@ -17,8 +17,6 @@ public:
 			if (ScriptDomain != nullptr)
 			{
 				IScriptDomain::Set(ScriptDomain);
-
-				Domain = ScriptDomain;
 			}
 		}
 
@@ -36,18 +34,9 @@ public:
 		}
 	}
 
-	~FScriptDomainScope()
-	{
-		if (Domain != nullptr)
-		{
-			FScriptDomainFactory::Destroy(Domain);
-		}
-	}
+	~FScriptDomainScope() = default;
 
 	FScriptDomainScope(const FScriptDomainScope&) = delete;
 
 	FScriptDomainScope& operator=(const FScriptDomainScope&) = delete;
-
-private:
-	IScriptDomain* Domain{};
 };

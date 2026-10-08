@@ -44,6 +44,11 @@ void FCoreCLRDomain::Initialize()
 	{
 		HostFxrDllHandle = FPlatformProcess::GetDllHandle(*FCoreCLRFunctionLibrary::GetHostFxrPath());
 
+		if (HostFxrDllHandle == nullptr)
+		{
+			return;
+		}
+
 		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 			UUnrealCSharpSetting>())
 		{
@@ -64,6 +69,11 @@ void FCoreCLRDomain::Initialize()
 
 		const auto HostFxrGetRuntimeDelegateFn = GetExport<hostfxr_get_runtime_delegate_fn>(
 			HostFxrDllHandle, FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE);
+
+		if (HostFxrInitializeForRuntimeConfigFn == nullptr || HostFxrGetRuntimeDelegateFn == nullptr)
+		{
+			return;
+		}
 
 		const auto HostPath = FCoreCLRFunctionLibrary::GetHostPath();
 

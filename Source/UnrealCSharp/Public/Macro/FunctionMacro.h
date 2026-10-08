@@ -91,6 +91,10 @@
 	REFERENCE_IN_VALUE() \
 	IN_END()
 
+#define PROCESS_INITIALIZE() \
+	INITIALIZE_VALUE() \
+	IN_END()
+
 #define NATIVE_OUT_VALUE() \
 		CA_SUPPRESS(6263) \
 		const auto Out = (FOutParmRec*)FMemory_Alloca(sizeof(FOutParmRec)); \
@@ -143,5 +147,14 @@
 		ReturnPropertyDescriptor->Get<FPropertyArgument::FReturn>( \
 			ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
 			reinterpret_cast<void**>(RETURN_BUFFER)); \
-	} \
-	BufferAllocator->Free(Params);
+	}
+
+#define PROCESS_FREE() \
+	if (Params != nullptr) \
+	{ \
+		for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index) \
+		{ \
+			PropertyDescriptors[Index]->GetProperty()->DestroyValue_InContainer(Params); \
+		} \
+		BufferAllocator->Free(Params); \
+	}

@@ -31,6 +31,8 @@ void UDelegateHandler::Initialize(FScriptDelegate* InScriptDelegate, UFunction* 
 
 void UDelegateHandler::Deinitialize()
 {
+	DelegateWrapper = {nullptr, nullptr};
+
 	if (ScriptDelegate != nullptr)
 	{
 		if (bNeedFree)

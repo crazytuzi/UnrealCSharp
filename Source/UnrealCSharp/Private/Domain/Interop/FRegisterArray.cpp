@@ -11,11 +11,25 @@ namespace
 {
 	struct FRegisterArray
 	{
+		static bool IsBufferLargeEnough(const FArrayHelper* InArrayHelper, const int32 InBufferSize)
+		{
+			if (InArrayHelper != nullptr)
+			{
+				if (const auto InnerPropertyDescriptor = InArrayHelper->GetInnerPropertyDescriptor())
+				{
+					return InnerPropertyDescriptor->GetBufferSize() <= InBufferSize;
+				}
+			}
+
+			return false;
+		}
+
 		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
-
-			FCSharpBind::Bind<FArrayHelper>(Class, Class->GetGenericArgument(), InManagedObject);
+			if (const auto Class = FReflectionRegistry::Get().GetClass(InManagedType))
+			{
+				FCSharpBind::Bind<FArrayHelper>(Class, Class->GetGenericArgument(), InManagedObject);
+			}
 		}
 
 		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
@@ -33,11 +47,19 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<
 					FArrayHelper>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<
+						FArrayHelper>(InManagedHandle);
+				});
+			}
 		}
 
 		static int32 GetTypeSizeImplementation(const IManagedHandle InManagedHandle)
@@ -107,55 +129,78 @@ namespace
 		}
 
 		static void GetImplementation(const IManagedHandle InManagedHandle,
-		                              const int32 InIndex, RETURN_BUFFER_SIGNATURE)
+		                              const int32 InIndex, RETURN_BUFFER_SIGNATURE, const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				const auto Value = ArrayHelper->Get(InIndex);
-
-				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					if (const auto Value = ArrayHelper->Get(InIndex))
+					{
+						ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+					}
+					else
+					{
+						FPropertyDescriptor::GetDefaultValue(ArrayHelper->GetInnerPropertyDescriptor(), RETURN_BUFFER);
+					}
+				}
 			}
 		}
 
 		static void SetImplementation(const IManagedHandle InManagedHandle,
-		                              const int32 InIndex, IN_VALUE_BUFFER_SIGNATURE)
+		                              const int32 InIndex, IN_VALUE_BUFFER_SIGNATURE, const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				ArrayHelper->Set(InIndex, IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					ArrayHelper->Set(InIndex, IN_VALUE_BUFFER);
+				}
 			}
 		}
 
-		static int32 FindImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 FindImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE,
+		                                const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->Find(IN_VALUE_BUFFER);
-			}
-
-			return INDEX_NONE;
-		}
-
-		static int32 FindLastImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
-		{
-			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InManagedHandle))
-			{
-				return ArrayHelper->FindLast(IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->Find(IN_VALUE_BUFFER);
+				}
 			}
 
 			return INDEX_NONE;
 		}
 
-		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 FindLastImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE,
+		                                    const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->Contains(IN_VALUE_BUFFER) ? 1 : 0;
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->FindLast(IN_VALUE_BUFFER);
+				}
+			}
+
+			return INDEX_NONE;
+		}
+
+		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE,
+		                                    const int32 InBufferSize)
+		{
+			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+				InManagedHandle))
+			{
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->Contains(IN_VALUE_BUFFER) ? 1 : 0;
+				}
 			}
 
 			return 0;
@@ -230,12 +275,16 @@ namespace
 			}
 		}
 
-		static int32 AddImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE)
+		static int32 AddImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE,
+		                               const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->Add(IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->Add(IN_VALUE_BUFFER);
+				}
 			}
 
 			return 0;
@@ -252,34 +301,46 @@ namespace
 			return 0;
 		}
 
-		static int32 AddUniqueImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE)
+		static int32 AddUniqueImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE,
+		                                     const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->AddUnique(IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->AddUnique(IN_VALUE_BUFFER);
+				}
 			}
 
 			return 0;
 		}
 
-		static int32 RemoveSingleImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 RemoveSingleImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE,
+		                                        const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->RemoveSingle(IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->RemoveSingle(IN_VALUE_BUFFER);
+				}
 			}
 
 			return 0;
 		}
 
-		static int32 RemoveImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 RemoveImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE,
+		                                  const int32 InBufferSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->Remove(IN_VALUE_BUFFER);
+				if (IsBufferLargeEnough(ArrayHelper, InBufferSize))
+				{
+					return ArrayHelper->Remove(IN_VALUE_BUFFER);
+				}
 			}
 
 			return 0;

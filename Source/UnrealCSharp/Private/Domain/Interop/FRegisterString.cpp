@@ -31,19 +31,38 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundString = FCSharpEnvironment::GetEnvironment().GetString<FString>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundString));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FString>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FString>(InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto String = FCSharpEnvironment::GetEnvironment().GetString<FString>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(**String));
+			return String != nullptr
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(**String))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterString()
@@ -51,6 +70,7 @@ namespace
 			FClassBuilder(TEXT("FString"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("ToString", ToStringImplementation);
 		}

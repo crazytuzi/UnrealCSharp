@@ -306,11 +306,13 @@ namespace Script.CoreUObject
 
                         if (!string.IsNullOrEmpty(AttributeFieldValue))
                         {
-                            foreach (var AttributeLine in AttributeFieldValue.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                            foreach (var AttributeLine in AttributeFieldValue.Split('\n',
+                                         StringSplitOptions.RemoveEmptyEntries))
                             {
                                 var Segments = AttributeLine.Split('|');
 
-                                if (int.TryParse(Segments[1], out var ValueCount) == false ||
+                                if (Segments.Length < 2 ||
+                                    !int.TryParse(Segments[1], out var ValueCount) ||
                                     Segments.Length - 2 != ValueCount)
                                 {
                                     continue;

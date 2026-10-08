@@ -1,4 +1,4 @@
-#include "FGeneratorCore.h"
+﻿#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -8,6 +8,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "UEVersion.h"
+#include "CoreGlobals.h"
 #if UE_F_OPTIONAL_PROPERTY
 #include "UObject/PropertyOptional.h"
 #endif
@@ -17,8 +18,6 @@ TMap<FString, TArray<FString>> FGeneratorCore::OverrideFunctionsMap;
 bool FGeneratorCore::bIsSkipGenerateEngineModules;
 
 bool FGeneratorCore::bIsGenerateAllModules;
-
-TArray<FString> FGeneratorCore::SupportedModule;
 
 TArray<FString> FGeneratorCore::SupportedAssetPath;
 
@@ -477,69 +476,6 @@ int32 FGeneratorCore::GetBufferSize(FProperty* Property)
 		       : sizeof(void*);
 }
 
-FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
-{
-	if (CastField<FByteProperty>(Property))
-	{
-		return TEXT("Byte");
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return GetTypeImplementation(EnumProperty->GetUnderlyingProperty());
-	}
-
-	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
-
-	if (CastField<FUInt32Property>(Property)) return TEXT("UInt32");
-
-	if (CastField<FUInt64Property>(Property)) return TEXT("UInt64");
-
-	if (CastField<FInt8Property>(Property)) return TEXT("SByte");
-
-	if (CastField<FInt16Property>(Property)) return TEXT("Int16");
-
-	if (CastField<FIntProperty>(Property)) return TEXT("Int32");
-
-	if (CastField<FInt64Property>(Property)) return TEXT("Int64");
-
-	if (CastField<FBoolProperty>(Property)) return TEXT("Boolean");
-
-	if (CastField<FFloatProperty>(Property)) return TEXT("Single");
-
-	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
-
-	return TEXT("");
-}
-
-FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
-{
-	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-	{
-		if (ByteProperty->Enum != nullptr)
-		{
-			return FString::Printf(TEXT(
-				"(%s)"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum));
-		}
-		else
-		{
-			return TEXT("");
-		}
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return FString::Printf(TEXT(
-			"(%s)"
-		),
-		                       *FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum()));
-	}
-
-	return TEXT("");
-}
-
 FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
@@ -623,7 +559,7 @@ FString FGeneratorCore::GetOutParam(const bool bIsPrimitive, const FString& InNa
 		                         *InOffset
 		       )
 		       : FString::Printf(TEXT(
-			       "\n%s%s = (%s)HandleData.GetObject(*(nint*)%s%s);\n"
+			       "\n%s%s = (%s)HandleData.GetObject(*(nint*)(%s%s));\n"
 		       ),
 		                         *InIndent,
 		                         *InName,
@@ -703,6 +639,61 @@ TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace,
 const FString& FGeneratorCore::GetGeneratorHeaderComment()
 {
 	return GeneratorHeaderComment;
+}
+
+FString FGeneratorCore::GetEscapedStringLiteral(const FString& InString)
+{
+	FString Result;
+
+	Result.Reserve(InString.Len());
+
+	for (const auto Char : InString)
+	{
+		switch (Char)
+		{
+		case TEXT('\\'):
+			Result += TEXT("\\\\");
+			break;
+		case TEXT('"'):
+			Result += TEXT("\\\"");
+			break;
+		case TEXT('\n'):
+			Result += TEXT("\\n");
+			break;
+		case TEXT('\r'):
+			Result += TEXT("\\r");
+			break;
+		case TEXT('\t'):
+			Result += TEXT("\\t");
+			break;
+		default:
+			Result.AppendChar(Char);
+			break;
+		}
+	}
+
+	return Result;
+}
+
+FString FGeneratorCore::GetTextStringLiteral(const FString& InMetaData)
+{
+	static const TCHAR* Prefixes[] = {TEXT("INVTEXT("), TEXT("TEXT(")};
+
+	for (const auto Prefix : Prefixes)
+	{
+		if (InMetaData.StartsWith(Prefix) && InMetaData.EndsWith(TEXT(")")))
+		{
+			const auto Length = FCString::Strlen(Prefix);
+
+			if (const auto Value = InMetaData.Mid(Length, InMetaData.Len() - Length - 1);
+				Value.Len() >= 2 && Value.StartsWith(TEXT("\"")) && Value.EndsWith(TEXT("\"")))
+			{
+				return Value.Mid(1, Value.Len() - 2);
+			}
+		}
+	}
+
+	return GetEscapedStringLiteral(InMetaData);
 }
 
 void FGeneratorCore::AddGeneratorFile(const FString& InFile)
@@ -990,15 +981,6 @@ void FGeneratorCore::BeginGenerator(const bool bIsFull)
 
 		bIsGenerateAllModules = UnrealCSharpEditorSetting->IsGenerateAllModules();
 
-		for (const auto& Module : UnrealCSharpEditorSetting->GetSupportedModule())
-		{
-			SupportedModule.Add(FString::Printf(TEXT(
-				"%s.%s"),
-			                                    *NAMESPACE_ROOT,
-			                                    *Module
-			));
-		}
-
 		for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
 			SupportedAssetPath.Add(*FString::Printf(TEXT(
@@ -1023,11 +1005,7 @@ void FGeneratorCore::BeginGenerator(const bool bIsFull)
 
 void FGeneratorCore::EndGenerator(const bool bIsFull)
 {
-	bIsSkipGenerateEngineModules = false;
-
 	bIsGenerateAllModules = false;
-
-	SupportedModule.Empty();
 
 	SupportedAssetPath.Empty();
 
@@ -1043,6 +1021,8 @@ void FGeneratorCore::EndGenerator(const bool bIsFull)
 	{
 		DeleteRemainGeneratorFiles();
 	}
+
+	bIsSkipGenerateEngineModules = false;
 
 	GeneratorFiles.Empty();
 }
@@ -1073,7 +1053,13 @@ void FGeneratorCore::DeleteRemainGeneratorFiles()
 		}
 	};
 
-	DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+	if (!IsRunningCommandlet())
+	{
+		if (!bIsSkipGenerateEngineModules)
+		{
+			DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+		}
 
-	DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
+		DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
+	}
 }

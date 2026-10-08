@@ -46,6 +46,19 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UUnrealCSharpSetting::RegisterSettings();
 
+	if (!IsRunningCookCommandlet())
+	{
+		FScriptDomainTypeScope ScriptDomainTypeScope(
+			FUnrealCSharpFunctionLibrary::GetScriptDomainType(FPlatformProperties::IniPlatformName()));
+
+		FSolutionGenerator::CopySharedProps();
+
+		if (FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+		{
+			(void)FCSharpCompiler::Get().SyncCompile();
+		}
+	}
+
 	if (!UGeneratorScriptCodeCommandlet::IsRunningGeneratorScriptCodeCommandlet())
 	{
 		FDynamicGenerator::Generator();
@@ -252,6 +265,14 @@ void FUnrealCSharpEditorModule::PluginButtonClicked() const
 
 void FUnrealCSharpEditorModule::OnPostEngineInit()
 {
+	if (!IsRunningCookCommandlet())
+	{
+		if (FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+		{
+			FCSharpCompiler::Get().ImmediatelyCompile();
+		}
+	}
+
 	RegisterMenus();
 }
 
@@ -263,7 +284,7 @@ void FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree()
 
 	if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
 	{
-		FCSharpCompiler::Get().Compile();
+		FCSharpCompiler::Get().AsyncCompile();
 	}
 }
 

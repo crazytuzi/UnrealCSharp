@@ -173,6 +173,8 @@ void FDynamicClassGenerator::Generator(FClassReflection* InClassReflection,
 	{
 		OldClass = DynamicClassMap[ClassName];
 
+		DynamicClassMap.Remove(ClassName);
+
 		DynamicClassSet.Remove(OldClass);
 
 		if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(OldClass))
@@ -283,21 +285,24 @@ FString FDynamicClassGenerator::GetNameSpace(const UClass* InClass)
 
 void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentClass)
 {
-	InClass->PropertyLink = InParentClass->PropertyLink;
+	if (InParentClass != nullptr)
+	{
+		InClass->PropertyLink = InParentClass->PropertyLink;
 
-	InClass->ClassWithin = InParentClass->ClassWithin;
+		InClass->ClassWithin = InParentClass->ClassWithin;
 
-	InClass->ClassConfigName = InParentClass->ClassConfigName;
+		InClass->ClassConfigName = InParentClass->ClassConfigName;
 
-	InClass->SetSuperStruct(InParentClass);
+		InClass->SetSuperStruct(InParentClass);
 
 #if UE_U_CLASS_ADD_REFERENCED_OBJECTS
-	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
+		InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
-	InClass->ClassFlags |= CLASS_Native;
+		InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+	}
 
-	InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+	InClass->ClassFlags |= CLASS_Native;
 
 	InClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
 }
@@ -537,6 +542,12 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 	}
 	else
 	{
+		NamespaceMap.Remove(InOldClass);
+
+		DefaultSubObjectInfoMap.Remove(InOldClass);
+
+		DefaultValueMap.Remove(InOldClass);
+
 		InOldClass->RemoveFromRoot();
 
 		InOldClass->MarkAsGarbage();

@@ -6,8 +6,12 @@
 #include "FGeneratorCore.h"
 #include "VSVersion.h"
 
+bool FSolutionGenerator::bIsCopyTemplateFailed;
+
 void FSolutionGenerator::Generator()
 {
+	bIsCopyTemplateFailed = false;
+
 	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory();
 
 	const auto ScriptPath = FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory();
@@ -102,7 +106,7 @@ void FSolutionGenerator::Generator()
 			&FSolutionGenerator::ReplaceImport,
 			&FSolutionGenerator::ReplaceProjectReference
 		},
-		false);
+		ECopyTemplate::KeepExisting);
 
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetGamePropsPath(),
@@ -112,16 +116,7 @@ void FSolutionGenerator::Generator()
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
-	CopyTemplate(
-		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(), SHARED_NAME + PROPS_SUFFIX),
-		FPaths::Combine(TemplatePath, SHARED_NAME + PROPS_SUFFIX),
-		TArray<TFunction<void(FString& OutResult)>>
-		{
-			&FSolutionGenerator::ReplaceTargetFramework,
-			&FSolutionGenerator::ReplaceDefineConstants,
-			&FSolutionGenerator::ReplaceHintPath,
-			&FSolutionGenerator::AddProjectGeneratorHeaderComment
-		});
+	CopySharedProps();
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
@@ -136,30 +131,63 @@ void FSolutionGenerator::Generator()
 		});
 }
 
+void FSolutionGenerator::CopySharedProps()
+{
+	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory();
+
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(), SHARED_NAME + PROPS_SUFFIX),
+		FPaths::Combine(TemplatePath, SHARED_NAME + PROPS_SUFFIX),
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::ReplaceTargetFramework,
+			&FSolutionGenerator::ReplaceDefineConstants,
+			&FSolutionGenerator::ReplaceHintPath,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
+		},
+		ECopyTemplate::ReplaceChanged);
+}
+
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src, const bool bReplaceExistingFile)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
+	if (!bIsCopyTemplateFailed)
 	{
-		FileManager.Copy(*Dest, *Src);
+		if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
+		{
+			bIsCopyTemplateFailed = FileManager.Copy(*Dest, *Src) != COPY_OK;
+		}
 	}
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
                                       const TArray<TFunction<void(FString& OutResult)>>& InFunction,
-                                      const bool bReplaceExistingFile)
+                                      const ECopyTemplate InCopyTemplate)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
+	if (!bIsCopyTemplateFailed)
 	{
-		FString Result;
-
-		FFileHelper::LoadFileToString(Result, *Src);
-
-		for (const auto& Function : InFunction)
+		if (FString SrcResult; FFileHelper::LoadFileToString(SrcResult, *Src))
 		{
-			Function(Result);
-		}
+			for (const auto& Function : InFunction)
+			{
+				Function(SrcResult);
+			}
 
-		FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, Result);
+			if (auto& FileManager = IFileManager::Get();
+				!FileManager.FileExists(*Dest) || InCopyTemplate == ECopyTemplate::ReplaceExisting)
+			{
+				bIsCopyTemplateFailed = !FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+			}
+			else if (InCopyTemplate == ECopyTemplate::ReplaceChanged)
+			{
+				if (FString DestResult; FFileHelper::LoadFileToString(DestResult, *Dest))
+				{
+					if (DestResult != SrcResult)
+					{
+						bIsCopyTemplateFailed = !FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, SrcResult);
+					}
+				}
+			}
+		}
 	}
 }
 

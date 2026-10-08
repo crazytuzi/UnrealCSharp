@@ -110,7 +110,8 @@ void FBindingClassRegister::BindingFunction(const FString& InName,
 	);
 }
 
-void FBindingClassRegister::BindingMethod(const FString& InImplementationName, const void* InFunction)
+void FBindingClassRegister::BindingMethod(const FString& InImplementationName, const void* InFunction,
+                                          const int32 InParamCount)
 {
 #if STD_CPP_20
 	MethodRegisters.Emplace([=, this]()
@@ -125,7 +126,8 @@ void FBindingClassRegister::BindingMethod(const FString& InImplementationName, c
 				                        BINDING_COMBINE_FUNCTION_IMPLEMENTATION(GetClass(),
 					                        InImplementationName));
 	                        },
-	                        InFunction);
+	                        InFunction,
+	                        InParamCount);
 }
 
 void FBindingClassRegister::Inheritance(const TFunction<FString()>& InBaseClassFunction,

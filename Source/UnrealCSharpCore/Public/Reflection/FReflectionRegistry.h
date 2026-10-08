@@ -92,6 +92,8 @@ public:
 
 	FClassReflection* GetTArrayClass() const;
 
+	FClassReflection* GetTFieldPathClass() const;
+
 #if UE_F_OPTIONAL_PROPERTY
 	FClassReflection* GetTOptionalClass() const;
 #endif
@@ -182,6 +184,8 @@ public:
 
 	FClassReflection* GetAutoCollapseCategoriesAttributeClass() const;
 
+	FClassReflection* GetDontAutoCollapseCategoriesAttributeClass() const;
+
 	FClassReflection* GetCollapseCategoriesAttributeClass() const;
 
 	FClassReflection* GetDontCollapseCategoriesAttributeClass() const;
@@ -193,6 +197,8 @@ public:
 	FClassReflection* GetEarlyAccessPreviewAttributeClass() const;
 
 	FClassReflection* GetSparseClassDataTypeAttributeClass() const;
+
+	FClassReflection* GetCustomThunkTemplatesAttributeClass() const;
 
 	FClassReflection* GetGlobalConfigAttributeClass() const;
 
@@ -671,6 +677,8 @@ private:
 
 	FClassReflection* TArrayClass{};
 
+	FClassReflection* TFieldPathClass{};
+
 #if UE_F_OPTIONAL_PROPERTY
 	FClassReflection* TOptionalClass{};
 #endif
@@ -761,6 +769,8 @@ private:
 
 	FClassReflection* AutoCollapseCategoriesAttributeClass{};
 
+	FClassReflection* DontAutoCollapseCategoriesAttributeClass{};
+
 	FClassReflection* CollapseCategoriesAttributeClass{};
 
 	FClassReflection* DontCollapseCategoriesAttributeClass{};
@@ -772,6 +782,8 @@ private:
 	FClassReflection* EarlyAccessPreviewAttributeClass{};
 
 	FClassReflection* SparseClassDataTypeAttributeClass{};
+
+	FClassReflection* CustomThunkTemplatesAttributeClass{};
 
 	FClassReflection* GlobalConfigAttributeClass{};
 

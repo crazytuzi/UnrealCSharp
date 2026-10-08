@@ -9,39 +9,17 @@
 #include "Domain/LeanCLR/FLeanCLRDomain.h"
 #endif
 
-EScriptDomainType FScriptDomainFactory::GetScriptDomainType()
-{
-	if (const auto UnrealCSharpSetting = GetDefault<UUnrealCSharpSetting>())
-	{
-		return UnrealCSharpSetting->GetScriptDomainType(FPlatformProperties::IniPlatformName());
-	}
-
-	return EScriptDomainType::Mono;
-}
-
 IScriptDomain* FScriptDomainFactory::Create()
 {
-	if (const auto ScriptDomainType = GetScriptDomainType();
-		ScriptDomainType == EScriptDomainType::Mono)
-	{
 #if WITH_MONO
-		return new FMonoDomain();
-#endif
-	}
-	else if (ScriptDomainType == EScriptDomainType::CoreCLR)
-	{
-#if WITH_CORECLR
-		return new FCoreCLRDomain();
-#endif
-	}
-	else if (ScriptDomainType == EScriptDomainType::LeanCLR)
-	{
-#if WITH_LEANCLR
-		return new FLeanCLRDomain();
-#endif
-	}
-
+	return new FMonoDomain();
+#elif WITH_CORECLR
+	return new FCoreCLRDomain();
+#elif WITH_LEANCLR
+	return new FLeanCLRDomain();
+#else
 	return nullptr;
+#endif
 }
 
 void FScriptDomainFactory::Destroy(IScriptDomain* InScriptDomain)

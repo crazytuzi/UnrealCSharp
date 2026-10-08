@@ -7,12 +7,16 @@ namespace Interop
 {
     public static unsafe class MethodBridge
     {
+        private const int UnknownParamCount = -1;
+
         private static readonly Dictionary<string, nint> StringToMethod = new(StringComparer.Ordinal);
 
+        private static readonly Dictionary<string, int> StringToParamCount = new(StringComparer.Ordinal);
+
         [UnmanagedCallersOnly]
-        public static void RegisterBinding(byte** InNames, nint* InMethods, int InLength)
+        public static void RegisterBinding(byte** InNames, nint* InMethods, int* InParamCounts, int InLength)
         {
-            if (InNames != null && InMethods != null)
+            if (InNames != null && InMethods != null && InParamCounts != null)
             {
                 for (var Index = 0; Index < InLength; Index++)
                 {
@@ -23,6 +27,8 @@ namespace Interop
                         if (!string.IsNullOrEmpty(Name))
                         {
                             StringToMethod[Name] = InMethods[Index];
+
+                            StringToParamCount[Name] = InParamCounts[Index];
                         }
                     }
                 }
@@ -137,11 +143,15 @@ namespace Interop
             }
         }
 
-        public static nint GetMethod(ref nint InSlot, string InName)
+        public static nint GetMethod(ref nint InSlot, string InName, int InParamCount)
         {
             if (InSlot == nint.Zero)
             {
-                InSlot = StringToMethod.TryGetValue(InName, out var Method) ? Method : nint.Zero;
+                InSlot = StringToMethod.TryGetValue(InName, out var Method) &&
+                         StringToParamCount.TryGetValue(InName, out var ParamCount) &&
+                         (ParamCount == UnknownParamCount || ParamCount == InParamCount)
+                    ? Method
+                    : nint.Zero;
             }
 
             return InSlot;

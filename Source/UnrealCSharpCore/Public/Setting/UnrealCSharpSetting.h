@@ -139,6 +139,9 @@ private:
 	TArray<FCustomProject> CustomProjects;
 
 	UPROPERTY(Config, EditAnywhere, Category = Override)
+	bool bEnableOverrideBlueprintNativeEvent;
+
+	UPROPERTY(Config, EditAnywhere, Category = Override)
 	bool bEnableCallOverrideFunction;
 
 	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
@@ -164,6 +167,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;
+
+	UPROPERTY(Config, EditAnywhere, Category = Bind)
+	bool bEnableFieldHash;
 
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
 	TArray<FBindClass> BindClass;

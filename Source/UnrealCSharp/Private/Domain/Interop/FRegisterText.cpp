@@ -59,17 +59,26 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FText>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FText>(InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Text->ToString()));
+			return Text != nullptr
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Text->ToString()))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterText()

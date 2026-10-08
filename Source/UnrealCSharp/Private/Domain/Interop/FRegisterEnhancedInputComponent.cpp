@@ -73,8 +73,10 @@ namespace
 				return;
 			}
 
-			if (InClass->FindFunctionByName(*InFunctionName))
+			if (const auto FoundFunction = InClass->FindFunctionByName(*InFunctionName))
 			{
+				FoundFunction->RemoveFromRoot();
+
 				return;
 			}
 
@@ -93,8 +95,6 @@ namespace
 			Function->Next = InClass->Children;
 
 			InClass->Children = Function;
-
-			Function->AddToRoot();
 
 			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
@@ -163,6 +163,23 @@ namespace
 			});
 		}
 
+		static bool HasActionEventBinding(const UEnhancedInputComponent* InEnhancedInputComponent,
+		                                  const UInputAction* InInputAction, const ETriggerEvent InTriggerEvent,
+		                                  const UObject* InObject)
+		{
+			for (const auto& ActionEventBinding : InEnhancedInputComponent->GetActionEventBindings())
+			{
+				if (ActionEventBinding->GetAction() == InInputAction &&
+					ActionEventBinding->GetTriggerEvent() == InTriggerEvent &&
+					ActionEventBinding->GetUObject() == InObject)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		static IManagedHandle BindActionImplementation(const IManagedHandle InManagedHandle,
 		                                               const IManagedHandle InBlueprintEnhancedInputActionBinding,
 		                                               const IManagedHandle InObjectToBindTo,
@@ -171,34 +188,58 @@ namespace
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UEnhancedInputComponent>(
 				InManagedHandle))
 			{
-				const auto [InputAction, TriggerEvent, FunctionNameToBind] = *FCSharpEnvironment::GetEnvironment().
+				const auto FoundInputBinding = FCSharpEnvironment::GetEnvironment().
 					GetStruct<FBlueprintEnhancedInputActionBinding>(InBlueprintEnhancedInputActionBinding);
 
 				const auto ObjectToBindTo = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InObjectToBindTo);
 
-				const auto& EnhancedInputActionEventBinding = FoundObject->BindAction(
-					InputAction,
-					TriggerEvent,
-					ObjectToBindTo,
-					FunctionNameToBind
-				);
-
-				BindActionFunction(ObjectToBindTo->GetClass(),
-				                   FCSharpEnvironment::GetEnvironment().GetString<FName>(InFunctionNameToBind));
+				const auto FoundFunctionName = FCSharpEnvironment::GetEnvironment().GetString<FName>(
+					InFunctionNameToBind);
 
 				const auto FoundClass = TPropertyClass<
 					FEnhancedInputActionEventBinding, FEnhancedInputActionEventBinding>::Get();
 
-				const auto Object = FoundClass->NewObject();
+				if (FoundInputBinding != nullptr && ObjectToBindTo != nullptr &&
+					FoundFunctionName != nullptr && FoundClass != nullptr)
+				{
+					const auto [InputAction, TriggerEvent, FunctionNameToBind] = *FoundInputBinding;
 
-				FCSharpEnvironment::GetEnvironment().AddBindingReference<
-					std::decay_t<FEnhancedInputActionEventBinding>, false>(
-					FoundClass, Object, &EnhancedInputActionEventBinding);
+					if (HasActionEventBinding(FoundObject, InputAction, TriggerEvent, ObjectToBindTo))
+					{
+						return InvalidManagedHandle;
+					}
 
-				return Object;
+					const auto& EnhancedInputActionEventBinding = FoundObject->BindAction(
+						InputAction,
+						TriggerEvent,
+						ObjectToBindTo,
+						FunctionNameToBind
+					);
+
+					BindActionFunction(ObjectToBindTo->GetClass(), FoundFunctionName);
+
+					const auto Object = FoundClass->NewObject();
+
+					FCSharpEnvironment::GetEnvironment().AddBindingReference<
+						std::decay_t<FEnhancedInputActionEventBinding>, false>(
+						FoundClass, Object, &EnhancedInputActionEventBinding);
+
+					return Object;
+				}
 			}
 
 			return InvalidManagedHandle;
+		}
+
+		static int32 GetNumActionEventBindingsImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UEnhancedInputComponent>(
+				InManagedHandle))
+			{
+				return FoundObject->GetActionEventBindings().Num();
+			}
+
+			return 0;
 		}
 
 		static void RemoveBindingImplementation(const IManagedHandle InManagedHandle,
@@ -207,10 +248,11 @@ namespace
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UEnhancedInputComponent>(
 				InManagedHandle))
 			{
-				const auto EnhancedInputActionEventBinding = FCSharpEnvironment::GetEnvironment().GetBinding<
-					FEnhancedInputActionEventBinding>(InEnhancedInputActionEventBinding);
-
-				FoundObject->RemoveBinding(*EnhancedInputActionEventBinding);
+				if (const auto EnhancedInputActionEventBinding = FCSharpEnvironment::GetEnvironment().GetBinding<
+					FEnhancedInputActionEventBinding>(InEnhancedInputActionEventBinding))
+				{
+					FoundObject->RemoveBinding(*EnhancedInputActionEventBinding);
+				}
 			}
 		}
 
@@ -219,7 +261,8 @@ namespace
 			TBindingClassBuilder<UEnhancedInputComponent>(NAMESPACE_LIBRARY)
 				.Function("GetDynamicBindingObject", GetDynamicBindingObjectImplementation)
 				.Function("BindAction", BindActionImplementation)
-				.Function("RemoveBinding", RemoveBindingImplementation);
+				.Function("RemoveBinding", RemoveBindingImplementation)
+				.Function("GetNumActionEventBindings", GetNumActionEventBindingsImplementation);
 		}
 	};
 

@@ -71,10 +71,10 @@ FString SCRIPT_DOMAIN_TYPE::GetFullName(const IManagedHandle InManagedClass)
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_NEW_OBJECT
-IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass)
+IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass, const bool bIsWeak)
 {
 	return ObjectBridgeNewObjectFn != nullptr
-		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass)
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass, bIsWeak ? 1 : 0)
 		       : InvalidManagedHandle;
 }
 #endif
@@ -331,6 +331,15 @@ FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle
 	}
 
 	return {};
+}
+#endif
+
+#ifndef SCRIPT_DOMAIN_CUSTOM_IS_ALIVE
+bool SCRIPT_DOMAIN_TYPE::IsAlive(const IManagedHandle InManagedHandle)
+{
+	return IManagedHandleIsValid(InManagedHandle) && HandleDataIsAliveFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(int32, HandleDataIsAliveFn, InManagedHandle.Value) != 0
+		       : true;
 }
 #endif
 
@@ -608,6 +617,8 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 
 		TArray<PTRINT> Methods;
 
+		TArray<int32> ParamCounts;
+
 		for (const auto& Class : FBinding::Get().Register().GetClasses())
 		{
 			for (const auto& Method : Class->GetMethods())
@@ -625,10 +636,13 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 				MethodNames.Add(reinterpret_cast<const uint8*>(Name.GetData()));
 
 				Methods.Add(reinterpret_cast<PTRINT>(const_cast<void*>(Method.GetFunction())));
+
+				ParamCounts.Add(Method.GetParamCount());
 			}
 		}
 
-		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), MethodNames.Num());
+		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
+		                              MethodNames.Num());
 	}
 }
 #endif

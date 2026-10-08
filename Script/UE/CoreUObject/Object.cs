@@ -27,7 +27,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as UObject;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            UObjectImplementation.UObject_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public UClass GetClass() => UObjectImplementation.UObject_GetClassImplementation(HandleData.GetHandle(this));
 

@@ -34,6 +34,8 @@
 
 #define FUNCTION_ASSEMBLY_LOADER_UNLOAD FString(TEXT("Unload"))
 
+#define FUNCTION_HANDLE_DATA_IS_ALIVE FString(TEXT("IsAlive"))
+
 #define FUNCTION_HANDLE_DATA_FREE FString(TEXT("Free"))
 
 #define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTER FString(TEXT("GetObjectPointer"))

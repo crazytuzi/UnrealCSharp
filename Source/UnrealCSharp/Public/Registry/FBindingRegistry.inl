@@ -16,10 +16,9 @@ auto FBindingRegistry::AddReference(const T* InObject, FClassReflection* InClass
 {
 	BindingAddress2ManagedHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), InManagedHandle);
 
-	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
+	auto BindingAddressWrapper = new TBindingAddressWrapper<T, IsNeedFree>(InObject);
 
-	ManagedHandle2BindingAddress.Add(InManagedHandle,
-	                                 FBindingValueMapping::ValueType(BindingAddressWrapper, IsNeedFree));
+	ManagedHandle2BindingAddress.Add(InManagedHandle, FBindingValueMapping::ValueType(BindingAddressWrapper));
 
 	return true;
 }
@@ -30,9 +29,9 @@ auto FBindingRegistry::AddReference(const IManagedHandle InOwner, const T* InObj
 {
 	BindingAddress2ManagedHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), InManagedHandle);
 
-	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
+	auto BindingAddressWrapper = new TBindingAddressWrapper<T, false>(InObject);
 
-	ManagedHandle2BindingAddress.Add(InManagedHandle, FBindingValueMapping::ValueType(BindingAddressWrapper, false));
+	ManagedHandle2BindingAddress.Add(InManagedHandle, FBindingValueMapping::ValueType(BindingAddressWrapper));
 
 	return FCSharpEnvironment::GetEnvironment().AddReference(InOwner, new FBindingReference(InManagedHandle));
 }

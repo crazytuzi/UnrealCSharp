@@ -7,12 +7,13 @@
 #include "Template/TIsTScriptInterface.inl"
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
+#include "TOwnedValue.inl"
 
 class UNREALCSHARP_API FMultiRegistry
 {
 public:
 	template <typename T, template<typename...> class IsType>
-	struct TMultiAddress : TValueWrapper<T>
+	struct TMultiAddress : TValueWrapper<T>, TOwnedValue<TMultiAddress<T, IsType>>
 	{
 		template <typename U>
 		struct TIsType
@@ -22,11 +23,20 @@ public:
 
 		TMultiAddress(T InValue, const bool InNeedFree) :
 			TValueWrapper<T>(InValue),
-			bNeedFree(InNeedFree)
+			TOwnedValue<TMultiAddress<T, IsType>>(InNeedFree)
 		{
 		}
 
-		bool bNeedFree;
+	private:
+		template <typename>
+		friend struct TOwnedValue;
+
+		void FreeImplementation()
+		{
+			FMemory::Free(TValueWrapper<T>::Value);
+
+			TValueWrapper<T>::Value = nullptr;
+		}
 	};
 
 	typedef TMultiAddress<TSubclassOf<UObject>*, TIsTSubclassOf> FSubclassOfAddress;

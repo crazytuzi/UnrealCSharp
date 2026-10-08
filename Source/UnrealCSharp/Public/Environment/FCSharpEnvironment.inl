@@ -286,6 +286,15 @@ auto FCSharpEnvironment::RemoveStringReference(const IManagedHandle InManagedHan
 		       : false;
 }
 
+template <auto IsNeedFree, auto IsMember>
+auto FCSharpEnvironment::AddFieldPathReference(FClassReflection* InClass, const IManagedHandle InManagedHandle,
+                                               FFieldPath* InValue) const
+{
+	return FieldPathRegistry != nullptr
+		       ? FieldPathRegistry->template AddReference<IsNeedFree, IsMember>(InClass, InManagedHandle, InValue)
+		       : false;
+}
+
 template <typename T>
 auto FCSharpEnvironment::GetBinding(const IManagedHandle InManagedHandle) const
 {

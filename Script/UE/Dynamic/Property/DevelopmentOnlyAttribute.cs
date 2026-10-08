@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class DevelopmentOnlyAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public DevelopmentOnlyAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

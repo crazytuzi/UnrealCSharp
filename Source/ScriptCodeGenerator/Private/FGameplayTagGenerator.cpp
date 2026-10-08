@@ -185,7 +185,7 @@ void FGameplayTagGenerator::GeneratorChildren(FString& OutContent, const FGamepl
 			),
 			                           *Pad,
 			                           *Name,
-			                           *Child.Tag
+			                           *FGeneratorCore::GetEscapedStringLiteral(Child.Tag)
 			);
 		}
 		else
@@ -207,7 +207,7 @@ void FGameplayTagGenerator::GeneratorChildren(FString& OutContent, const FGamepl
 					"%s\tpublic static readonly FGameplayTag Value = new FGameplayTag { TagName = \"%s\" };\n"
 				),
 				                           *Pad,
-				                           *Child.Tag
+				                           *FGeneratorCore::GetEscapedStringLiteral(Child.Tag)
 				);
 
 				Content += TEXT("\n");

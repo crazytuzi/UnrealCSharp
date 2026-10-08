@@ -14,7 +14,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __FName_RegisterImplementation(HandleData.Alloc(InName), Ptr);
+                __FName_RegisterImplementation(HandleData.Alloc(InName, true), Ptr);
             }
         }
 
@@ -23,6 +23,13 @@ namespace Script.Library
         public static unsafe bool FName_IdenticalImplementation(nint InA, nint InB)
         {
             return __FName_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __FName_GetTypeHashImplementation(nint InName);
+
+        public static unsafe int FName_GetTypeHashImplementation(nint InName)
+        {
+            return __FName_GetTypeHashImplementation(InName);
         }
 
         private static unsafe partial void __FName_UnRegisterImplementation(nint InName);
@@ -38,7 +45,16 @@ namespace Script.Library
         {
             var Handle = __FName_ToStringImplementation(InName);
 
-            return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Result = (string)HandleData.GetObject(Handle);
+
+                HandleData.FreeImplementation(Handle);
+
+                return Result;
+            }
+
+            return null;
         }
 
         private static unsafe partial nint __FName_NAME_NoneImplementation();

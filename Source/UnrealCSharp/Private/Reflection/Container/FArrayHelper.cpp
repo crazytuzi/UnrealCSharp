@@ -2,11 +2,13 @@
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
-                           const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                           const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                           const FDataDeleter InDataDeleter) :
 	InnerPropertyDescriptor(nullptr),
 	ScriptArray(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter)
 {
 	InnerPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
@@ -18,6 +20,8 @@ FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
 	{
 		ScriptArray = new FScriptArray();
 	}
+
+	Initialize();
 }
 
 FArrayHelper::~FArrayHelper()
@@ -33,7 +37,19 @@ void FArrayHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptArray != nullptr)
 	{
-		delete ScriptArray;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptArray);
+		}
+		else
+		{
+			if (InnerPropertyDescriptor != nullptr)
+			{
+				Empty(0);
+			}
+
+			delete ScriptArray;
+		}
 
 		ScriptArray = nullptr;
 	}
@@ -134,7 +150,11 @@ void FArrayHelper::Set(const int32 Index, void* InValue) const
 {
 	if (auto ScriptArrayHelper = CreateHelperFormInnerProperty(); ScriptArrayHelper.IsValidIndex(Index))
 	{
-		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+		const auto Dest = ScriptArrayHelper.GetRawPtr(Index);
+
+		InnerPropertyDescriptor->DestroyValue(Dest);
+
+		InnerPropertyDescriptor->Set(InValue, Dest);
 	}
 }
 
@@ -188,75 +208,100 @@ bool FArrayHelper::Contains(const void* InValue) const
 
 int32 FArrayHelper::AddUninitialized(const int32 InCount) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+	if (InCount >= 0)
+	{
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	return ScriptArrayHelper.AddUninitializedValues(InCount);
+		return ScriptArrayHelper.AddUninitializedValues(InCount);
+	}
+
+	return INDEX_NONE;
 }
 
 void FArrayHelper::InsertZeroed(const int32 InIndex, const int32 InCount) const
 {
-	ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+	if (InCount >= 0 && InIndex >= 0 && InIndex <= Num())
+	{
+		ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize(),
+		                          __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+	}
 }
 
 void FArrayHelper::InsertDefaulted(const int32 InIndex, const int32 InCount) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+	if (InCount >= 0 && InIndex >= 0 && InIndex <= Num())
+	{
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	ScriptArrayHelper.InsertValues(InIndex, InCount);
+		ScriptArrayHelper.InsertValues(InIndex, InCount);
+	}
 }
 
 void FArrayHelper::RemoveAt(const int32 InIndex, const int32 InCount, const bool bAllowShrinking) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
-
-	auto Dest = ScriptArrayHelper.GetRawPtr(InIndex);
-
-	if (!(InnerPropertyDescriptor->GetPropertyFlags() & (CPF_IsPlainOldData | CPF_NoDestructor)))
+	if (InCount >= 0 && InIndex >= 0 && InIndex <= Num() - InCount)
 	{
-		for (auto Index = 0; Index < InCount; ++Index, Dest += InnerPropertyDescriptor->GetElementSize())
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+
+		auto Dest = ScriptArrayHelper.GetRawPtr(InIndex);
+
+		if (!(InnerPropertyDescriptor->GetPropertyFlags() & (CPF_IsPlainOldData | CPF_NoDestructor)))
 		{
-			InnerPropertyDescriptor->DestroyValue(Dest);
+			for (auto Index = 0; Index < InCount; ++Index, Dest += InnerPropertyDescriptor->GetElementSize())
+			{
+				InnerPropertyDescriptor->DestroyValue(Dest);
+			}
 		}
-	}
 
-	ScriptArray->Remove(InIndex, InCount, InnerPropertyDescriptor->GetElementSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		ScriptArray->Remove(InIndex, InCount, InnerPropertyDescriptor->GetElementSize(),
+		                    __STDCPP_DEFAULT_NEW_ALIGNMENT__);
 
-	if (bAllowShrinking)
-	{
-		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		if (bAllowShrinking)
+		{
+			ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		}
 	}
 }
 
 void FArrayHelper::Reset(const int32 InNewSize) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+	if (InNewSize >= 0)
+	{
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	if (InNewSize <= ScriptArray->GetSlack() + ScriptArray->Num())
-	{
-		ScriptArrayHelper.RemoveValues(0, ScriptArray->Num());
-	}
-	else
-	{
-		ScriptArrayHelper.EmptyValues(InNewSize);
+		if (InNewSize <= ScriptArray->GetSlack() + ScriptArray->Num())
+		{
+			ScriptArrayHelper.RemoveValues(0, ScriptArray->Num());
+		}
+		else
+		{
+			ScriptArrayHelper.EmptyValues(InNewSize);
+		}
 	}
 }
 
 void FArrayHelper::Empty(const int32 InSlack) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+	if (InSlack >= 0)
+	{
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	ScriptArrayHelper.EmptyValues(InSlack);
+		ScriptArrayHelper.EmptyValues(InSlack);
+	}
 }
 
 void FArrayHelper::SetNum(const int32 InNewNum, const bool bAllowShrinking) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
-
-	ScriptArrayHelper.Resize(InNewNum);
-
-	if (bAllowShrinking)
+	if (InNewNum >= 0)
 	{
-		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+
+		ScriptArrayHelper.Resize(InNewNum);
+
+		if (bAllowShrinking)
+		{
+			ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		}
 	}
 }
 
@@ -273,7 +318,9 @@ int32 FArrayHelper::Add(void* InValue) const
 
 int32 FArrayHelper::AddZeroed(const int32 InCount) const
 {
-	return ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+	return InCount >= 0
+		       ? ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__)
+		       : INDEX_NONE;
 }
 
 int32 FArrayHelper::AddUnique(void* InValue) const
@@ -323,12 +370,20 @@ int32 FArrayHelper::Remove(const void* InValue) const
 
 void FArrayHelper::SwapMemory(const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap) const
 {
-	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
+	if (const auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+		ScriptArrayHelper.IsValidIndex(InFirstIndexToSwap) && ScriptArrayHelper.IsValidIndex(InSecondIndexToSwap))
+	{
+		ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
+	}
 }
 
 void FArrayHelper::Swap(const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap) const
 {
-	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
+	if (const auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+		ScriptArrayHelper.IsValidIndex(InFirstIndexToSwap) && ScriptArrayHelper.IsValidIndex(InSecondIndexToSwap))
+	{
+		ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
+	}
 }
 
 FPropertyDescriptor* FArrayHelper::GetInnerPropertyDescriptor() const

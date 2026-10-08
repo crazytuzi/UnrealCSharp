@@ -1,4 +1,4 @@
-#include "Common/FUnrealCSharpFunctionLibrary.h"
+﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
@@ -853,6 +853,16 @@ bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
 	return false;
 }
 
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const FProperty* InProperty)
+{
+	return GetHash(InProperty, InProperty != nullptr ? InProperty->GetOwnerStruct() : nullptr);
+}
+
+uint32 FUnrealCSharpFunctionLibrary::GetHash(const UFunction* InFunction)
+{
+	return GetHash(InFunction, InFunction != nullptr ? Cast<UStruct>(InFunction->GetOuter()) : nullptr);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionNamePrefix()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
@@ -1036,6 +1046,11 @@ FString FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath()
 #endif
 }
 
+FString FUnrealCSharpFunctionLibrary::GetFullInteropBuildDirectory()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::ProjectIntermediateDir() / PLUGIN_NAME);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFullUEPublishPath()
 {
 	return GetFullPublishDirectory() / GetUEName() + DLL_SUFFIX;
@@ -1111,11 +1126,6 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 {
 	return GetFullScriptDirectory() / WEAVERS_NAME;
 }
-
-FString FUnrealCSharpFunctionLibrary::GetInteropPath()
-{
-	return GetFullScriptDirectory() / INTEROP_NAME;
-}
 #endif
 
 #if WITH_EDITOR
@@ -1162,10 +1172,6 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 		}
 	}
 
-#if WITH_EDITOR
-	MarkScriptChanged();
-#endif
-
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
 	if (const auto DirectoryName = FPaths::GetPath(InFileName);
@@ -1174,8 +1180,18 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
 
-	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
-	                                     FileManager, FILEWRITE_None);
+	const auto bIsSaved = FFileHelper::SaveStringToFile(InString, *InFileName,
+	                                                    FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+	                                                    FileManager, FILEWRITE_None);
+
+	if (bIsSaved)
+	{
+#if WITH_EDITOR
+		MarkScriptChanged();
+#endif
+	}
+
+	return bIsSaved;
 }
 
 TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)
@@ -1188,29 +1204,29 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 		{
 			TSharedPtr<FJsonObject> JsonObject;
 
-			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
-
-			FJsonSerializer::Deserialize(JsonReader, JsonObject);
-
-			for (const auto& [Key, Value] : JsonObject->Values)
+			if (const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+				FJsonSerializer::Deserialize(JsonReader, JsonObject))
 			{
-				TArray<FString> Array;
-
-				const auto& JsonValueArray = Value->AsArray();
-
-				for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
+				for (const auto& [Key, Value] : JsonObject->Values)
 				{
-					if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+					TArray<FString> Array;
+
+					const auto& JsonValueArray = Value->AsArray();
+
+					for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
 					{
-						Array.Add(Element);
+						if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+						{
+							Array.Add(Element);
+						}
 					}
-				}
 
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-				Result.Add(FString(*Key), Array);
+					Result.Add(FString(*Key), Array);
 #else
-				Result.Add(Key, Array);
+					Result.Add(Key, Array);
 #endif
+				}
 			}
 		}
 	}
@@ -1228,17 +1244,17 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 		{
 			TSharedPtr<FJsonObject> JsonObject;
 
-			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
-
-			FJsonSerializer::Deserialize(JsonReader, JsonObject);
-
-			for (const auto& [Key, Value] : JsonObject->Values)
+			if (const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+				FJsonSerializer::Deserialize(JsonReader, JsonObject))
 			{
+				for (const auto& [Key, Value] : JsonObject->Values)
+				{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-				Result.Add(FString(*Key), Value->AsString());
+					Result.Add(FString(*Key), Value->AsString());
 #else
-				Result.Add(Key, Value->AsString());
+					Result.Add(Key, Value->AsString());
 #endif
+				}
 			}
 		}
 	}
@@ -1254,6 +1270,36 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 	       Add(GetGameDirectory()).
 	       Append(GetCustomProjectsDirectory()).
 	       Build();
+}
+
+bool FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated()
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	const auto SharedPropsPath = FPaths::Combine(GetFullScriptDirectory(), SHARED_NAME + PROPS_SUFFIX);
+
+	if (!PlatformFile.FileExists(*SharedPropsPath))
+	{
+		return false;
+	}
+
+	const auto SharedPropsTimestamp = PlatformFile.GetTimeStamp(*SharedPropsPath);
+
+	const TArray<FString> AssemblyPaths{
+		GetFullUEPublishPath(),
+		GetFullGamePublishPath()
+	};
+
+	for (const auto& AssemblyPath : AssemblyPaths)
+	{
+		if (!PlatformFile.FileExists(*AssemblyPath) ||
+			PlatformFile.GetTimeStamp(*AssemblyPath) < SharedPropsTimestamp)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 #endif
 
@@ -1316,29 +1362,32 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 
 			TSharedPtr<FJsonObject> JsonObj;
 
-			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
+			if (FJsonSerializer::Deserialize(JsonReader, JsonObj))
 			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					EngineModuleList.AddUnique(FString(*Key));
+						EngineModuleList.AddUnique(FString(*Key));
 #else
-					EngineModuleList.AddUnique(Key);
+						EngineModuleList.AddUnique(Key);
 #endif
+					}
 				}
-			}
 
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
-			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					EngineModuleList.AddUnique(FString(*Key));
+						EngineModuleList.AddUnique(FString(*Key));
 #else
-					EngineModuleList.AddUnique(Key);
+						EngineModuleList.AddUnique(Key);
 #endif
+					}
 				}
 			}
 		}
@@ -1361,29 +1410,32 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 
 			TSharedPtr<FJsonObject> JsonObj;
 
-			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
+			if (FJsonSerializer::Deserialize(JsonReader, JsonObj))
 			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					ProjectModuleList.AddUnique(FString(*Key));
+						ProjectModuleList.AddUnique(FString(*Key));
 #else
-					ProjectModuleList.AddUnique(Key);
+						ProjectModuleList.AddUnique(Key);
 #endif
+					}
 				}
-			}
 
-			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
-			{
-				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+				if (const TSharedPtr<FJsonObject>* OutObject;
+					JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
 				{
+					for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
+					{
 #if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
-					ProjectModuleList.AddUnique(FString(*Key));
+						ProjectModuleList.AddUnique(FString(*Key));
 #else
-					ProjectModuleList.AddUnique(Key);
+						ProjectModuleList.AddUnique(Key);
 #endif
+					}
 				}
 			}
 		}
@@ -1493,7 +1545,7 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 		Class = Class->GetSuperClass();
 	}
 
-	return Function->IsNative() && OwnerClass->IsNative();
+	return Function != nullptr ? Function->IsNative() && OwnerClass->IsNative() : false;
 }
 
 void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass)
@@ -1520,7 +1572,8 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
                                                const FString& InWorkingDirectory,
-                                               const TFunction<void(const FString&)>& InOnOutput)
+                                               const TFunction<void(const FString&)>& InOnOutput,
+                                               const TFunction<bool()>& InIsStopped)
 {
 	void* ReadPipe = nullptr;
 
@@ -1552,7 +1605,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
-	const auto ReadOutput = [&]()
+	const auto ReadOutput = [&]() -> bool
 	{
 		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
 			!Output.IsEmpty())
@@ -1563,21 +1616,61 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 			{
 				InOnOutput(Output);
 			}
+
+			return true;
 		}
+
+		return false;
 	};
+
+	const auto StartTime = FPlatformTime::Seconds();
+
+	auto LastOutputTime = StartTime;
+
+	auto bCancelled = false;
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
-		FPlatformProcess::Sleep(0.01f);
+		constexpr auto SyncProcessSilenceTimeoutSeconds = 120.0;
 
-		ReadOutput();
+		constexpr auto SyncProcessTimeoutSeconds = 600.0;
+
+		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
+
+		const auto Now = FPlatformTime::Seconds();
+
+		const auto bIsStopped = InIsStopped && InIsStopped();
+
+		const auto bIsTimeout = Now - StartTime > SyncProcessTimeoutSeconds;
+
+		const auto bIsSilenceTimeout = Now - LastOutputTime > SyncProcessSilenceTimeoutSeconds;
+
+		if (bIsStopped || bIsTimeout || bIsSilenceTimeout)
+		{
+			bCancelled = true;
+
+			FPlatformProcess::TerminateProc(ProcessHandle, true);
+
+			break;
+		}
+
+		FPlatformProcess::SleepNoStats(SyncProcessPollIntervalSeconds);
+
+		if (ReadOutput())
+		{
+			LastOutputTime = FPlatformTime::Seconds();
+		}
 	}
 
 	ReadOutput();
 
 	auto ReturnCode = 0;
 
-	if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	if (bCancelled)
+	{
+		ReturnCode = -2;
+	}
+	else if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
 		ReturnCode = -1;
 	}

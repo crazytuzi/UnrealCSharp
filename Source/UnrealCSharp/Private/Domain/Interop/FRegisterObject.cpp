@@ -1,4 +1,5 @@
 #include "Engine/World.h"
+#include "Templates/TypeHash.h"
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
@@ -21,6 +22,16 @@ namespace
 				{
 					return FoundA == FoundB ? 1 : 0;
 				}
+			}
+
+			return 0;
+		}
+
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
+			{
+				return static_cast<int32>(PointerHash(FoundObject));
 			}
 
 			return 0;
@@ -132,6 +143,7 @@ namespace
 		{
 			TBindingClassBuilder<UObject>(NAMESPACE_LIBRARY)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("StaticClass", StaticClassImplementation)
 				.Function("GetClass", GetClassImplementation)
 				.Function("GetName", GetNameImplementation)

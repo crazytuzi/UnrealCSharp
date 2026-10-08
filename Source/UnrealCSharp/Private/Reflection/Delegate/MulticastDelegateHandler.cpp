@@ -1,4 +1,5 @@
 #include "Reflection/Delegate/MulticastDelegateHandler.h"
+#include "UObject/UnrealType.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/FunctionMacro.h"
 
@@ -8,7 +9,8 @@ void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			for (const auto& [Key, Value] : DelegateWrappers)
+			for (const TArray<FDelegateWrapper, TInlineAllocator<4>> DelegateWrappersCopy(DelegateWrappers);
+			     const auto& [Key, Value] : DelegateWrappersCopy)
 			{
 				DelegateDescriptor->CallDelegate(Key.Get(), Value, Parms);
 			}
@@ -25,7 +27,8 @@ void UMulticastDelegateHandler::CSharpCallBack()
 }
 
 void UMulticastDelegateHandler::Initialize(FMulticastScriptDelegate* InMulticastScriptDelegate,
-                                           UFunction* InSignatureFunction)
+                                           UFunction* InSignatureFunction,
+                                           FMulticastDelegateProperty* InProperty, void* InAddress)
 {
 	bNeedFree = InMulticastScriptDelegate == nullptr;
 
@@ -34,6 +37,10 @@ void UMulticastDelegateHandler::Initialize(FMulticastScriptDelegate* InMulticast
 		                          : new FMulticastScriptDelegate();
 
 	DelegateDescriptor = new FCSharpDelegateDescriptor(InSignatureFunction);
+
+	Property = InProperty;
+
+	Address = InAddress;
 }
 
 void UMulticastDelegateHandler::Deinitialize()
@@ -60,6 +67,12 @@ void UMulticastDelegateHandler::Deinitialize()
 	DelegateWrappers.Empty();
 
 	ScriptDelegate.Unbind();
+
+	Property = nullptr;
+
+	Address = nullptr;
+
+	bNeedFree = false;
 }
 
 bool UMulticastDelegateHandler::IsBound() const
@@ -74,7 +87,21 @@ bool UMulticastDelegateHandler::Contains(UObject* InObject, FMethodReflection* I
 
 void UMulticastDelegateHandler::Add(UObject* InObject, FMethodReflection* InMethod)
 {
-	if (MulticastScriptDelegate != nullptr)
+	if (bNeedFree && Property != nullptr && Address != nullptr)
+	{
+		ScriptDelegate.Unbind();
+
+		ScriptDelegate.BindUFunction(this, *FUNCTION_CSHARP_CALLBACK);
+
+		Property->AddDelegate(ScriptDelegate, nullptr, Address);
+
+		delete MulticastScriptDelegate;
+
+		MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(Property->GetMulticastDelegate(Address));
+
+		bNeedFree = false;
+	}
+	else if (MulticastScriptDelegate != nullptr)
 	{
 		if (!MulticastScriptDelegate->Contains(ScriptDelegate))
 		{
@@ -91,7 +118,21 @@ void UMulticastDelegateHandler::Add(UObject* InObject, FMethodReflection* InMeth
 
 void UMulticastDelegateHandler::AddUnique(UObject* InObject, FMethodReflection* InMethod)
 {
-	if (MulticastScriptDelegate != nullptr)
+	if (bNeedFree && Property != nullptr && Address != nullptr)
+	{
+		ScriptDelegate.Unbind();
+
+		ScriptDelegate.BindUFunction(this, *FUNCTION_CSHARP_CALLBACK);
+
+		Property->AddDelegate(ScriptDelegate, nullptr, Address);
+
+		delete MulticastScriptDelegate;
+
+		MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(Property->GetMulticastDelegate(Address));
+
+		bNeedFree = false;
+	}
+	else if (MulticastScriptDelegate != nullptr)
 	{
 		if (!MulticastScriptDelegate->Contains(ScriptDelegate))
 		{

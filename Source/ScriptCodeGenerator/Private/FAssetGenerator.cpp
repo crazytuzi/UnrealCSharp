@@ -151,13 +151,24 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
 		),
 		                                         *UsingNameSpace);
 	}
+
+	const auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FUnrealCSharpFunctionLibrary::GetObjectPathName(
+#if UE_F_ASSET_DATA_GET_OBJECT_PATH_STRING
+			InAssetData, InAssetData.GetObjectPathString()
+#else
+			InAssetData, InAssetData.ObjectPath.ToString()
+#endif
+		));
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
@@ -173,12 +184,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
-	                                     *FUnrealCSharpFunctionLibrary::GetObjectPathName(
-#if UE_F_ASSET_DATA_GET_OBJECT_PATH_STRING
-		                                     InAssetData, InAssetData.GetObjectPathString()),
-#else
-		                                     InAssetData, InAssetData.ObjectPath.ToString()),
-#endif
+	                                     *PathNameAttributeContent,
 	                                     *ClassName,
 	                                     *FUnrealCSharpFunctionLibrary::GetAssetClass(
 		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))

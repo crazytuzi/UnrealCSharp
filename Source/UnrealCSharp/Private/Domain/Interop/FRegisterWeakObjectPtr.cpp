@@ -35,13 +35,32 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundWeakObjectPtr = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TWeakObjectPtr<UObject>>(InManagedHandle))
+			{
+				return FoundWeakObjectPtr->IsValid() ? static_cast<int32>(GetTypeHash(*FoundWeakObjectPtr)) : 0;
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle GetImplementation(const IManagedHandle InManagedHandle)
@@ -49,7 +68,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment()
 				.GetMulti<TWeakObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->Get())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterWeakObjectPtr()
@@ -57,6 +78,7 @@ namespace
 			FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Get", GetImplementation);
 		}

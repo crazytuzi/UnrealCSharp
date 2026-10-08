@@ -5,11 +5,25 @@
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
                                                      FCSharpFunctionRegister&& InFunctionRegister) :
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	Super(InFunction,
+	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction),
+	      InFunctionRegister.GetOriginalOwnerClass()),
+#else
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
+#endif
 	FunctionRegister(std::move(InFunctionRegister))
 {
-	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InFunction->GetOwnerClass()))
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	const auto OriginalOwnerClass = FunctionRegister.GetOriginalOwnerClass();
+
+	const auto OwnerClass = OriginalOwnerClass != nullptr ? OriginalOwnerClass : InFunction->GetOwnerClass();
+#else
+	const auto OwnerClass = InFunction->GetOwnerClass();
+#endif
+
+	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(OwnerClass))
 	{
 		Method = FoundClass->GetParentMethod(InFunction->HasAnyFunctionFlags(FUNC_Net)
 			                                     ? FString::Printf(TEXT(
@@ -25,117 +39,120 @@ FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
 
 bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, RESULT_DECL)
 {
-	void* Params = InStack.Locals;
-
-	FOutParmRec* NewOutParams{};
-
-	if (InStack.Node != InStack.CurrentNativeFunction)
+	if (const auto FoundFunction = Function.Get())
 	{
-		Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
+		void* Params = InStack.Locals;
 
-		if (Params != nullptr)
+		FOutParmRec* NewOutParams{};
+
+		if (InStack.Node != InStack.CurrentNativeFunction)
 		{
-			auto LastOutParam = &NewOutParams;
+			Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-			for (auto Property = static_cast<FProperty*>(Function->ChildProperties);
-			     *InStack.Code != EX_EndFunctionParms;
-			     Property = static_cast<FProperty*>(Property->Next))
+			if (Params != nullptr)
 			{
-				Property->InitializeValue_InContainer(Params);
+				auto LastOutParam = &NewOutParams;
 
-				InStack.MostRecentPropertyAddress = nullptr;
-
-				if (Property->HasAnyPropertyFlags(CPF_OutParm))
+				for (auto Property = static_cast<FProperty*>(FoundFunction->ChildProperties);
+				     *InStack.Code != EX_EndFunctionParms;
+				     Property = static_cast<FProperty*>(Property->Next))
 				{
-					InStack.Step(InStack.Object, Property->ContainerPtrToValuePtr<uint8>(Params));
+					Property->InitializeValue_InContainer(Params);
 
-					if (LastOutParam != nullptr)
+					InStack.MostRecentPropertyAddress = nullptr;
+
+					if (Property->HasAnyPropertyFlags(CPF_OutParm))
 					{
-						CA_SUPPRESS(6263)
+						InStack.Step(InStack.Object, Property->ContainerPtrToValuePtr<uint8>(Params));
 
-						const auto OutParam = (FOutParmRec*)FMemory_Alloca(sizeof(FOutParmRec));
-
-						OutParam->PropAddr = InStack.MostRecentPropertyAddress != nullptr
-							                     ? InStack.MostRecentPropertyAddress
-							                     : Property->ContainerPtrToValuePtr<uint8>(Params);
-
-						OutParam->Property = Property;
-
-						if (*LastOutParam != nullptr)
+						if (LastOutParam != nullptr)
 						{
-							(*LastOutParam)->NextOutParm = OutParam;
+							CA_SUPPRESS(6263)
 
-							LastOutParam = &(*LastOutParam)->NextOutParm;
-						}
-						else
-						{
-							*LastOutParam = OutParam;
+							const auto OutParam = (FOutParmRec*)FMemory_Alloca(sizeof(FOutParmRec));
+
+							OutParam->PropAddr = InStack.MostRecentPropertyAddress != nullptr
+								                     ? InStack.MostRecentPropertyAddress
+								                     : Property->ContainerPtrToValuePtr<uint8>(Params);
+
+							OutParam->Property = Property;
+
+							if (*LastOutParam != nullptr)
+							{
+								(*LastOutParam)->NextOutParm = OutParam;
+
+								LastOutParam = &(*LastOutParam)->NextOutParm;
+							}
+							else
+							{
+								*LastOutParam = OutParam;
+							}
 						}
 					}
-				}
-				else
-				{
-					InStack.Step(InStack.Object, Property->ContainerPtrToValuePtr<uint8>(Params));
-				}
-			}
-		}
-
-		if (InStack.Code != nullptr)
-		{
-			InStack.SkipCode(1);
-		}
-	}
-
-	auto OutParams = NewOutParams != nullptr ? NewOutParams : InStack.OutParms;
-
-	auto ReferenceParam = OutParams;
-
-	Invoke(
-		Method,
-		FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
-			? InvalidManagedHandle
-			: FCSharpEnvironment::GetEnvironment().GetObject(InContext),
-		[this, Params, &ReferenceParam](const int32 Index) -> void*
-		{
-			if (ReferencePropertyIndexes.Contains(Index))
-			{
-				if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
-				{
-					ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
-
-					if (ReferenceParam != nullptr)
+					else
 					{
-						return ReferenceParam->PropAddr;
+						InStack.Step(InStack.Object, Property->ContainerPtrToValuePtr<uint8>(Params));
 					}
 				}
-
-				return nullptr;
 			}
 
-			return PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
-		},
-		RESULT_PARAM,
-		[this, &OutParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
-		{
-			OutParams = FindOutParmRec(OutParams, InPropertyDescriptor->GetProperty());
-
-			return OutParams != nullptr ? OutParams->PropAddr : nullptr;
-		}
-	);
-
-	if (Params != nullptr && Params != InStack.Locals)
-	{
-		for (auto DestructorLink = Function->DestructorLink;
-		     DestructorLink != nullptr;
-		     DestructorLink = DestructorLink->DestructorLinkNext)
-		{
-			if (!DestructorLink->HasAnyPropertyFlags(CPF_OutParm))
+			if (InStack.Code != nullptr)
 			{
-				DestructorLink->DestroyValue_InContainer(Params);
+				InStack.SkipCode(1);
 			}
 		}
 
-		BufferAllocator->Free(Params);
+		auto OutParams = NewOutParams != nullptr ? NewOutParams : InStack.OutParms;
+
+		auto ReferenceParam = OutParams;
+
+		Invoke(
+			Method,
+			FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
+				? InvalidManagedHandle
+				: FCSharpEnvironment::GetEnvironment().Bind(InContext),
+			[this, Params, &ReferenceParam](const int32 Index) -> void*
+			{
+				if (ReferencePropertyIndexes.Contains(Index))
+				{
+					if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
+					{
+						ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
+
+						if (ReferenceParam != nullptr)
+						{
+							return ReferenceParam->PropAddr;
+						}
+					}
+
+					return nullptr;
+				}
+
+				return PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
+			},
+			RESULT_PARAM,
+			[this, &OutParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
+			{
+				OutParams = FindOutParmRec(OutParams, InPropertyDescriptor->GetProperty());
+
+				return OutParams != nullptr ? OutParams->PropAddr : nullptr;
+			}
+		);
+
+		if (Params != nullptr && Params != InStack.Locals)
+		{
+			for (auto DestructorLink = FoundFunction->DestructorLink;
+			     DestructorLink != nullptr;
+			     DestructorLink = DestructorLink->DestructorLinkNext)
+			{
+				if (!DestructorLink->HasAnyPropertyFlags(CPF_OutParm))
+				{
+					DestructorLink->DestroyValue_InContainer(Params);
+				}
+			}
+
+			BufferAllocator->Free(Params);
+		}
 	}
 
 	return true;

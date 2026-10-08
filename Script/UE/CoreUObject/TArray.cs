@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
@@ -10,11 +11,25 @@ namespace Script.CoreUObject
         public static int INDEX_NONE => TArrayImplementation.TArray_INDEX_NONEImplementation();
     }
 
-    public class TArray<T> : IEnumerable<T>
+    public class TArray<T> : IEnumerable<T>, IDisposable
     {
         public TArray() => TArrayImplementation.TArray_RegisterImplementation(this, GetType());
 
-        ~TArray() => TArrayImplementation.TArray_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TArray() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TArrayImplementation.TArray_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public static bool operator ==(TArray<T> A, TArray<T> B)
         {
@@ -38,7 +53,7 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TArray<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() => 0;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -79,7 +94,8 @@ namespace Script.CoreUObject
                     {
                         var ValueBuffer = stackalloc byte[sizeof(T)];
 
-                        TArrayImplementation.TArray_GetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer);
+                        TArrayImplementation.TArray_GetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer,
+                            sizeof(T));
 
                         return *(T*)ValueBuffer;
                     }
@@ -101,7 +117,8 @@ namespace Script.CoreUObject
 
                         *(T*)ValueBuffer = value;
 
-                        TArrayImplementation.TArray_SetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer);
+                        TArrayImplementation.TArray_SetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer,
+                            sizeof(T));
                     }
                     else
                     {
@@ -109,7 +126,8 @@ namespace Script.CoreUObject
 
                         *(nint*)ValueBuffer = HandleData.GetHandle((object)value);
 
-                        TArrayImplementation.TArray_SetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer);
+                        TArrayImplementation.TArray_SetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer,
+                            sizeof(nint));
                     }
                 }
             }
@@ -125,7 +143,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_FindImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_FindImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -133,7 +152,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_FindImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_FindImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }
@@ -148,7 +168,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_FindLastImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_FindLastImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -156,7 +177,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_FindLastImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_FindLastImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }
@@ -171,7 +193,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_ContainsImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_ContainsImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -179,7 +202,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_ContainsImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_ContainsImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }
@@ -216,7 +240,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_AddImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_AddImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -224,7 +249,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_AddImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_AddImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }
@@ -242,7 +268,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_AddUniqueImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_AddUniqueImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -250,7 +277,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_AddUniqueImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_AddUniqueImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }
@@ -266,7 +294,7 @@ namespace Script.CoreUObject
                     *(T*)ValueBuffer = InValue;
 
                     return TArrayImplementation.TArray_RemoveSingleImplementation(HandleData.GetHandle(this),
-                        ValueBuffer);
+                        ValueBuffer, sizeof(T));
                 }
                 else
                 {
@@ -275,7 +303,7 @@ namespace Script.CoreUObject
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
                     return TArrayImplementation.TArray_RemoveSingleImplementation(HandleData.GetHandle(this),
-                        ValueBuffer);
+                        ValueBuffer, sizeof(nint));
                 }
             }
         }
@@ -290,7 +318,8 @@ namespace Script.CoreUObject
 
                     *(T*)ValueBuffer = InValue;
 
-                    return TArrayImplementation.TArray_RemoveImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_RemoveImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(T));
                 }
                 else
                 {
@@ -298,7 +327,8 @@ namespace Script.CoreUObject
 
                     *(nint*)ValueBuffer = HandleData.GetHandle((object)InValue);
 
-                    return TArrayImplementation.TArray_RemoveImplementation(HandleData.GetHandle(this), ValueBuffer);
+                    return TArrayImplementation.TArray_RemoveImplementation(HandleData.GetHandle(this), ValueBuffer,
+                        sizeof(nint));
                 }
             }
         }

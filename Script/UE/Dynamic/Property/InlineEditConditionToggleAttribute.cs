@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class InlineEditConditionToggleAttribute : Attribute
     {
-        public InlineEditConditionToggleAttribute()
-        {
-            Value = "true";
-        }
-
-        public InlineEditConditionToggleAttribute(string InValue)
+        public InlineEditConditionToggleAttribute(string InValue = "true")
         {
             Value = InValue;
         }

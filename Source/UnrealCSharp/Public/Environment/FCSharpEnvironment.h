@@ -5,6 +5,7 @@
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FStringRegistry.h"
+#include "Registry/FFieldPathRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
@@ -95,7 +96,7 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const IManagedHandle InManagedHandle) const;
 
-	bool AddObjectReference(const FClassReflection* InClass, UObject* InObject, IManagedHandle InManagedHandle) const;
+	IManagedHandle AddObjectReference(UObject* InObject, IManagedHandle InManagedHandle) const;
 
 	IManagedHandle GetObject(const UObject* InObject) const;
 
@@ -205,6 +206,21 @@ public:
 
 	template <typename T>
 	auto RemoveStringReference(const IManagedHandle InManagedHandle) const;
+
+public:
+	IManagedHandle GetFieldPathObject(const void* InAddress) const;
+
+	FFieldPath* GetFieldPath(const IManagedHandle InManagedHandle) const;
+
+	FField* GetField(const IManagedHandle InManagedHandle) const;
+
+	IManagedHandle GetFieldObject(FField* InField) const;
+
+	template <auto IsNeedFree, auto IsMember>
+	auto AddFieldPathReference(FClassReflection* InClass, const IManagedHandle InManagedHandle,
+	                           FFieldPath* InValue) const;
+
+	bool RemoveFieldPathReference(const IManagedHandle InManagedHandle) const;
 
 public:
 	IManagedHandle GetBinding(void* InObject) const;
@@ -350,6 +366,8 @@ private:
 	FMultiRegistry* MultiRegistry;
 
 	FStringRegistry* StringRegistry;
+
+	FFieldPathRegistry* FieldPathRegistry;
 
 	class FBindingRegistry* BindingRegistry;
 

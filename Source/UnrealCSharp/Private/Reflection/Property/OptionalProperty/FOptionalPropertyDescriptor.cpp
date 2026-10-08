@@ -8,12 +8,15 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument:
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		Object = Class->NewObject();
+		if (Class != nullptr)
+		{
+			Object = Class->NewObject();
 
-		const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
+			const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
 
-		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(
-			Src, OptionalHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(
+				Src, OptionalHelper, Class, Object);
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -21,12 +24,17 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument:
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-		Src, OptionalHelper, Class, Object);
+		const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
+
+		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+			Src, OptionalHelper, Class, Object);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -35,10 +43,22 @@ void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(SrcManagedHandle);
+	if (const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(SrcManagedHandle))
+	{
+		Property->InitializeValue(Dest);
 
-	Property->InitializeValue(Dest);
+		Property->CopyCompleteValue(Dest, SrcOptional->GetData());
+	}
+}
 
-	Property->CopyCompleteValue(Dest, SrcOptional->GetData());
+bool FOptionalPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, OptionalHelper->GetData(), PortFlags);
+	}
+
+	return false;
 }
 #endif

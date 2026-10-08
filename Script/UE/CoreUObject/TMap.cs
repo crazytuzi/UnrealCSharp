@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
@@ -5,11 +6,25 @@ using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    public class TMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IDisposable
     {
         public TMap() => TMapImplementation.TMap_RegisterImplementation(this, GetType());
 
-        ~TMap() => TMapImplementation.TMap_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TMap() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TMapImplementation.TMap_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {

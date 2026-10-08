@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TLazyObjectPtr_RegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr,
             nint InObject, Type InType) where T : UObject
         {
-            __TLazyObjectPtr_RegisterImplementation(HandleData.Alloc(InLazyObjectPtr), InObject,
+            __TLazyObjectPtr_RegisterImplementation(HandleData.Alloc(InLazyObjectPtr, true), InObject,
                 HandleData.Alloc(InType));
         }
 
@@ -20,6 +20,13 @@ namespace Script.Library
         public static unsafe bool TLazyObjectPtr_IdenticalImplementation(nint InA, nint InB)
         {
             return __TLazyObjectPtr_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __TLazyObjectPtr_GetTypeHashImplementation(nint InLazyObjectPtr);
+
+        public static unsafe int TLazyObjectPtr_GetTypeHashImplementation(nint InLazyObjectPtr)
+        {
+            return __TLazyObjectPtr_GetTypeHashImplementation(InLazyObjectPtr);
         }
 
         private static unsafe partial void __TLazyObjectPtr_UnRegisterImplementation(nint InLazyObjectPtr);

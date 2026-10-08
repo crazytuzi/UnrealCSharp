@@ -35,19 +35,39 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundUtf8String = FCSharpEnvironment::GetEnvironment().
+				GetString<FUtf8String>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundUtf8String));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FUtf8String>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FUtf8String>(InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto Utf8String = FCSharpEnvironment::GetEnvironment().GetString<FUtf8String>(InManagedHandle);
 
-			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FUtf8String(*Utf8String)));
+			return Utf8String != nullptr
+				       ? IScriptDomain::Get()->NewString(reinterpret_cast<const char*>(**Utf8String))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterUtf8String()
@@ -55,6 +75,7 @@ namespace
 			FClassBuilder(TEXT("FUtf8String"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("ToString", ToStringImplementation);
 		}

@@ -14,20 +14,21 @@ namespace
 			if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(
 				InManagedHandle))
 			{
-				const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName);
-
-				if (const auto Function = FoundClass->FindFunctionByName(*Name))
+				if (const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName))
 				{
-					if (Function->IsRooted())
+					if (const auto Function = FoundClass->FindFunctionByName(*Name))
 					{
-						Function->RemoveFromRoot();
-					}
-					else
-					{
-						Function->MarkAsGarbage();
-					}
+						if (Function->IsRooted())
+						{
+							Function->RemoveFromRoot();
+						}
+						else
+						{
+							Function->MarkAsGarbage();
+						}
 
-					FoundClass->RemoveFunctionFromFunctionMap(Function);
+						FoundClass->RemoveFunctionFromFunctionMap(Function);
+					}
 				}
 			}
 		}

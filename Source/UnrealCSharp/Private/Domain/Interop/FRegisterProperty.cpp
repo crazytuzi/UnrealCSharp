@@ -32,7 +32,11 @@ namespace
 				if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
 					GetOrAddPropertyDescriptor(InPropertyHash))
 				{
-					PropertyDescriptor->Set(IN_BUFFER, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress));
+					const auto FoundValue = PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress);
+
+					PropertyDescriptor->DestroyValue(FoundValue);
+
+					PropertyDescriptor->Set(IN_BUFFER, FoundValue);
 				}
 			}
 		}
@@ -61,8 +65,11 @@ namespace
 				if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
 					GetOrAddPropertyDescriptor(InPropertyHash))
 				{
-					PropertyDescriptor->Set(IN_BUFFER,
-					                        PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress));
+					const auto FoundValue = PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress);
+
+					PropertyDescriptor->DestroyValue(FoundValue);
+
+					PropertyDescriptor->Set(IN_BUFFER, FoundValue);
 				}
 			}
 		}

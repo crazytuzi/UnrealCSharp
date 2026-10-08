@@ -1,15 +1,30 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FText
+    public class FText : IDisposable
     {
         public FText()
         {
         }
 
-        ~FText() => FTextImplementation.FText_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FText() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FTextImplementation.FText_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FText(string InBuffer, string InTextNamespace = null, string InPackageNamespace = null,
             bool bRequiresQuotes = false) =>
@@ -40,9 +55,9 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FText;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() => 0;
 
         public override string ToString() =>
-            FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this));
+            FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
     }
 }

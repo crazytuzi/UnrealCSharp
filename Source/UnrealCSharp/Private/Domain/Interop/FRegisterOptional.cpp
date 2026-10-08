@@ -13,62 +13,66 @@ namespace
 	{
 		static void Register1Implementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
-
+			if (const auto Class = FReflectionRegistry::Get().GetClass(InManagedType))
+			{
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
+				const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 #else
-			const auto OptionalProperty = new FOptionalProperty(nullptr, "");
+				const auto OptionalProperty = new FOptionalProperty(nullptr, "");
 #endif
 
-			const auto ValueProperty = FTypeBridge::Factory(Class->GetGenericArgument(),
-			                                                OptionalProperty, "",
-			                                                EObjectFlags::RF_Transient);
+				if (const auto ValueProperty = FTypeBridge::Factory(
+					Class->GetGenericArgument(), OptionalProperty, "", EObjectFlags::RF_Transient))
+				{
+					ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+					OptionalProperty->SetValueProperty(ValueProperty);
 
-			OptionalProperty->SetValueProperty(ValueProperty);
+					const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
-			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
-
-			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, Class, InManagedObject);
+					FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+						nullptr, OptionalHelper, Class, InManagedObject);
+				}
+			}
 		}
 
 		static void Register2Implementation(const IManagedHandle InManagedObject,
 		                                    const IManagedHandle InValue, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
-
+			if (const auto Class = FReflectionRegistry::Get().GetClass(InManagedType))
+			{
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
-			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
+				const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 #else
-			const auto OptionalProperty = new FOptionalProperty(nullptr, "");
+				const auto OptionalProperty = new FOptionalProperty(nullptr, "");
 #endif
 
-			const auto ValueProperty = FTypeBridge::Factory(Class->GetGenericArgument(),
-			                                                OptionalProperty, "",
-			                                                EObjectFlags::RF_Transient);
+				if (const auto ValueProperty = FTypeBridge::Factory(
+					Class->GetGenericArgument(), OptionalProperty, "", EObjectFlags::RF_Transient))
+				{
+					ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+					OptionalProperty->SetValueProperty(ValueProperty);
 
-			OptionalProperty->SetValueProperty(ValueProperty);
+					const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
-			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
+					FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+						nullptr, OptionalHelper, Class, InManagedObject);
 
-			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, Class, InManagedObject);
+					if (OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
+					{
+						OptionalHelper->Set(FDomain::Object_Unbox(InValue));
+					}
+					else
+					{
+						auto ManagedHandle = InValue;
 
-			if (OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-			{
-				OptionalHelper->Set(FDomain::Object_Unbox(InValue));
+						OptionalHelper->Set(&ManagedHandle);
+					}
+				}
 			}
-			else
-			{
-				auto ManagedHandle = InValue;
 
-				OptionalHelper->Set(&ManagedHandle);
-			}
+			FDomain::GCHandle_Free(InValue);
 		}
 
 		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
@@ -86,10 +90,17 @@ namespace
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveOptionalReference(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveOptionalReference(InManagedHandle);
+				});
+			}
 		}
 
 		static void ResetImplementation(const IManagedHandle InManagedHandle)
@@ -116,9 +127,13 @@ namespace
 
 			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
-				const auto Value = OptionalHelper->Get();
+				if (OptionalHelper->IsSet())
+				{
+					const auto Value = OptionalHelper->Get();
 
-				OptionalHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+					OptionalHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue),
+					                                                  FPropertyArgument::FMember());
+				}
 			}
 
 			return ReturnValue;
@@ -139,6 +154,8 @@ namespace
 					OptionalHelper->Set(&ManagedHandle);
 				}
 			}
+
+			FDomain::GCHandle_Free(InValue);
 		}
 
 		FRegisterOptional()

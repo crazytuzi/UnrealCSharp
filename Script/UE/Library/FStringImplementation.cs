@@ -14,7 +14,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __FString_RegisterImplementation(HandleData.Alloc(InString), Ptr);
+                __FString_RegisterImplementation(HandleData.Alloc(InString, true), Ptr);
             }
         }
 
@@ -23,6 +23,13 @@ namespace Script.Library
         public static unsafe bool FString_IdenticalImplementation(nint InA, nint InB)
         {
             return __FString_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __FString_GetTypeHashImplementation(nint InString);
+
+        public static unsafe int FString_GetTypeHashImplementation(nint InString)
+        {
+            return __FString_GetTypeHashImplementation(InString);
         }
 
         private static unsafe partial void __FString_UnRegisterImplementation(nint InString);
@@ -38,7 +45,16 @@ namespace Script.Library
         {
             var Handle = __FString_ToStringImplementation(InString);
 
-            return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Result = (string)HandleData.GetObject(Handle);
+
+                HandleData.FreeImplementation(Handle);
+
+                return Result;
+            }
+
+            return null;
         }
     }
 }

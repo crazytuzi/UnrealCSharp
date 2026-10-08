@@ -366,15 +366,15 @@ void FClassReflection::ParseMethods(const FManagedReader& InManagedReader, IMana
 			}
 		}
 
-		Methods.Add({MethodName, MethodParamCount},
-		            new FMethodReflection(MethodName,
-		                                  MethodParamCount,
-		                                  InManagedReader.ArrayGet(InParams[3], MethodIndex),
-		                                  bMethodIsStatic,
-		                                  ReturnType,
-		                                  ParamReflections,
-		                                  MethodAttributes,
-		                                  MethodAttributeValue));
+		Methods.FindOrAdd({MethodName, MethodParamCount}).Add(
+			new FMethodReflection(MethodName,
+			                      MethodParamCount,
+			                      InManagedReader.ArrayGet(InParams[3], MethodIndex),
+			                      bMethodIsStatic,
+			                      ReturnType,
+			                      ParamReflections,
+			                      MethodAttributes,
+			                      MethodAttributeValue));
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -496,9 +496,12 @@ void FClassReflection::Deinitialize()
 
 	Fields.Empty();
 
-	for (const auto& [PLACEHOLDER, Method] : Methods)
+	for (const auto& [PLACEHOLDER, FoundMethods] : Methods)
 	{
-		delete Method;
+		for (const auto Method : FoundMethods)
+		{
+			delete Method;
+		}
 	}
 
 	Methods.Empty();
@@ -653,7 +656,7 @@ FFieldReflection* FClassReflection::GetField(const FString& InName) const
 	return FoundField != nullptr ? *FoundField : nullptr;
 }
 
-const TMap<TTuple<FString, int32>, FMethodReflection*>& FClassReflection::GetMethods() const
+const TMap<TTuple<FString, int32>, TArray<FMethodReflection*>>& FClassReflection::GetMethods() const
 {
 	EnsureMethods();
 
@@ -664,21 +667,17 @@ FMethodReflection* FClassReflection::GetMethod(const FString& InName, const int3
 {
 	EnsureMethods();
 
-	const auto FoundMethod = Methods.Find({InName, InParamCount});
-
-	return FoundMethod != nullptr ? *FoundMethod : nullptr;
-}
-
-FMethodReflection* FClassReflection::GetMethod(const IManagedHandle InManagedMethod)
-{
-	EnsureMethods();
-
-	for (const auto& [PLACEHOLDER, Method] : Methods)
+	if (const auto FoundMethods = Methods.Find({InName, InParamCount}))
 	{
-		if (Method->GetManagedMethod() == InManagedMethod)
+		for (const auto Method : *FoundMethods)
 		{
-			return Method;
+			if (Method->IsOverride())
+			{
+				return Method;
+			}
 		}
+
+		return (*FoundMethods)[0];
 	}
 
 	return nullptr;
@@ -701,11 +700,11 @@ FMethodReflection* FClassReflection::GetParentMethod(const FString& InName, cons
 	return nullptr;
 }
 
-IManagedHandle FClassReflection::NewObject() const
+IManagedHandle FClassReflection::NewObject(const bool bIsWeak) const
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		return ScriptDomain->NewObject(ManagedClass);
+		return ScriptDomain->NewObject(ManagedClass, bIsWeak);
 	}
 
 	return InvalidManagedHandle;

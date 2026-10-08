@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class IgnoreCategoryKeywordsInSubclassesAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public IgnoreCategoryKeywordsInSubclassesAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

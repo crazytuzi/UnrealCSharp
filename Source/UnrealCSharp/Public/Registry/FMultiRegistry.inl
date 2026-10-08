@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Domain/FDomain.h"
 #include "Reflection/FClassReflection.h"
 
 template <
@@ -29,9 +30,19 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	static auto GetObject(Class* InRegistry, typename FMultiValueMapping::FAddressType InAddress)
 		-> IManagedHandle
 	{
-		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
+		if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress))
+		{
+			if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+			{
+				return *FoundManagedHandle;
+			}
 
-		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+			(void)RemoveReference(InRegistry, *FoundManagedHandle);
+
+			(InRegistry->*Address2ManagedHandle).Remove(InAddress);
+		}
+
+		return InvalidManagedHandle;
 	}
 
 	template <auto IsNeedFree, auto IsMember>
@@ -63,14 +74,11 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 				}
 			}
 
-			if (FoundValue->bNeedFree)
-			{
-				FMemory::Free(FoundValue->Value);
-
-				FoundValue->Value = nullptr;
-			}
+			FoundValue->Free();
 
 			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
+
+			FDomain::GCHandle_Free(InManagedHandle);
 
 			return true;
 		}

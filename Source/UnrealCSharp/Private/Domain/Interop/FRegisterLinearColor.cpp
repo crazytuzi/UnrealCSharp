@@ -10,12 +10,12 @@ namespace
 	{
 		static FLinearColor MultipliesImplementation(const FLinearColor& In, const float Scalar)
 		{
-			return &In != nullptr ? In * Scalar : decltype(In * Scalar)();
+			return In * Scalar;
 		}
 
 		static FLinearColor DividesImplementation(const FLinearColor& In, const float Scalar)
 		{
-			return &In != nullptr ? In / Scalar : decltype(In / Scalar)();
+			return In / Scalar;
 		}
 
 		FRegisterLinearColor()

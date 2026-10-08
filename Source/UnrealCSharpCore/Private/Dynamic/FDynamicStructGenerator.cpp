@@ -91,6 +91,8 @@ void FDynamicStructGenerator::Generator(FClassReflection* InClassReflection)
 	{
 		OldScriptStruct = DynamicStructMap[ClassName];
 
+		DynamicStructMap.Remove(ClassName);
+
 		DynamicStructSet.Remove(OldScriptStruct);
 
 		OldScriptStruct->Rename(
@@ -376,6 +378,8 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 			FDynamicClassGenerator::Generator(FoundClass, EDynamicClassGeneratorType::ReInstance);
 		}
 	}
+
+	NamespaceMap.Remove(InOldScriptStruct);
 
 	InOldScriptStruct->RemoveFromRoot();
 

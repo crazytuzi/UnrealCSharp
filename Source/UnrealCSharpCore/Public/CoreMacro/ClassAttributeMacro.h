@@ -40,6 +40,8 @@
 
 #define CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE FString(TEXT("AutoCollapseCategoriesAttribute"))
 
+#define CLASS_DONT_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE FString(TEXT("DontAutoCollapseCategoriesAttribute"))
+
 #define CLASS_COLLAPSE_CATEGORIES_ATTRIBUTE FString(TEXT("CollapseCategoriesAttribute"))
 
 #define CLASS_DONT_COLLAPSE_CATEGORIES_ATTRIBUTE FString(TEXT("DontCollapseCategoriesAttribute"))
@@ -51,3 +53,5 @@
 #define CLASS_EARLY_ACCESS_PREVIEW_ATTRIBUTE FString(TEXT("EarlyAccessPreviewAttribute"))
 
 #define CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE FString(TEXT("SparseClassDataTypeAttribute"))
+
+#define CLASS_CUSTOM_THUNK_TEMPLATES_ATTRIBUTE FString(TEXT("CustomThunkTemplatesAttribute"))

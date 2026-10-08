@@ -195,6 +195,14 @@ void FPropertyDescriptor::DestroyValue(void* Dest) const
 	}
 }
 
+void FPropertyDescriptor::GetDefaultValue(const FPropertyDescriptor* InPropertyDescriptor, void* Dest)
+{
+	if (InPropertyDescriptor != nullptr && Dest != nullptr)
+	{
+		FMemory::Memzero(Dest, InPropertyDescriptor->GetBufferSize());
+	}
+}
+
 bool FPropertyDescriptor::IsPrimitiveProperty() const
 {
 	return false;

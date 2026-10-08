@@ -672,7 +672,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	{
 		FunctionContent += FString::Printf(TEXT(
 			"\n\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-			"\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n"
+			"\t\tpublic override int GetHashCode() => 0;\n"
 		),
 		                                   *ClassContent
 		);
@@ -684,6 +684,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	}
 
 	UsingNameSpaces.Remove(NameSpaceContent[0]);
+
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
@@ -970,6 +972,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	}
 
 	UsingNameSpaceContent += TEXT("using Interop;\n");
+
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{

@@ -47,11 +47,6 @@ int32 FMethodReflection::GetParamCount() const
 	return ParamCount;
 }
 
-IManagedHandle FMethodReflection::GetManagedMethod() const
-{
-	return ManagedMethod;
-}
-
 bool FMethodReflection::IsOverride() const
 {
 	return bIsOverride;

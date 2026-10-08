@@ -3,11 +3,14 @@
 #include "CppVersion.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
-                       const bool InbNeedFreeData, const bool InbNeedFreeProperty) :
+                       const bool InbNeedFreeData, const bool InbNeedFreeProperty,
+                       const FDataDeleter InDataDeleter) :
 	ElementPropertyDescriptor(nullptr),
 	ScriptSet(nullptr),
 	bNeedFreeData(InbNeedFreeData),
-	bNeedFreeProperty(InbNeedFreeProperty)
+	bNeedFreeProperty(InbNeedFreeProperty),
+	DataDeleter(InDataDeleter),
+	bNeedRehash(false)
 {
 	if (InData != nullptr)
 	{
@@ -25,6 +28,8 @@ FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
 		ScriptSetLayout = FScriptSet::GetScriptLayout(ElementPropertyDescriptor->GetSize(),
 		                                              ElementPropertyDescriptor->GetMinAlignment());
 	}
+
+	Initialize();
 }
 
 FSetHelper::~FSetHelper()
@@ -40,7 +45,19 @@ void FSetHelper::Deinitialize()
 {
 	if (bNeedFreeData && ScriptSet != nullptr)
 	{
-		delete ScriptSet;
+		if (DataDeleter != nullptr)
+		{
+			DataDeleter(ScriptSet);
+		}
+		else
+		{
+			if (ElementPropertyDescriptor != nullptr)
+			{
+				Empty(0);
+			}
+
+			delete ScriptSet;
+		}
 
 		ScriptSet = nullptr;
 	}
@@ -55,9 +72,37 @@ void FSetHelper::Deinitialize()
 	}
 }
 
+void FSetHelper::EnsureRehash() const
+{
+	if (bNeedRehash)
+	{
+		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
+		{
+			return ElementPropertyDescriptor->GetValueTypeHash(Src);
+		});
+
+		bNeedRehash = false;
+	}
+}
+
 void FSetHelper::Empty(const int32 InExpectedNumElements) const
 {
-	ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
+	if (InExpectedNumElements >= 0)
+	{
+		for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+		{
+			if (ScriptSet->IsValidIndex(Index))
+			{
+				const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+
+				ElementPropertyDescriptor->DestroyValue(Data);
+			}
+		}
+
+		ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
+
+		bNeedRehash = false;
+	}
 }
 
 int32 FSetHelper::Num() const
@@ -101,14 +146,7 @@ void FSetHelper::Add(void* InValue) const
 
 		ElementPropertyDescriptor->Set(InValue, Data);
 
-#if STD_CPP_20
-		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
-#else
-		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
-#endif
-		                  {
-			                  return ElementPropertyDescriptor->GetValueTypeHash(Src);
-		                  });
+		bNeedRehash = true;
 	}
 }
 
@@ -138,6 +176,8 @@ int32 FSetHelper::Remove(const void* InValue) const
 	const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
 
 	ElementPropertyDescriptor->DestroyValue(Data);
+
+	EnsureRehash();
 
 	ScriptSet->RemoveAt(ValueIndex, ScriptSetLayout);
 

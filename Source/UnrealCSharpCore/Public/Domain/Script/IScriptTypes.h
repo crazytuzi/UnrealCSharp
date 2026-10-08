@@ -1,10 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include "Domain/Script/IManagedHandle.h"
 
 typedef IManagedHandle (*assembly_loader_Load_from_stream_fn)(const uint8*, int32, const char16_t*);
 
 typedef void (*assembly_loader_unload_fn)();
+
+typedef int32 (*handle_data_is_alive_fn)(PTRINT);
 
 typedef void (*handle_data_free_fn)(PTRINT);
 
@@ -74,13 +76,13 @@ typedef int32 (*type_bridge_unbox_float_fn)(IManagedHandle, float*);
 
 typedef int32 (*type_bridge_unbox_double_fn)(IManagedHandle, double*);
 
-typedef IManagedHandle (*object_bridge_new_object_fn)(IManagedHandle);
+typedef IManagedHandle (*object_bridge_new_object_fn)(IManagedHandle, int32);
 
 typedef void (*field_bridge_set_static_value_fn)(IManagedHandle, const uint8*, IManagedHandle);
 
 typedef IManagedHandle (*field_bridge_get_static_value_fn)(IManagedHandle, const uint8*);
 
-typedef void (*method_bridge_register_binding_fn)(const uint8* const*, const PTRINT*, int32);
+typedef void (*method_bridge_register_binding_fn)(const uint8* const*, const PTRINT*, const int32*, int32);
 
 typedef IManagedHandle (*method_bridge_invoke_fn)(IManagedHandle, IManagedHandle, int32, IManagedHandle*);
 
@@ -107,6 +109,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 #define COMMON_BRIDGE_METHODS(Op) \
 	Op(AssemblyLoaderUnload, assembly_loader_unload_fn, CLASS_ASSEMBLY_LOADER, FUNCTION_ASSEMBLY_LOADER_UNLOAD, 0) \
 	\
+	Op(HandleDataIsAlive, handle_data_is_alive_fn, CLASS_HANDLE_DATA, FUNCTION_HANDLE_DATA_IS_ALIVE, 1) \
 	Op(HandleDataFree, handle_data_free_fn, CLASS_HANDLE_DATA, FUNCTION_HANDLE_DATA_FREE, 1) \
 	\
 	Op(TypeBridgeGetClass, type_bridge_get_class_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_CLASS, 1) \
@@ -130,19 +133,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 	Op(TypeBridgeBoxFloat, type_bridge_box_float_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_BOX_FLOAT, 1) \
 	Op(TypeBridgeBoxDouble, type_bridge_box_double_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_BOX_DOUBLE, 1) \
 	\
-	Op(TypeBridgeUnboxBool, type_bridge_unbox_bool_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_BOOL, 2) \
-	Op(TypeBridgeUnboxSByte, type_bridge_unbox_sbyte_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_SBYTE, 2) \
-	Op(TypeBridgeUnboxInt16, type_bridge_unbox_int16_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT16, 2) \
-	Op(TypeBridgeUnboxInt32, type_bridge_unbox_int32_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT32, 2) \
-	Op(TypeBridgeUnboxInt64, type_bridge_unbox_int64_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT64, 2) \
-	Op(TypeBridgeUnboxByte, type_bridge_unbox_byte_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_BYTE, 2) \
-	Op(TypeBridgeUnboxUInt16, type_bridge_unbox_uint16_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT16, 2) \
-	Op(TypeBridgeUnboxUInt32, type_bridge_unbox_uint32_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT32, 2) \
-	Op(TypeBridgeUnboxUInt64, type_bridge_unbox_uint64_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT64, 2) \
-	Op(TypeBridgeUnboxFloat, type_bridge_unbox_float_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT, 2) \
-	Op(TypeBridgeUnboxDouble, type_bridge_unbox_double_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE, 2) \
-	\
-	Op(ObjectBridgeNewObject, object_bridge_new_object_fn, CLASS_OBJECT_BRIDGE, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 1) \
+	Op(ObjectBridgeNewObject, object_bridge_new_object_fn, CLASS_OBJECT_BRIDGE, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 2) \
 	\
 	Op(FieldBridgeSetStaticValue, field_bridge_set_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE, 3) \
 	Op(FieldBridgeGetStaticValue, field_bridge_get_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE, 2) \
@@ -163,7 +154,19 @@ typedef void (*synchronization_context_tick_fn)(float);
 	\
 	Op(TypeBridgeGetFunctionPointer, type_bridge_get_function_pointer_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER, 3) \
 	\
-	Op(MethodBridgeRegisterBinding, method_bridge_register_binding_fn, CLASS_METHOD_BRIDGE, FUNCTION_METHOD_BRIDGE_REGISTER_BINDING, 3)
+	Op(MethodBridgeRegisterBinding, method_bridge_register_binding_fn, CLASS_METHOD_BRIDGE, FUNCTION_METHOD_BRIDGE_REGISTER_BINDING, 4) \
+	\
+	Op(TypeBridgeUnboxBool, type_bridge_unbox_bool_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_BOOL, 2) \
+	Op(TypeBridgeUnboxSByte, type_bridge_unbox_sbyte_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_SBYTE, 2) \
+	Op(TypeBridgeUnboxInt16, type_bridge_unbox_int16_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT16, 2) \
+	Op(TypeBridgeUnboxInt32, type_bridge_unbox_int32_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT32, 2) \
+	Op(TypeBridgeUnboxInt64, type_bridge_unbox_int64_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_INT64, 2) \
+	Op(TypeBridgeUnboxByte, type_bridge_unbox_byte_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_BYTE, 2) \
+	Op(TypeBridgeUnboxUInt16, type_bridge_unbox_uint16_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT16, 2) \
+	Op(TypeBridgeUnboxUInt32, type_bridge_unbox_uint32_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT32, 2) \
+	Op(TypeBridgeUnboxUInt64, type_bridge_unbox_uint64_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_UINT64, 2) \
+	Op(TypeBridgeUnboxFloat, type_bridge_unbox_float_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT, 2) \
+	Op(TypeBridgeUnboxDouble, type_bridge_unbox_double_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE, 2)
 
 #define UTILS_BRIDGE_METHODS(Op) \
 	Op(UtilsIsOverride, utils_is_override_fn, COMBINE_FULL_NAME(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS), FUNCTION_UTILS_IS_OVERRIDE, 1) \

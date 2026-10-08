@@ -63,6 +63,8 @@ private:
 
 	static void WaitForCompile();
 
+	static bool PumpTaskGraphWhileCompiling(float InDeltaTime);
+
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
@@ -84,7 +86,7 @@ private:
 
 	FDelegateHandle OnApplicationActivationStateChangedDelegateHandle;
 
-	FDelegateHandle OnDirectoryChangedDelegateHandle;
+	TMap<FString, FDelegateHandle> OnDirectoryChangedDelegateHandles;
 
 	FDelegateHandle OnBlueprintCompiledDelegateHandle;
 

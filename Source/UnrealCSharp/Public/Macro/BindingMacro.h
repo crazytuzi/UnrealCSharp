@@ -330,7 +330,7 @@ OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static auto Name##Implementation(const T& In) \
 { \
-	return (&In != nullptr) ? Operator In : decltype(Operator In)(); \
+	return Operator In; \
 }
 
 #define PREFIX_UNARY_OPERATOR(Name, FunctionName, ImplementationName, Operator) \
@@ -339,7 +339,7 @@ OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static auto Name##Implementation(T& In) -> T& \
 { \
-	return (&In != nullptr) ? Operator In : In; \
+	return Operator In; \
 }
 
 #define BINARY_OPERATOR(Name, FunctionName, ImplementationName, Operator) \
@@ -348,5 +348,5 @@ OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static auto Name##Implementation(const T& InA, const T& InB) \
 { \
-	return (&InA != nullptr) && (&InB != nullptr) ? InA Operator InB : decltype(InA Operator InB)(); \
+	return InA Operator InB; \
 }

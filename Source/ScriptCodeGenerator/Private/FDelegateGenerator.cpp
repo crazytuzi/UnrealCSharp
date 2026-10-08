@@ -344,7 +344,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	UsingNameSpaces.Remove(TEXT(""));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
@@ -667,7 +669,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	UsingNameSpaces.Remove(TEXT(""));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
@@ -676,6 +680,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	}
 
 	auto Content = FString::Printf(TEXT(
+		"%s\n"
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
@@ -695,6 +700,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"\t}\n"
 		"}\n"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *ClassContent,

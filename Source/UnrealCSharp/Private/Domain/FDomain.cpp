@@ -1,4 +1,4 @@
-#include "Domain/FDomain.h"
+﻿#include "Domain/FDomain.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Domain/Script/FScriptDomainFactory.h"
 #include "Template/TGetArrayLength.inl"
@@ -28,7 +28,10 @@ void FDomain::Initialize()
 		IScriptDomain::Set(ScriptDomain);
 	}
 
-	ScriptDomain->Initialize();
+	if (ScriptDomain != nullptr)
+	{
+		ScriptDomain->Initialize();
+	}
 
 	InitializeSynchronizationContext();
 }
@@ -71,16 +74,6 @@ void* FDomain::Object_Unbox(const IManagedHandle InManagedHandle)
 	return nullptr;
 }
 
-IManagedHandle FDomain::String_New(const char* InText)
-{
-	if (const auto ScriptDomain = IScriptDomain::Get())
-	{
-		return ScriptDomain->NewString(InText);
-	}
-
-	return InvalidManagedHandle;
-}
-
 FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
@@ -89,6 +82,16 @@ FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 	}
 
 	return FString();
+}
+
+bool FDomain::GCHandle_IsAlive(const IManagedHandle InManagedHandle)
+{
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->IsAlive(InManagedHandle);
+	}
+
+	return true;
 }
 
 void FDomain::GCHandle_Free(const IManagedHandle InManagedHandle)

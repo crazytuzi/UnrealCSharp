@@ -1,16 +1,31 @@
+using System;
 #if UE_5_6_OR_LATER
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FUtf8String
+    public class FUtf8String : IDisposable
     {
         public FUtf8String()
         {
         }
 
-        ~FUtf8String() => FUtf8StringImplementation.FUtf8String_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FUtf8String() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FUtf8StringImplementation.FUtf8String_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FUtf8String(string InValue) =>
             FUtf8StringImplementation.FUtf8String_RegisterImplementation(this, InValue);
@@ -39,10 +54,11 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FUtf8String;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FUtf8StringImplementation.FUtf8String_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
-            FUtf8StringImplementation.FUtf8String_ToStringImplementation(HandleData.GetHandle(this));
+            FUtf8StringImplementation.FUtf8String_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
     }
 }
 #endif
