@@ -5,9 +5,6 @@
 class FUnrealCSharpBlueprintToolBar final
 {
 public:
-	FUnrealCSharpBlueprintToolBar();
-
-public:
 	void Initialize();
 
 	void Deinitialize();
@@ -16,7 +13,7 @@ private:
 	void OnEndGenerator();
 
 private:
-	void BuildAction();
+	void BuildAction(const TSharedRef<FUICommandList> InCommandList, const TWeakObjectPtr<UBlueprint> InBlueprint);
 
 	TSharedRef<FExtender> GenerateBlueprintExtender(const TSharedRef<FUICommandList> InCommandList,
 	                                                const TArray<UObject*> InContextSensitiveObjects);
@@ -24,18 +21,14 @@ private:
 private:
 	void SetCodeAnalysisOverrideFilesMap();
 
-	bool HasOverrideFile() const;
+	bool HasOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const;
 
-	FString GetOverrideFile() const;
+	FString GetOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const;
 
-	FString GetFileName() const;
+	FString GetFileName(const TWeakObjectPtr<UBlueprint>& InBlueprint) const;
 
 private:
 	FDelegateHandle OnEndGeneratorDelegateHandle;
-
-	TSharedRef<FUICommandList> CommandList;
-
-	TWeakObjectPtr<UBlueprint> Blueprint;
 
 	TMap<FString, FString> CodeAnalysisOverrideFilesMap;
 

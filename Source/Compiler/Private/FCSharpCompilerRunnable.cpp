@@ -550,7 +550,10 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 				FileChangesSnapshot = MoveTemp(FileChanges);
 			}
 
-			FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
+			AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+			{
+				FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
+			});
 
 			if (bSucceeded)
 			{

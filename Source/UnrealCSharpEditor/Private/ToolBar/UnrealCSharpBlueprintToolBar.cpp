@@ -12,12 +12,6 @@
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpBlueprintToolBar"
 
-FUnrealCSharpBlueprintToolBar::FUnrealCSharpBlueprintToolBar()
-	: CommandList(MakeShared<FUICommandList>())
-{
-	BuildAction();
-}
-
 void FUnrealCSharpBlueprintToolBar::Initialize()
 {
 	auto& BlueprintEditorModule = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
@@ -59,13 +53,14 @@ void FUnrealCSharpBlueprintToolBar::OnEndGenerator()
 	FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
 }
 
-void FUnrealCSharpBlueprintToolBar::BuildAction()
+void FUnrealCSharpBlueprintToolBar::BuildAction(const TSharedRef<FUICommandList> InCommandList,
+                                                const TWeakObjectPtr<UBlueprint> InBlueprint)
 {
-	CommandList->MapAction(
+	InCommandList->MapAction(
 		FUnrealCSharpEditorCommands::Get().OpenFile,
-		FExecuteAction::CreateLambda([this]
+		FExecuteAction::CreateLambda([this, InBlueprint]
 		{
-			if (const auto OverrideFile = GetOverrideFile(); !OverrideFile.IsEmpty())
+			if (const auto OverrideFile = GetOverrideFile(InBlueprint); !OverrideFile.IsEmpty())
 			{
 				if (IFileManager::Get().FileExists(*OverrideFile))
 				{
@@ -74,11 +69,11 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 			}
 		}), FCanExecuteAction());
 
-	CommandList->MapAction(
+	InCommandList->MapAction(
 		FUnrealCSharpEditorCommands::Get().CodeAnalysis,
-		FExecuteAction::CreateLambda([this]
+		FExecuteAction::CreateLambda([this, InBlueprint]
 		{
-			if (const auto OverrideFile = GetOverrideFile(); !OverrideFile.IsEmpty())
+			if (const auto OverrideFile = GetOverrideFile(InBlueprint); !OverrideFile.IsEmpty())
 			{
 				if (IFileManager::Get().FileExists(*OverrideFile))
 				{
@@ -87,11 +82,11 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 			}
 		}), FCanExecuteAction());
 
-	CommandList->MapAction(
+	InCommandList->MapAction(
 		FUnrealCSharpEditorCommands::Get().OverrideBlueprint,
-		FExecuteAction::CreateLambda([this]
+		FExecuteAction::CreateLambda([this, InBlueprint]
 		{
-			if (Blueprint.IsValid())
+			if (InBlueprint.IsValid())
 			{
 				static TArray<UClass*> TemplateClasses =
 				{
@@ -103,7 +98,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 
 				for (const auto TemplateClass : TemplateClasses)
 				{
-					if (Blueprint->GeneratedClass->IsChildOf(TemplateClass))
+					if (InBlueprint->GeneratedClass->IsChildOf(TemplateClass))
 					{
 						const auto Template = FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(
 							TemplateClass);
@@ -122,7 +117,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 							                      "namespace %s"
 						                      ),
 						                                       *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-							                                       Blueprint->GeneratedClass))
+							                                       InBlueprint->GeneratedClass))
 						);
 
 						Content.ReplaceInline(*FString::Printf(TEXT(
@@ -135,19 +130,19 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 							                      " %s"
 						                      ),
 						                                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-							                                       Blueprint->GeneratedClass))
+							                                       InBlueprint->GeneratedClass))
 						);
 
-						if (const auto FileName = GetFileName();
+						if (const auto FileName = GetFileName(InBlueprint);
 							FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
 						{
 							const auto Class = FString::Printf(TEXT(
 								"%s.%s"
 							),
 							                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-								                                   Blueprint->GeneratedClass),
+								                                   InBlueprint->GeneratedClass),
 							                                   *FUnrealCSharpFunctionLibrary::GetFullClass(
-								                                   Blueprint->GeneratedClass));
+								                                   InBlueprint->GeneratedClass));
 
 							DynamicOverrideFilesMap.Add(Class, FileName);
 						}
@@ -169,24 +164,28 @@ TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(
 		InBlueprint = Cast<UBlueprint>(InContextSensitiveObjects[0]);
 	}
 
+	const TWeakObjectPtr<UBlueprint> Blueprint(InBlueprint);
+
+	const auto UICommandList = MakeShared<FUICommandList>();
+
+	BuildAction(UICommandList, Blueprint);
+
 	TSharedRef<FExtender> Extender(new FExtender());
 
 	const auto ExtensionDelegate = FToolBarExtensionDelegate::CreateLambda(
-		[this, InBlueprint](FToolBarBuilder& ToolbarBuilder)
+		[this, Blueprint, UICommandList](FToolBarBuilder& ToolbarBuilder)
 		{
 			ToolbarBuilder.BeginSection(NAME_None);
 
 			ToolbarBuilder.AddComboButton(
 				FUIAction(),
-				FOnGetContent::CreateLambda([this, InBlueprint]()
+				FOnGetContent::CreateLambda([this, Blueprint, UICommandList]()
 				{
-					Blueprint = InBlueprint;
-
 					const FUnrealCSharpEditorCommands& Commands = FUnrealCSharpEditorCommands::Get();
 
-					FMenuBuilder MenuBuilder(true, CommandList);
+					FMenuBuilder MenuBuilder(true, UICommandList);
 
-					if (HasOverrideFile())
+					if (HasOverrideFile(Blueprint))
 					{
 						MenuBuilder.AddMenuEntry(Commands.OpenFile, NAME_None,
 						                         LOCTEXT("OpenFile", "Open File"));
@@ -210,7 +209,7 @@ TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(
 			ToolbarBuilder.EndSection();
 		});
 
-	Extender->AddToolBarExtension("Debugging", EExtensionHook::After, CommandList, ExtensionDelegate);
+	Extender->AddToolBarExtension("Debugging", EExtensionHook::After, UICommandList, ExtensionDelegate);
 
 	return Extender;
 }
@@ -225,15 +224,16 @@ void FUnrealCSharpBlueprintToolBar::SetCodeAnalysisOverrideFilesMap()
 	));
 }
 
-bool FUnrealCSharpBlueprintToolBar::HasOverrideFile() const
+bool FUnrealCSharpBlueprintToolBar::HasOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (Blueprint.IsValid())
+	if (InBlueprint.IsValid())
 	{
 		const auto Class = FString::Printf(TEXT(
 			"%s.%s"
 		),
-		                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(Blueprint->GeneratedClass),
-		                                   *FUnrealCSharpFunctionLibrary::GetFullClass(Blueprint->GeneratedClass));
+		                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+			                                   InBlueprint->GeneratedClass),
+		                                   *FUnrealCSharpFunctionLibrary::GetFullClass(InBlueprint->GeneratedClass));
 
 		return CodeAnalysisOverrideFilesMap.Contains(Class) || DynamicOverrideFilesMap.Contains(Class);
 	}
@@ -241,15 +241,16 @@ bool FUnrealCSharpBlueprintToolBar::HasOverrideFile() const
 	return false;
 }
 
-FString FUnrealCSharpBlueprintToolBar::GetOverrideFile() const
+FString FUnrealCSharpBlueprintToolBar::GetOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (Blueprint.IsValid())
+	if (InBlueprint.IsValid())
 	{
 		const auto Class = FString::Printf(TEXT(
 			"%s.%s"
 		),
-		                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(Blueprint->GeneratedClass),
-		                                   *FUnrealCSharpFunctionLibrary::GetFullClass(Blueprint->GeneratedClass));
+		                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+			                                   InBlueprint->GeneratedClass),
+		                                   *FUnrealCSharpFunctionLibrary::GetFullClass(InBlueprint->GeneratedClass));
 
 		if (const auto FoundOverrideFile = CodeAnalysisOverrideFilesMap.Find(Class))
 		{
@@ -265,17 +266,17 @@ FString FUnrealCSharpBlueprintToolBar::GetOverrideFile() const
 	return {};
 }
 
-FString FUnrealCSharpBlueprintToolBar::GetFileName() const
+FString FUnrealCSharpBlueprintToolBar::GetFileName(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (Blueprint.IsValid())
+	if (InBlueprint.IsValid())
 	{
-		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(Blueprint->GeneratedClass);
+		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InBlueprint->GeneratedClass);
 
 		auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameDirectory(), ModuleName);
 
 		auto ModuleRelativeFile = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(Blueprint->GeneratedClass),
-			Blueprint->GeneratedClass->GetName());
+			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InBlueprint->GeneratedClass),
+			InBlueprint->GeneratedClass->GetName());
 
 		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;
 	}

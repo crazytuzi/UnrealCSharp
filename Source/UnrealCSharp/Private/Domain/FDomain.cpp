@@ -28,7 +28,10 @@ void FDomain::Initialize()
 		IScriptDomain::Set(ScriptDomain);
 	}
 
-	ScriptDomain->Initialize();
+	if (ScriptDomain != nullptr)
+	{
+		ScriptDomain->Initialize();
+	}
 
 	InitializeSynchronizationContext();
 }

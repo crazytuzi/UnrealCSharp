@@ -1167,6 +1167,12 @@ namespace SourceGenerator
 
                 var accessibility = method.DeclaredAccessibility == Accessibility.Public ? "public" : "private";
 
+                var invokeStatement = method.ReturnsVoid
+                    ? $"\t\t\t\t((delegate* unmanaged[Cdecl]<{pointerType}>)MethodPointer)({arguments});\n"
+                    : $"\t\t\t\treturn ((delegate* unmanaged[Cdecl]<{pointerType}>)MethodPointer)({arguments});\n";
+
+                var defaultStatement = method.ReturnsVoid ? "" : "\n\t\t\treturn default;\n";
+
                 source +=
                     "#if WITH_LEANCLR\n" +
                     $"\t\t[DllImport(\"{NativeModuleName}\", CallingConvention = CallingConvention.Cdecl)]\n" +
@@ -1174,9 +1180,16 @@ namespace SourceGenerator
                     "#else\n" +
                     $"\t\tprivate static nint {slot};\n" +
                     "\n" +
-                    $"\t\t{accessibility} static unsafe partial {returnType} {method.Name}({parameters}) =>\n" +
-                    $"\t\t\t((delegate* unmanaged[Cdecl]<{pointerType}>)global::Interop.MethodBridge.GetMethod(\n" +
-                    $"\t\t\t\tref {slot}, \"{key}\", {method.Parameters.Length}))({arguments});\n" +
+                    $"\t\t{accessibility} static unsafe partial {returnType} {method.Name}({parameters})\n" +
+                    "\t\t{\n" +
+                    $"\t\t\tvar MethodPointer = global::Interop.MethodBridge.GetMethod(ref {slot}, \"{key}\", {method.Parameters.Length});\n" +
+                    "\n" +
+                    "\t\t\tif (MethodPointer != nint.Zero)\n" +
+                    "\t\t\t{\n" +
+                    invokeStatement +
+                    "\t\t\t}\n" +
+                    defaultStatement +
+                    "\t\t}\n" +
                     "#endif\n\n";
             }
 

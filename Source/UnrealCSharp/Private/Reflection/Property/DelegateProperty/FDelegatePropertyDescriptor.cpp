@@ -23,9 +23,9 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 	const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(SrcManagedHandle);
 
-	Property->InitializeValue(Dest);
-
 	const auto DestScriptDelegate = Property->GetPropertyValuePtr(Dest);
+
+	DestScriptDelegate->Unbind();
 
 	if (SrcDelegateHelper != nullptr)
 	{

@@ -63,6 +63,8 @@ private:
 
 	static void WaitForCompile();
 
+	static bool PumpTaskGraphWhileCompiling(float InDeltaTime);
+
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 

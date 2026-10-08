@@ -15,19 +15,28 @@
 
 ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
 
+using FSignalHandler = void (*)(int32);
+
+static constexpr int32 MaxSignalCount = 32;
+
 #if PLATFORM_MAC
 TMap<int32, struct sigaction> SignalActions;
+#else
+static FSignalHandler SignalHandlers[MaxSignalCount] = {};
 #endif
 
-void SignalHandler(int32 Signal)
+static void ScriptSignalHandler(int32 Signal)
 {
-	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *FDomain::GetTraceback());
-
-	GLog->Flush();
-
 #if PLATFORM_MAC
 	sigaction(Signal, &SignalActions[Signal], nullptr);
+#else
+	if (Signal >= 0 && Signal < MaxSignalCount)
+	{
+		signal(Signal, SignalHandlers[Signal]);
+	}
 #endif
+
+	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *FDomain::GetTraceback());
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
@@ -126,7 +135,7 @@ void FCSharpEnvironment::Initialize()
 
 		FMemory::Memzero(&SigAction, sizeof(struct sigaction));
 
-		SigAction.sa_handler = SignalHandler;
+		SigAction.sa_handler = ScriptSignalHandler;
 
 		sigemptyset(&SigAction.sa_mask);
 
@@ -139,7 +148,11 @@ void FCSharpEnvironment::Initialize()
 			sigaction(SignalType, &SigAction, nullptr);
 		}
 #else
-		signal(SignalType, SignalHandler);
+		if (const auto SignalHandler = signal(SignalType, ScriptSignalHandler);
+			SignalHandler != SIG_ERR)
+		{
+			SignalHandlers[SignalType] = SignalHandler;
+		}
 #endif
 	}
 

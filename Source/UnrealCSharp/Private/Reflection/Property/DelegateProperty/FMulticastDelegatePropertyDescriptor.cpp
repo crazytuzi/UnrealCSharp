@@ -33,17 +33,20 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 		ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
 		                             SrcMulticastDelegateHelper->GetFunctionName());
 
-		if (const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest)))
+		if (ScriptDelegate.IsBound())
 		{
-			MulticastScriptDelegate->Add(ScriptDelegate);
-		}
-		else if (ScriptDelegate.IsBound())
-		{
-			FMulticastScriptDelegate MulticastDelegate;
+			if (const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest)))
+			{
+				MulticastScriptDelegate->Add(ScriptDelegate);
+			}
+			else
+			{
+				FMulticastScriptDelegate MulticastDelegate;
 
-			MulticastDelegate.Add(ScriptDelegate);
+				MulticastDelegate.Add(ScriptDelegate);
 
-			Property->SetMulticastDelegate(Dest, MulticastDelegate);
+				Property->SetMulticastDelegate(Dest, MulticastDelegate);
+			}
 		}
 	}
 }

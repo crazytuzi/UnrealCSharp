@@ -737,7 +737,9 @@ void FEditorListener::WaitForCompile()
 
 	auto LastTime = StartTime;
 
-	constexpr auto IntervalSecond = 1.0 / 60.0;
+	constexpr auto IntervalSeconds = 1.0 / 60.0;
+
+	constexpr auto CompileWaitTimeoutSeconds = 600.0;
 
 	while (FCSharpCompiler::Get().IsCompiling())
 	{
@@ -746,7 +748,7 @@ void FEditorListener::WaitForCompile()
 		if (const auto Now = FPlatformTime::Seconds();
 			ProgressWindow.IsValid() &&
 			ProgressDialog.IsValid() &&
-			Now - LastTime >= IntervalSecond)
+			Now - LastTime >= IntervalSeconds)
 		{
 			LastTime = Now;
 
@@ -766,6 +768,14 @@ void FEditorListener::WaitForCompile()
 		FThreadManager::Get().Tick();
 
 		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+
+		if (FPlatformTime::Seconds() - StartTime >= CompileWaitTimeoutSeconds)
+		{
+			FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateStatic(&FEditorListener::PumpTaskGraphWhileCompiling));
+
+			break;
+		}
 	}
 
 	if (ProgressWindow.IsValid())
@@ -776,4 +786,16 @@ void FEditorListener::WaitForCompile()
 
 		TickProgressWindow(ProgressWindow);
 	}
+}
+
+bool FEditorListener::PumpTaskGraphWhileCompiling(float InDeltaTime)
+{
+	if (FCSharpCompiler::Get().IsCompiling())
+	{
+		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+
+		return true;
+	}
+
+	return false;
 }
