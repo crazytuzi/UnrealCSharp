@@ -184,6 +184,8 @@ public:
 
 	FClassReflection* GetAutoCollapseCategoriesAttributeClass() const;
 
+	FClassReflection* GetDontAutoCollapseCategoriesAttributeClass() const;
+
 	FClassReflection* GetCollapseCategoriesAttributeClass() const;
 
 	FClassReflection* GetDontCollapseCategoriesAttributeClass() const;
@@ -195,6 +197,8 @@ public:
 	FClassReflection* GetEarlyAccessPreviewAttributeClass() const;
 
 	FClassReflection* GetSparseClassDataTypeAttributeClass() const;
+
+	FClassReflection* GetCustomThunkTemplatesAttributeClass() const;
 
 	FClassReflection* GetGlobalConfigAttributeClass() const;
 
@@ -765,6 +769,8 @@ private:
 
 	FClassReflection* AutoCollapseCategoriesAttributeClass{};
 
+	FClassReflection* DontAutoCollapseCategoriesAttributeClass{};
+
 	FClassReflection* CollapseCategoriesAttributeClass{};
 
 	FClassReflection* DontCollapseCategoriesAttributeClass{};
@@ -776,6 +782,8 @@ private:
 	FClassReflection* EarlyAccessPreviewAttributeClass{};
 
 	FClassReflection* SparseClassDataTypeAttributeClass{};
+
+	FClassReflection* CustomThunkTemplatesAttributeClass{};
 
 	FClassReflection* GlobalConfigAttributeClass{};
 

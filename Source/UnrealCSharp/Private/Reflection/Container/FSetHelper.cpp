@@ -28,6 +28,8 @@ FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
 		ScriptSetLayout = FScriptSet::GetScriptLayout(ElementPropertyDescriptor->GetSize(),
 		                                              ElementPropertyDescriptor->GetMinAlignment());
 	}
+
+	Initialize();
 }
 
 FSetHelper::~FSetHelper()

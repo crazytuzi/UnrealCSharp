@@ -1,4 +1,4 @@
-#include "FGeneratorCore.h"
+﻿#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -18,8 +18,6 @@ TMap<FString, TArray<FString>> FGeneratorCore::OverrideFunctionsMap;
 bool FGeneratorCore::bIsSkipGenerateEngineModules;
 
 bool FGeneratorCore::bIsGenerateAllModules;
-
-TArray<FString> FGeneratorCore::SupportedModule;
 
 TArray<FString> FGeneratorCore::SupportedAssetPath;
 
@@ -476,69 +474,6 @@ int32 FGeneratorCore::GetBufferSize(FProperty* Property)
 		       ? Property->ElementSize
 #endif
 		       : sizeof(void*);
-}
-
-FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
-{
-	if (CastField<FByteProperty>(Property))
-	{
-		return TEXT("Byte");
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return GetTypeImplementation(EnumProperty->GetUnderlyingProperty());
-	}
-
-	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
-
-	if (CastField<FUInt32Property>(Property)) return TEXT("UInt32");
-
-	if (CastField<FUInt64Property>(Property)) return TEXT("UInt64");
-
-	if (CastField<FInt8Property>(Property)) return TEXT("SByte");
-
-	if (CastField<FInt16Property>(Property)) return TEXT("Int16");
-
-	if (CastField<FIntProperty>(Property)) return TEXT("Int32");
-
-	if (CastField<FInt64Property>(Property)) return TEXT("Int64");
-
-	if (CastField<FBoolProperty>(Property)) return TEXT("Boolean");
-
-	if (CastField<FFloatProperty>(Property)) return TEXT("Single");
-
-	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
-
-	return TEXT("");
-}
-
-FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
-{
-	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-	{
-		if (ByteProperty->Enum != nullptr)
-		{
-			return FString::Printf(TEXT(
-				"(%s)"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum));
-		}
-		else
-		{
-			return TEXT("");
-		}
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return FString::Printf(TEXT(
-			"(%s)"
-		),
-		                       *FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum()));
-	}
-
-	return TEXT("");
 }
 
 FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
@@ -1046,15 +981,6 @@ void FGeneratorCore::BeginGenerator(const bool bIsFull)
 
 		bIsGenerateAllModules = UnrealCSharpEditorSetting->IsGenerateAllModules();
 
-		for (const auto& Module : UnrealCSharpEditorSetting->GetSupportedModule())
-		{
-			SupportedModule.Add(FString::Printf(TEXT(
-				"%s.%s"),
-			                                    *NAMESPACE_ROOT,
-			                                    *Module
-			));
-		}
-
 		for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
 			SupportedAssetPath.Add(*FString::Printf(TEXT(
@@ -1080,8 +1006,6 @@ void FGeneratorCore::BeginGenerator(const bool bIsFull)
 void FGeneratorCore::EndGenerator(const bool bIsFull)
 {
 	bIsGenerateAllModules = false;
-
-	SupportedModule.Empty();
 
 	SupportedAssetPath.Empty();
 

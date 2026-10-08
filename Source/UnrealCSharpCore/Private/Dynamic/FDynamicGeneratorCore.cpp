@@ -1,10 +1,10 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/MetaDataAttributeMacro.h"
+#include "CoreMacro/ClassAttributeMacro.h"
 #include "Domain/Script/IManagedHandle.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -871,6 +871,37 @@ void FDynamicGeneratorCore::SetMetaData(UClass* InClass, FReflection* InReflecti
 
 			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
 		                 }
+
+		                 if (const auto DontAutoCollapseCategoriesAttributeClass = FReflectionRegistry::Get().
+			                 GetDontAutoCollapseCategoriesAttributeClass())
+		                 {
+			                 if (InReflection->HasAttribute(DontAutoCollapseCategoriesAttributeClass))
+			                 {
+				                 TArray<FString> AutoCollapseCategories;
+
+				                 if (const auto SuperClass = InClass->GetSuperClass())
+				                 {
+					                 SuperClass->GetAutoCollapseCategories(AutoCollapseCategories);
+				                 }
+
+				                 auto DontAutoCollapseCategories = InReflection->GetAttributeValue(
+					                 DontAutoCollapseCategoriesAttributeClass);
+
+				                 DontAutoCollapseCategories.ReplaceInline(TEXT(","), TEXT(" "));
+
+				                 TArray<FString> Categories;
+
+				                 DontAutoCollapseCategories.ParseIntoArray(Categories, TEXT(" "), true);
+
+				                 for (const auto& Category : Categories)
+				                 {
+					                 AutoCollapseCategories.RemoveSwap(Category);
+				                 }
+
+				                 SetMetaData(InClass, CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE,
+				                             FString::Join(AutoCollapseCategories, TEXT(" ")));
+			                 }
+		                 }
 	                 });
 }
 
@@ -1092,7 +1123,8 @@ TArray<FClassReflection*> FDynamicGeneratorCore::GetClassMetaDataAttributes()
 		ReflectionRegistry.GetDontUseGenericSpawnObjectAttributeClass(),
 		ReflectionRegistry.GetExposedAsyncProxyAttributeClass(),
 		ReflectionRegistry.GetBlueprintThreadSafeAttributeClass(),
-		ReflectionRegistry.GetUsesHierarchyAttributeClass()
+		ReflectionRegistry.GetUsesHierarchyAttributeClass(),
+		ReflectionRegistry.GetCustomThunkTemplatesAttributeClass()
 	};
 
 	return ClassMetaDataAttributes;

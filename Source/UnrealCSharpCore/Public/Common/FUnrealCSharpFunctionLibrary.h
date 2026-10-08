@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "UEVersion.h"
@@ -214,8 +214,6 @@ public:
 	static FString GetSourceGeneratorPath();
 
 	static FString GetWeaversPath();
-
-	static FString GetInteropPath();
 #endif
 
 #if WITH_EDITOR

@@ -20,6 +20,8 @@ FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
 	{
 		ScriptArray = new FScriptArray();
 	}
+
+	Initialize();
 }
 
 FArrayHelper::~FArrayHelper()

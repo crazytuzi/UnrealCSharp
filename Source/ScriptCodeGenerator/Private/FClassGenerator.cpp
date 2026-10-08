@@ -1,4 +1,4 @@
-#include "FClassGenerator.h"
+﻿#include "FClassGenerator.h"
 #include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
@@ -472,10 +472,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionDeclarationBody;
 
-		TArray<int32> FunctionOutParamIndexMapping;
-
-		FunctionOutParamIndexMapping.AddDefaulted(FunctionParams.Num());
-
 		auto bGeneratorFunctionDefaultParam = false;
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
@@ -486,16 +482,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 				if (FUnrealCSharpFunctionLibrary::IsNativeFunction(InClass, Function->GetFName()) ||
 					FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
 				{
-					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
-						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
-
 					FunctionRefParamIndex.Emplace(Index);
 				}
 				else
 				{
-					FunctionOutParamIndexMapping[FunctionOutParamIndex.Num()] =
-						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
-
 					FunctionOutParamIndex.Emplace(Index);
 				}
 			}

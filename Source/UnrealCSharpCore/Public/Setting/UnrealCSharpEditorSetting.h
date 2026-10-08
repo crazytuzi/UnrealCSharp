@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "UnrealCSharpEditorSetting.generated.h"
@@ -90,8 +90,6 @@ public:
 
 	UFUNCTION()
 	TArray<FString> GetClassList();
-
-	const TArray<FString>& GetClassBlacklist() const;
 
 	ESolutionConfiguration GetEditorConfiguration() const;
 

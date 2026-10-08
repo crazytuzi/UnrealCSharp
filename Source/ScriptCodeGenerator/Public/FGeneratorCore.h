@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class FGeneratorCore
 {
@@ -12,10 +12,6 @@ public:
 	static FString GetBufferCast(FProperty* Property);
 
 	static int32 GetBufferSize(FProperty* Property);
-
-	static FString GetTypeImplementation(FProperty* Property);
-
-	static FString GetGetAccessorReturnParamName(FProperty* Property);
 
 	static FString GetSetAccessorParamName(FProperty* Property);
 
@@ -83,8 +79,6 @@ private:
 	static bool bIsSkipGenerateEngineModules;
 
 	static bool bIsGenerateAllModules;
-
-	static TArray<FString> SupportedModule;
 
 	static TArray<FString> SupportedAssetPath;
 

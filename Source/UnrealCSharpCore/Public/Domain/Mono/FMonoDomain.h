@@ -89,37 +89,13 @@ public:
 	                                                          const IManagedHandle InManagedHandle) override;
 
 public:
-	static MonoObject* Object_New(MonoClass* InManagedClass);
-
-	static MonoObject* Value_Box(MonoClass* InManagedClass, void* InValue);
-
-	static MonoString* String_New(const char* InText);
-
 	static MonoMethod* Class_Get_Method_From_Name(MonoClass* InManagedClass, const FString& InName,
 	                                              int32 InParamCount);
 
-	static MonoObject* Runtime_Invoke(MonoMethod* InManagedMethod, MonoObject* InManagedObject,
-	                                  void** InParams);
-
-	static MonoObject* Runtime_Invoke(MonoMethod* InManagedMethod, MonoObject* InManagedObject,
-	                                  void** InParams, MonoObject** InExc);
-
 public:
-	static void Unhandled_Exception(MonoObject* InManagedObject);
-
 	static void Free(void* InPointer);
 
 	static void* Method_Get_Unmanaged_Callers_Only_Ftnptr(MonoMethod* InManagedMethod);
-
-public:
-	static MonoObject* Object_Init(MonoClass* InManagedClass, int32 InParamCount = 0,
-	                               void** InParams = nullptr);
-
-	static void Object_Constructor(MonoObject* InManagedObject, int32 InParamCount = 0,
-	                               void** InParams = nullptr);
-
-	static MonoMethod* Class_Get_Method_From_Params(MonoClass* InManagedClass, const FString& InName,
-	                                                const TArray<MonoType*>& InParams);
 
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InManagedAssemblyName,

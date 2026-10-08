@@ -1,4 +1,4 @@
-#include "Common/FUnrealCSharpFunctionLibrary.h"
+﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
@@ -1125,11 +1125,6 @@ FString FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath()
 FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 {
 	return GetFullScriptDirectory() / WEAVERS_NAME;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetInteropPath()
-{
-	return GetFullScriptDirectory() / INTEROP_NAME;
 }
 #endif
 

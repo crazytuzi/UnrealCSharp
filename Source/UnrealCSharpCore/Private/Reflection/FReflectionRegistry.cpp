@@ -231,6 +231,9 @@ void FReflectionRegistry::Initialize()
 	AutoCollapseCategoriesAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE);
 
+	DontAutoCollapseCategoriesAttributeClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DONT_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE);
+
 	CollapseCategoriesAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_COLLAPSE_CATEGORIES_ATTRIBUTE);
 
@@ -248,6 +251,9 @@ void FReflectionRegistry::Initialize()
 
 	SparseClassDataTypeAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE);
+
+	CustomThunkTemplatesAttributeClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CUSTOM_THUNK_TEMPLATES_ATTRIBUTE);
 
 	GlobalConfigAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_GLOBAL_CONFIG_ATTRIBUTE);
@@ -1358,6 +1364,11 @@ FClassReflection* FReflectionRegistry::GetAutoCollapseCategoriesAttributeClass()
 	return AutoCollapseCategoriesAttributeClass;
 }
 
+FClassReflection* FReflectionRegistry::GetDontAutoCollapseCategoriesAttributeClass() const
+{
+	return DontAutoCollapseCategoriesAttributeClass;
+}
+
 FClassReflection* FReflectionRegistry::GetCollapseCategoriesAttributeClass() const
 {
 	return CollapseCategoriesAttributeClass;
@@ -1386,6 +1397,11 @@ FClassReflection* FReflectionRegistry::GetEarlyAccessPreviewAttributeClass() con
 FClassReflection* FReflectionRegistry::GetSparseClassDataTypeAttributeClass() const
 {
 	return SparseClassDataTypeAttributeClass;
+}
+
+FClassReflection* FReflectionRegistry::GetCustomThunkTemplatesAttributeClass() const
+{
+	return CustomThunkTemplatesAttributeClass;
 }
 
 FClassReflection* FReflectionRegistry::GetGlobalConfigAttributeClass() const

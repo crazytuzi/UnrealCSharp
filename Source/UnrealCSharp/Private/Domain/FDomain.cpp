@@ -1,4 +1,4 @@
-#include "Domain/FDomain.h"
+﻿#include "Domain/FDomain.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Domain/Script/FScriptDomainFactory.h"
 #include "Template/TGetArrayLength.inl"
@@ -72,16 +72,6 @@ void* FDomain::Object_Unbox(const IManagedHandle InManagedHandle)
 	}
 
 	return nullptr;
-}
-
-IManagedHandle FDomain::String_New(const char* InText)
-{
-	if (const auto ScriptDomain = IScriptDomain::Get())
-	{
-		return ScriptDomain->NewString(InText);
-	}
-
-	return InvalidManagedHandle;
 }
 
 FString FDomain::StringToFString(const IManagedHandle InManagedHandle)

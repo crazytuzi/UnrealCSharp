@@ -29,6 +29,30 @@ namespace Script.CoreUObject
             GC.SuppressFinalize(this);
         }
 
+        public static bool operator ==(TFieldPath<T> A, TFieldPath<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TFieldPathImplementation.TFieldPath_IdenticalImplementation(
+                       HandleData.GetHandle(A),
+                       HandleData.GetHandle(B));
+        }
+
+        public static bool operator !=(TFieldPath<T> A, TFieldPath<T> B) => !(A == B);
+
+        public override bool Equals(object Other) => this == Other as TFieldPath<T>;
+
+        public override int GetHashCode() => 0;
+
         public bool IsValid() => TFieldPathImplementation.TFieldPath_IsValidImplementation(HandleData.GetHandle(this));
 
         public T Get() =>

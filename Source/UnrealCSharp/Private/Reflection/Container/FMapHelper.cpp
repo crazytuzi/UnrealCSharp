@@ -32,6 +32,8 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 		                                              ValuePropertyDescriptor->GetSize(),
 		                                              ValuePropertyDescriptor->GetMinAlignment());
 	}
+
+	Initialize();
 }
 
 FMapHelper::~FMapHelper()

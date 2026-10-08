@@ -24,6 +24,8 @@ FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* In
 
 		InOptionalProperty->InitializeValueInternal(Data);
 	}
+
+	Initialize();
 }
 
 FOptionalHelper::~FOptionalHelper()
