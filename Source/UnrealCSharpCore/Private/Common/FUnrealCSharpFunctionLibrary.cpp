@@ -1086,6 +1086,21 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	       Build();
 }
 
+bool FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(const TArray<FString>& InAssemblies)
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	for (const auto& Assembly : InAssemblies)
+	{
+		if (!PlatformFile.FileExists(*Assembly))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetScriptDirectory()
 {

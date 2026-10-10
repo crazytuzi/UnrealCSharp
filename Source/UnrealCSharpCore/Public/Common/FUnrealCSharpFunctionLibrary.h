@@ -200,6 +200,8 @@ public:
 
 	static TArray<FString> GetFullAssemblyPublishPath();
 
+	static bool IsAssembliesFileExists(const TArray<FString>& InAssemblies);
+
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
 

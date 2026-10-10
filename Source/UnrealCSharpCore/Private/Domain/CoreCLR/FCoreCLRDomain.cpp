@@ -5,7 +5,6 @@
 #include "Misc/Paths.h"
 #include "Misc/App.h"
 #include "Misc/FileHelper.h"
-#include "HAL/FileManager.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -119,20 +118,17 @@ void FCoreCLRDomain::Initialize()
 
 	const auto InteropAssembly = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
 
-	if (!IFileManager::Get().FileExists(*InteropAssembly))
+	if (const auto AssemblyPublishPath = FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath();
+		FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(AssemblyPublishPath))
 	{
+		RegisterInterop(InteropAssembly);
+
+		RegisterLog();
+
 		bIsInitialized = true;
 
-		return;
+		InitializeAssembly(AssemblyPublishPath);
 	}
-
-	RegisterInterop(InteropAssembly);
-
-	RegisterLog();
-
-	bIsInitialized = true;
-
-	InitializeAssembly(FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath());
 }
 
 void FCoreCLRDomain::Deinitialize()

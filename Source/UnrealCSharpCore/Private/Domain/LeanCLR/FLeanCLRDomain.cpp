@@ -767,6 +767,11 @@ bool FLeanCLRDomain::FileLoader(const char* InAssemblyName, const char* InExtens
 
 bool FLeanCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 {
+	if (!FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(InAssemblies))
+	{
+		return false;
+	}
+
 	LoadAssembly(InAssemblies);
 
 	UEModule = nullptr;

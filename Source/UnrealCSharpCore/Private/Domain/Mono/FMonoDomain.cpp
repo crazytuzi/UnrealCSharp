@@ -301,7 +301,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			}
 		}
 
-		bIsInitialized = true;
+		bIsInitialized = FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(InAssemblies);
 	}
 }
 
