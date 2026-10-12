@@ -7,6 +7,37 @@ FBinding& FBinding::Get()
 	return Binding;
 }
 
+FBinding::~FBinding()
+{
+	for (const auto& Class : Classes)
+	{
+		delete Class;
+	}
+
+	Classes.Empty();
+
+	for (const auto& Enum : Enums)
+	{
+		delete Enum;
+	}
+
+	Enums.Empty();
+
+	for (const auto& ClassRegister : ClassRegisters)
+	{
+		delete ClassRegister;
+	}
+
+	ClassRegisters.Empty();
+
+	for (const auto& EnumRegister : EnumRegisters)
+	{
+		delete EnumRegister;
+	}
+
+	EnumRegisters.Empty();
+}
+
 FBinding& FBinding::Register()
 {
 	if (!bIsRegister)
@@ -35,11 +66,11 @@ FBinding& FBinding::Register()
 	return *this;
 }
 
-FBindingClassRegister*& FBinding::Register(const TFunction<FString()>& InClassFunction,
-                                           const FString& InImplementationNameSpace,
-                                           const TFunction<bool()>& InIsProjectClassFunction,
-                                           const bool InIsReflectionClass,
-                                           const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
+FBindingClassRegister* FBinding::Register(const TFunction<FString()>& InClassFunction,
+                                          const FString& InImplementationNameSpace,
+                                          const TFunction<bool()>& InIsProjectClassFunction,
+                                          const bool InIsReflectionClass,
+                                          const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
 	if (!InIsReflectionClass)
 	{
@@ -64,10 +95,10 @@ FBindingClassRegister*& FBinding::Register(const TFunction<FString()>& InClassFu
 	                                                           InTypeInfoFunction));
 }
 
-FBindingEnumRegister*& FBinding::Register(const TFunction<FString()>& InEnumFunction,
-                                          const FString& InUnderlyingType,
-                                          const bool InIsProjectEnum,
-                                          const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
+FBindingEnumRegister* FBinding::Register(const TFunction<FString()>& InEnumFunction,
+                                         const FString& InUnderlyingType,
+                                         const bool InIsProjectEnum,
+                                         const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
 	return EnumRegisters.Add_GetRef(new FBindingEnumRegister(InEnumFunction,
 	                                                         InUnderlyingType,

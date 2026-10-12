@@ -3,16 +3,21 @@
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(Src);
+	auto Object = InvalidManagedHandle;
 
-	if (!IManagedHandleIsValid(Object))
+	if (Property->GetObjectPropertyValue(Src) != nullptr)
 	{
-		if (Class != nullptr)
-		{
-			Object = Class->NewObject(true);
+		Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(Src);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
-				Class, Object, Src);
+		if (!IManagedHandleIsValid(Object))
+		{
+			if (Class != nullptr)
+			{
+				Object = Class->NewObject(true);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
+					Class, Object, Src);
+			}
 		}
 	}
 

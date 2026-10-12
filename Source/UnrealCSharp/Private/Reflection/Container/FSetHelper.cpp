@@ -175,9 +175,9 @@ int32 FSetHelper::Remove(const void* InValue) const
 
 	const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
 
-	ElementPropertyDescriptor->DestroyValue(Data);
-
 	EnsureRehash();
+
+	ElementPropertyDescriptor->DestroyValue(Data);
 
 	ScriptSet->RemoveAt(ValueIndex, ScriptSetLayout);
 

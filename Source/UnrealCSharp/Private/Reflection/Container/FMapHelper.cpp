@@ -163,11 +163,11 @@ int32 FMapHelper::Remove(const void* InKey) const
 
 		const auto Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
 
+		EnsureRehash();
+
 		KeyPropertyDescriptor->DestroyValue(Data);
 
 		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
-
-		EnsureRehash();
 
 		ScriptMap->RemoveAt(KeyIndex, ScriptMapLayout);
 	}

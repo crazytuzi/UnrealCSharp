@@ -64,7 +64,7 @@ private:
 	FString GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const;
 
 protected:
-	FBindingClassRegister*& ClassRegister;
+	FBindingClassRegister* ClassRegister;
 
 private:
 	TArray<FString> Functions;
