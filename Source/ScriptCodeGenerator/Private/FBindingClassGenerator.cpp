@@ -9,7 +9,7 @@
 
 void FBindingClassGenerator::Generator()
 {
-	for (const auto& Class : FBinding::Get().GetClasses())
+	for (const auto& Class : FBinding::Get().Register().GetClasses())
 	{
 		Generator(Class);
 	}

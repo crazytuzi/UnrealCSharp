@@ -7,6 +7,8 @@ namespace Interop
 {
     public static unsafe class MethodBridge
     {
+        public const nint ExceptionHandle = -1;
+
         private const int UnknownParamCount = -1;
 
         private static readonly Dictionary<string, nint> StringToMethod = new(StringComparer.Ordinal);
@@ -139,7 +141,7 @@ namespace Interop
 
                 Console.Error.WriteLine($"\nUnhandled Exception:\n{InnerException}");
 
-                return 0;
+                return ExceptionHandle;
             }
         }
 

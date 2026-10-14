@@ -275,7 +275,58 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 		return EnumUnderlyingTypeName[*FoundEnumUnderlyingType];
 	}
 
-	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("byte") : TEXT("long");
+	auto UnderlyingTypeName = FString(TEXT("long"));
+
+	if (InEnum->IsA(UUserDefinedEnum::StaticClass()))
+	{
+		UnderlyingTypeName = TEXT("byte");
+	}
+	else
+	{
+		auto MinValue = MAX_int64;
+
+		auto MaxValue = MIN_int64;
+
+		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+		{
+			const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+			MinValue = FMath::Min(MinValue, EnumeratorValue);
+
+			MaxValue = FMath::Max(MaxValue, EnumeratorValue);
+		}
+
+		if (MinValue >= 0 && MaxValue <= MAX_uint8)
+		{
+			UnderlyingTypeName = TEXT("byte");
+		}
+		else if (MinValue >= MIN_int8 && MaxValue <= MAX_int8)
+		{
+			UnderlyingTypeName = TEXT("sbyte");
+		}
+		else if (MinValue >= 0 && MaxValue <= MAX_uint16)
+		{
+			UnderlyingTypeName = TEXT("ushort");
+		}
+		else if (MinValue >= MIN_int16 && MaxValue <= MAX_int16)
+		{
+			UnderlyingTypeName = TEXT("short");
+		}
+		else if (MinValue >= 0 && MaxValue <= MAX_uint32)
+		{
+			UnderlyingTypeName = TEXT("uint");
+		}
+		else if (MinValue >= MIN_int32 && MaxValue <= MAX_int32)
+		{
+			UnderlyingTypeName = TEXT("int");
+		}
+		else if (MinValue >= 0)
+		{
+			UnderlyingTypeName = TEXT("ulong");
+		}
+	}
+
+	return UnderlyingTypeName;
 }
 
 bool FEnumGenerator::IsValueInUnderlyingTypeRange(const int64 InValue, const FString& InUnderlyingTypeName)

@@ -85,9 +85,14 @@ public:
 
 		if constexpr (!std::is_void_v<Result>)
 		{
-			auto Value = TPropertyValue<Result, Result>::Get(ReturnValue);
+			Result Value{};
 
-			FDomain::GCHandle_Free(ReturnValue);
+			if (ReturnValue != ExceptionManagedHandle && IManagedHandleIsValid(ReturnValue))
+			{
+				Value = TPropertyValue<Result, Result>::Get(ReturnValue);
+
+				FDomain::GCHandle_Free(ReturnValue);
+			}
 
 			return Value;
 		}

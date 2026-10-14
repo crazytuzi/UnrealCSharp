@@ -373,13 +373,13 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const b
 
 	FStructGenerator::Generator();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Enum Generator"));
-
-	FEnumGenerator::Generator();
-
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Asset Generator"));
 
 	FAssetGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Enum Generator"));
+
+	FEnumGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "GameplayTag Generator"));
 

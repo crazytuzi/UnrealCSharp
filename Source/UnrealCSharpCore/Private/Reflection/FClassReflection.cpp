@@ -209,11 +209,15 @@ void FClassReflection::ParseProperties(const FManagedReader& InManagedReader, IM
 		return;
 	}
 
+	const auto PropertyCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Properties.Reserve(Properties.Num() + PropertyCount);
+
 	auto PropertyAttributeIndex = 0;
 
 	auto PropertyAttributeValueIndex = 0;
 
-	for (auto PropertyIndex = 0; PropertyIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++PropertyIndex)
+	for (auto PropertyIndex = 0; PropertyIndex < PropertyCount; ++PropertyIndex)
 	{
 		auto PropertyName = InManagedReader.ArrayGetString(InParams[2], PropertyIndex);
 
@@ -245,12 +249,14 @@ void FClassReflection::ParseProperties(const FManagedReader& InManagedReader, IM
 
 		PropertyAttributeIndex += AttributeCount;
 
-		Properties.Add(PropertyName, new FPropertyReflection(PropertyName,
-		                                                     InManagedReader.ArrayGet(InParams[3], PropertyIndex),
-		                                                     FReflectionRegistry::Get().GetClass(
-			                                                     InManagedReader.ArrayGet(InParams[4], PropertyIndex)),
-		                                                     PropertyAttributes,
-		                                                     PropertyAttributeValues));
+		auto PropertyReflection = new FPropertyReflection(PropertyName,
+		                                                  InManagedReader.ArrayGet(InParams[3], PropertyIndex),
+		                                                  FReflectionRegistry::Get().GetClass(
+			                                                  InManagedReader.ArrayGet(InParams[4], PropertyIndex)),
+		                                                  PropertyAttributes,
+		                                                  PropertyAttributeValues);
+
+		Properties.Add(MoveTemp(PropertyName), PropertyReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -275,11 +281,17 @@ void FClassReflection::ParseFields(const FManagedReader& InManagedReader, IManag
 		return;
 	}
 
-	for (auto FieldIndex = 0; FieldIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++FieldIndex)
+	const auto FieldCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Fields.Reserve(Fields.Num() + FieldCount);
+
+	for (auto FieldIndex = 0; FieldIndex < FieldCount; ++FieldIndex)
 	{
 		auto FieldName = InManagedReader.ArrayGetString(InParams[2], FieldIndex);
 
-		Fields.Add(FieldName, new FFieldReflection(FieldName, InManagedReader.ArrayGet(InParams[3], FieldIndex)));
+		auto FieldReflection = new FFieldReflection(FieldName, InManagedReader.ArrayGet(InParams[3], FieldIndex));
+
+		Fields.Add(MoveTemp(FieldName), FieldReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -294,11 +306,15 @@ void FClassReflection::ParseMethods(const FManagedReader& InManagedReader, IMana
 		return;
 	}
 
+	const auto MethodCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Methods.Reserve(Methods.Num() + MethodCount);
+
 	auto MethodAttributeIndex = 0;
 
 	auto MethodAttributeValueIndex = 0;
 
-	for (auto MethodIndex = 0; MethodIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++MethodIndex)
+	for (auto MethodIndex = 0; MethodIndex < MethodCount; ++MethodIndex)
 	{
 		auto MethodName = InManagedReader.ArrayGetString(InParams[2], MethodIndex);
 
@@ -366,15 +382,16 @@ void FClassReflection::ParseMethods(const FManagedReader& InManagedReader, IMana
 			}
 		}
 
-		Methods.FindOrAdd({MethodName, MethodParamCount}).Add(
-			new FMethodReflection(MethodName,
-			                      MethodParamCount,
-			                      InManagedReader.ArrayGet(InParams[3], MethodIndex),
-			                      bMethodIsStatic,
-			                      ReturnType,
-			                      ParamReflections,
-			                      MethodAttributes,
-			                      MethodAttributeValue));
+		auto MethodReflection = new FMethodReflection(MethodName,
+		                                              MethodParamCount,
+		                                              InManagedReader.ArrayGet(InParams[3], MethodIndex),
+		                                              bMethodIsStatic,
+		                                              ReturnType,
+		                                              ParamReflections,
+		                                              MethodAttributes,
+		                                              MethodAttributeValue);
+
+		Methods.FindOrAdd(TTuple<FString, int32>(MoveTemp(MethodName), MethodParamCount)).Add(MethodReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);

@@ -24,6 +24,8 @@ struct IManagedHandle
 
 static constexpr IManagedHandle InvalidManagedHandle{};
 
+static constexpr IManagedHandle ExceptionManagedHandle{-1};
+
 FORCEINLINE bool IManagedHandleIsValid(const IManagedHandle InManagedHandle)
 {
 	return InManagedHandle != InvalidManagedHandle;

@@ -1,4 +1,4 @@
-﻿#include "Domain/FDomain.h"
+#include "Domain/FDomain.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Domain/Script/FScriptDomainFactory.h"
 #include "Template/TGetArrayLength.inl"
@@ -120,9 +120,14 @@ FString FDomain::GetTraceback()
 		{
 			const auto Traceback = TracebackMethod->Runtime_Invoke();
 
-			auto Result = StringToFString(Traceback);
+			FString Result;
 
-			GCHandle_Free(Traceback);
+			if (Traceback != ExceptionManagedHandle && IManagedHandleIsValid(Traceback))
+			{
+				Result = StringToFString(Traceback);
+
+				GCHandle_Free(Traceback);
+			}
 
 			return Result;
 		}

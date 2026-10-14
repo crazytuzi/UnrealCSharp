@@ -49,7 +49,8 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 		}
 
 		if (auto ReturnValue = InMethod->Runtime_Invoke(InManagedHandle, CSharpParams.GetData());
-			IManagedHandleIsValid(ReturnValue) && ReturnPropertyDescriptor != nullptr)
+			ReturnValue != ExceptionManagedHandle && IManagedHandleIsValid(ReturnValue) &&
+			ReturnPropertyDescriptor != nullptr)
 		{
 			if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 			{
