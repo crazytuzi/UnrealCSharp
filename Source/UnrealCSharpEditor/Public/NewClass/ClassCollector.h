@@ -49,6 +49,8 @@ private:
 
 	static bool IsValidParentClass(const UClass* InClass);
 
+	static bool IsSupportedAsset(const FAssetData& InAssetData);
+
 	static void OnReloadComplete(EReloadCompleteReason InReason);
 
 	static void OnAssetAdded(const FAssetData& InAssetData);

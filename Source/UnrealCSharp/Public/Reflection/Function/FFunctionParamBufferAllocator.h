@@ -31,7 +31,7 @@ public:
 	virtual void Free(void* InMemory) override;
 
 private:
-	uint8 Count;
+	int32 Count;
 
 	decltype(UFunction::ParmsSize) ParamSize;
 

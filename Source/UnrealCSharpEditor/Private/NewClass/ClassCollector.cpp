@@ -230,31 +230,11 @@ void FClassCollector::PopulateClassByAsset()
 
 		AssetRegistryModule.Get().GetAssetsByPaths(AssetPaths, OutAssetData, true);
 
-		TArray<FName> SupportedAssetClassNames;
-
-		for (const auto& SupportedAssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
-		{
-			SupportedAssetClassNames.Add(SupportedAssetClass->GetFName());
-		}
-
 		for (const auto& AssetData : OutAssetData)
 		{
-			if (const auto& AssetDataClassName =
-#if UE_F_ASSET_DATA_GET_ASSET_NAME
-					AssetData.AssetClassPath.GetAssetName();
-#else
-					AssetData.AssetClass;
-#endif
-
-				SupportedAssetClassNames.Contains(AssetDataClassName))
+			if (IsSupportedAsset(AssetData))
 			{
-				if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
-					AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
-				{
-					TSharedPtr<FDynamicClassViewerNode> Node = MakeShared<FDynamicClassViewerNode>(AssetData);
-
-					NodesSet.Add(Node);
-				}
+				NodesSet.Add(MakeShared<FDynamicClassViewerNode>(AssetData));
 			}
 		}
 	}
@@ -305,6 +285,45 @@ bool FClassCollector::IsValidParentClass(const UClass* InClass)
 	return true;
 }
 
+bool FClassCollector::IsSupportedAsset(const FAssetData& InAssetData)
+{
+	auto bIsSupported = false;
+
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		const auto AssetDataClassName =
+#if UE_F_ASSET_DATA_GET_ASSET_NAME
+			InAssetData.AssetClassPath.GetAssetName();
+#else
+			InAssetData.AssetClass;
+#endif
+
+		const auto bIsSupportedClass =
+			(AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
+				AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName()) &&
+			UnrealCSharpEditorSetting->GetSupportedAssetClass().ContainsByPredicate(
+				[&AssetDataClassName](const TSubclassOf<UObject>& InSupportedAssetClass)
+				{
+					return InSupportedAssetClass->GetFName() == AssetDataClassName;
+				});
+
+		if (bIsSupportedClass)
+		{
+			for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
+			{
+				if (const auto SupportedAssetPath = Path.EndsWith(TEXT("/")) ? Path : Path + TEXT("/");
+					InAssetData.PackageName.ToString().StartsWith(SupportedAssetPath))
+				{
+					bIsSupported = true;
+				}
+			}
+		}
+	}
+
+	return bIsSupported;
+}
+
 void FClassCollector::OnReloadComplete(EReloadCompleteReason InReason)
 {
 	RequestPopulateClassHierarchy();
@@ -312,15 +331,17 @@ void FClassCollector::OnReloadComplete(EReloadCompleteReason InReason)
 
 void FClassCollector::OnAssetAdded(const FAssetData& InAssetData)
 {
-	if (const auto NewClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
-		ValidateNode(NewClassName))
+	if (IsSupportedAsset(InAssetData))
 	{
-		return;
+		const auto NewClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
+
+		if (!NewClassName.IsEmpty() && !ValidateNode(NewClassName))
+		{
+			NodesSet.Add(MakeShared<FDynamicClassViewerNode>(InAssetData));
+
+			RefreshAllNodes();
+		}
 	}
-
-	NodesSet.Add(MakeShared<FDynamicClassViewerNode>(InAssetData));
-
-	RefreshAllNodes();
 }
 
 void FClassCollector::OnAssetRemoved(const FAssetData& InAssetData)

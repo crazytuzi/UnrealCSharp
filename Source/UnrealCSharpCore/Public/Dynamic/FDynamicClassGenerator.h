@@ -7,7 +7,7 @@
 
 inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
 {
-	return GetTypeHash(TFunctionPointer(InClassConstructor).Value.Pointer);
+	return GetTypeHash(TFunctionPointer(InClassConstructor).Value);
 }
 
 class FDynamicClassGenerator

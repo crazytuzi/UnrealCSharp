@@ -1,6 +1,11 @@
 #include "Reflection/Function/FManagedFunctionDescriptor.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Domain/FDomain.h"
+#include "UEVersion.h"
+#include "UObject/FieldPathProperty.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#endif
 
 bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
                                         const IManagedHandle InManagedHandle,
@@ -34,10 +39,24 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 				}
 				else
 				{
+					const auto Property = PropertyDescriptor->GetProperty();
+
 					IManagedHandle ManagedHandle{};
 
-					PropertyDescriptor->Get<FPropertyArgument::FParameter>(PropertyAddress,
-					                                                       reinterpret_cast<void**>(&ManagedHandle));
+					if (PropertyAddress != nullptr &&
+						!ReferencePropertyIndexes.Contains(Index) &&
+						Property != nullptr &&
+						IsCopyValueProperty(Property))
+					{
+						PropertyDescriptor->Get<FPropertyArgument::FReturn>(
+							PropertyDescriptor->CopyValue(PropertyAddress),
+							reinterpret_cast<void**>(&ManagedHandle));
+					}
+					else
+					{
+						PropertyDescriptor->Get<FPropertyArgument::FParameter>(
+							PropertyAddress, reinterpret_cast<void**>(&ManagedHandle));
+					}
 
 					CompoundManagedHandles.Add(ManagedHandle);
 
@@ -101,4 +120,27 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 	}
 
 	return false;
+}
+
+bool FManagedFunctionDescriptor::IsCopyValueProperty(const FProperty* InProperty)
+{
+	return InProperty->IsA<FNameProperty>() ||
+		InProperty->IsA<FStructProperty>() ||
+		InProperty->IsA<FArrayProperty>() ||
+		InProperty->IsA<FStrProperty>() ||
+#if UE_F_UTF8_STR_PROPERTY
+		InProperty->IsA<FUtf8StrProperty>() ||
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+		InProperty->IsA<FAnsiStrProperty>() ||
+#endif
+		InProperty->IsA<FTextProperty>() ||
+		InProperty->IsA<FMapProperty>() ||
+		InProperty->IsA<FSetProperty>() ||
+		InProperty->IsA<FFieldPathProperty>()
+#if UE_F_OPTIONAL_PROPERTY
+		|| InProperty->IsA<FOptionalProperty>();
+#else
+		;
+#endif
 }

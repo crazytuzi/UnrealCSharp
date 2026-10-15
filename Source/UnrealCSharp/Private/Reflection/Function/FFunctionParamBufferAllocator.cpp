@@ -56,7 +56,10 @@ void* FFunctionParamPoolBufferAllocator::Malloc()
 
 void FFunctionParamPoolBufferAllocator::Free(void* InMemory)
 {
-	Count--;
+	if (Buffers.IsValidIndex(Count - 1) && Buffers[Count - 1] == InMemory)
+	{
+		Count--;
+	}
 }
 
 FFunctionParamPersistentBufferAllocator::FFunctionParamPersistentBufferAllocator(
