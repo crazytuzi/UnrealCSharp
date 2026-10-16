@@ -1,4 +1,4 @@
-﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
@@ -707,7 +707,18 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 
 FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData, const FString& InAssetName)
 {
-	auto ModuleName = InAssetData.PackagePath.ToString().Replace(TEXT("Game"), FApp::GetProjectName());
+	const auto GameRoot = FString(TEXT("/Game"));
+
+	auto ModuleName = InAssetData.PackagePath.ToString();
+
+	if (ModuleName == GameRoot || ModuleName.StartsWith(GameRoot + TEXT("/"), ESearchCase::CaseSensitive))
+	{
+		ModuleName = FString::Printf(TEXT(
+			"/%s%s"
+		),
+		                             FApp::GetProjectName(),
+		                             *ModuleName.RightChop(GameRoot.Len()));
+	}
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 

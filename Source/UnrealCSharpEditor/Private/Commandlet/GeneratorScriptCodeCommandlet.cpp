@@ -7,6 +7,8 @@
 
 int32 UGeneratorScriptCodeCommandlet::Main(const FString& Params)
 {
+	int32 Result = 0;
+
 	if (FString Platform; FParse::Value(*Params, TEXT("Platform="), Platform))
 	{
 		if (FParse::Param(*Params, TEXT("Rebuild")))
@@ -29,8 +31,12 @@ int32 UGeneratorScriptCodeCommandlet::Main(const FString& Params)
 
 		FUnrealCSharpEditorModule::Generator(Platform, true);
 	}
+	else
+	{
+		Result = 1;
+	}
 
-	return 0;
+	return Result;
 }
 
 bool UGeneratorScriptCodeCommandlet::IsRunningGeneratorScriptCodeCommandlet()

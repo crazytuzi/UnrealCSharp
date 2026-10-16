@@ -515,6 +515,27 @@ bool UDynamicDataSource::GetItemAttribute(const FContentBrowserItemData& InItem,
 	return FileItemDataPayload ? FileItemDataPayload->GetItemAttribute(InAttributeKey, OutAttributeValue) : false;
 }
 
+bool UDynamicDataSource::GetItemPhysicalPath(const FContentBrowserItemData& InItem, FString& OutDiskPath)
+{
+	auto bIsPhysicalPath = false;
+
+	if (const auto InternalPath = InItem.GetInternalPath().ToString(); !InternalPath.IsEmpty())
+	{
+		const auto DiskPath = InItem.IsFolder()
+			                      ? FDynamicHierarchy::ConvertInternalPathToFileSystemPath(InternalPath)
+			                      : InternalPath;
+
+		if (IFileManager::Get().DirectoryExists(*DiskPath) || IFileManager::Get().FileExists(*DiskPath))
+		{
+			OutDiskPath = DiskPath;
+
+			bIsPhysicalPath = true;
+		}
+	}
+
+	return bIsPhysicalPath;
+}
+
 bool UDynamicDataSource::CanEditItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
 {
 	return true;

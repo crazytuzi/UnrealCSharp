@@ -141,11 +141,23 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	FString UsingNameSpaceContent;
 
-	const auto NameSpaceContent = FString::Printf(TEXT(
-		"%s%s"
-	),
-	                                              *NAMESPACE_ROOT,
-	                                              *InAssetData.PackagePath.ToString().Replace(TEXT("/"), TEXT(".")));
+	auto NameSpaceContent = NAMESPACE_ROOT;
+
+	TArray<FString> NameSpaces;
+
+	InAssetData.PackagePath.ToString().ParseIntoArray(NameSpaces, TEXT("/"), true);
+
+	for (const auto& NameSpace : NameSpaces)
+	{
+		if (const auto EncodedNameSpace = FUnrealCSharpFunctionLibrary::Encode(NameSpace, false);
+			!EncodedNameSpace.IsEmpty())
+		{
+			NameSpaceContent += FString::Printf(TEXT(
+				".%s"
+			),
+			                                    *EncodedNameSpace);
+		}
+	}
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 

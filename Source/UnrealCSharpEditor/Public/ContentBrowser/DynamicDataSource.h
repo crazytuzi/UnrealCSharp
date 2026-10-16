@@ -68,6 +68,8 @@ public:
 	                              const FName InAttributeKey,
 	                              FContentBrowserItemDataAttributeValue& OutAttributeValue) override;
 
+	virtual bool GetItemPhysicalPath(const FContentBrowserItemData& InItem, FString& OutDiskPath) override;
+
 	virtual bool CanEditItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg) override;
 
 	virtual bool EditItem(const FContentBrowserItemData& InItem) override;

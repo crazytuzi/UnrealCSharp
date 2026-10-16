@@ -11,4 +11,8 @@ private:
 	static void Compile();
 
 	static void Analysis();
+
+	static FString GetProgramPath();
+
+	static bool IsProgramOutdated();
 };

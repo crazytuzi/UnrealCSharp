@@ -63,7 +63,12 @@ namespace SourceGenerator
 
         internal static string GetEngineName(string Name)
         {
-            return Name.EndsWith("_C") ? Name : Name.Substring(1);
+            return Name.EndsWith("_C") ? Name : RemoveTypePrefix(Name);
+        }
+
+        internal static string RemoveTypePrefix(string Name)
+        {
+            return Name.Length > 0 ? Name.Substring(1) : Name;
         }
 
         internal static string GetPathName(string Name)
@@ -104,7 +109,7 @@ namespace SourceGenerator
 
                 source += $"\n\t[{string.Join(", ", @interface.Attributes)}]";
 
-                source += $"\n\tpublic partial class U{@interface.Name.Substring(1)} : UInterface ";
+                source += $"\n\tpublic partial class U{RemoveTypePrefix(@interface.Name)} : UInterface ";
 
                 source += "\n\t{";
 
@@ -114,7 +119,7 @@ namespace SourceGenerator
 
                 unrealTypeReceiver.TypeInfos.Add(@interface.Name, new TypeInfo
                 {
-                    Name = $"U{@interface.Name.Substring(1)}",
+                    Name = $"U{RemoveTypePrefix(@interface.Name)}",
                     DynamicType = EDynamicType.UInterface,
                     NameSpace = "Script.CoreUObject",
                     Modifiers = "public partial",
@@ -326,7 +331,7 @@ namespace SourceGenerator
                 {
                     Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
                         Location.Create(
-                            enumDeclarationSyntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                            enumDeclarationSyntax.SyntaxTree,
                             enumDeclarationSyntax.Identifier.Span),
                         $"The name of UEnum {name} must start with \"E\""));
                 }
@@ -334,11 +339,12 @@ namespace SourceGenerator
                 {
                     var currentFileName = name + ".cs";
 
-                    if (Path.GetFileName(filePath) != currentFileName)
+                    if (!string.IsNullOrEmpty(filePath) &&
+                        Path.GetFileName(filePath) != currentFileName)
                     {
                         Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch,
                             Location.Create(
-                                enumDeclarationSyntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                                enumDeclarationSyntax.SyntaxTree,
                                 enumDeclarationSyntax.Identifier.Span),
                             "enum", name, currentFileName));
                     }
@@ -373,7 +379,7 @@ namespace SourceGenerator
 
                     Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
                         Location.Create(
-                            interfaceDeclarationSyntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                            interfaceDeclarationSyntax.SyntaxTree,
                             interfaceDeclarationSyntax.Identifier.Span),
                         $"The name of UInterface {name} must start with \"I\""));
                 }
@@ -383,14 +389,14 @@ namespace SourceGenerator
 
                     currentFileName = currentFileName.Substring(1, currentFileName.Length - 1);
 
-                    if (Path.GetFileName(filePath) != currentFileName)
+                    if (!string.IsNullOrEmpty(filePath) &&
+                        Path.GetFileName(filePath) != currentFileName)
                     {
                         hasError = true;
 
                         Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch,
                             Location.Create(
-                                interfaceDeclarationSyntax.Identifier.SyntaxTree ??
-                                throw new InvalidOperationException(),
+                                interfaceDeclarationSyntax.SyntaxTree,
                                 interfaceDeclarationSyntax.Identifier.Span),
                             "interface", name, currentFileName));
                     }
@@ -477,7 +483,7 @@ namespace SourceGenerator
 
                                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
                                     Location.Create(
-                                        Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                                        Syntax.SyntaxTree,
                                         Syntax.Identifier.Span),
                                     $"The name of UClass {name} must end with \"_C\""));
                             }
@@ -490,7 +496,7 @@ namespace SourceGenerator
 
                                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
                                     Location.Create(
-                                        Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                                        Syntax.SyntaxTree,
                                         Syntax.Identifier.Span),
                                     $"The name of UClass {name} must end with \"_C\" or start with \"A\""));
                             }
@@ -503,7 +509,7 @@ namespace SourceGenerator
 
                                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
                                     Location.Create(
-                                        Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                                        Syntax.SyntaxTree,
                                         Syntax.Identifier.Span),
                                     $"The name of UClass {name} must end with \"_C\" or start with \"U\""));
                             }
@@ -519,7 +525,7 @@ namespace SourceGenerator
 
                     Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorUClassHasNoBaseClass,
                         Location.Create(
-                            Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                            Syntax.SyntaxTree,
                             Syntax.Identifier.Span),
                         $"{name} must have a base class"));
                 }
@@ -532,7 +538,7 @@ namespace SourceGenerator
                     hasError = true;
 
                     Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeNameNotMatch,
-                        Location.Create(Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                        Location.Create(Syntax.SyntaxTree,
                             Syntax.Identifier.Span),
                         $"The name of UStruct {name} must start with \"F\""));
                 }
@@ -559,9 +565,12 @@ namespace SourceGenerator
                         dynamicType = EDynamicType.UStruct;
                     }
 
-                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorDynamicClassNotAPartialClass,
-                        Location.Create(errorAttribute.SyntaxTree, errorAttribute.Span),
-                        dynamicType.ToString().Replace("EType.", ""), name));
+                    if (errorAttribute != null)
+                    {
+                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorDynamicClassNotAPartialClass,
+                            Location.Create(errorAttribute.SyntaxTree, errorAttribute.Span),
+                            dynamicType.ToString().Replace("EType.", ""), name));
+                    }
                 }
 
                 return;
@@ -700,9 +709,10 @@ namespace SourceGenerator
                 {
                     var currentFileName = bIsUClass && name.EndsWith("_C")
                         ? name + ".cs"
-                        : name.Substring(1) + ".cs";
+                        : UnrealTypeSourceGenerator.RemoveTypePrefix(name) + ".cs";
 
-                    if (Path.GetFileName(filePath) != currentFileName)
+                    if (!string.IsNullOrEmpty(filePath) &&
+                        Path.GetFileName(filePath) != currentFileName)
                     {
                         Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch,
                             Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), "class", name,
@@ -814,7 +824,7 @@ namespace SourceGenerator
             {
                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFunctionNameMustBeUnique,
                     Location.Create(
-                        Syntax.Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                        Syntax.SyntaxTree,
                         Syntax.Identifier.Span),
                     $"'{Syntax.Identifier.Text}' conflicts with 'Function {UnrealTypeSourceGenerator.GetPathName(TypeName)}:{Syntax.Identifier.Text}'"));
             }
@@ -833,7 +843,7 @@ namespace SourceGenerator
             {
                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorPropertyNameMustBeUnique,
                     Location.Create(
-                        Identifier.SyntaxTree ?? throw new InvalidOperationException(),
+                        Syntax.SyntaxTree,
                         Identifier.Span),
                     $"Member variable declaration: '{Identifier.Text}' cannot be defined in '{TypeName}' as it is already defined in scope '{TypeName}' (shadowing is not allowed)"));
             }
