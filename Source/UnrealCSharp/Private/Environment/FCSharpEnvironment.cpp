@@ -3,7 +3,6 @@
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
-#include "CoreMacro/AccessPrivateMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
@@ -12,8 +11,6 @@
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #endif
-
-ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
 
 using FSignalHandler = void (*)(int32);
 
@@ -426,8 +423,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 			auto Object = ObjectPtr.Get();
 
-			if (Object->*TAccessPrivate<UObjectBase_ObjectFlags>::Value & ~RF_AllFlags ||
-				Object->HasAnyFlags(RF_NeedPostLoad) ||
+			if (Object->HasAnyFlags(RF_NeedPostLoad) ||
 				Object->HasAnyInternalFlags(
 #if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
 					EInternalObjectFlags_AsyncLoading

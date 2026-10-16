@@ -739,7 +739,17 @@ void FCSharpBind::RegisterScriptTick(const UClass* InClass, const UFunction* InF
 
 							if (bIsTick && !bHasScriptImplementedTick)
 							{
+#if UE_U_USER_WIDGET_UPDATE_CAN_TICK
 								Widget->UpdateCanTick();
+#else
+								if (Widget->GetDesiredTickFrequency() != EWidgetTickFrequency::Never)
+								{
+									if (const auto CachedWidget = Widget->GetCachedWidget(); CachedWidget.IsValid())
+									{
+										CachedWidget->SetCanTick(true);
+									}
+								}
+#endif
 							}
 						}
 					}

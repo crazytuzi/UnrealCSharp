@@ -112,7 +112,13 @@ namespace
 			{
 				if (IsBoundTo(InBindings[Index].*TUnifiedDelegate, InObject, InFunctionName))
 				{
-					InBindings.RemoveAt(Index, EAllowShrinking::No);
+					InBindings.RemoveAt(Index,
+#if UE_F_ARRAY_REMOVE_AT_E_ALLOW_SHRINKING
+					                    EAllowShrinking::No
+#else
+					                    1, false
+#endif
+					);
 				}
 			}
 		}
@@ -535,7 +541,13 @@ namespace
 						if (IsBoundTo(InFoundObject->KeyBindings[Index], InObjectToBindTo, *InInputChord,
 						              static_cast<EInputEvent>(InKeyEvent)))
 						{
-							InFoundObject->KeyBindings.RemoveAt(Index, EAllowShrinking::No);
+							InFoundObject->KeyBindings.RemoveAt(Index,
+#if UE_F_ARRAY_REMOVE_AT_E_ALLOW_SHRINKING
+							                                    EAllowShrinking::No
+#else
+							                                    1, false
+#endif
+							);
 						}
 					}
 				});

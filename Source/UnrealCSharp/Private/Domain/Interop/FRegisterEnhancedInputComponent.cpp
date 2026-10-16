@@ -169,9 +169,14 @@ namespace
 		{
 			for (const auto& ActionEventBinding : InEnhancedInputComponent->GetActionEventBindings())
 			{
+#if UE_F_ENHANCED_INPUT_ACTION_EVENT_BINDING_IS_BOUND_TO_OBJECT
 				if (ActionEventBinding->GetAction() == InInputAction &&
 					ActionEventBinding->GetTriggerEvent() == InTriggerEvent &&
-					ActionEventBinding->GetUObject() == InObject)
+					ActionEventBinding->IsBoundToObject(InObject))
+#else
+				if (ActionEventBinding->GetAction() == InInputAction &&
+					ActionEventBinding->GetTriggerEvent() == InTriggerEvent)
+#endif
 				{
 					return true;
 				}

@@ -607,7 +607,7 @@ void SCRIPT_DOMAIN_TYPE::RegisterLog()
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
-void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
+void SCRIPT_DOMAIN_TYPE::RegisterBinding()
 {
 	if (MethodBridgeRegisterBindingFn != nullptr)
 	{
@@ -643,6 +643,10 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 
 		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
 		                              MethodNames.Num());
+	}
+	else
+	{
+		bIsInitialized = false;
 	}
 }
 #endif

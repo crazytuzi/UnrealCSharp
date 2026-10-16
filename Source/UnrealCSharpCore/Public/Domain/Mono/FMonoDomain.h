@@ -122,7 +122,7 @@ private:
 
 	void RegisterLog();
 
-	void RegisterBinding() const;
+	void RegisterBinding();
 
 	void RegisterSynchronizationContextTick();
 

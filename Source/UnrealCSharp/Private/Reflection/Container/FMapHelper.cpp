@@ -86,7 +86,7 @@ void FMapHelper::EnsureRehash() const
 {
 	if (bNeedRehash)
 	{
-		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
+		ScriptMap->Rehash(ScriptMapLayout, [this](const void* Src)
 		{
 			return KeyPropertyDescriptor->GetValueTypeHash(Src);
 		});

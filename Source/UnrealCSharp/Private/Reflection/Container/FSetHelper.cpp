@@ -76,7 +76,7 @@ void FSetHelper::EnsureRehash() const
 {
 	if (bNeedRehash)
 	{
-		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
+		ScriptSet->Rehash(ScriptSetLayout, [this](const void* Src)
 		{
 			return ElementPropertyDescriptor->GetValueTypeHash(Src);
 		});

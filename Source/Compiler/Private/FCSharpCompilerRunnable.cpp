@@ -559,7 +559,7 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 			{
 				const auto bHasDynamicFileChanged = FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot);
 
-				const auto Reload = [InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
+				auto Reload = [InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
 				{
 					if (GExitPurge)
 					{
@@ -592,7 +592,7 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 				};
 
 				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-					Reload,
+					MoveTemp(Reload),
 					TStatId(),
 					nullptr,
 					ENamedThreads::GameThread);
