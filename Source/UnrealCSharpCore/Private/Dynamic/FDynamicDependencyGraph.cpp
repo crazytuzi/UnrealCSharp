@@ -219,7 +219,9 @@ void FDynamicDependencyGraph::Generator()
 				}
 				else
 				{
-					// @TODO
+					NodeArray[NodeMap[OutNode]].Generator();
+
+					NodeArray[NodeMap[OutNode]].Completed();
 				}
 			}
 		}

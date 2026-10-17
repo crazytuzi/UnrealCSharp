@@ -327,6 +327,8 @@ void FDynamicClassGenerator::ProcessGenerator(FClassReflection* InClassReflectio
 	GeneratorFunction(InClassReflection, InClass);
 
 	GeneratorInterface(InClassReflection, InClass);
+
+	FDynamicGeneratorCore::GeneratorAccessor(InClassReflection, InClass);
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)

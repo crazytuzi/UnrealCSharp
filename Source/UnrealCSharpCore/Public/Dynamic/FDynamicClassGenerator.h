@@ -4,6 +4,7 @@
 #include "Template/TFunctionPointer.inl"
 #include "EDynamicClassGeneratorType.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGeneratorCore.h"
 
 inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
 {
@@ -75,6 +76,8 @@ private:
 		InProcessGenerator(InClass);
 
 		EndGenerator(InClass);
+
+		FDynamicGeneratorCore::GeneratorAccessor(InClass);
 	}
 
 	static UClass* GeneratorClass(UPackage* InOuter, const FString& InNameSpace, const FString& InName,

@@ -15,6 +15,9 @@
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
 #endif
 
+TMap<TObjectPtr<UClass>, TArray<TTuple<FString, const FClassReflection*, FName>>>
+FDynamicGeneratorCore::PendingAccessors;
+
 #if WITH_EDITOR
 void FDynamicGeneratorCore::BeginCodeAnalysisGenerator()
 {
@@ -216,6 +219,85 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 	}
 }
 
+void FDynamicGeneratorCore::GeneratorAccessor(const FClassReflection* InClassReflection, UClass* InClass)
+{
+	if (InClassReflection != nullptr && InClass != nullptr)
+	{
+		const auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+		const auto GetterAttributeClass = ReflectionRegistry.GetBlueprintGetterAttributeClass();
+
+		const auto SetterAttributeClass = ReflectionRegistry.GetBlueprintSetterAttributeClass();
+
+		auto& AccessorMetaData = PendingAccessors.FindOrAdd(InClass);
+
+		AccessorMetaData.Reset();
+
+		for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
+		{
+			for (const auto Method : Methods)
+			{
+				if (Method->IsUFunction())
+				{
+					if (Method->HasAttribute(GetterAttributeClass))
+					{
+						const auto BlueprintGetter = Method->GetAttributeValue(GetterAttributeClass);
+
+						AccessorMetaData.Emplace(Method->GetName(), GetterAttributeClass,
+						                         FName(BlueprintGetter.IsEmpty()
+							                               ? Method->GetName()
+							                               : BlueprintGetter));
+					}
+
+					if (Method->HasAttribute(SetterAttributeClass))
+					{
+						const auto BlueprintSetter = Method->GetAttributeValue(SetterAttributeClass);
+
+						AccessorMetaData.Emplace(Method->GetName(), SetterAttributeClass,
+						                         FName(BlueprintSetter.IsEmpty()
+							                               ? Method->GetName()
+							                               : BlueprintSetter));
+					}
+				}
+			}
+		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorAccessor(UClass* InClass)
+{
+	if (InClass != nullptr)
+	{
+		if (const auto AccessorMetaData = PendingAccessors.Find(InClass))
+		{
+			for (const auto& [MethodName, AttributeClass, PropertyName] : *AccessorMetaData)
+			{
+				if (const auto Property = InClass->FindPropertyByName(PropertyName))
+				{
+#if WITH_EDITOR
+					SetMetaData(Property, AttributeClass->GetName(), MethodName);
+#endif
+				}
+
+				for (TFieldIterator<UFunction> Iterator(InClass, EFieldIteratorFlags::IncludeSuper); Iterator;
+				     ++Iterator)
+				{
+					if ((*Iterator)->GetName() == MethodName)
+					{
+#if WITH_EDITOR
+						SetMetaData(*Iterator, AttributeClass->GetName(), MethodName);
+#endif
+
+						break;
+					}
+				}
+			}
+		}
+
+		PendingAccessors.Remove(InClass);
+	}
+}
+
 void FDynamicGeneratorCore::GeneratorInterface(const FClassReflection* InClassReflection,
                                                FDynamicDependencyGraph::FNode& OutNode)
 {
@@ -350,7 +432,6 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetLocalizedAttributeClass()))
 	{
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetTransientAttributeClass()))
@@ -476,7 +557,6 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetFieldNotifyAttributeClass()))
 	{
-		// @TODO
 	}
 #endif
 
@@ -514,6 +594,10 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 
 	auto FunctionExportFlags = 0u;
 
+#if WITH_EDITOR
+	auto bIsSealedEvent = false;
+#endif
+
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintNativeEventAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
@@ -529,8 +613,12 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		{
 			UE_LOG(LogUnrealCSharp, Error, TEXT("A Private function cannot be a BlueprintNativeEvent!"));
 		}
-
-		// @TODO A function cannot be both BlueprintNativeEvent and a Blueprint Property accessor!
+		else if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintGetterAttributeClass()) ||
+			InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
+		{
+			UE_LOG(LogUnrealCSharp, Error,
+			       TEXT("A function cannot be both BlueprintNativeEvent and a Blueprint Property accessor!"));
+		}
 
 		InFunction->FunctionFlags |= FUNC_Event;
 
@@ -573,6 +661,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 #if WITH_EDITOR
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSealedEventAttributeClass()))
 	{
+		bIsSealedEvent = true;
 	}
 #endif
 
@@ -657,8 +746,6 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 
 		InFunction->FunctionFlags |= FUNC_BlueprintPure;
-
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
@@ -669,8 +756,6 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		}
 
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
-
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintPureAttributeClass()))
@@ -727,6 +812,19 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 	}
 
 #if WITH_EDITOR
+	if (bIsSealedEvent)
+	{
+		if (InFunction->FunctionFlags & FUNC_BlueprintEvent)
+		{
+			UE_LOG(LogUnrealCSharp, Error,
+			       TEXT("A function cannot be both SealedEvent and BlueprintImplementableEvent!"));
+		}
+		else
+		{
+			InFunction->FunctionFlags |= FUNC_Final;
+		}
+	}
+
 	SetMetaData(InFunction, InReflection);
 #endif
 }

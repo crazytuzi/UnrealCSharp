@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceGenerator
@@ -61,6 +62,14 @@ namespace SourceGenerator
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
+        public static readonly DiagnosticDescriptor ErrorSealedEventOverridden = new DiagnosticDescriptor(
+            "UC_ERROR_08",
+            "Sealed event cannot be overridden",
+            "{0} cannot override the sealed event \"{1}\" declared in \"{2}\"",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
         internal static string GetEngineName(string Name)
         {
             return Name.EndsWith("_C") ? Name : RemoveTypePrefix(Name);
@@ -89,6 +98,8 @@ namespace SourceGenerator
             }
 
             unrealTypeReceiver.ValidateInheritanceChain();
+
+            unrealTypeReceiver.ValidateSealedEventOverride();
 
             foreach (var error in unrealTypeReceiver.Errors)
             {
@@ -949,6 +960,85 @@ namespace SourceGenerator
             }
         }
 
+        private static string GetBaseTypeName(ClassDeclarationSyntax Syntax)
+        {
+            var baseTypeName = "";
+
+            if (Syntax.BaseList != null && Syntax.BaseList.Types.Count > 0)
+            {
+                baseTypeName = Syntax.BaseList.Types[0].Type.GetText().ToString().Trim();
+
+                var index = baseTypeName.LastIndexOf('.');
+
+                if (index >= 0)
+                {
+                    baseTypeName = baseTypeName.Substring(index + 1);
+                }
+            }
+
+            return baseTypeName;
+        }
+
+        private bool HasSealedEvent(string TypeName, string MethodName, HashSet<string> VisitedTypeNames)
+        {
+            var bHasSealedEvent = false;
+
+            if (VisitedTypeNames.Add(TypeName) &&
+                ClassDeclarations.TryGetValue(TypeName, out var declarations))
+            {
+                foreach (var declaration in declarations)
+                {
+                    foreach (var member in declaration.Members)
+                    {
+                        if (member is MethodDeclarationSyntax method &&
+                            method.Identifier.Text == MethodName &&
+                            GetAttributeFromMember(method, "SealedEvent") != null)
+                        {
+                            bHasSealedEvent = true;
+                        }
+                    }
+
+                    var baseTypeName = GetBaseTypeName(declaration);
+
+                    if (bHasSealedEvent == false && baseTypeName != "")
+                    {
+                        bHasSealedEvent = HasSealedEvent(baseTypeName, MethodName, VisitedTypeNames);
+                    }
+                }
+            }
+
+            return bHasSealedEvent;
+        }
+
+        public void ValidateSealedEventOverride()
+        {
+            foreach (var declarations in ClassDeclarations.Values)
+            {
+                foreach (var declaration in declarations)
+                {
+                    var baseTypeName = GetBaseTypeName(declaration);
+
+                    if (baseTypeName != "")
+                    {
+                        foreach (var member in declaration.Members)
+                        {
+                            if (member is MethodDeclarationSyntax method &&
+                                method.Modifiers.Any(SyntaxKind.OverrideKeyword) &&
+                                GetAttributeFromMember(method, "UFunction") != null &&
+                                HasSealedEvent(baseTypeName, method.Identifier.Text,
+                                    new HashSet<string>(StringComparer.Ordinal)))
+                            {
+                                Errors.Add(Diagnostic.Create(
+                                    UnrealTypeSourceGenerator.ErrorSealedEventOverridden,
+                                    Location.Create(declaration.SyntaxTree, method.Identifier.Span),
+                                    $"'{declaration.Identifier.Text}.{method.Identifier.Text}'",
+                                    method.Identifier.Text, baseTypeName));
+                            }
+                        }
+                    }
+                }
+            }
+        }
         private static List<string> MergeUsing(List<string> UsingListA, List<string> UsingListB)
         {
             if (UsingListA == null && UsingListB != null)
