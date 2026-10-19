@@ -48,13 +48,6 @@ namespace Script.Library
             return __TSet_GetMaxIndexImplementation(InSet);
         }
 
-        private static unsafe partial byte __TSet_IsValidIndexImplementation(nint InSet, int InIndex);
-
-        public static bool TSet_IsValidIndexImplementation(nint InSet, int InIndex)
-        {
-            return __TSet_IsValidIndexImplementation(InSet, InIndex) != 0;
-        }
-
         private static unsafe partial void __TSet_AddImplementation(nint InSet, byte* InValueBuffer);
 
         public static void TSet_AddImplementation(nint InSet, byte* InValueBuffer)
@@ -76,11 +69,35 @@ namespace Script.Library
             return __TSet_ContainsImplementation(InSet, InValueBuffer) != 0;
         }
 
+        private static unsafe partial byte __TSet_IsValidIndexImplementation(nint InSet, int InIndex);
+
+        public static bool TSet_IsValidIndexImplementation(nint InSet, int InIndex)
+        {
+            return __TSet_IsValidIndexImplementation(InSet, InIndex) != 0;
+        }
+
         private static unsafe partial void __TSet_GetEnumeratorImplementation(nint InSet, int InIndex, byte* ReturnBuffer);
 
         public static void TSet_GetEnumeratorImplementation(nint InSet, int InIndex, byte* ReturnBuffer)
         {
             __TSet_GetEnumeratorImplementation(InSet, InIndex, ReturnBuffer);
+        }
+
+        private static unsafe partial int __TSet_GetTypeSizeImplementation(nint InSet);
+
+        public static int TSet_GetTypeSizeImplementation(nint InSet)
+        {
+            return __TSet_GetTypeSizeImplementation(InSet);
+        }
+
+        private static unsafe partial int __TSet_GetElementsImplementation(nint InSet, int InIndex,
+            int InCount, byte* OutBuffer, int InBufferSize, int* OutNextIndex);
+
+        public static int TSet_GetElementsImplementation(nint InSet, int InIndex, int InCount,
+            byte* OutBuffer, int InBufferSize, int* OutNextIndex)
+        {
+            return __TSet_GetElementsImplementation(InSet, InIndex, InCount,
+                OutBuffer, InBufferSize, OutNextIndex);
         }
 
         public static T TSet_GetEnumeratorCompoundImplementation<T>(nint InSet, int InIndex)

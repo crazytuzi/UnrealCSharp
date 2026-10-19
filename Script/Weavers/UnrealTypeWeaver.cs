@@ -338,6 +338,55 @@ namespace Weavers
             }
         }
 
+        private static bool IsBackingFieldReference(Instruction Instruction, FieldDefinition BackingField)
+        {
+            return Instruction.Operand is FieldReference Field && Field.Resolve() == BackingField;
+        }
+
+        private static bool RewriteBackingFieldReferences(TypeDefinition Type, PropertyDefinition Property,
+            FieldDefinition BackingField)
+        {
+            var Methods = Type.Methods
+                .Where(Method => Method.HasBody)
+                .Where(Method => Method != Property.GetMethod && Method != Property.SetMethod)
+                .ToList();
+
+            var Instructions = Methods
+                .SelectMany(Method => Method.Body.Instructions)
+                .Where(Instruction => IsBackingFieldReference(Instruction, BackingField))
+                .ToList();
+
+            if (Instructions.Count == 0)
+            {
+                return true;
+            }
+
+            if (BackingField.IsStatic || Instructions.Any(Instruction => Instruction.OpCode != OpCodes.Stfld))
+            {
+                return false;
+            }
+
+            foreach (var Method in Methods)
+            {
+                var ILProcessor = Method.Body.GetILProcessor();
+
+                foreach (var Instruction in Method.Body.Instructions.ToList())
+                {
+                    if (IsBackingFieldReference(Instruction, BackingField) &&
+                        Instruction.OpCode == OpCodes.Stfld)
+                    {
+                        ILProcessor.InsertAfter(Instruction, Instruction.Create(OpCodes.Pop));
+
+                        ILProcessor.InsertAfter(Instruction, Instruction.Create(OpCodes.Pop));
+
+                        ILProcessor.Remove(Instruction);
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private void ProcessUClassProperty(TypeDefinition Type, PropertyDefinition Property)
         {
             // 删除默认生成
@@ -346,7 +395,7 @@ namespace Weavers
             var backingField = Type.Fields.FirstOrDefault(Field =>
                 Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
 
-            if (backingField != null)
+            if (backingField != null && RewriteBackingFieldReferences(Type, Property, backingField))
             {
                 Type.Fields.Remove(backingField);
             }
@@ -565,7 +614,7 @@ namespace Weavers
             var backingField = Type.Fields.FirstOrDefault(Field =>
                 Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
 
-            if (backingField != null)
+            if (backingField != null && RewriteBackingFieldReferences(Type, Property, backingField))
             {
                 Type.Fields.Remove(backingField);
             }

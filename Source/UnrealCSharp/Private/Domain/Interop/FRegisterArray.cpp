@@ -148,6 +148,34 @@ namespace
 			}
 		}
 
+		static int32 GetElementsImplementation(const IManagedHandle InManagedHandle, const int32 InIndex,
+		                                    const int32 InCount, uint8* OutBuffer, const int32 InBufferSize)
+		{
+			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+				InManagedHandle))
+			{
+				if (const auto TypeSize = ArrayHelper->GetTypeSize();
+					TypeSize > 0 && InIndex >= 0 && InCount > 0 && OutBuffer != nullptr)
+				{
+					const auto Available = ArrayHelper->Num() - InIndex;
+
+					if (const auto MaxCount = InCount < Available ? InCount : Available;
+						MaxCount > 0 && static_cast<int64>(MaxCount) * TypeSize <= InBufferSize)
+					{
+						for (auto Index = 0; Index < MaxCount; ++Index)
+						{
+							FMemory::Memcpy(OutBuffer + static_cast<int64>(Index) * TypeSize,
+							                ArrayHelper->Get(InIndex + Index), TypeSize);
+						}
+
+						return MaxCount;
+					}
+				}
+			}
+
+			return 0;
+		}
+
 		static void SetImplementation(const IManagedHandle InManagedHandle,
 		                              const int32 InIndex, IN_VALUE_BUFFER_SIGNATURE, const int32 InBufferSize)
 		{
@@ -384,6 +412,7 @@ namespace
 				.Function("IsEmpty", IsEmptyImplementation)
 				.Function("Max", MaxImplementation)
 				.Function("Get", GetImplementation)
+				.Function("GetElements", GetElementsImplementation)
 				.Function("Set", SetImplementation)
 				.Function("Find", FindImplementation)
 				.Function("FindLast", FindLastImplementation)

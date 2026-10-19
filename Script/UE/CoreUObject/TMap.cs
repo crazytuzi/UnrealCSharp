@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Script.Library;
 using Interop;
 
@@ -8,6 +9,8 @@ namespace Script.CoreUObject
 {
     public class TMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IDisposable
     {
+        private const int EnumeratorChunkSize = 256;
+
         public TMap() => TMapImplementation.TMap_RegisterImplementation(this, GetType());
 
         ~TMap() => Dispose();
@@ -28,12 +31,66 @@ namespace Script.CoreUObject
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            for (var Index = 0; Index < GetMaxIndex(); Index++)
+            var Handle = HandleData.GetHandle(this);
+
+            var KeySize = TMapImplementation.TMap_GetKeyTypeSizeImplementation(Handle);
+
+            var ValueSize = TMapImplementation.TMap_GetValueTypeSizeImplementation(Handle);
+
+            if (typeof(TKey).IsValueType && typeof(TValue).IsValueType &&
+                KeySize == Unsafe.SizeOf<TKey>() && ValueSize == Unsafe.SizeOf<TValue>())
             {
-                if (IsValidIndex(Index))
+                var PairSize = KeySize + ValueSize;
+
+                var Buffer = new byte[EnumeratorChunkSize * PairSize];
+
+                var Index = 0;
+
+                while (true)
                 {
-                    yield return new KeyValuePair<TKey, TValue>(GetEnumeratorKey(Index), GetEnumeratorValue(Index));
+                    var Count = GetPairs(Handle, Index, EnumeratorChunkSize, Buffer, out var NextIndex);
+
+                    for (var PairIndex = 0; PairIndex < Count; PairIndex++)
+                    {
+                        var Offset = PairIndex * PairSize;
+
+                        yield return new KeyValuePair<TKey, TValue>(
+                            Unsafe.ReadUnaligned<TKey>(ref Buffer[Offset]),
+                            Unsafe.ReadUnaligned<TValue>(ref Buffer[Offset + KeySize]));
+                    }
+
+                    if (Count < EnumeratorChunkSize)
+                    {
+                        yield break;
+                    }
+
+                    Index = NextIndex;
                 }
+            }
+
+            for (var Index = 0; Index < GetMaxIndex(Handle); Index++)
+            {
+                if (IsValidIndex(Handle, Index))
+                {
+                    yield return new KeyValuePair<TKey, TValue>(GetEnumeratorKey(Handle, Index),
+                        GetEnumeratorValue(Handle, Index));
+                }
+            }
+        }
+
+        private static unsafe int GetPairs(nint InHandle, int InIndex, int InCount, byte[] InBuffer,
+            out int OutNextIndex)
+        {
+            fixed (byte* Buffer = InBuffer)
+            {
+                var NextIndex = 0;
+
+                var Count = TMapImplementation.TMap_GetPairsImplementation(InHandle, InIndex, InCount,
+                    Buffer, InBuffer.Length, &NextIndex);
+
+                OutNextIndex = NextIndex;
+
+                return Count;
             }
         }
 
@@ -393,12 +450,12 @@ namespace Script.CoreUObject
             }
         }
 
-        private int GetMaxIndex() => TMapImplementation.TMap_GetMaxIndexImplementation(HandleData.GetHandle(this));
+        private int GetMaxIndex(nint InHandle) => TMapImplementation.TMap_GetMaxIndexImplementation(InHandle);
 
-        private bool IsValidIndex(int InIndex) =>
-            TMapImplementation.TMap_IsValidIndexImplementation(HandleData.GetHandle(this), InIndex);
+        private bool IsValidIndex(nint InHandle, int InIndex) =>
+            TMapImplementation.TMap_IsValidIndexImplementation(InHandle, InIndex);
 
-        private TKey GetEnumeratorKey(int InIndex)
+        private TKey GetEnumeratorKey(nint InHandle, int InIndex)
         {
             unsafe
             {
@@ -406,20 +463,19 @@ namespace Script.CoreUObject
                 {
                     var ReturnBuffer = stackalloc byte[sizeof(TKey)];
 
-                    TMapImplementation.TMap_GetEnumeratorKeyImplementation(HandleData.GetHandle(this), InIndex,
-                        ReturnBuffer);
+                    TMapImplementation.TMap_GetEnumeratorKeyImplementation(InHandle, InIndex, ReturnBuffer);
 
                     return *(TKey*)ReturnBuffer;
                 }
                 else
                 {
                     return TMapImplementation.TMap_GetEnumeratorKeyCompoundImplementation<TKey>(
-                        HandleData.GetHandle(this), InIndex);
+                        InHandle, InIndex);
                 }
             }
         }
 
-        private TValue GetEnumeratorValue(int InIndex)
+        private TValue GetEnumeratorValue(nint InHandle, int InIndex)
         {
             unsafe
             {
@@ -427,15 +483,14 @@ namespace Script.CoreUObject
                 {
                     var ReturnBuffer = stackalloc byte[sizeof(TValue)];
 
-                    TMapImplementation.TMap_GetEnumeratorValueImplementation(HandleData.GetHandle(this), InIndex,
-                        ReturnBuffer);
+                    TMapImplementation.TMap_GetEnumeratorValueImplementation(InHandle, InIndex, ReturnBuffer);
 
                     return *(TValue*)ReturnBuffer;
                 }
                 else
                 {
                     return TMapImplementation.TMap_GetEnumeratorValueCompoundImplementation<TValue>(
-                        HandleData.GetHandle(this), InIndex);
+                        InHandle, InIndex);
                 }
             }
         }

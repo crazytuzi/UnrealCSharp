@@ -76,6 +76,15 @@ namespace Script.Library
             __TArray_GetImplementation(InArray, InIndex, ReturnBuffer, InBufferSize);
         }
 
+        private static unsafe partial int __TArray_GetElementsImplementation(nint InArray, int InIndex,
+            int InCount, byte* OutBuffer, int InBufferSize);
+
+        public static int TArray_GetElementsImplementation(nint InArray, int InIndex, int InCount,
+            byte* OutBuffer, int InBufferSize)
+        {
+            return __TArray_GetElementsImplementation(InArray, InIndex, InCount, OutBuffer, InBufferSize);
+        }
+
         private static unsafe partial void __TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer, int InBufferSize);
 
         public static void TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer, int InBufferSize)

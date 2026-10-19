@@ -664,7 +664,14 @@ bool FCSharpEnvironment::RemoveOptionalReference(const IManagedHandle InManagedH
 
 bool FCSharpEnvironment::AddReference(const IManagedHandle InOwner, FReference* InReference) const
 {
-	return ReferenceRegistry != nullptr ? ReferenceRegistry->AddReference(InOwner, InReference) : false;
+	if (ReferenceRegistry != nullptr && IManagedHandleIsValid(InOwner))
+	{
+		return ReferenceRegistry->AddReference(InOwner, InReference);
+	}
+
+	delete InReference;
+
+	return false;
 }
 
 bool FCSharpEnvironment::RemoveReference(const IManagedHandle InOwner) const
