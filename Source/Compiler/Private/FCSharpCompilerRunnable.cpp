@@ -550,17 +550,12 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 				FileChangesSnapshot = MoveTemp(FileChanges);
 			}
 
-			AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
-			{
-				FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
-			});
-
 			if (bSucceeded)
 			{
-				const auto bHasDynamicFileChanged = FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot);
-
-				auto Reload = [InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
+				auto Reload = [InFunction, bReloadImmediately, FileChangesSnapshot]()
 				{
+					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(true);
+
 					if (GExitPurge)
 					{
 						return;
@@ -575,7 +570,8 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 						return;
 					}
 
-					if (UnrealCSharpCoreModule.IsLoaded() && (bReloadImmediately || bHasDynamicFileChanged))
+					if (UnrealCSharpCoreModule.IsLoaded() &&
+						(bReloadImmediately || FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot)))
 					{
 						UnrealCSharpCoreModule.Deactivate();
 
@@ -604,6 +600,13 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 						FPlatformProcess::SleepNoStats(FCSharpCompiler::PollIntervalSeconds);
 					}
 				}
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, []()
+				{
+					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(false);
+				});
 			}
 		}
 	}
