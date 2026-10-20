@@ -3,17 +3,30 @@
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "UEVersion.h"
 
 FEngineListener::FEngineListener()
 {
-	// 注意：不要在这里用 IsRunningGame() 做守卫。
-	// 编辑器进程自身不算 IsRunningGame()，加了守卫会导致编辑器启动时永远不调用
-	// SetActive(true)，模块 State 一直是 Inactive，进而：
-	//   - FCSharpEnvironment 从未 Initialize()，注册表/反射环境不存在
-	//   - 保存 C# 时 CompileInternal 的 IsLoaded() 为 false，只 MarkOutdated()，不会重载
-	// 表现为"改动必须重启编辑器"或"保存两次才生效"。
+#if WITH_EDITOR
+	if (IsRunningGame())
+	{
+		OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
+			this, &FEngineListener::OnLoadingPhaseComplete);
+	}
+	else if (!IsRunningCommandlet())
+	{
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+		OnPostEngineInitHandle = FCoreDelegates::GetOnPostEngineInit().AddRaw(
+			this, &FEngineListener::OnPostEngineInit);
+#else
+		OnPostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(
+			this, &FEngineListener::OnPostEngineInit);
+#endif
+	}
+#else
 	OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
 		this, &FEngineListener::OnLoadingPhaseComplete);
+#endif
 
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 }
@@ -24,6 +37,19 @@ FEngineListener::~FEngineListener()
 	{
 		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
 	}
+
+#if WITH_EDITOR
+	if (OnPostEngineInitHandle.IsValid())
+	{
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+		FCoreDelegates::GetOnPostEngineInit().Remove(OnPostEngineInitHandle);
+#else
+		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitHandle);
+#endif
+
+		OnPostEngineInitHandle.Reset();
+	}
+#endif
 
 	if (OnLoadingPhaseCompleteHandle.IsValid())
 	{
@@ -55,6 +81,13 @@ void FEngineListener::OnLoadingPhaseComplete(const ELoadingPhase::Type LoadingPh
 		}
 	}
 }
+
+#if WITH_EDITOR
+void FEngineListener::OnPostEngineInit()
+{
+	SetActive(true);
+}
+#endif
 
 void FEngineListener::OnPreExit()
 {

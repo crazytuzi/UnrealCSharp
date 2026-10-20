@@ -74,19 +74,20 @@ namespace CodeAnalysis
 
                 if (_overrideFunction != null && _overrideFile != null)
                 {
-                    var Pair = _overrideFile.FirstOrDefault(pair => pair.Value == _inputFileName);
+                    var FileKeys = _overrideFile
+                        .Where(Pair => IsSameFilePath(Pair.Value, _inputFileName))
+                        .Select(Pair => Pair.Key)
+                        .ToList();
 
-                    if (Pair.Key != null)
+                    foreach (var Key in FileKeys)
                     {
-                        _overrideFunction.Remove(Pair.Key);
+                        _overrideFunction.Remove(Key);
 
-                        _overrideFile.Remove(Pair.Key);
+                        _overrideFile.Remove(Key);
                     }
                 }
 
-                // 单文件分析前，先清掉"这个文件"之前登记过的动态类型。
-                // 否则改文件名/改类名后会残留旧条目，且同一类会被反复累加。
-                PurgeDynamicByFile(_inputFileName);
+                RemoveDynamicTypes(_inputFileName);
             }
             else
             {
@@ -117,62 +118,54 @@ namespace CodeAnalysis
             }
         }
 
-        /// <summary>
-        /// 比较两个文件路径是否指向同一个文件（忽略分隔符与大小写差异）。
-        /// 单文件模式传进来的是 DirectoryWatcher 给的路径，JSON 里存的可能是另一种写法。
-        /// </summary>
-        private static bool IsSamePath(string InA, string InB)
+        private static bool IsSameFilePath(string InPathA, string InPathB)
         {
-            if (string.IsNullOrEmpty(InA) || string.IsNullOrEmpty(InB))
+            if (string.IsNullOrEmpty(InPathA) || string.IsNullOrEmpty(InPathB))
             {
                 return false;
             }
 
+            var PathComparison = OperatingSystem.IsWindows()
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+
             return string.Equals(
-                InA.Replace('\\', '/').Trim(),
-                InB.Replace('\\', '/').Trim(),
-                StringComparison.OrdinalIgnoreCase);
+                InPathA.Replace('\\', '/').Trim(),
+                InPathB.Replace('\\', '/').Trim(),
+                PathComparison);
         }
 
-        /// <summary>
-        /// 移除某个源文件登记过的全部动态类型，保持清单与实际源码一致。
-        /// </summary>
-        private void PurgeDynamicByFile(string InFile)
+        private void RemoveDynamicTypes(string InFile)
         {
             if (_dynamicFile == null || _dynamic == null || string.IsNullOrEmpty(InFile))
             {
                 return;
             }
 
-            var StaleKeys = _dynamicFile
-                .Where(Pair => IsSamePath(Pair.Value, InFile))
+            var FileKeys = _dynamicFile
+                .Where(Pair => IsSameFilePath(Pair.Value, InFile))
                 .Select(Pair => Pair.Key)
                 .ToList();
 
-            foreach (var Key in StaleKeys)
+            foreach (var Key in FileKeys)
             {
                 _dynamicFile.Remove(Key);
 
                 foreach (var Names in _dynamic.Values)
                 {
-                    Names.RemoveAll(Name => Name == Key);
+                    Names?.RemoveAll(Name => Name == Key);
                 }
             }
         }
 
-        /// <summary>
-        /// 登记一个动态类型。
-        /// 与原始实现（直接 Add）的区别：重复登记不会产生重复项。
-        /// 原始实现会让 Dynamic.json 里的类名无限累加，进而让生成器重复处理同一个类。
-        /// </summary>
-        private void AddDynamic(string InCategory, string InName, string InFile)
+        private void AddDynamicType(string InCategory, string InName, string InFile)
         {
             if (_dynamic == null || string.IsNullOrEmpty(InName))
             {
                 return;
             }
 
-            if (!_dynamic.TryGetValue(InCategory, out var Names))
+            if (!_dynamic.TryGetValue(InCategory, out var Names) || Names == null)
             {
                 Names = new List<string>();
 
@@ -190,11 +183,11 @@ namespace CodeAnalysis
             }
         }
 
-        private static List<string> GetFiles(string inPathName)
+        private static List<string> GetFiles(string InPathName)
         {
             var Files = new List<string>();
 
-            var DirectoryInfo = new DirectoryInfo(inPathName);
+            var DirectoryInfo = new DirectoryInfo(InPathName);
 
             foreach (var Item in DirectoryInfo.GetFiles("*.cs"))
             {
@@ -247,20 +240,20 @@ namespace CodeAnalysis
             WriteAll();
         }
 
-        private void AnalysisSingle(string inFile)
+        private void AnalysisSingle(string InFile)
         {
-            var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(inFile, Encoding.UTF8));
+            var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(InFile, Encoding.UTF8));
 
             var Root = (CompilationUnitSyntax)Tree.GetRoot();
 
-            AnalysisOverride(inFile, Root);
+            AnalysisOverride(InFile, Root);
 
-            AnalysisDynamic(inFile, Root);
+            AnalysisDynamic(InFile, Root);
         }
 
-        private void AnalysisOverride(string inFile, CompilationUnitSyntax inRoot)
+        private void AnalysisOverride(string InFile, CompilationUnitSyntax InRoot)
         {
-            foreach (var RootMember in inRoot.Members)
+            foreach (var RootMember in InRoot.Members)
             {
                 if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
@@ -290,7 +283,7 @@ namespace CodeAnalysis
                                 if (_overrideFile != null)
                                 {
                                     _overrideFile[$"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}"] =
-                                        inFile;
+                                        InFile;
                                 }
 
                                 foreach (var MemberDeclaration in ClassDeclaration.Members)
@@ -334,9 +327,9 @@ namespace CodeAnalysis
             }
         }
 
-        private void AnalysisDynamic(string inFile, CompilationUnitSyntax inRoot)
+        private void AnalysisDynamic(string InFile, CompilationUnitSyntax InRoot)
         {
-            foreach (var RootMember in inRoot.Members)
+            foreach (var RootMember in InRoot.Members)
             {
                 if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
@@ -350,16 +343,16 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UClass"))
                                     {
-                                        AddDynamic("DynamicClass",
-                                            $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", inFile);
+                                        AddDynamicType("DynamicClass",
+                                            $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", InFile);
 
                                         return;
                                     }
 
                                     if (Attribute.ToString().Equals("UStruct"))
                                     {
-                                        AddDynamic("DynamicStruct",
-                                            $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", inFile);
+                                        AddDynamicType("DynamicStruct",
+                                            $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", InFile);
 
                                         return;
                                     }
@@ -374,8 +367,8 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UInterface"))
                                     {
-                                        AddDynamic("DynamicInterface",
-                                            $"{NamespaceDeclaration.Name}.{InterfaceDeclaration.Identifier}", inFile);
+                                        AddDynamicType("DynamicInterface",
+                                            $"{NamespaceDeclaration.Name}.{InterfaceDeclaration.Identifier}", InFile);
 
                                         return;
                                     }
@@ -390,8 +383,8 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UEnum"))
                                     {
-                                        AddDynamic("DynamicEnum",
-                                            $"{NamespaceDeclaration.Name}.{EnumDeclaration.Identifier}", inFile);
+                                        AddDynamicType("DynamicEnum",
+                                            $"{NamespaceDeclaration.Name}.{EnumDeclaration.Identifier}", InFile);
 
                                         return;
                                     }

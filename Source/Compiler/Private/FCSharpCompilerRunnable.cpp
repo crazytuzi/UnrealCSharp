@@ -554,18 +554,6 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 			{
 				auto Reload = [InFunction, bReloadImmediately, FileChangesSnapshot]()
 				{
-					// 关键顺序：必须先广播 OnCompile 再生成动态类。
-					//
-					// OnCompile 的监听者 FEditorListener::OnCompile 会调用
-					// FCodeAnalysis::Analysis() 逐个重写 DynamicFile.json，
-					// 再调用 SetCodeAnalysisDynamicFilesMap() 刷新内存映射。
-					// 而动态类生成链（HasDynamicFileChanged / IsDynamicFile /
-					// GetDynamicType / FindDynamicName）全部依赖该映射。
-					//
-					// 原本这两件事是各自 AsyncTask 排到游戏线程的，执行先后无保证。
-					// 一旦生成先跑，读到的就是旧映射，新增的动态类会被静默丢弃
-					// —— 表现为"运行中新建的类型永不生效"。
-					// 放进同一个任务并按顺序执行，才能消除这个竞态。
 					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(true);
 
 					if (GExitPurge)
