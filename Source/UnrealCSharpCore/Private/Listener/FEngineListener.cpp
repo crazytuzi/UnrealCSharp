@@ -103,7 +103,7 @@ void FEngineListener::SetActive(const bool InbIsActive)
 		{
 #if WITH_EDITOR
 			if (UnrealCSharpSetting->IsEnableImmediatelyActive() &&
-				!FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+				(IsRunningGame() || !FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated()))
 #else
 			if (UnrealCSharpSetting->IsEnableImmediatelyActive())
 #endif

@@ -641,8 +641,15 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding()
 			}
 		}
 
-		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
-		                              MethodNames.Num());
+		if (!MethodNames.IsEmpty())
+		{
+			MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
+			                              MethodNames.Num());
+		}
+		else
+		{
+			bIsInitialized = false;
+		}
 	}
 	else
 	{

@@ -556,6 +556,8 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 				{
 					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(true);
 
+					FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+
 					if (GExitPurge)
 					{
 						return;

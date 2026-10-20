@@ -349,8 +349,6 @@ void FEditorListener::OnCompile(const bool bSucceeded)
 				FCodeAnalysis::Analysis(File);
 			}
 		}
-
-		FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
 	}
 
 	CompilingFileChanges.Reset();
