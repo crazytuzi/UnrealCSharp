@@ -86,6 +86,7 @@ void FSolutionGenerator::Generator()
 		{
 			&FSolutionGenerator::ReplaceOutputPath,
 			&FSolutionGenerator::ReplaceTargetFramework,
+			&FSolutionGenerator::ReplacePluginBaseDir,
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
@@ -193,13 +194,15 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
 
 void FSolutionGenerator::ReplacePluginBaseDir(FString& OutResult)
 {
-	auto Index = 0;
+	auto PluginBaseDir = FUnrealCSharpFunctionLibrary::GetPluginDirectory();
 
-	const auto PluginBaseDir = FUnrealCSharpFunctionLibrary::GetPluginBaseDir();
+	FPaths::MakePathRelativeTo(PluginBaseDir, *FUnrealCSharpFunctionLibrary::GetUEProjectPath());
 
-	PluginBaseDir.FindLastChar('/', Index);
+	FPaths::MakePlatformFilename(PluginBaseDir);
 
-	OutResult = OutResult.Replace(*PLUGIN_NAME, *PluginBaseDir.Right(PluginBaseDir.Len() - Index - 1));
+	OutResult = OutResult.Replace(TEXT("..\\..\\Plugins\\UnrealCSharp"), *PluginBaseDir);
+
+	OutResult = OutResult.Replace(TEXT("../../Plugins/UnrealCSharp"), *PluginBaseDir);
 }
 
 void FSolutionGenerator::ReplaceImport(FString& OutResult)

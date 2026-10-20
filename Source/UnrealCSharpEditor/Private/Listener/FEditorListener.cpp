@@ -375,8 +375,10 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
+void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData)
 {
+	CrcCompiledSignatures.Remove(InAssetData.GetSoftObjectPath());
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
@@ -387,8 +389,10 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const
+void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath)
 {
+	CrcCompiledSignatures.Remove(FSoftObjectPath(InOldObjectPath));
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(

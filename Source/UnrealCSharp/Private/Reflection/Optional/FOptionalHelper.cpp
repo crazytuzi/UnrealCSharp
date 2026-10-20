@@ -51,12 +51,15 @@ void FOptionalHelper::Deinitialize()
 		Data = nullptr;
 	}
 
-	if (bNeedFreeProperty && ValuePropertyDescriptor != nullptr && OptionalProperty != nullptr)
+	if (ValuePropertyDescriptor != nullptr)
 	{
 		delete ValuePropertyDescriptor;
 
 		ValuePropertyDescriptor = nullptr;
+	}
 
+	if (bNeedFreeProperty && OptionalProperty != nullptr)
+	{
 		delete OptionalProperty;
 
 		OptionalProperty = nullptr;

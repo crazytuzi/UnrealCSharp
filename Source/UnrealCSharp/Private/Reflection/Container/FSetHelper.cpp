@@ -62,9 +62,12 @@ void FSetHelper::Deinitialize()
 		ScriptSet = nullptr;
 	}
 
-	if (bNeedFreeProperty && ElementPropertyDescriptor != nullptr)
+	if (ElementPropertyDescriptor != nullptr)
 	{
-		ElementPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			ElementPropertyDescriptor->DestroyProperty();
+		}
 
 		delete ElementPropertyDescriptor;
 

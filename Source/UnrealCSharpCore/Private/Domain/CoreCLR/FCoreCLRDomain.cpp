@@ -133,29 +133,27 @@ void FCoreCLRDomain::Initialize()
 
 void FCoreCLRDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (bIsInitialized)
 	{
-		return;
-	}
+		bIsInitialized = false;
 
-	bIsInitialized = false;
+		UnloadAssembly();
 
-	UnloadAssembly();
-
-	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-		UUnrealCSharpSetting>())
-	{
-		if (UnrealCSharpSetting->IsEnableDebug())
+		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+			UUnrealCSharpSetting>())
 		{
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics"), TEXT("0"));
+			if (UnrealCSharpSetting->IsEnableDebug())
+			{
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics"), TEXT("0"));
 
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics_Debugger"), TEXT("0"));
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics_Debugger"), TEXT("0"));
 
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_DiagnosticPorts"), TEXT(""));
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_DiagnosticPorts"), TEXT(""));
+			}
 		}
 	}
 
-	if (HostFxrHandle != nullptr)
+	if (HostFxrHandle != nullptr && HostFxrDllHandle != nullptr)
 	{
 		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
 			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
@@ -165,6 +163,15 @@ void FCoreCLRDomain::Deinitialize()
 
 		HostFxrHandle = nullptr;
 	}
+
+	if (HostFxrDllHandle != nullptr)
+	{
+		FPlatformProcess::FreeDllHandle(HostFxrDllHandle);
+
+		HostFxrDllHandle = nullptr;
+	}
+
+	LoadAssemblyAndGetFunctionPointerFn = nullptr;
 }
 
 #define SCRIPT_DOMAIN_TYPE FCoreCLRDomain

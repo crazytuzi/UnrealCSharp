@@ -66,15 +66,24 @@ void FMapHelper::Deinitialize()
 		ScriptMap = nullptr;
 	}
 
-	if (bNeedFreeProperty && KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr)
+	if (KeyPropertyDescriptor != nullptr)
 	{
-		KeyPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			KeyPropertyDescriptor->DestroyProperty();
+		}
 
 		delete KeyPropertyDescriptor;
 
 		KeyPropertyDescriptor = nullptr;
+	}
 
-		ValuePropertyDescriptor->DestroyProperty();
+	if (ValuePropertyDescriptor != nullptr)
+	{
+		if (bNeedFreeProperty)
+		{
+			ValuePropertyDescriptor->DestroyProperty();
+		}
 
 		delete ValuePropertyDescriptor;
 

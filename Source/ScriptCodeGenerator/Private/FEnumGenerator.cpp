@@ -44,6 +44,8 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
 
+	const auto bIsBitflags = InEnum->HasMetaData(TEXT("Bitflags"));
+
 	FString UsingNameSpaceContent;
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
@@ -58,6 +60,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	auto ClassName = InEnum->GetName();
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
+
+	if (bIsBitflags)
+	{
+		UsingNameSpaces.Add(TEXT("System"));
+	}
 
 	const auto UnderlyingTypeName = GetEnumUnderlyingTypeName(InEnum);
 
@@ -95,11 +102,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		                                         *UsingNameSpace);
 	}
 
+	const FString FlagsAttributeContent = bIsBitflags ? TEXT("\t[Flags]\n") : TEXT("");
+
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
+		"%s"
 		"\t[PathName(\"%s\")]\n"
 		"\tpublic enum %s : %s\n"
 		"\t{\n"
@@ -110,6 +120,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
+	                                     *FlagsAttributeContent,
 	                                     *PathNameAttributeContent,
 	                                     *FullClassContent,
 	                                     *UnderlyingTypeName,

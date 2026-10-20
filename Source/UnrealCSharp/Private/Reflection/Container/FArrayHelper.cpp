@@ -54,9 +54,12 @@ void FArrayHelper::Deinitialize()
 		ScriptArray = nullptr;
 	}
 
-	if (bNeedFreeProperty && InnerPropertyDescriptor != nullptr)
+	if (InnerPropertyDescriptor != nullptr)
 	{
-		InnerPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			InnerPropertyDescriptor->DestroyProperty();
+		}
 
 		delete InnerPropertyDescriptor;
 
