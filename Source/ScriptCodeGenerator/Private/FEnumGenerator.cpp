@@ -129,9 +129,10 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto FileName = FGeneratorCore::GetFileName(InEnum);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty)
@@ -261,9 +262,10 @@ void FEnumGenerator::GeneratorCollisionChannel()
 
 	const auto FileName = FGeneratorCore::GetFileName(InEnum);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)

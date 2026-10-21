@@ -89,9 +89,10 @@ void FGameplayTagGenerator::Generator()
 	                                     *ChildrenContent
 	);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 void FGameplayTagGenerator::GeneratorTag(FGameplayTagTreeNode& InRoot, const FString& InTag, const FString& InComment)

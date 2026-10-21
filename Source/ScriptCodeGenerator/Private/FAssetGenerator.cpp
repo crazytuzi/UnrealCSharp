@@ -204,7 +204,8 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }

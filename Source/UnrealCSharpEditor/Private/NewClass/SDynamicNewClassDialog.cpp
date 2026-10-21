@@ -774,11 +774,15 @@ void SDynamicNewClassDialog::FinishClicked()
 
 			FDynamicNewClassUtils::GetDynamicClassContent(ParentClass, NewClassName, NewClassContent);
 
-			FUnrealCSharpFunctionLibrary::SaveStringToFile(*GetDynamicFileName(), NewClassContent);
+			if (!NewClassContent.IsEmpty())
+			{
+				if (FUnrealCSharpFunctionLibrary::SaveStringToFile(*GetDynamicFileName(), NewClassContent))
+				{
+					CloseContainingWindow();
 
-			CloseContainingWindow();
-
-			FSourceCodeNavigation::OpenSourceFile(GetDynamicFileName());
+					FSourceCodeNavigation::OpenSourceFile(GetDynamicFileName());
+				}
+			}
 		}
 	}
 }

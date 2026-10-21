@@ -204,6 +204,13 @@ namespace Interop
             }
         }
 
+        internal static void Clear()
+        {
+            StringToMethod.Clear();
+
+            StringToParamCount.Clear();
+        }
+
         private static void WritePrimitiveValue(nint InHandle, object InValue, Type InType)
         {
             switch (InType)

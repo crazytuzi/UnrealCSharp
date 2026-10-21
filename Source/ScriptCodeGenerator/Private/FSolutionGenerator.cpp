@@ -198,10 +198,6 @@ void FSolutionGenerator::ReplacePluginBaseDir(FString& OutResult)
 
 	FPaths::MakePathRelativeTo(PluginBaseDir, *FUnrealCSharpFunctionLibrary::GetUEProjectPath());
 
-	FPaths::MakePlatformFilename(PluginBaseDir);
-
-	OutResult = OutResult.Replace(TEXT("..\\..\\Plugins\\UnrealCSharp"), *PluginBaseDir);
-
 	OutResult = OutResult.Replace(TEXT("../../Plugins/UnrealCSharp"), *PluginBaseDir);
 }
 
@@ -258,7 +254,7 @@ void FSolutionGenerator::ReplaceScriptOutputPath(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("<ScriptOutputPath></ScriptOutputPath>"),
 	                              *FString::Printf(TEXT(
-		                              "<ScriptOutputPath>..\\..\\Content\\%s</ScriptOutputPath>"
+		                              "<ScriptOutputPath>../../Content/%s</ScriptOutputPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 	                              ));
@@ -268,7 +264,7 @@ void FSolutionGenerator::ReplaceOutputPath(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("<OutputPath></OutputPath>"),
 	                              *FString::Printf(TEXT(
-		                              "<OutputPath>..\\..\\Content\\%s</OutputPath>"
+		                              "<OutputPath>../../Content/%s</OutputPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 	                              ));
@@ -278,7 +274,7 @@ void FSolutionGenerator::ReplaceHintPath(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("<HintPath></HintPath>"),
 	                              *FString::Printf(TEXT(
-		                              "<HintPath>..\\..\\Content\\%s\\%s%s</HintPath>"
+		                              "<HintPath>../../Content/%s/%s%s</HintPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory(),
 	                                               *INTEROP_NAME,
@@ -302,7 +298,7 @@ void FSolutionGenerator::ReplaceProjectReference(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("<ProjectReference Include=\"\" />"),
 	                              *FString::Printf(TEXT(
-		                              "<ProjectReference Include=\"..\\%s\\%s%s\" />"
+		                              "<ProjectReference Include=\"../%s/%s%s\" />"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
@@ -346,7 +342,7 @@ void FSolutionGenerator::ReplaceProject(FString& OutResult)
 		TEXT(
 			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"\", \"\", \"{7AF881DC-664B-4AF7-BCB6-8FA8CC5E8780}\""),
 		*FString::Printf(TEXT(
-			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"%s\", \"%s\\%s%s\", \"{7AF881DC-664B-4AF7-BCB6-8FA8CC5E8780}\""
+			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"%s\", \"%s/%s%s\", \"{7AF881DC-664B-4AF7-BCB6-8FA8CC5E8780}\""
 		),
 		                 *FUnrealCSharpFunctionLibrary::GetUEName(),
 		                 *FUnrealCSharpFunctionLibrary::GetUEName(),
@@ -358,7 +354,7 @@ void FSolutionGenerator::ReplaceProject(FString& OutResult)
 		TEXT(
 			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"\", \"\", \"{A2B210E9-51AE-490B-8B87-F8492CB2A417}\""),
 		*FString::Printf(TEXT(
-			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"%s\", \"%s\\%s%s\", \"{A2B210E9-51AE-490B-8B87-F8492CB2A417}\""
+			"Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"%s\", \"%s/%s%s\", \"{A2B210E9-51AE-490B-8B87-F8492CB2A417}\""
 		),
 		                 *FUnrealCSharpFunctionLibrary::GetGameName(),
 		                 *FUnrealCSharpFunctionLibrary::GetGameName(),
@@ -374,7 +370,7 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
 		Projects += FString::Printf(TEXT(
-			"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
+			"Project(\"{%s}\") = \"%s\", \"%s/%s%s\", \"{%s}\"\r\n"
 			"EndProject\r\n"
 		),
 		                            *CSHARP_GUID,
@@ -388,7 +384,7 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
 			Projects += FString::Printf(TEXT(
-				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
+				"Project(\"{%s}\") = \"%s\", \"%s/%s%s\", \"{%s}\"\r\n"
 				"EndProject\r\n"
 			),
 			                            *CSHARP_GUID,

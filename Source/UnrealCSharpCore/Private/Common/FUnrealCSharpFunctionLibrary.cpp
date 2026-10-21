@@ -923,7 +923,12 @@ FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
 
 FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
 {
-	return IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir();
+	if (const auto Plugin = IPluginManager::Get().FindPlugin(PLUGIN_NAME))
+	{
+		return Plugin->GetBaseDir();
+	}
+
+	return FPaths::ProjectPluginsDir() / PLUGIN_NAME;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetPluginDirectory()

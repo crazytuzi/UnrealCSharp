@@ -34,6 +34,8 @@ namespace Interop
 
             TypeBridge.Clear();
 
+            MethodBridge.Clear();
+
             if (Context != null)
             {
                 var ContextWeakReference = new WeakReference(Context);
