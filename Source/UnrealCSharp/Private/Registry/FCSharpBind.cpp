@@ -211,26 +211,16 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	for (const auto& [PropertyName, Property] : Properties)
 	{
-		for (const auto& Field : Fields)
+		if (Fields.Remove(PropertyName) > 0)
 		{
-			if (Field == PropertyName)
+			auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
+
+			if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *PropertyName)))
 			{
-				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
-
-				if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-					"__%s"
-				),
-				                                                      *Field)))
-				{
-					FoundField->SetValue(Class, &FieldHash);
-				}
-
-				FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
-
-				Fields.Remove(Field);
-
-				break;
+				FoundField->SetValue(Class, &FieldHash);
 			}
+
+			FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
 		}
 	}
 
@@ -263,27 +253,17 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& Field : Fields)
+			if (Fields.Remove(FunctionName) > 0)
 			{
-				if (Field == FunctionName)
+				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
+
+				if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *FunctionName)))
 				{
-					auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
-
-					if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-						"__%s"
-					),
-					                                                      *Field)))
-					{
-						FoundField->SetValue(Class, &FieldHash);
-					}
-
-					FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
-						FieldHash, NewClassDescriptor, Function);
-
-					Fields.Remove(Field);
-
-					break;
+					FoundField->SetValue(Class, &FieldHash);
 				}
+
+				FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
+					FieldHash, NewClassDescriptor, Function);
 			}
 		}
 

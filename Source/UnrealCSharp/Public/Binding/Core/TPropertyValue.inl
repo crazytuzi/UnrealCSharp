@@ -69,7 +69,7 @@ struct TStringPropertyValue
 			{
 				SrcManagedHandle = FoundClass->NewObject(true);
 
-				FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, true>(
+				FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, false>(
 					FoundClass, SrcManagedHandle, InMember);
 			}
 		}

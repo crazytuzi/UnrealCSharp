@@ -11,7 +11,7 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMem
 		{
 			Object = Class->NewObject(true);
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false, true>(
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false, false>(
 				Class, Object, Src);
 		}
 	}

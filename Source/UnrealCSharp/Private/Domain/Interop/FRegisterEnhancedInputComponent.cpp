@@ -226,8 +226,8 @@ namespace
 					const auto Object = FoundClass->NewObject();
 
 					FCSharpEnvironment::GetEnvironment().AddBindingReference<
-						std::decay_t<FEnhancedInputActionEventBinding>, false>(
-						FoundClass, Object, &EnhancedInputActionEventBinding);
+						std::decay_t<FEnhancedInputActionEventBinding>>(
+						InManagedHandle, FoundClass, Object, &EnhancedInputActionEventBinding);
 
 					return Object;
 				}
@@ -258,6 +258,8 @@ namespace
 				{
 					FoundObject->RemoveBinding(*EnhancedInputActionEventBinding);
 				}
+
+				(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InEnhancedInputActionEventBinding);
 			}
 		}
 
