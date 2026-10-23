@@ -1,4 +1,4 @@
-﻿#include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif

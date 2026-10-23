@@ -1,4 +1,4 @@
-﻿#include "FClassGenerator.h"
+#include "FClassGenerator.h"
 #include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"

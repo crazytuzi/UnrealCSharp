@@ -41,7 +41,9 @@ public:
 private:
 	static FString GetBuildConfiguration();
 
-	bool CompileInterop(bool bForceCompileInterop);
+	static bool IsInteropOutdated();
+
+	bool CompileInterop(bool bForceCompileInterop, bool bInteropOutdated = false);
 
 	static bool PublishInterop(const FString& InSourcePath, const FString& InTargetPath, const FString& InBackupPath);
 

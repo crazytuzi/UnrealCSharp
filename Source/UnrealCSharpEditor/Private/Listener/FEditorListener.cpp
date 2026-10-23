@@ -377,7 +377,7 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 
 void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData)
 {
-	CrcCompiledSignatures.Remove(InAssetData.GetSoftObjectPath());
+	CrcCompiledSignatures.Remove(InAssetData.ToSoftObjectPath());
 
 	OnAssetChanged(InAssetData, [&]
 	{

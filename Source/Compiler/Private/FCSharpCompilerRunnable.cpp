@@ -2,6 +2,7 @@
 #include "FCSharpCompiler.h"
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Log/UnrealCSharpLog.h"
@@ -185,7 +186,7 @@ bool FCSharpCompilerRunnable::SyncCompile()
 
 	auto bSucceeded = false;
 
-	if (CompileInterop(false))
+	if (CompileInterop(false, IsInteropOutdated()))
 	{
 		FString Result;
 
@@ -231,7 +232,41 @@ FString FCSharpCompilerRunnable::GetBuildConfiguration()
 	return TEXT("Debug");
 }
 
-bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
+bool FCSharpCompilerRunnable::IsInteropOutdated()
+{
+	const auto InteropDirectory = FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory() / INTEROP_NAME;
+
+	const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
+
+	auto Timestamp = FDateTime::MinValue();
+
+	if (IFileManager::Get().FileExists(*InteropPath))
+	{
+		Timestamp = IFileManager::Get().GetTimeStamp(*InteropPath);
+	}
+
+	auto bIsIOutdated = false;
+
+	IFileManager::Get().IterateDirectoryRecursively(
+		*InteropDirectory,
+		[&bIsIOutdated, Timestamp](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
+		{
+			if (!bIsDirectory &&
+				FPaths::GetExtension(InFilenameOrDirectory) == CSHARP_SUFFIX.RightChop(1) &&
+				IFileManager::Get().GetTimeStamp(InFilenameOrDirectory) > Timestamp)
+			{
+				bIsIOutdated = true;
+
+				return false;
+			}
+
+			return true;
+		});
+
+	return bIsIOutdated;
+}
+
+bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop, const bool bInteropOutdated)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
 
@@ -241,7 +276,7 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 	}
 
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
-		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
+		bForceCompileInterop || bInteropOutdated || !IFileManager::Get().FileExists(*InteropPath))
 	{
 		CompileNotification->Progress.SetStage(FCSharpCompileProgress::StageCompilingInterop);
 
@@ -534,9 +569,10 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 		{
 			CompileNotification->Progress.SetStage(FCSharpCompileProgress::StagePreparing);
 
-			if (bCompileInterop)
+			if (const auto bIsInteropOutdated = IsInteropOutdated();
+				bCompileInterop || bIsInteropOutdated)
 			{
-				CompileInterop(bForceCompileInterop);
+				CompileInterop(bForceCompileInterop, bIsInteropOutdated);
 			}
 
 			TArray<FFileChangeData> FileChangesSnapshot;

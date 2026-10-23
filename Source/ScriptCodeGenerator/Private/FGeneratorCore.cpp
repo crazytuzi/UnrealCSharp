@@ -1,4 +1,4 @@
-﻿#include "FGeneratorCore.h"
+#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"

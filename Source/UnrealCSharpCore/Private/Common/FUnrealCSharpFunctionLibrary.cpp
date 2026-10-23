@@ -1298,6 +1298,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
 	return TArrayBuilder<FString>().
 	       Add(GetPluginScriptDirectory() / DEFAULT_UE_NAME).
+	       Add(GetPluginScriptDirectory() / INTEROP_NAME).
 	       Add(GetGameDirectory()).
 	       Append(GetCustomProjectsDirectory()).
 	       Build();

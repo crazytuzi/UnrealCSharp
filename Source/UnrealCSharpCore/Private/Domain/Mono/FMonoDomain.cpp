@@ -1,4 +1,4 @@
-﻿#include "Domain/Mono/FMonoDomain.h"
+#include "Domain/Mono/FMonoDomain.h"
 #if WITH_MONO
 #include "Misc/FileHelper.h"
 #include "Domain/Mono/FMonoFunctionLibrary.h"
