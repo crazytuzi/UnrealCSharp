@@ -56,9 +56,14 @@ namespace Weavers
 
         private TypeDefinition _overrideAttributeType;
 
+        private bool bHasMetaError;
+
         public override void Execute()
         {
-            GetAllMeta();
+            if (!GetAllMeta())
+            {
+                return;
+            }
 
             GetAllDynamic();
 
@@ -1152,68 +1157,127 @@ namespace Weavers
             }
         }
 
-        private void GetAllMeta()
+        private bool GetAllMeta()
         {
+            bHasMetaError = false;
+
             var definition = ModuleDefinition;
 
             if (definition.Name != "DefinitionPlaceholder")
             {
                 var path = GetUEAssemblyPath(AssemblyFilePath);
 
+                if (!File.Exists(path))
+                {
+                    WriteError($"[UnrealCSharp] required assembly not found: {path}");
+
+                    return false;
+                }
+
                 definition = ModuleDefinition.ReadModule(path);
             }
 
-            _pathNameAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
+            var structImplementation = GetMetaType(definition, "Script.Library.UStructImplementation");
 
-            _structRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "UStruct_RegisterImplementation");
+            var propertyImplementation = GetMetaType(definition, "Script.Library.FPropertyImplementation");
 
-            _structUnRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "UStruct_UnRegisterImplementation");
+            var functionImplementation = GetMetaType(definition, "Script.Library.FFunctionImplementation");
 
-            _ufunctionAttributeType = definition.GetType("Script.Dynamic.UFunctionAttribute");
+            var handleData = GetInteropType("Interop.HandleData");
 
-            _clientAttributeType = definition.GetType("Script.Dynamic.ClientAttribute");
+            _pathNameAttributeType = GetMetaType(definition, "Script.CoreUObject.PathNameAttribute");
 
-            _serverAttributeType = definition.GetType("Script.Dynamic.ServerAttribute");
+            _ufunctionAttributeType = GetMetaType(definition, "Script.Dynamic.UFunctionAttribute");
 
-            _netMulticastAttributeType = definition.GetType("Script.Dynamic.NetMulticastAttribute");
+            _clientAttributeType = GetMetaType(definition, "Script.Dynamic.ClientAttribute");
 
-            _notPlaceableAttributeType = definition.GetType("Script.Dynamic.NotPlaceableAttribute");
+            _serverAttributeType = GetMetaType(definition, "Script.Dynamic.ServerAttribute");
 
-            _overrideAttributeType = definition.GetType("Script.CoreUObject.OverrideAttribute");
+            _netMulticastAttributeType = GetMetaType(definition, "Script.Dynamic.NetMulticastAttribute");
 
-            _getObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_GetObjectPropertyImplementation");
+            _notPlaceableAttributeType = GetMetaType(definition, "Script.Dynamic.NotPlaceableAttribute");
 
-            _setObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_SetObjectPropertyImplementation");
+            _overrideAttributeType = GetMetaType(definition, "Script.CoreUObject.OverrideAttribute");
 
-            _getStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_GetStructPropertyImplementation");
+            _structRegisterImplementation =
+                GetMetaMethod(structImplementation, "UStruct_RegisterImplementation");
 
-            _setStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_SetStructPropertyImplementation");
+            _structUnRegisterImplementation =
+                GetMetaMethod(structImplementation, "UStruct_UnRegisterImplementation");
 
-            _getObject = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
-                    .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
-                .Methods.FirstOrDefault(Method => Method.Name == "GetObject");
+            _getObjectPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_GetObjectPropertyImplementation");
 
-            _genericCall24Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall24Implementation");
+            _setObjectPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_SetObjectPropertyImplementation");
 
-            _genericCall26Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall26Implementation");
+            _getStructPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_GetStructPropertyImplementation");
 
-            _getHandle = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
-                    .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
-                .Methods.FirstOrDefault(Method => Method.Name == "GetHandle");
+            _setStructPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_SetStructPropertyImplementation");
+
+            _genericCall24Implementation =
+                GetMetaMethod(functionImplementation, "FFunction_GenericCall24Implementation");
+
+            _genericCall26Implementation =
+                GetMetaMethod(functionImplementation, "FFunction_GenericCall26Implementation");
+
+            _getObject = GetMetaMethod(handleData, "GetObject");
+
+            _getHandle = GetMetaMethod(handleData, "GetHandle");
+
+            return !bHasMetaError;
         }
 
+        private TypeDefinition GetMetaType(ModuleDefinition Definition, string TypeName)
+        {
+            var Type = Definition.GetType(TypeName);
+
+            if (Type == null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required type not found: {TypeName}");
+            }
+
+            return Type;
+        }
+
+        private MethodDefinition GetMetaMethod(TypeDefinition Type, string MethodName)
+        {
+            var Method = Type?.Methods.FirstOrDefault(Candidate => Candidate.Name == MethodName);
+
+            if (Method == null && Type != null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required method not found: {MethodName}");
+            }
+
+            return Method;
+        }
+
+        private TypeDefinition GetInteropType(string TypeName)
+        {
+            var Reference = ModuleDefinition.AssemblyReferences
+                .FirstOrDefault(Candidate => Candidate.Name == "Interop");
+
+            var Module = Reference != null
+                ? ModuleDefinition.AssemblyResolver.Resolve(Reference).MainModule
+                : null;
+
+            var Type = Module?.GetType(TypeName);
+
+            if (Type == null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required Interop type not found: {TypeName}");
+            }
+
+            return Type;
+        }
         private string GetUEAssemblyPath(string assemblyFilePath)
         {
             var scriptPathName = "ScriptPathPlaceholder";

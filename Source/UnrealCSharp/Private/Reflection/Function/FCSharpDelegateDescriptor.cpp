@@ -3,7 +3,7 @@
 
 FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction) :
 	Super(InFunction,
-	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPersistentBufferAllocator>(InFunction))
+	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction))
 {
 }
 

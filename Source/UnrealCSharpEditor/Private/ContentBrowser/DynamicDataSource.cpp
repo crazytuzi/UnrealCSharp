@@ -538,7 +538,7 @@ bool UDynamicDataSource::GetItemPhysicalPath(const FContentBrowserItemData& InIt
 
 bool UDynamicDataSource::CanEditItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
 {
-	return true;
+	return GetFileItemDataPayload(InItem).IsValid();
 }
 
 bool UDynamicDataSource::EditItem(const FContentBrowserItemData& InItem)
@@ -552,17 +552,19 @@ bool UDynamicDataSource::EditItem(const FContentBrowserItemData& InItem)
 
 bool UDynamicDataSource::BulkEditItems(TArrayView<const FContentBrowserItemData> InItems)
 {
+	auto bIsEdited = true;
+
 	for (const auto& Item : InItems)
 	{
-		EditItem(Item);
+		bIsEdited = EditItem(Item) && bIsEdited;
 	}
 
-	return true;
+	return bIsEdited;
 }
 
 bool UDynamicDataSource::CanDeleteItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
 {
-	return true;
+	return GetFileItemDataPayload(InItem).IsValid();
 }
 
 bool UDynamicDataSource::DeleteItem(const FContentBrowserItemData& InItem)
