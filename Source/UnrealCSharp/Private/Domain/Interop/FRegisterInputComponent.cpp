@@ -591,10 +591,8 @@ namespace
 				return;
 			}
 
-			if (const auto FoundFunction = InClass->FindFunctionByName(*InFunctionName))
+			if (InClass->FindFunctionByName(*InFunctionName) != nullptr)
 			{
-				FoundFunction->RemoveFromRoot();
-
 				return;
 			}
 

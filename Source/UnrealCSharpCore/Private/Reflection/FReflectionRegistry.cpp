@@ -983,6 +983,49 @@ FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, cons
 	return nullptr;
 }
 
+bool FReflectionRegistry::IsInitialized() const
+{
+	return GetUtilsClass() != nullptr
+		&& GetObjectClass() != nullptr
+		&& GetBooleanClass() != nullptr
+		&& GetSByteClass() != nullptr
+		&& GetInt16Class() != nullptr
+		&& GetInt32Class() != nullptr
+		&& GetInt64Class() != nullptr
+		&& GetByteClass() != nullptr
+		&& GetUInt16Class() != nullptr
+		&& GetUInt32Class() != nullptr
+		&& GetUInt64Class() != nullptr
+		&& GetSingleClass() != nullptr
+		&& GetDoubleClass() != nullptr
+		&& GetEnumClass() != nullptr
+		&& GetUClassClass() != nullptr
+		&& GetUObjectClass() != nullptr
+		&& GetTSubclassOfClass() != nullptr
+		&& GetNameClass() != nullptr
+		&& GetTScriptInterfaceClass() != nullptr
+		&& GetStringClass() != nullptr
+#if UE_F_UTF8_STR_PROPERTY
+		&& GetUtf8StringClass() != nullptr
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+		&& GetAnsiStringClass() != nullptr
+#endif
+		&& GetTextClass() != nullptr
+		&& GetTWeakObjectPtrClass() != nullptr
+		&& GetTLazyObjectPtrClass() != nullptr
+		&& GetTSoftClassPtrClass() != nullptr
+		&& GetTSoftObjectPtrClass() != nullptr
+		&& GetTMapClass() != nullptr
+		&& GetTSetClass() != nullptr
+		&& GetTArrayClass() != nullptr
+		&& GetTFieldPathClass() != nullptr
+#if UE_F_OPTIONAL_PROPERTY
+		&& GetTOptionalClass() != nullptr
+#endif
+		;
+}
+
 FClassReflection* FReflectionRegistry::GetUtilsClass() const
 {
 	return UtilsClass;
@@ -1073,7 +1116,7 @@ FClassReflection* FReflectionRegistry::GetNameClass() const
 	return NameClass;
 }
 
-FClassReflection* FReflectionRegistry::GetTScriptInterfaceClass()
+FClassReflection* FReflectionRegistry::GetTScriptInterfaceClass() const
 {
 	return TScriptInterfaceClass;
 }

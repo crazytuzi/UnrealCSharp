@@ -456,7 +456,16 @@ public static class TypeBridge
 
         var AssemblyName = Index >= 0 ? InFullName[(Index + 1)..].Trim() : null;
 
-        var Type = System.Type.GetType(InFullName, throwOnError: false, ignoreCase: false);
+        Type? Type;
+
+        try
+        {
+            Type = System.Type.GetType(InFullName, throwOnError: false, ignoreCase: false);
+        }
+        catch (Exception)
+        {
+            Type = null;
+        }
 
         if (Type == null)
         {

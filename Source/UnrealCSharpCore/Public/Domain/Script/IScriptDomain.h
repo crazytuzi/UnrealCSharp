@@ -53,7 +53,8 @@ public:
 
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName, void* InValue) = 0;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) = 0;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) = 0;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName, void** InParams) = 0;
 

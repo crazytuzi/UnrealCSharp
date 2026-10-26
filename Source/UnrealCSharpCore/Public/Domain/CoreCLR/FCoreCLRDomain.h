@@ -54,7 +54,8 @@ public:
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
 	                                 void* InValue) override;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) override;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) override;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName,
 	                              void** InParams) override;

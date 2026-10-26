@@ -28,8 +28,13 @@ namespace
 
 			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
-				Class, InManagedObject, ScriptInterface);
+			const auto bIsAdded = FCSharpEnvironment::GetEnvironment().AddMultiReference<
+				TScriptInterface<IInterface>, true, false>(Class, InManagedObject, ScriptInterface);
+
+			if (!bIsAdded)
+			{
+				delete ScriptInterface;
+			}
 		}
 
 		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)

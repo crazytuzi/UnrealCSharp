@@ -796,7 +796,7 @@ bool FLeanCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	FReflectionRegistry::Get().Initialize();
 
-	return true;
+	return FReflectionRegistry::Get().IsInitialized();
 }
 
 void FLeanCLRDomain::LoadAssembly(const TArray<FString>& InAssemblies)

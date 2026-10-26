@@ -412,12 +412,13 @@ void SCRIPT_DOMAIN_TYPE::SetFieldStaticValue(const IManagedHandle InManagedClass
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_GET_FIELD_STATIC_VALUE
-void* SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName)
+bool SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+                                             int64& OutValue)
 {
 	return IManagedHandleIsValid(InManagedClass) && FieldBridgeGetStaticValueFn != nullptr
-		       ? IManagedHandleToObject(SCRIPT_DOMAIN_INVOKE(IManagedHandle, FieldBridgeGetStaticValueFn,
-		                                                     InManagedClass, SCRIPT_DOMAIN_STRING_CAST(InName)))
-		       : nullptr;
+		       ? SCRIPT_DOMAIN_INVOKE(uint8, FieldBridgeGetStaticValueFn, InManagedClass,
+		                              SCRIPT_DOMAIN_STRING_CAST(InName), &OutValue) != 0
+		       : false;
 }
 #endif
 

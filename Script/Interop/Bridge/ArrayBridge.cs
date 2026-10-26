@@ -28,7 +28,7 @@ public static unsafe class ArrayBridge
     {
         if (HandleData.GetObject(InHandle) is Array Array)
         {
-            if (InIndex < Array.Length)
+            if (InIndex >= 0 && InIndex < Array.Length)
             {
                 var Value = Array.GetValue(InIndex);
 

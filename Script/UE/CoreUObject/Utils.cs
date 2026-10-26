@@ -181,7 +181,7 @@ namespace Script.CoreUObject
 
                         foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
                         {
-                            ClassAttributeValues.Add(ConstructorArgument.Value.ToString());
+                            ClassAttributeValues.Add(ConstructorArgument.Value?.ToString() ?? string.Empty);
 
                             ClassAttributeValueCount++;
                         }
@@ -349,7 +349,8 @@ namespace Script.CoreUObject
 
                             foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
                             {
-                                PropertyAttributeValues.Add(ConstructorArgument.Value.ToString());
+                                PropertyAttributeValues.Add(
+                                    ConstructorArgument.Value?.ToString() ?? string.Empty);
 
                                 PropertyAttributeValueCount++;
                             }
@@ -565,7 +566,8 @@ namespace Script.CoreUObject
 
                             foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
                             {
-                                MethodAttributeValues.Add(ConstructorArgument.Value.ToString());
+                                MethodAttributeValues.Add(
+                                    ConstructorArgument.Value?.ToString() ?? string.Empty);
 
                                 MethodAttributeValue++;
                             }
@@ -620,6 +622,18 @@ namespace Script.CoreUObject
         [UnmanagedCallersOnly]
         public static int IsOverride(nint InTypeHandle)
         {
+            try
+            {
+                return IsOverrideInternal(InTypeHandle);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        private static int IsOverrideInternal(nint InTypeHandle)
+        {
             if (HandleData.GetObject(InTypeHandle) is Type Type)
             {
                 return Type.IsDefined(typeof(UClassAttribute), false) ||
@@ -633,6 +647,21 @@ namespace Script.CoreUObject
 
         [UnmanagedCallersOnly]
         public static unsafe void GetClassDescriptor(nint InTypeHandle, nint* OutBuffer)
+        {
+            try
+            {
+                GetClassDescriptorInternal(InTypeHandle, OutBuffer);
+            }
+            catch (Exception)
+            {
+                for (var Index = 0; Index < 15; Index++)
+                {
+                    OutBuffer[Index] = 0;
+                }
+            }
+        }
+
+        private static unsafe void GetClassDescriptorInternal(nint InTypeHandle, nint* OutBuffer)
         {
             if (HandleData.GetObject(InTypeHandle) is Type Type)
             {
@@ -682,6 +711,21 @@ namespace Script.CoreUObject
         [UnmanagedCallersOnly]
         public static unsafe void GetClassProperties(nint InTypeHandle, nint* OutBuffer)
         {
+            try
+            {
+                GetClassPropertiesInternal(InTypeHandle, OutBuffer);
+            }
+            catch (Exception)
+            {
+                for (var Index = 0; Index < 8; Index++)
+                {
+                    OutBuffer[Index] = 0;
+                }
+            }
+        }
+
+        private static unsafe void GetClassPropertiesInternal(nint InTypeHandle, nint* OutBuffer)
+        {
             if (HandleData.GetObject(InTypeHandle) is Type Type)
             {
                 GetClassPropertiesImplementation(Type,
@@ -714,6 +758,21 @@ namespace Script.CoreUObject
         [UnmanagedCallersOnly]
         public static unsafe void GetClassFields(nint InTypeHandle, nint* OutBuffer)
         {
+            try
+            {
+                GetClassFieldsInternal(InTypeHandle, OutBuffer);
+            }
+            catch (Exception)
+            {
+                for (var Index = 0; Index < 3; Index++)
+                {
+                    OutBuffer[Index] = 0;
+                }
+            }
+        }
+
+        private static unsafe void GetClassFieldsInternal(nint InTypeHandle, nint* OutBuffer)
+        {
             if (HandleData.GetObject(InTypeHandle) is Type Type)
             {
                 GetClassFieldsImplementation(Type,
@@ -730,6 +789,21 @@ namespace Script.CoreUObject
 
         [UnmanagedCallersOnly]
         public static unsafe void GetClassMethods(nint InTypeHandle, nint* OutBuffer)
+        {
+            try
+            {
+                GetClassMethodsInternal(InTypeHandle, OutBuffer);
+            }
+            catch (Exception)
+            {
+                for (var Index = 0; Index < 14; Index++)
+                {
+                    OutBuffer[Index] = 0;
+                }
+            }
+        }
+
+        private static unsafe void GetClassMethodsInternal(nint InTypeHandle, nint* OutBuffer)
         {
             if (HandleData.GetObject(InTypeHandle) is Type Type)
             {

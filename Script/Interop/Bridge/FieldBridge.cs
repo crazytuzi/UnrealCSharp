@@ -10,6 +10,30 @@ public static class FieldBridge
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe void SetStaticValue(nint InHandle, byte* InName, long InValue)
     {
+        try
+        {
+            SetStaticValueInternal(InHandle, InName, InValue);
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    public static unsafe uint GetStaticValue(nint InHandle, byte* InName, long* OutValue)
+    {
+        try
+        {
+            return GetStaticValueInternal(InHandle, InName, OutValue);
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
+    }
+
+    private static unsafe void SetStaticValueInternal(nint InHandle, byte* InName, long InValue)
+    {
         var Field = GetField(InHandle, InName);
 
         if (Field != null)
@@ -18,14 +42,15 @@ public static class FieldBridge
         }
     }
 
-    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    public static unsafe long GetStaticValue(nint InHandle, byte* InName)
+    private static unsafe uint GetStaticValueInternal(nint InHandle, byte* InName, long* OutValue)
     {
         var Field = GetField(InHandle, InName);
 
         if (Field != null)
         {
-            return FieldToLong(Field.GetValue(null));
+            *OutValue = FieldToLong(Field.GetValue(null));
+
+            return 1;
         }
 
         return 0;
@@ -61,6 +86,7 @@ public static class FieldBridge
         null => 0,
         nint v => v,
         nuint v => (long)v,
+        _ when InValue is ulong v => unchecked((long)v),
         _ when InValue.GetType().IsValueType => Convert.ToInt64(InValue),
         _ => HandleData.Alloc(InValue)
     };

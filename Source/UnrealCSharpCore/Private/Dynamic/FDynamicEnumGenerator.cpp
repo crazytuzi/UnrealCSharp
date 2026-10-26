@@ -286,10 +286,11 @@ void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassR
 		{
 			if (const auto ScriptDomain = IScriptDomain::Get())
 			{
-				const auto FieldValue = reinterpret_cast<int64>(ScriptDomain->GetFieldStaticValue(
-					InClassReflection->GetManagedClass(), Name));
-
-				InNames.Add({FName(Name), FieldValue});
+				if (int64 FieldValue = 0;
+					ScriptDomain->GetFieldStaticValue(InClassReflection->GetManagedClass(), Name, FieldValue))
+				{
+					InNames.Add({FName(Name), FieldValue});
+				}
 			}
 		}
 	}

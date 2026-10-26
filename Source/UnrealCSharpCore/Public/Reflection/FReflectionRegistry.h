@@ -27,6 +27,8 @@ public:
 	template <class T>
 	auto GetClass() -> FClassReflection*;
 
+	bool IsInitialized() const;
+
 public:
 	FClassReflection* GetUtilsClass() const;
 
@@ -64,7 +66,7 @@ public:
 
 	FClassReflection* GetNameClass() const;
 
-	FClassReflection* GetTScriptInterfaceClass();
+	FClassReflection* GetTScriptInterfaceClass() const;
 
 	FClassReflection* GetStringClass() const;
 

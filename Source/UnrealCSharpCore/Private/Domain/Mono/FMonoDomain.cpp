@@ -166,6 +166,11 @@ void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	FReflectionRegistry::Get().Initialize();
 
+	if (FReflectionRegistry::Get().IsInitialized() == false)
+	{
+		bIsInitialized = false;
+	}
+
 	RegisterBinding();
 }
 

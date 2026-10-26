@@ -85,9 +85,7 @@ IManagedHandle FCSharpBind::Bind(UObject* InObject)
 
 IManagedHandle FCSharpBind::Bind(UClass* InClass)
 {
-	Bind<false>(InClass);
-
-	return Bind(static_cast<UObject*>(InClass));
+	return Bind<false>(InClass) ? Bind(static_cast<UObject*>(InClass)) : InvalidManagedHandle;
 }
 
 bool FCSharpBind::Bind(const IManagedHandle InManagedObject, const FName& InStructName)
