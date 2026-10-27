@@ -25,7 +25,10 @@ static FSignalHandler SignalHandlers[MaxSignalCount] = {};
 static void ScriptSignalHandler(int32 Signal)
 {
 #if PLATFORM_MAC
-	sigaction(Signal, &SignalActions[Signal], nullptr);
+	if (const auto FoundAction = SignalActions.Find(Signal))
+	{
+		sigaction(Signal, FoundAction, nullptr);
+	}
 #else
 	if (Signal >= 0 && Signal < MaxSignalCount)
 	{
@@ -158,6 +161,21 @@ void FCSharpEnvironment::Initialize()
 
 void FCSharpEnvironment::Deinitialize()
 {
+#if PLATFORM_MAC
+	for (const auto& [Signal, Action] : SignalActions)
+	{
+		sigaction(Signal, &Action, nullptr);
+	}
+#else
+	for (auto Index = 0; Index < MaxSignalCount; ++Index)
+	{
+		if (SignalHandlers[Index] != nullptr)
+		{
+			signal(Index, SignalHandlers[Index]);
+		}
+	}
+#endif
+
 	AsyncLoadingObjectArray.Empty();
 
 #if WITH_EDITOR

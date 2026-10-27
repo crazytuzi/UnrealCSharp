@@ -1,16 +1,21 @@
 #pragma once
 
-#include <iomanip>
-#include <sstream>
 #include "UEVersion.h"
 
-inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDigits = 1)
+inline FString SanitizeFloat(double InFloat, const int32 InMinFractionalDigits = 1)
 {
-	std::stringstream StringStream;
+	InFloat = InFloat == 0.0 ? 0.0 : InFloat;
 
-	StringStream << std::fixed << std::setprecision(std::numeric_limits<float>::max_digits10) << InFloat;
+	FString TempString;
 
-	FString TempString = StringStream.str().c_str();
+	if (InFloat != 0.0 && FMath::IsNearlyZero(InFloat, 0.5e-6))
+	{
+		TempString = FString::Printf(TEXT("%.9f"), InFloat);
+	}
+	else
+	{
+		TempString = FString::Printf(TEXT("%f"), InFloat);
+	}
 
 	int32 TrimIndex = INDEX_NONE;
 
@@ -62,6 +67,11 @@ inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDi
 				TempString.AppendChar(TEXT('0'));
 			}
 		}
+	}
+
+	if (InFloat != 0.0 && FMath::IsNearlyZero(InFloat, 0.5e-9))
+	{
+		TempString = FString::Printf(TEXT("%.9g"), InFloat);
 	}
 
 	return TempString;
