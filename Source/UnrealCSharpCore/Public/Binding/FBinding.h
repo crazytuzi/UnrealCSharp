@@ -37,7 +37,7 @@ public:
 	bool IsProjectEnum(const FString& InEnum) const;
 
 private:
-	bool bIsRegister;
+	bool bIsRegister{};
 
 	TArray<FBindingClass*> Classes;
 

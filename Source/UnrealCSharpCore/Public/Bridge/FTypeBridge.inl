@@ -1,7 +1,11 @@
 #pragma once
 
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "UObject/FieldPathProperty.h"
 #include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#endif
 
 template <auto IsSoftReference>
 FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& InOwner, const FName& InName,
@@ -189,6 +193,18 @@ FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& 
 		{
 			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
+
+	case EPropertyTypeExtent::FieldPath:
+		{
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
+		}
+
+#if UE_F_OPTIONAL_PROPERTY
+	case EPropertyTypeExtent::Optional:
+		{
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
+		}
+#endif
 
 	default: return nullptr;
 	}
@@ -529,6 +545,50 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			return nullptr;
 		}
+
+	case EPropertyTypeExtent::FieldPath:
+		{
+			if (InClass != nullptr)
+			{
+				if (const auto GenericArgument = InClass->GetGenericArgument())
+				{
+					const auto FieldClassName = GenericArgument->GetName().RightChop(1);
+
+					if (const auto FoundFieldClass =
+						FFieldClass::GetNameToFieldClassMap().Find(FName(*FieldClassName)))
+					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+						const auto FieldPathProperty = new FFieldPathProperty(InOwner, InName, InObjectFlags);
+#else
+						const auto FieldPathProperty = new FFieldPathProperty(InOwner, InName);
+#endif
+
+						FieldPathProperty->PropertyClass = *FoundFieldClass;
+
+						return FieldPathProperty;
+					}
+				}
+			}
+
+			return nullptr;
+		}
+
+#if UE_F_OPTIONAL_PROPERTY
+	case EPropertyTypeExtent::Optional:
+		{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+			const auto OptionalProperty = new FOptionalProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto OptionalProperty = new FOptionalProperty(InOwner, InName);
+#endif
+
+			OptionalProperty->SetValueProperty(Factory<IsSoftReference>(InClass->GetGenericArgument(),
+			                                                            OptionalProperty, "",
+			                                                            EObjectFlags::RF_Transient));
+
+			return OptionalProperty;
+		}
+#endif
 
 	default: return nullptr;
 	}

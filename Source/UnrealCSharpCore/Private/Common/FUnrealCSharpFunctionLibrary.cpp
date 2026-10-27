@@ -392,25 +392,29 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 		return TEXT("");
 	}
 
+	const auto bIsNativeName = (InStruct->IsNative() ||
+			FDynamicClassGenerator::IsDynamicClass(InStruct) ||
+			FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
+		!FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct);
+
 	return Encode(FString::Printf(TEXT(
 		              "%s%s"
 	              ),
-	                              (InStruct->IsNative() ||
-		                              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
-		                              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
-	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+	                              bIsNativeName
 		                              ? InStruct->GetPrefixCPP()
 		                              : TEXT(""),
 	                              *InStruct->GetName()),
-	              (InStruct->IsNative() ||
-		              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
-		              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
-	              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+	              bIsNativeName
 	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
+	if (InStruct == nullptr)
+	{
+		return TEXT("");
+	}
+
 	return Encode(FString::Printf(TEXT(
 		              "I%s"
 	              ),
@@ -1374,12 +1378,12 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FProperty* InProperty)
 {
-	return Encode(InProperty->GetName(), InProperty->IsNative());
+	return InProperty != nullptr ? Encode(InProperty->GetName(), InProperty->IsNative()) : TEXT("");
 }
 
 FString FUnrealCSharpFunctionLibrary::Encode(const UFunction* InFunction)
 {
-	return Encode(InFunction->GetName(), InFunction->IsNative());
+	return InFunction != nullptr ? Encode(InFunction->GetName(), InFunction->IsNative()) : TEXT("");
 }
 
 const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()

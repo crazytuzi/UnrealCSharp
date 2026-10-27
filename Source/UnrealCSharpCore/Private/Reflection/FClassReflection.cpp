@@ -444,9 +444,9 @@ void FClassReflection::EnsureDescriptorImplementation()
 		ScriptDomain->GetClassDescriptor(ManagedClass, reinterpret_cast<PTRINT*>(&Params[1]));
 
 		ParseDescriptor(FManagedReader{ScriptDomain}, &Params[0]);
-	}
 
-	bDescriptorLoaded = true;
+		bDescriptorLoaded = true;
+	}
 }
 
 void FClassReflection::EnsureMemberImplementation(
@@ -474,9 +474,9 @@ void FClassReflection::EnsureMemberImplementation(
 		(ScriptDomain->*GetMemberFunction)(ManagedClass, reinterpret_cast<PTRINT*>(&Params[1]));
 
 		(this->*ParseMemberFunction)(FManagedReader{ScriptDomain}, &Params[0]);
-	}
 
-	bLoaded = true;
+		bLoaded = true;
+	}
 }
 
 void FClassReflection::EnsurePropertiesImplementation()

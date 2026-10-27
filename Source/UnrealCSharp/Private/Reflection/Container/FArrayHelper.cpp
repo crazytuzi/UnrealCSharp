@@ -386,17 +386,25 @@ int32 FArrayHelper::Remove(const void* InValue) const
 {
 	auto RemovedNum = 0;
 
-	TArray<int32> x;
+	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	auto Index = Find(InValue);
-
-	while (Index != INDEX_NONE)
+	for (auto Index = 0; Index < Num();)
 	{
-		++RemovedNum;
+		if (InnerPropertyDescriptor->Identical(ScriptArrayHelper.GetRawPtr(Index), InValue))
+		{
+			RemoveAt(Index, 1, false);
 
-		RemoveAt(Index, 1, true);
+			++RemovedNum;
+		}
+		else
+		{
+			++Index;
+		}
+	}
 
-		Index = Find(InValue);
+	if (RemovedNum > 0)
+	{
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
 	}
 
 	return RemovedNum;

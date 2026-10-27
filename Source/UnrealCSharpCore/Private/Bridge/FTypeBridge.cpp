@@ -163,6 +163,18 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(const FClassReflection* InClass
 		return EPropertyTypeExtent::Array;
 	}
 
+	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetTFieldPathClass()))
+	{
+		return EPropertyTypeExtent::FieldPath;
+	}
+
+#if UE_F_OPTIONAL_PROPERTY
+	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetTOptionalClass()))
+	{
+		return EPropertyTypeExtent::Optional;
+	}
+#endif
+
 	return EPropertyTypeExtent::None;
 }
 
