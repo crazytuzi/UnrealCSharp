@@ -417,6 +417,11 @@ void UDynamicDataSource::EnumerateItemsAtPath(const FName InPath,
 		return;
 	}
 
+	if (!DynamicHierarchy.IsValid())
+	{
+		return;
+	}
+
 	if (EnumHasAnyFlags(InItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFolders))
 	{
 		if (DynamicHierarchy->FindNode(InternalPath))
@@ -877,6 +882,11 @@ bool UDynamicDataSource::GetClassPaths(
 #endif
 ) const
 {
+	if (CollectionManager == nullptr)
+	{
+		return false;
+	}
+
 	if (!InCollections.IsEmpty())
 	{
 		const auto CollectionRecursionFlags = bIncludeChildCollections

@@ -42,6 +42,8 @@ private:
 
 	FDelegateHandle OnEditorRefreshGameplayTagTreeDelegateHandle;
 
+	FDelegateHandle OnFilesLoadedDelegateHandle;
+
 	TUniquePtr<FAutoConsoleCommand> CodeAnalysisConsoleCommand;
 
 	TUniquePtr<FAutoConsoleCommand> SolutionGeneratorConsoleCommand;

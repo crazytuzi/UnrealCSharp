@@ -21,11 +21,14 @@ void FUnrealCSharpEditorStyle::Initialize()
 
 void FUnrealCSharpEditorStyle::Shutdown()
 {
-	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
+	if (StyleInstance.IsValid())
+	{
+		ensure(StyleInstance.IsUnique());
 
-	ensure(StyleInstance.IsUnique());
+		FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
 
-	StyleInstance.Reset();
+		StyleInstance.Reset();
+	}
 }
 
 FName FUnrealCSharpEditorStyle::GetStyleSetName()

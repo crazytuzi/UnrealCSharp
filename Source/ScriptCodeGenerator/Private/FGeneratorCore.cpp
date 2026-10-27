@@ -846,6 +846,8 @@ bool FGeneratorCore::IsSupported(const UPackage* InPackage)
 
 bool FGeneratorCore::IsSupported(const UClass* InClass)
 {
+	if (InClass == nullptr) return false;
+
 	if (bIsGenerateAllModules && InClass->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InClass))
@@ -887,6 +889,8 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 
 bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 {
+	if (InFunction == nullptr) return false;
+
 	if (bIsGenerateAllModules && InFunction->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InFunction))
@@ -912,6 +916,8 @@ bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 
 bool FGeneratorCore::IsSupported(const UScriptStruct* InScriptStruct)
 {
+	if (InScriptStruct == nullptr) return false;
+
 	if (bIsGenerateAllModules && InScriptStruct->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InScriptStruct))
@@ -943,6 +949,8 @@ bool FGeneratorCore::IsSupported(const UScriptStruct* InScriptStruct)
 
 bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 {
+	if (InEnum == nullptr) return false;
+
 	if (bIsGenerateAllModules && InEnum->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InEnum))

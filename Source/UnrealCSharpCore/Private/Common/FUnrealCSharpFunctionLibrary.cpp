@@ -163,7 +163,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	if (const auto& ProjectModuleList = GetProjectModuleList();
 		ProjectModuleList.Contains(OutArray[0]) ||
 		OutArray[0] == TEXT("Game") ||
-		(OutArray[0] == TEXT("Script") && ProjectModuleList.Contains(OutArray[1])))
+		(OutArray[0] == TEXT("Script") &&
+			OutArray.IsValidIndex(1) && ProjectModuleList.Contains(OutArray[1])))
 	{
 		ModuleName = FApp::GetProjectName();
 	}
@@ -1022,6 +1023,7 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 		ProjectModuleList.Contains(Splits[0]) ||
 		Splits[0] == TEXT("Game") ||
 		(Splits[0] == NAMESPACE_SCRIPT &&
+			Splits.IsValidIndex(1) &&
 			ProjectModuleList.Contains(Splits[1])))
 	{
 		static auto GameProxyPath = GetGameProxyDirectory();
@@ -1384,8 +1386,12 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 {
 	static TArray<FString> EngineModuleList;
 
-	if (EngineModuleList.IsEmpty())
+	static bool bIsLoaded = false;
+
+	if (!bIsLoaded)
 	{
+		bIsLoaded = true;
+
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
 		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))
@@ -1432,8 +1438,12 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 {
 	static TArray<FString> ProjectModuleList;
 
-	if (ProjectModuleList.IsEmpty())
+	static bool bIsLoaded = false;
+
+	if (!bIsLoaded)
 	{
+		bIsLoaded = true;
+
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
 		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))

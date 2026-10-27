@@ -1,8 +1,22 @@
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 
-FUnrealCSharpModuleDelegates::FOnUnrealCSharpModuleActive FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive;
+auto FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive() -> FOnUnrealCSharpModuleActive&
+{
+	static FOnUnrealCSharpModuleActive OnUnrealCSharpModuleActive;
 
-FUnrealCSharpModuleDelegates::FOnUnrealCSharpModuleInActive FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive;
+	return OnUnrealCSharpModuleActive;
+}
 
-FUnrealCSharpModuleDelegates::FOnCSharpEnvironmentInitialize
-FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize;
+auto FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive() -> FOnUnrealCSharpModuleInActive&
+{
+	static FOnUnrealCSharpModuleInActive OnUnrealCSharpModuleInActive;
+
+	return OnUnrealCSharpModuleInActive;
+}
+
+auto FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize() -> FOnCSharpEnvironmentInitialize&
+{
+	static FOnCSharpEnvironmentInitialize OnCSharpEnvironmentInitialize;
+
+	return OnCSharpEnvironmentInitialize;
+}

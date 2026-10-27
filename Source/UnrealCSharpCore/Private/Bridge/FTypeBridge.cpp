@@ -10,6 +10,8 @@
 
 EPropertyTypeExtent FTypeBridge::GetPropertyType(const FClassReflection* InClass)
 {
+	if (InClass == nullptr) return EPropertyTypeExtent::None;
+
 	const auto TypeDefinition = InClass->GetTypeDefinition();
 
 	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetByteClass()))

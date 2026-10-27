@@ -36,15 +36,16 @@ void FDynamicRegistry::Initialize()
 		}
 	};
 
-	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
-		this, &FDynamicRegistry::OnCSharpEnvironmentInitialize);
+	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+		AddRaw(this, &FDynamicRegistry::OnCSharpEnvironmentInitialize);
 }
 
 void FDynamicRegistry::Deinitialize()
 {
 	if (OnCSharpEnvironmentInitializeDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+			Remove(OnCSharpEnvironmentInitializeDelegateHandle);
 	}
 
 	FDynamicClassGenerator::OnPostClassConstructor = nullptr;

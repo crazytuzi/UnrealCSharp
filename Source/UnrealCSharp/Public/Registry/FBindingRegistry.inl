@@ -18,6 +18,18 @@ auto FBindingRegistry::AddReference(const T* InObject, FClassReflection* InClass
 
 	BindingAddress2ManagedHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), InManagedHandle);
 
+	if (const auto FoundBindingAddress = ManagedHandle2BindingAddress.Find(InManagedHandle))
+	{
+		if (FoundBindingAddress->AddressWrapper != nullptr)
+		{
+			BindingAddress2ManagedHandle.Remove(FoundBindingAddress->AddressWrapper->Value);
+
+			delete FoundBindingAddress->AddressWrapper;
+
+			FoundBindingAddress->AddressWrapper = nullptr;
+		}
+	}
+
 	auto BindingAddressWrapper = new TBindingAddressWrapper<T, IsNeedFree>(InObject);
 
 	ManagedHandle2BindingAddress.Add(InManagedHandle, FBindingValueMapping::ValueType(BindingAddressWrapper));
@@ -32,6 +44,18 @@ auto FBindingRegistry::AddReference(const IManagedHandle InOwner, const T* InObj
 	RemoveBindingAddress(static_cast<void*>(const_cast<T*>(InObject)), InManagedHandle);
 
 	BindingAddress2ManagedHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), InManagedHandle);
+
+	if (const auto FoundBindingAddress = ManagedHandle2BindingAddress.Find(InManagedHandle))
+	{
+		if (FoundBindingAddress->AddressWrapper != nullptr)
+		{
+			BindingAddress2ManagedHandle.Remove(FoundBindingAddress->AddressWrapper->Value);
+
+			delete FoundBindingAddress->AddressWrapper;
+
+			FoundBindingAddress->AddressWrapper = nullptr;
+		}
+	}
 
 	auto BindingAddressWrapper = new TBindingAddressWrapper<T, false>(InObject);
 

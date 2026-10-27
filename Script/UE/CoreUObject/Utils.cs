@@ -79,9 +79,11 @@ namespace Script.CoreUObject
 
             foreach (var Frame in Frames)
             {
+                var Method = Frame.GetMethod();
+
                 Traceback.Append(string.Format("at {0}.{1} in {2}:{3}\r\n",
-                    Frame.GetMethod().DeclaringType.FullName,
-                    Frame.GetMethod().Name,
+                    Method?.DeclaringType?.FullName,
+                    Method?.Name,
                     Frame.GetFileName(),
                     Frame.GetFileLineNumber()));
             }

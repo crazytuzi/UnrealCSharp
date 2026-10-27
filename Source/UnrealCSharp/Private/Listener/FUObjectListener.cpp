@@ -4,23 +4,25 @@
 
 FUObjectListener::FUObjectListener()
 {
-	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
-		this, &FUObjectListener::OnUnrealCSharpModuleActive);
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+		AddRaw(this, &FUObjectListener::OnUnrealCSharpModuleActive);
 
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FUObjectListener::OnUnrealCSharpModuleInActive);
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+		AddRaw(this, &FUObjectListener::OnUnrealCSharpModuleInActive);
 }
 
 FUObjectListener::~FUObjectListener()
 {
 	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+			Remove(OnUnrealCSharpModuleActiveDelegateHandle);
 	}
 
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+			Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
 	}
 }
 

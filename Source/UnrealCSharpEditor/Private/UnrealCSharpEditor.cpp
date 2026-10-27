@@ -177,7 +177,7 @@ void FUnrealCSharpEditorModule::StartupModule()
 			if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(
 				TEXT("AssetRegistry")))
 			{
-				AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+				OnFilesLoadedDelegateHandle = AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
 				{
 					if (const auto TargetPlatformManager = GetTargetPlatformManager())
 					{
@@ -198,22 +198,31 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 
+	if (UnrealCSharpBlueprintToolBar.IsValid())
+	{
+		UnrealCSharpBlueprintToolBar->Deinitialize();
+	}
+
+	if (UnrealCSharpPlayToolBar.IsValid())
+	{
+		UnrealCSharpPlayToolBar->Deinitialize();
+	}
+
 	UToolMenus::UnregisterOwner(this);
 
-	FUnrealCSharpEditorStyle::Shutdown();
-
-	FUnrealCSharpEditorCommands::Unregister();
-
-	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+	if (OnFilesLoadedDelegateHandle.IsValid())
 	{
-		auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		{
+			AssetRegistryModule->Get().OnFilesLoaded().Remove(OnFilesLoadedDelegateHandle);
+		}
 
-		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("GameContentDirectoryPath");
-
-		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("ProjectDirectoryPath");
-
-		PropertyEditorModule.NotifyCustomizationModuleChanged();
+		OnFilesLoadedDelegateHandle.Reset();
 	}
+
+	FTSTicker::GetCoreTicker().RemoveTicker(TickHandle);
+
+	DynamicDataSource.Reset();
 
 	if (OnEditorRefreshGameplayTagTreeDelegateHandle.IsValid())
 	{
@@ -229,23 +238,24 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 #endif
 	}
 
-	if (UnrealCSharpBlueprintToolBar.IsValid())
+	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
 	{
-		UnrealCSharpBlueprintToolBar->Deinitialize();
+		auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("ProjectDirectoryPath");
+
+		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("GameContentDirectoryPath");
+
+		PropertyEditorModule.NotifyCustomizationModuleChanged();
 	}
 
-	if (UnrealCSharpPlayToolBar.IsValid())
-	{
-		UnrealCSharpPlayToolBar->Deinitialize();
-	}
+	FUnrealCSharpEditorCommands::Unregister();
 
-	DynamicDataSource.Reset();
-
-	FTSTicker::GetCoreTicker().RemoveTicker(TickHandle);
-
-	UUnrealCSharpEditorSetting::UnregisterSettings();
+	FUnrealCSharpEditorStyle::Shutdown();
 
 	UUnrealCSharpSetting::UnregisterSettings();
+
+	UUnrealCSharpEditorSetting::UnregisterSettings();
 }
 
 void FUnrealCSharpEditorModule::Tick(const float InDeltaTime)

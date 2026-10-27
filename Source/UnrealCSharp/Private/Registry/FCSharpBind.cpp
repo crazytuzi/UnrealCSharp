@@ -36,15 +36,16 @@ void FCSharpBind::Initialize()
 {
 	NotOverrideTypes.Empty();
 
-	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
-		this, &FCSharpBind::OnCSharpEnvironmentInitialize);
+	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+		AddRaw(this, &FCSharpBind::OnCSharpEnvironmentInitialize);
 }
 
 void FCSharpBind::Deinitialize()
 {
 	if (OnCSharpEnvironmentInitializeDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+			Remove(OnCSharpEnvironmentInitializeDelegateHandle);
 	}
 
 #if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
@@ -437,7 +438,14 @@ bool FCSharpBind::BindImplementation(const IManagedHandle InManagedObject, const
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject);
+	if (!FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject))
+	{
+		InScriptStruct->DestroyStruct(Structure);
+
+		FMemory::Free(Structure);
+
+		return false;
+	}
 
 	return true;
 }

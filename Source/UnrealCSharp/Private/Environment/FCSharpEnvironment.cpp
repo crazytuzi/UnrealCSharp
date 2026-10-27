@@ -43,23 +43,25 @@ FCSharpEnvironment FCSharpEnvironment::Environment;
 
 FCSharpEnvironment::FCSharpEnvironment()
 {
-	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
 
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+			Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
 	}
 
 	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+			Remove(OnUnrealCSharpModuleActiveDelegateHandle);
 	}
 }
 
@@ -156,7 +158,7 @@ void FCSharpEnvironment::Initialize()
 #endif
 	}
 
-	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
+	FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().Broadcast();
 }
 
 void FCSharpEnvironment::Deinitialize()
