@@ -58,6 +58,8 @@ public class UnrealCSharpCore : ModuleRules
 				new string[]
 				{
 					"BlueprintGraph",
+					"KismetCompiler",
+					"Settings",
 					"UnrealEd"
 					// ... add other public dependencies that you statically link with here ...
 				}
@@ -72,8 +74,8 @@ public class UnrealCSharpCore : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Json",
-				"CrossVersion",
-				"Projects"
+				"Projects",
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);

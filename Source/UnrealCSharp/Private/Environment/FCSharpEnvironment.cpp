@@ -52,6 +52,8 @@ FCSharpEnvironment::FCSharpEnvironment()
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
+	Deinitialize();
+
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().

@@ -206,10 +206,15 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 		{
 			OutTextReader.NextChar();
 
-			OutTextReader.EatWhile([](const int InChar)
+			if (OutTextReader.EatWhile([](const int InChar)
 			{
 				return InChar > 0 && InChar < 128 && FChar::IsAlpha(InChar);
-			});
+			}) == 0)
+			{
+				OutTextReader.Save();
+
+				return ETokenKind::Trivial;
+			}
 
 			const auto TokenKind = [](const FStringView& InTag)
 			{
@@ -249,7 +254,7 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 
 			OutTextReader.EatWhile([](const int InChar)
 			{
-				return InChar != '@' && InChar != '\\';
+				return InChar != '@' && InChar != '\\' && InChar != '\n' && InChar != '\r';
 			});
 
 			return ETokenKind::Trivial;
@@ -275,12 +280,41 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 	{
 	case EExpect::Name:
 		{
-			OutTextReader.EatWhile([](const int InChar)
+			if (OutTextReader.GetCurrentChar() == ':')
 			{
-				return InChar > 0 && InChar < 128 && (FChar::IsAlnum(InChar) || InChar == '_');
-			});
+				OutTextReader.NextChar();
+			}
+
+			if (OutTextReader.GetCurrentChar() == '[')
+			{
+				while (!OutTextReader.IsEof() && OutTextReader.GetCurrentChar() != ']')
+				{
+					OutTextReader.NextChar();
+				}
+
+				if (!OutTextReader.IsEof())
+				{
+					OutTextReader.NextChar();
+				}
+			}
+
+			while (!OutTextReader.IsEof() &&
+				(OutTextReader.GetCurrentChar() == ' ' || OutTextReader.GetCurrentChar() == '\t'))
+			{
+				OutTextReader.NextChar();
+			}
 
 			OutExpect = EExpect::Description;
+
+			if (OutTextReader.EatWhile([](const int InChar)
+			{
+				return InChar > 0 && InChar < 128 && (FChar::IsAlnum(InChar) || InChar == '_');
+			}) == 0)
+			{
+				OutTextReader.Save();
+
+				return ETokenKind::Trivial;
+			}
 
 			return ETokenKind::Name;
 		}

@@ -428,6 +428,10 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
+                Property.SetMethod.Body.Variables.Clear();
+
+                Property.SetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.SetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -524,6 +528,10 @@ namespace Weavers
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
                 var bIsCompound = IsCompound(Property.PropertyType);
+
+                Property.GetMethod.Body.Variables.Clear();
+
+                Property.GetMethod.Body.ExceptionHandlers.Clear();
 
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
@@ -647,6 +655,10 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
+                Property.SetMethod.Body.Variables.Clear();
+
+                Property.SetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.SetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -743,6 +755,10 @@ namespace Weavers
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
                 var bIsCompound = IsCompound(Property.PropertyType);
+
+                Property.GetMethod.Body.Variables.Clear();
+
+                Property.GetMethod.Body.ExceptionHandlers.Clear();
 
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));

@@ -14,26 +14,27 @@ namespace
 		static void RegisterImplementation(const IManagedHandle InManagedObject,
 		                                   const IManagedHandle InObject, const IManagedHandle InManagedType)
 		{
-			const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+			{
 #if UE_T_SCRIPT_INTERFACE_CONSTRUCTOR_U_OBJECT
-			const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
+				const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
 #else
-			const auto ScriptInterface = new TScriptInterface<IInterface>();
+				const auto ScriptInterface = new TScriptInterface<IInterface>();
 
-			ScriptInterface->SetObject(FoundObject);
+				ScriptInterface->SetObject(FoundObject);
 
-			static_cast<FScriptInterface*>(ScriptInterface)->SetInterface(FoundObject);
+				static_cast<FScriptInterface*>(ScriptInterface)->SetInterface(FoundObject);
 #endif
 
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
+				const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
-			const auto bIsAdded = FCSharpEnvironment::GetEnvironment().AddMultiReference<
-				TScriptInterface<IInterface>, true, false>(Class, InManagedObject, ScriptInterface);
+				const auto bIsAdded = FCSharpEnvironment::GetEnvironment().AddMultiReference<
+					TScriptInterface<IInterface>, true, false>(Class, InManagedObject, ScriptInterface);
 
-			if (!bIsAdded)
-			{
-				delete ScriptInterface;
+				if (!bIsAdded)
+				{
+					delete ScriptInterface;
+				}
 			}
 		}
 

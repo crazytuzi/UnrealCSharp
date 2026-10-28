@@ -41,10 +41,11 @@ public class ScriptCodeGenerator : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UMGEditor",
-				"UnrealEd", 
+				"UnrealEd",
+				"Json",
+				"AssetRegistry",
 				"UnrealCSharpCore",
-				"CrossVersion",
-				"Json"
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
