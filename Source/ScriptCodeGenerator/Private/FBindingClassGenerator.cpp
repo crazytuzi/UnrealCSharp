@@ -25,6 +25,16 @@ void FBindingClassGenerator::Generator(const FBindingClass* InClass)
 	}
 }
 
+bool FBindingClassGenerator::IsSubscriptValid(const FBindingClass* InClass)
+{
+	const auto& Subscript = InClass->GetSubscript();
+
+	return Subscript.IsSet() &&
+		Subscript.GetParams().Num() == 1 &&
+		Subscript.GetParamNames().Num() == 1 &&
+		Subscript.GetReturn() != nullptr;
+}
+
 void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 {
 	FString UsingNameSpaceContent;
@@ -43,7 +53,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	bool bHasEqualTo = false;
 
-	if (InClass->GetSubscript().IsSet())
+	if (IsSubscriptValid(InClass))
 	{
 		auto Param = InClass->GetSubscript().GetParams()[0];
 
@@ -844,7 +854,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		);
 	};
 
-	if (InClass->GetSubscript().IsSet())
+	if (IsSubscriptValid(InClass))
 	{
 		UsingNameSpaces.Append(InClass->GetSubscript().GetReturn()->GetNameSpace());
 

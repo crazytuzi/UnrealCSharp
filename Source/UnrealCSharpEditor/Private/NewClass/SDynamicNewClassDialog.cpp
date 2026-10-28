@@ -865,6 +865,30 @@ TSharedRef<SWidget> SDynamicNewClassDialog::MakeWidgetForSelectedModuleCombo(TSh
 		.Text(FText::Format(LOCTEXT("ModuleComboEntry", "{ProjectName}"), Args));
 }
 
+bool SDynamicNewClassDialog::IsUnderSourcePath(const FString& InClassPath, const FString& InSourcePath)
+{
+	auto FullClassPath = FPaths::ConvertRelativePathToFull(InClassPath);
+
+	auto FullSourcePath = FPaths::ConvertRelativePathToFull(InSourcePath);
+
+	FPaths::CollapseRelativeDirectories(FullClassPath);
+
+	FPaths::CollapseRelativeDirectories(FullSourcePath);
+
+	while (FullSourcePath.EndsWith(TEXT("/")))
+	{
+		FullSourcePath = FullSourcePath.LeftChop(1);
+	}
+
+	return FullClassPath.Equals(FullSourcePath, ESearchCase::IgnoreCase) ||
+		FullClassPath.StartsWith(FullSourcePath + TEXT("/"), ESearchCase::IgnoreCase);
+}
+
+bool SDynamicNewClassDialog::IsKeyword(const FString& InNewClassName)
+{
+	return FUnrealCSharpFunctionLibrary::Encode(InNewClassName, false) != InNewClassName;
+}
+
 void SDynamicNewClassDialog::UpdateInputValidity()
 {
 	bLastInputValidityCheckSuccessful = GameProjectUtils::IsValidClassNameForCreation(
@@ -905,6 +929,22 @@ void SDynamicNewClassDialog::UpdateInputValidity()
 			return;
 		}
 
+		const auto bNeedPrefixCPP = ParentClass->IsNative() &&
+			!FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(ParentClass) &&
+			!NewClassName.EndsWith(TEXT("_C"));
+
+		if (!bNeedPrefixCPP && IsKeyword(NewClassName))
+		{
+			bLastInputValidityCheckSuccessful = false;
+
+			LastInputValidityErrorText = FText::Format(
+				LOCTEXT("Keyword",
+				        "The name {NewClassName} is a reserved C# keyword; the generated class would not compile."),
+				FText::FromString(NewClassName));
+
+			return;
+		}
+
 		if (DynamicClassViewer->ValidateClass(NewClassName))
 		{
 			bLastInputValidityCheckSuccessful = false;
@@ -923,7 +963,7 @@ void SDynamicNewClassDialog::UpdateInputValidity()
 
 		for (const auto& AvailableProject : AvailableProjects)
 		{
-			if (NewClassPath.StartsWith(AvailableProject->SourcePath))
+			if (IsUnderSourcePath(NewClassPath, AvailableProject->SourcePath))
 			{
 				bIsStartWithProjectDirectory = true;
 			}

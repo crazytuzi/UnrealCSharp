@@ -10,6 +10,8 @@ public:
 private:
 	static void Generator(const FBindingClass* InClass);
 
+	static bool IsSubscriptValid(const FBindingClass* InClass);
+
 	static void GeneratorPartial(const FBindingClass* InClass);
 
 	static void GeneratorImplementation(const FBindingClass* InClass);

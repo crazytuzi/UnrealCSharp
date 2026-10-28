@@ -42,15 +42,21 @@ void FCSharpCompileProgress::SetOutput(const FString& InOutput)
 
 	PendingOutput.Append(InOutput);
 
-	int32 Index = INDEX_NONE;
+	int32 LineStart = 0;
 
-	while (PendingOutput.FindChar(TEXT('\n'), Index))
+	for (auto Index = 0; Index < PendingOutput.Len(); ++Index)
 	{
-		auto Line = PendingOutput.Left(Index);
+		if (PendingOutput[Index] == TEXT('\n'))
+		{
+			ProcessLine(PendingOutput.Mid(LineStart, Index - LineStart));
 
-		PendingOutput.MidInline(Index + 1);
+			LineStart = Index + 1;
+		}
+	}
 
-		ProcessLine(Line);
+	if (LineStart > 0)
+	{
+		PendingOutput.RightChopInline(LineStart);
 	}
 }
 

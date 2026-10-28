@@ -70,7 +70,7 @@ void FGameplayTagGenerator::Generator()
 
 	FString ChildrenContent;
 
-	GeneratorChildren(ChildrenContent, Root, 2);
+	GeneratorChildren(ChildrenContent, Root, 2, GAMEPLAY_TAGS_NAME);
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
@@ -147,13 +147,18 @@ void FGameplayTagGenerator::GeneratorDocComment(FString& OutContent, const FStri
 }
 
 void FGameplayTagGenerator::GeneratorChildren(FString& OutContent, const FGameplayTagTreeNode& InNode,
-                                              const int32 InIndent)
+                                              const int32 InIndent, const FString& InClassName)
 {
 	TSet<FString> UsedNames;
 
 	if (!InNode.Tag.IsEmpty())
 	{
 		UsedNames.Add(TEXT("Value"));
+	}
+
+	if (!InClassName.IsEmpty())
+	{
+		UsedNames.Add(InClassName);
 	}
 
 	TArray<FString> Keys;
@@ -173,7 +178,12 @@ void FGameplayTagGenerator::GeneratorChildren(FString& OutContent, const FGamepl
 	{
 		const auto& Child = **InNode.Children.Find(Keys[Index]);
 
-		const auto Name = MakeUniqueName(FUnrealCSharpFunctionLibrary::Encode(Keys[Index], false), UsedNames);
+		auto Name = MakeUniqueName(FUnrealCSharpFunctionLibrary::Encode(Keys[Index], false), UsedNames);
+
+		if (!Child.Children.IsEmpty() && Name == TEXT("Value"))
+		{
+			Name = MakeUniqueName(Name, UsedNames);
+		}
 
 		FString Content;
 
@@ -214,7 +224,7 @@ void FGameplayTagGenerator::GeneratorChildren(FString& OutContent, const FGamepl
 				Content += TEXT("\n");
 			}
 
-			GeneratorChildren(Content, Child, InIndent + 1);
+			GeneratorChildren(Content, Child, InIndent + 1, Name);
 
 			Content += FString::Printf(TEXT(
 				"%s}\n"
