@@ -617,16 +617,13 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 
 			TArray<FFileChangeData> FileChangesSnapshot;
 
-			const auto bSucceeded = Compile();
-
-			if (bSucceeded)
 			{
 				FScopeLock ScopeLock(&CriticalSection);
 
 				FileChangesSnapshot = MoveTemp(FileChanges);
 			}
 
-			if (bSucceeded)
+			if (Compile())
 			{
 				auto Reload = [InFunction, bReloadImmediately, FileChangesSnapshot]()
 				{
@@ -760,25 +757,11 @@ void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceede
 void FCSharpCompilerRunnable::OnBeginGenerator()
 {
 	bIsGenerating = true;
-
-	FScopeLock ScopeLock(&CriticalSection);
-
-	bIsPending = false;
-
-	FileChanges.Empty();
 }
 
 void FCSharpCompilerRunnable::OnEndGenerator()
 {
 	bIsGenerating = false;
-
-	{
-		FScopeLock ScopeLock(&CriticalSection);
-
-		bIsPending = false;
-
-		FileChanges.Empty();
-	}
 
 	if (Event != nullptr)
 	{

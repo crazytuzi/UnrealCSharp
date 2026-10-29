@@ -16,7 +16,7 @@ public static unsafe class ArrayBridge
 
             if (Type != null)
             {
-                return HandleData.Alloc(Array.CreateInstance(Type, InLength), true);
+                return HandleData.Alloc(Array.CreateInstance(Type, InLength));
             }
         }
 

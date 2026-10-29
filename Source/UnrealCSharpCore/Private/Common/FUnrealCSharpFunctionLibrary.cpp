@@ -1689,7 +1689,10 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 	{
 		Result = FString::Printf(TEXT("Failed to launch '%s' %s."), *InURL, *InParms);
 
-		InOnComplete(-1, Result);
+		if (InOnComplete)
+		{
+			InOnComplete(-1, Result);
+		}
 
 		FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 
@@ -1751,6 +1754,8 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	auto bCancelled = false;
 
+	const TCHAR* CancelReason{};
+
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
 		constexpr auto SyncProcessSilenceTimeoutSeconds = 120.0;
@@ -1771,7 +1776,18 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		{
 			bCancelled = true;
 
-			FPlatformProcess::TerminateProc(ProcessHandle, true);
+			if (bIsStopped)
+			{
+				CancelReason = TEXT("stopped");
+			}
+			else if (bIsTimeout)
+			{
+				CancelReason = TEXT("timeout");
+			}
+			else
+			{
+				CancelReason = TEXT("silence");
+			}
 
 			break;
 		}
@@ -1792,6 +1808,10 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	if (bCancelled)
 	{
+		FPlatformProcess::TerminateProc(ProcessHandle, true);
+
+		Result.Append(FString::Printf(TEXT("\nCancelled (%s)."), CancelReason));
+
 		ReturnCode = -2;
 	}
 	else if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
@@ -1799,11 +1819,12 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		ReturnCode = -1;
 	}
 
-	InOnComplete(ReturnCode, Result);
+	if (InOnComplete)
+	{
+		InOnComplete(ReturnCode, Result);
+	}
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::TerminateProc(ProcessHandle, true);
 
 	FPlatformProcess::CloseProc(ProcessHandle);
 }

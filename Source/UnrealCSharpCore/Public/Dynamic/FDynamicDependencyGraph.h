@@ -101,7 +101,7 @@ public:
 
 	void Generator();
 
-	void Empty();
+	void Reset();
 
 private:
 	TArray<FNode> NodeArray;

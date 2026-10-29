@@ -506,7 +506,8 @@ void FEditorListener::CompileChangedBlueprints()
 		{
 			if (Blueprint->GeneratedClass != nullptr)
 			{
-				if (const auto AssetData = FAssetData(Blueprint);
+				if (const auto AssetData = FAssetData(Blueprint,
+				                                      FAssetData::ECreationFlags::SkipAssetRegistryTagsGathering);
 					FGeneratorCore::IsSupported(AssetData))
 				{
 					const auto SoftObjectPath = FSoftObjectPath(Blueprint);
@@ -522,7 +523,7 @@ void FEditorListener::CompileChangedBlueprints()
 						if (!IFileManager::Get().FileExists(
 							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
 						{
-							FAssetGenerator::Generator(AssetData);
+							FAssetGenerator::Generator(FAssetData(Blueprint));
 						}
 
 						continue;
@@ -532,7 +533,7 @@ void FEditorListener::CompileChangedBlueprints()
 					{
 						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
 
-						FAssetGenerator::Generator(AssetData);
+						FAssetGenerator::Generator(FAssetData(Blueprint));
 					}
 				}
 			}

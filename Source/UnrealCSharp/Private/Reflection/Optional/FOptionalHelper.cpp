@@ -93,7 +93,9 @@ bool FOptionalHelper::IsSet() const
 
 void* FOptionalHelper::Get() const
 {
-	return OptionalProperty->GetValuePointerForReadOrReplace(Data);
+	return OptionalProperty != nullptr && Data != nullptr && OptionalProperty->IsSet(Data)
+		       ? OptionalProperty->GetValuePointerForReadOrReplace(Data)
+		       : nullptr;
 }
 
 void FOptionalHelper::Set(void* InValue) const

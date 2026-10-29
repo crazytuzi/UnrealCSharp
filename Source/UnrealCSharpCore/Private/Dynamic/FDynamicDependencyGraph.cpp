@@ -15,11 +15,11 @@ void FDynamicDependencyGraph::AddNode(const FNode& InNode)
 	NodeMap.Emplace(InNode.Name, NodeArray.Num() - 1);
 }
 
-void FDynamicDependencyGraph::Empty()
+void FDynamicDependencyGraph::Reset()
 {
-	NodeArray.Empty();
+	NodeArray.Reset();
 
-	NodeMap.Empty();
+	NodeMap.Reset();
 }
 
 bool FDynamicDependencyGraph::IsCompleted(const FString& InName)

@@ -1,4 +1,5 @@
 #include "FCodeAnalysis.h"
+#include "Misc/CoreMisc.h"
 #include "HAL/PlatformFileManager.h"
 #include "Misc/Paths.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -22,8 +23,11 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 	);
 
 	FUnrealCSharpFunctionLibrary::SyncProcess(GetProgramPath(), AnalysisParam, [](const int32, const FString&)
-	{
-	});
+	                                          {
+	                                          }, FString(), {}, []()
+	                                          {
+		                                          return GIsRequestingExit;
+	                                          });
 }
 
 void FCodeAnalysis::Compile()
@@ -39,8 +43,11 @@ void FCodeAnalysis::Compile()
 		);
 
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, [](const int32, const FString&)
-		{
-		});
+		                                          {
+		                                          }, FString(), {}, []()
+		                                          {
+			                                          return GIsRequestingExit;
+		                                          });
 	}
 }
 
@@ -65,8 +72,11 @@ void FCodeAnalysis::Analysis()
 	}
 
 	FUnrealCSharpFunctionLibrary::SyncProcess(GetProgramPath(), AnalysisParam, [](const int32, const FString&)
-	{
-	});
+	                                          {
+	                                          }, FString(), {}, []()
+	                                          {
+		                                          return GIsRequestingExit;
+	                                          });
 }
 
 FString FCodeAnalysis::GetProgramPath()

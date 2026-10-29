@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -18,7 +19,32 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
 
     public static void Deinitialize()
     {
+        var OldContext = Context;
+
         SetSynchronizationContext(null);
+
+        if (OldContext != null)
+        {
+            List<TaskInfo> Tasks;
+
+            lock (OldContext.TaskList)
+            {
+                Tasks = new List<TaskInfo>(OldContext.TaskList);
+
+                OldContext.TaskList.Clear();
+            }
+
+            foreach (var Task in Tasks)
+            {
+                try
+                {
+                    Task.Invoke();
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
 
         Context = null;
     }
