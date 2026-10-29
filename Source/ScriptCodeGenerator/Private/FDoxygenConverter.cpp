@@ -4,13 +4,21 @@ static auto TagParam = FString(TEXT("param"));
 
 static auto TagReturn = FString(TEXT("return"));
 
+static auto TagReturns = FString(TEXT("returns"));
+
 static auto TagBrief = FString(TEXT("brief"));
+
+static auto TagCode = FString(TEXT("code"));
+
+static auto TagEndCode = FString(TEXT("endcode"));
 
 enum class ETokenKind
 {
 	TagParam,
 	TagReturn,
 	TagBrief,
+	TagCode,
+	TagEndCode,
 	TagOther,
 	Name,
 	Whitespace,
@@ -21,9 +29,18 @@ enum class ETokenKind
 
 enum class EExpect
 {
-	None,
 	Name,
 	Description
+};
+
+enum class ETagKind
+{
+	Default,
+	Param,
+	Return,
+	Brief,
+	Code,
+	Other
 };
 
 struct FTokenData
@@ -41,19 +58,10 @@ struct FTokenData
 
 struct FTagData
 {
-	explicit FTagData(const FStringView& InName) :
-		Name(InName)
+	explicit FTagData(const FStringView& InName, const ETagKind InKind) :
+		Name(InName),
+		Kind(InKind)
 	{
-	}
-
-	bool operator ==(const FStringView& InName) const
-	{
-		return Name == InName;
-	}
-
-	bool operator !=(const FStringView& InName) const
-	{
-		return Name != InName;
 	}
 
 	FStringView Name;
@@ -61,6 +69,8 @@ struct FTagData
 	FStringView ParamName;
 
 	TArray<FStringView> Descriptions;
+
+	ETagKind Kind;
 };
 
 class FTextReader
@@ -223,7 +233,7 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 					return ETokenKind::TagParam;
 				}
 
-				if (InTag == TagReturn)
+				if (InTag == TagReturn || InTag == TagReturns)
 				{
 					return ETokenKind::TagReturn;
 				}
@@ -231,6 +241,16 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 				if (InTag == TagBrief)
 				{
 					return ETokenKind::TagBrief;
+				}
+
+				if (InTag == TagCode)
+				{
+					return ETokenKind::TagCode;
+				}
+
+				if (InTag == TagEndCode)
+				{
+					return ETokenKind::TagEndCode;
 				}
 
 				return ETokenKind::TagOther;
@@ -252,17 +272,43 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 		{
 			OutTextReader.Bump();
 
+			if (OutTextReader.GetCurrentChar() == '/' ||
+				OutTextReader.GetCurrentChar() == '*' ||
+				OutTextReader.GetCurrentChar() == '!')
+			{
+				while (OutTextReader.GetCurrentChar() == '/' ||
+					OutTextReader.GetCurrentChar() == '*' ||
+					OutTextReader.GetCurrentChar() == '!')
+				{
+					OutTextReader.Bump();
+				}
+
+				return ETokenKind::Trivial;
+			}
+
+			if (OutTextReader.GetCurrentChar() == INDEX_NONE ||
+				OutTextReader.GetCurrentChar() == '\n' ||
+				OutTextReader.GetCurrentChar() == '\r')
+			{
+				return ETokenKind::Trivial;
+			}
+
 			OutTextReader.EatWhile([](const int InChar)
 			{
-				return InChar != '@' && InChar != '\\' && InChar != '\n' && InChar != '\r';
+				return InChar != '\n' && InChar != '\r';
 			});
 
-			return ETokenKind::Trivial;
+			return ETokenKind::Description;
 		}
 
 	case '*':
 		{
 			OutTextReader.Bump();
+
+			if (OutTextReader.GetCurrentChar() == '/')
+			{
+				OutTextReader.Bump();
+			}
 
 			return ETokenKind::Trivial;
 		}
@@ -328,15 +374,6 @@ ETokenKind Lex(FTextReader& OutTextReader, EExpect& OutExpect)
 
 			return ETokenKind::Description;
 		}
-
-	case EExpect::None:
-		{
-			OutTextReader.NextChar();
-
-			OutExpect = EExpect::None;
-
-			break;
-		}
 	}
 
 	return ETokenKind::Trivial;
@@ -348,7 +385,7 @@ TArray<FTokenData> Tokenize(const FStringView& InText)
 
 	FTextReader TextReader(InText);
 
-	EExpect Expect{};
+	EExpect Expect = EExpect::Description;
 
 	while (!TextReader.IsEof())
 	{
@@ -386,15 +423,37 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 {
 	static auto TagDefault = FString(TEXT("default"));
 
-	auto BriefIndex = 0;
+	auto TextLen = InText.Len();
 
-	auto ReturnIndex = 0;
+	while (TextLen > 0 &&
+		(InText[TextLen - 1] == '\n' || InText[TextLen - 1] == '\r' ||
+			InText[TextLen - 1] == ' ' || InText[TextLen - 1] == '\t'))
+	{
+		--TextLen;
+	}
+
+	if (TextLen >= 2 && InText[TextLen - 2] == '*' && InText[TextLen - 1] == '/')
+	{
+		TextLen -= 2;
+	}
+
+	auto Text = InText.SubStr(0, TextLen);
+
+	int32 BriefIndex = INDEX_NONE;
+
+	int32 ReturnIndex = INDEX_NONE;
+
+	int32 CodeIndex = INDEX_NONE;
+
+	int32 CodeParentIndex = 0;
+
+	int32 DescriptionIndex = 0;
 
 	TArray<FTagData> TagData;
 
-	TagData.Emplace(TagDefault);
+	TagData.Emplace(TagDefault, ETagKind::Default);
 
-	auto TokenData = Tokenize(InText);
+	auto TokenData = Tokenize(Text);
 
 	for (auto& Token : TokenData)
 	{
@@ -402,7 +461,9 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 		{
 		case ETokenKind::TagParam:
 			{
-				TagData.Emplace(Slice(InText, Token.TextRange));
+				TagData.Emplace(Slice(Text, Token.TextRange), ETagKind::Param);
+
+				DescriptionIndex = TagData.Num() - 1;
 
 				break;
 			}
@@ -411,7 +472,9 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 			{
 				ReturnIndex = TagData.Num();
 
-				TagData.Emplace(Slice(InText, Token.TextRange));
+				TagData.Emplace(Slice(Text, Token.TextRange), ETagKind::Return);
+
+				DescriptionIndex = TagData.Num() - 1;
 
 				break;
 			}
@@ -420,28 +483,60 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 			{
 				BriefIndex = TagData.Num();
 
-				TagData.Emplace(Slice(InText, Token.TextRange));
+				TagData.Emplace(Slice(Text, Token.TextRange), ETagKind::Brief);
+
+				DescriptionIndex = TagData.Num() - 1;
+
+				break;
+			}
+
+		case ETokenKind::TagCode:
+			{
+				if (CodeIndex == INDEX_NONE)
+				{
+					CodeParentIndex = DescriptionIndex;
+
+					CodeIndex = TagData.Num();
+
+					TagData.Emplace(Slice(Text, Token.TextRange), ETagKind::Code);
+
+					DescriptionIndex = CodeIndex;
+				}
+
+				break;
+			}
+
+		case ETokenKind::TagEndCode:
+			{
+				if (CodeIndex != INDEX_NONE)
+				{
+					CodeIndex = INDEX_NONE;
+
+					DescriptionIndex = CodeParentIndex;
+				}
 
 				break;
 			}
 
 		case ETokenKind::TagOther:
 			{
-				TagData.Emplace(Slice(InText, Token.TextRange));
+				TagData.Emplace(Slice(Text, Token.TextRange), ETagKind::Other);
+
+				DescriptionIndex = TagData.Num() - 1;
 
 				break;
 			}
 
 		case ETokenKind::Name:
 			{
-				TagData.Last().ParamName = Slice(InText, Token.TextRange);
+				TagData[DescriptionIndex].ParamName = Slice(Text, Token.TextRange);
 
 				break;
 			}
 
 		case ETokenKind::Description:
 			{
-				TagData.Last().Descriptions.Emplace(Slice(InText, Token.TextRange));
+				TagData[DescriptionIndex].Descriptions.Emplace(Slice(Text, Token.TextRange));
 
 				break;
 			}
@@ -455,11 +550,18 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 
 	TStringBuilder<1024> StringBuilder;
 
-	if (BriefIndex != 0)
+	auto SummaryIndex = BriefIndex;
+
+	if (SummaryIndex == INDEX_NONE && !TagData[0].Descriptions.IsEmpty())
+	{
+		SummaryIndex = 0;
+	}
+
+	if (SummaryIndex != INDEX_NONE)
 	{
 		StringBuilder.Append(Indent).Append(TEXT("/// <summary>\n"));
 
-		for (const auto& Description : TagData[BriefIndex].Descriptions)
+		for (const auto& Description : TagData[SummaryIndex].Descriptions)
 		{
 			StringBuilder.Append(Indent).Append(TEXT("/// ")).Append(Description).Append(TEXT("\n"));
 		}
@@ -469,31 +571,57 @@ FString FDoxygenConverter::operator()(const FStringView& InText) const
 
 	for (auto& Tag : TagData)
 	{
-		if (Tag == TagParam)
+		if (Tag.Kind == ETagKind::Param)
 		{
-			StringBuilder.Append(Indent).Append(TEXT("/// <param name=\"")).Append(Tag.ParamName).Append(TEXT("\">\n"));
-
-			for (const auto& Description : Tag.Descriptions)
+			if (Tag.ParamName.IsEmpty())
 			{
-				StringBuilder.Append(Indent).Append(TEXT("/// ")).Append(Description).Append(TEXT("\n"));
+				for (const auto& Description : Tag.Descriptions)
+				{
+					StringBuilder.Append(Indent).Append(TEXT("/// ")).Append(Description).Append(TEXT("\n"));
+				}
 			}
+			else
+			{
+				StringBuilder.Append(Indent).Append(TEXT("/// <param name=\""));
 
-			StringBuilder.Append(Indent).Append(TEXT("/// </param>\n"));
+				StringBuilder.Append(Tag.ParamName).Append(TEXT("\">\n"));
+
+				for (const auto& Description : Tag.Descriptions)
+				{
+					StringBuilder.Append(Indent).Append(TEXT("/// ")).Append(Description).Append(TEXT("\n"));
+				}
+
+				StringBuilder.Append(Indent).Append(TEXT("/// </param>\n"));
+			}
 		}
-		else if (Tag != TagBrief && Tag != TagReturn && Tag != TagDefault)
+		else if (Tag.Kind == ETagKind::Code)
 		{
-			StringBuilder.Append(Indent).Append(TEXT("/// <")).Append(Tag.Name).Append(TEXT(">\n"));
+			StringBuilder.Append(Indent).Append(TEXT("/// <code>\n"));
 
 			for (const auto& Description : Tag.Descriptions)
 			{
 				StringBuilder.Append(Indent).Append(TEXT("/// ")).Append(Description).Append(TEXT("\n"));
 			}
 
-			StringBuilder.Append(Indent).Append(TEXT("/// </")).Append(Tag.Name).Append(TEXT(">\n"));
+			StringBuilder.Append(Indent).Append(TEXT("/// </code>\n"));
+		}
+		else if (Tag.Kind == ETagKind::Other)
+		{
+			for (auto Index = 0; Index < Tag.Descriptions.Num(); ++Index)
+			{
+				StringBuilder.Append(Indent).Append(TEXT("/// "));
+
+				if (Index == 0)
+				{
+					StringBuilder.Append(Tag.Name).Append(TEXT(": "));
+				}
+
+				StringBuilder.Append(Tag.Descriptions[Index]).Append(TEXT("\n"));
+			}
 		}
 	}
 
-	if (ReturnIndex != 0)
+	if (ReturnIndex != INDEX_NONE)
 	{
 		StringBuilder.Append(Indent).Append(TEXT("/// <returns>\n"));
 

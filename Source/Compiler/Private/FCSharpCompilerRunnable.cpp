@@ -2,6 +2,7 @@
 #include "FCSharpCompiler.h"
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/FEnvironmentVariableScope.h"
 #include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -266,6 +267,37 @@ bool FCSharpCompilerRunnable::IsInteropOutdated()
 	return bIsIOutdated;
 }
 
+FString FCSharpCompilerRunnable::GetFirstErrorLine(const FString& InResult)
+{
+	TArray<FString> Lines;
+
+	InResult.ParseIntoArrayLines(Lines, false);
+
+	FString Fallback;
+
+	for (const auto& Line : Lines)
+	{
+		const auto TrimmedLine = Line.TrimStartAndEnd();
+
+		if (TrimmedLine.IsEmpty())
+		{
+			continue;
+		}
+
+		if (TrimmedLine.Contains(TEXT(": error ")))
+		{
+			return TrimmedLine;
+		}
+
+		if (Fallback.IsEmpty())
+		{
+			Fallback = TrimmedLine;
+		}
+	}
+
+	return Fallback;
+}
+
 bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop, const bool bInteropOutdated)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
@@ -296,6 +328,8 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop, co
 		);
 
 		auto bSucceeded = false;
+
+		const FEnvironmentVariableScope EnvironmentVariableScope(TEXT("DOTNET_CLI_UI_LANGUAGE"), TEXT("en"));
 
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
 		                                          [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
@@ -476,12 +510,16 @@ bool FCSharpCompilerRunnable::Compile()
 		                                       ? FCSharpCompileProgress::StageSucceeded
 		                                       : FCSharpCompileProgress::StageFailed);
 
+	FString ErrorMessage;
+
 	if (!bSucceeded)
 	{
 		UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
+
+		ErrorMessage = GetFirstErrorLine(Result);
 	}
 
-	ShowCompileResultNotification(bSucceeded);
+	ShowCompileResultNotification(bSucceeded, ErrorMessage);
 
 	AsyncTask(ENamedThreads::GameThread, [Notification = CompileNotification]()
 	{
@@ -528,6 +566,8 @@ bool FCSharpCompilerRunnable::CompileGame(FString& OutResult, const TFunction<vo
 		                                          *GetBuildConfiguration(),
 		                                          bDisableBuildServers ? TEXT(" --disable-build-servers") : TEXT("")
 		);
+
+		const FEnvironmentVariableScope EnvironmentVariableScope(TEXT("DOTNET_CLI_UI_LANGUAGE"), TEXT("en"));
 
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
 		                                          [&bBuildSucceeded, &OutResult](const int32 InReturnCode,
@@ -683,9 +723,9 @@ void FCSharpCompilerRunnable::ReleaseCompile()
 	bIsCompiling = false;
 }
 
-void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded) const
+void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded, const FString& InErrorMessage) const
 {
-	AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+	AsyncTask(ENamedThreads::GameThread, [bSucceeded, InErrorMessage]()
 	{
 		if (GExitPurge)
 		{
@@ -696,8 +736,14 @@ void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceede
 
 		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
 
-		const auto NotificationInfo = new FNotificationInfo(
-			FText::FromString(bSucceeded ? TEXT("Compilation succeeded") : TEXT("Compilation failed")));
+		auto Title = bSucceeded ? FString(TEXT("Compilation succeeded")) : FString(TEXT("Compilation failed"));
+
+		if (!InErrorMessage.IsEmpty())
+		{
+			Title = FString::Printf(TEXT("%s: %s"), *Title, *InErrorMessage.Left(200));
+		}
+
+		const auto NotificationInfo = new FNotificationInfo(FText::FromString(Title));
 
 		NotificationInfo->bUseSuccessFailIcons = true;
 

@@ -44,6 +44,18 @@ namespace Weavers
 
         private TypeDefinition _pathNameAttributeType;
 
+        private TypeDefinition _uclassAttributeType;
+
+        private TypeDefinition _ustructAttributeType;
+
+        private TypeDefinition _uenumAttributeType;
+
+        private TypeDefinition _uinterfaceAttributeType;
+
+        private TypeDefinition _upropertyAttributeType;
+
+        private TypeDefinition _iinterfaceType;
+
         private TypeDefinition _ufunctionAttributeType;
 
         private TypeDefinition _serverAttributeType;
@@ -336,7 +348,7 @@ namespace Weavers
             foreach (var property in Type.Properties)
             {
                 if (property.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                        Attribute.AttributeType.FullName == _upropertyAttributeType.FullName))
                 {
                     ProcessUClassProperty(Type, property);
                 }
@@ -612,7 +624,7 @@ namespace Weavers
             foreach (var property in Type.Properties)
             {
                 if (property.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                        Attribute.AttributeType.FullName == _upropertyAttributeType.FullName))
                 {
                     ProcessUStructProperty(Type, property);
                 }
@@ -1146,27 +1158,27 @@ namespace Weavers
             foreach (var type in ModuleDefinition.Types)
             {
                 if (type.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UClassAttribute"))
+                        Attribute.AttributeType.FullName == _uclassAttributeType.FullName))
                 {
                     _classTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UStructAttribute"))
+                             Attribute.AttributeType.FullName == _ustructAttributeType.FullName))
                 {
                     _structTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UEnumAttribute"))
+                             Attribute.AttributeType.FullName == _uenumAttributeType.FullName))
                 {
                     _enumTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UInterfaceAttribute"))
+                             Attribute.AttributeType.FullName == _uinterfaceAttributeType.FullName))
                 {
                     _interfaceTypes.Add(type);
                 }
                 else if (type.IsInterface && type.Interfaces.ToList().Any(Interface =>
-                             Interface.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
+                             Interface.InterfaceType.FullName == _iinterfaceType.FullName))
                 {
                     _interfaceTypes.Add(type);
                 }
@@ -1202,6 +1214,18 @@ namespace Weavers
             var handleData = GetInteropType("Interop.HandleData");
 
             _pathNameAttributeType = GetMetaType(definition, "Script.CoreUObject.PathNameAttribute");
+
+            _uclassAttributeType = GetMetaType(definition, "Script.Dynamic.UClassAttribute");
+
+            _ustructAttributeType = GetMetaType(definition, "Script.Dynamic.UStructAttribute");
+
+            _uenumAttributeType = GetMetaType(definition, "Script.Dynamic.UEnumAttribute");
+
+            _uinterfaceAttributeType = GetMetaType(definition, "Script.Dynamic.UInterfaceAttribute");
+
+            _upropertyAttributeType = GetMetaType(definition, "Script.Dynamic.UPropertyAttribute");
+
+            _iinterfaceType = GetMetaType(definition, "Script.CoreUObject.IInterface");
 
             _ufunctionAttributeType = GetMetaType(definition, "Script.Dynamic.UFunctionAttribute");
 

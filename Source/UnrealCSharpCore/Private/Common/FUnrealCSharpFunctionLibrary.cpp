@@ -1,10 +1,12 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
+#include "Containers/StringConv.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "HAL/PlatformFileManager.h"
+#include "HAL/PlatformMisc.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
@@ -46,6 +48,38 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 		if (const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath(); !DotNetPath.IsEmpty())
 		{
 			return DotNetPath;
+		}
+	}
+
+#if PLATFORM_WINDOWS
+	const auto ExecutableName = TEXT("dotnet.exe");
+
+	const auto PathDelimiter = TEXT(";");
+#else
+	const auto ExecutableName = TEXT("dotnet");
+
+	const auto PathDelimiter = TEXT(":");
+#endif
+
+	TArray<FString> SearchPaths;
+
+	FPlatformMisc::GetEnvironmentVariable(TEXT("PATH")).ParseIntoArray(SearchPaths, PathDelimiter);
+
+	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("DOTNET_ROOT")));
+
+#if PLATFORM_WINDOWS
+	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")) / TEXT("Microsoft/dotnet"));
+#endif
+
+	for (const auto& SearchPath : SearchPaths)
+	{
+		if (!SearchPath.IsEmpty())
+		{
+			if (const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(SearchPath, ExecutableName));
+				IFileManager::Get().FileExists(*File))
+			{
+				return File;
+			}
 		}
 	}
 
@@ -1651,22 +1685,64 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
-	const auto ReadOutput = [&]() -> bool
+	if (!ProcessHandle.IsValid())
 	{
-		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
-			!Output.IsEmpty())
+		Result = FString::Printf(TEXT("Failed to launch '%s' %s."), *InURL, *InParms);
+
+		InOnComplete(-1, Result);
+
+		FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+		return;
+	}
+
+	TArray<uint8> PendingBytes;
+
+	const auto AppendBytes = [&](const int32 InLength)
+	{
+		if (InLength <= 0)
 		{
-			Result.Append(Output);
-
-			if (InOnOutput)
-			{
-				InOnOutput(Output);
-			}
-
-			return true;
+			return;
 		}
 
-		return false;
+		TArray<uint8> Bytes(PendingBytes.GetData(), InLength);
+
+		Bytes.Add(0);
+
+		const auto Output = FUTF8ToTCHAR(reinterpret_cast<const ANSICHAR*>(Bytes.GetData())).Get();
+
+		PendingBytes.RemoveAt(0, InLength);
+
+		Result.Append(Output);
+
+		if (InOnOutput)
+		{
+			InOnOutput(Output);
+		}
+	};
+
+	const auto ReadOutput = [&]() -> bool
+	{
+		TArray<uint8> Buffer;
+
+		if (!FPlatformProcess::ReadPipeToArray(ReadPipe, Buffer) || Buffer.IsEmpty())
+		{
+			return false;
+		}
+
+		PendingBytes.Append(Buffer);
+
+		for (auto Index = PendingBytes.Num() - 1; Index >= 0; --Index)
+		{
+			if (PendingBytes[Index] == '\n')
+			{
+				AppendBytes(Index + 1);
+
+				break;
+			}
+		}
+
+		return true;
 	};
 
 	const auto StartTime = FPlatformTime::Seconds();
@@ -1709,6 +1785,8 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 	}
 
 	ReadOutput();
+
+	AppendBytes(PendingBytes.Num());
 
 	auto ReturnCode = 0;
 

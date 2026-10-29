@@ -10,3 +10,4 @@
 | UC_ERROR_06 | UnrealCSharp | Error    | UFunction must be unique |
 | UC_ERROR_07 | UnrealCSharp | Error    | UProperty must be unique |
 | UC_ERROR_08 | UnrealCSharp | Error    | Sealed event cannot be overridden |
+| UC_ERROR_09 | UnrealCSharp | Error    | Nested dynamic types must be declared in a namespace |

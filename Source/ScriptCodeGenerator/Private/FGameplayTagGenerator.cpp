@@ -42,12 +42,19 @@ void FGameplayTagGenerator::Generator()
 
 	if (Root.Children.IsEmpty())
 	{
-		if (auto& FileManager = IFileManager::Get();
-			FileManager.FileExists(*FileName))
+		FGameplayTagContainer AllGameplayTags;
+
+		UGameplayTagsManager::Get().RequestAllGameplayTags(AllGameplayTags, false);
+
+		if (AllGameplayTags.IsEmpty())
 		{
-			if (FileManager.Delete(*FileName))
+			if (auto& FileManager = IFileManager::Get();
+				FileManager.FileExists(*FileName))
 			{
-				FUnrealCSharpFunctionLibrary::MarkScriptChanged();
+				if (FileManager.Delete(*FileName))
+				{
+					FUnrealCSharpFunctionLibrary::MarkScriptChanged();
+				}
 			}
 		}
 

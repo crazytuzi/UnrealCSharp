@@ -43,6 +43,8 @@ private:
 
 	static bool IsInteropOutdated();
 
+	static FString GetFirstErrorLine(const FString& InResult);
+
 	bool CompileInterop(bool bForceCompileInterop, bool bInteropOutdated = false);
 
 	static bool PublishInterop(const FString& InSourcePath, const FString& InTargetPath, const FString& InBackupPath);
@@ -60,7 +62,7 @@ private:
 
 	void ReleaseCompile();
 
-	void ShowCompileResultNotification(bool bSucceeded) const;
+	void ShowCompileResultNotification(bool bSucceeded, const FString& InErrorMessage) const;
 
 private:
 	void OnBeginGenerator();

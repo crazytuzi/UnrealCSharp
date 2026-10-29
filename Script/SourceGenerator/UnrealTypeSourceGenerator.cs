@@ -73,6 +73,14 @@ namespace SourceGenerator
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
+        public static readonly DiagnosticDescriptor ErrorDynamicTypeNotInNamespace = new DiagnosticDescriptor(
+            "UC_ERROR_09",
+            "UClass or UStruct must be declared in a namespace",
+            "{0} \"{1}\" must be declared in a namespace",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
         internal static string GetEngineName(string Name)
         {
             return Name.EndsWith("_C") ? Name : RemoveTypePrefix(Name);
@@ -595,6 +603,13 @@ namespace SourceGenerator
 
             if (Syntax.Parent is BaseNamespaceDeclarationSyntax namespaceDeclarationSyntax == false)
             {
+                if (bIsUClass || bIsUStruct)
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorDynamicTypeNotInNamespace,
+                        Location.Create(Syntax.SyntaxTree, Syntax.Identifier.Span),
+                        bIsUClass ? "UClass" : "UStruct", name));
+                }
+
                 return;
             }
 
