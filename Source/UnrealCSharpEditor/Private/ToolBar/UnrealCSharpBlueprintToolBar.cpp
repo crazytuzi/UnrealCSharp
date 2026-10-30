@@ -3,6 +3,7 @@
 #include "SourceCodeNavigation.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/FileHelper.h"
+#include "FCSharpCompiler.h"
 #include "FCodeAnalysis.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -77,7 +78,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction(const TSharedRef<FUICommandList>
 			{
 				if (IFileManager::Get().FileExists(*OverrideFile))
 				{
-					FCodeAnalysis::Analysis(OverrideFile);
+					FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask({OverrideFile}));
 				}
 			}
 		}), FCanExecuteAction());

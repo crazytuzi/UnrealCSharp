@@ -34,12 +34,14 @@ void FDynamicEnumGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
 		                                 const auto ClassName = InClassReflection->GetName();
 
 		                                 const auto Node = FDynamicDependencyGraph::FNode(
-			                                 ClassName, [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection);
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName));
 			                                 });
 
 		                                 FDynamicGeneratorCore::AddNode(Node);

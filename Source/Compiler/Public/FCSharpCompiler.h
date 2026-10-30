@@ -17,6 +17,8 @@ public:
 
 	void AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const;
 
+	void EnqueueTask(const TFunction<void()>& InTask) const;
+
 	bool SyncCompile() const;
 
 	void Compile(const TFunction<void()>& InFunction) const;

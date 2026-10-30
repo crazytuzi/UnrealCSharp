@@ -22,7 +22,12 @@ namespace CodeAnalysis
             {
                 _outputPathName = args[1];
 
-                _inputFileName = args[2];
+                _inputFileNames = new List<string>();
+
+                for (var i = 2; i < args.Length; i++)
+                {
+                    _inputFileNames.Add(args[i]);
+                }
 
                 _inputPathNames = new List<string>();
 
@@ -74,26 +79,32 @@ namespace CodeAnalysis
 
                 if (_overrideFunction != null && _overrideFile != null)
                 {
-                    var FileKeys = _overrideFile
-                        .Where(Pair => IsSameFilePath(Pair.Value, _inputFileName))
-                        .Select(Pair => Pair.Key)
-                        .ToList();
-
-                    foreach (var Key in FileKeys)
+                    foreach (var InputFileName in _inputFileNames)
                     {
-                        _overrideFunction.Remove(Key);
+                        var FileKeys = _overrideFile
+                            .Where(Pair => IsSameFilePath(Pair.Value, InputFileName))
+                            .Select(Pair => Pair.Key)
+                            .ToList();
 
-                        _overrideFile.Remove(Key);
+                        foreach (var Key in FileKeys)
+                        {
+                            _overrideFunction.Remove(Key);
+
+                            _overrideFile.Remove(Key);
+                        }
                     }
                 }
 
-                RemoveDynamicTypes(_inputFileName);
+                foreach (var InputFileName in _inputFileNames)
+                {
+                    RemoveDynamicTypes(InputFileName);
+                }
             }
             else
             {
                 _outputPathName = args[1];
 
-                _inputFileName = "";
+                _inputFileNames = new List<string>();
 
                 _inputPathNames = new List<string>();
 
@@ -222,7 +233,10 @@ namespace CodeAnalysis
 
             if (_bIsSingle)
             {
-                AnalysisSingle(_inputFileName);
+                foreach (var InputFileName in _inputFileNames)
+                {
+                    AnalysisSingle(InputFileName);
+                }
             }
             else
             {
@@ -431,7 +445,7 @@ namespace CodeAnalysis
 
         private readonly string _outputPathName;
 
-        private readonly string _inputFileName;
+        private readonly List<string> _inputFileNames;
 
         private readonly List<string> _inputPathNames;
 

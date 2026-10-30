@@ -11,6 +11,7 @@
 #include "Interfaces/ITargetPlatformManagerModule.h"
 #include "FGameplayTagGenerator.h"
 #include "GameplayTagsManager.h"
+#include "Async/Async.h"
 #include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
@@ -105,7 +106,7 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FConsoleCommandDelegate::CreateLambda(
 			[]()
 			{
-				FCodeAnalysis::CodeAnalysis();
+				FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask());
 			}));
 
 	SolutionGeneratorConsoleCommand = MakeUnique<FAutoConsoleCommand>(
@@ -298,51 +299,9 @@ void FUnrealCSharpEditorModule::OnEditorRefreshGameplayTagTree()
 	}
 }
 
-void FUnrealCSharpEditorModule::RegisterMenus()
-{
-	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
-	FToolMenuOwnerScoped OwnerScoped(this);
-
-	if (UnrealCSharpPlayToolBar.IsValid())
-	{
-		UnrealCSharpPlayToolBar->Initialize();
-	}
-
-	if (UnrealCSharpBlueprintToolBar.IsValid())
-	{
-		UnrealCSharpBlueprintToolBar->Initialize();
-	}
-}
-
-void FUnrealCSharpEditorModule::UpdatePackagingSettings()
-{
-	const auto PublishDirectory = FUnrealCSharpFunctionLibrary::GetPublishDirectory();
-
-	if (const auto ProjectPackagingSettings = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-		UProjectPackagingSettings>())
-	{
-		bool bIsExisted{};
-
-		for (const auto& [Path] : ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS)
-		{
-			if (Path == PublishDirectory)
-			{
-				bIsExisted = true;
-
-				break;
-			}
-		}
-
-		if (!bIsExisted)
-		{
-			ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS.Add({PublishDirectory});
-
-			ProjectPackagingSettings->TryUpdateDefaultConfigFile();
-		}
-	}
-}
-
-void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const bool bForceCompileInterop)
+void FUnrealCSharpEditorModule::GeneratorInternal(const FString& InPlatformName,
+                                                  const bool bForceCompileInterop,
+                                                  const bool bIsPrepared)
 {
 	FScriptDomainTypeScope ScriptDomainTypeScope(FUnrealCSharpFunctionLibrary::GetScriptDomainType(InPlatformName));
 
@@ -357,17 +316,20 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const b
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
-	FScopedSlowTask SlowTask(13, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+	FScopedSlowTask SlowTask(bIsPrepared ? 11 : 13, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
 
 	SlowTask.MakeDialog();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
+	if (!bIsPrepared)
+	{
+		SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
 
-	FSolutionGenerator::Generator();
+		FSolutionGenerator::Generator();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
+		SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
 
-	FCodeAnalysis::CodeAnalysis();
+		FCodeAnalysis::CodeAnalysis();
+	}
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis Generator"));
 
@@ -416,11 +378,100 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const b
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
 
-	FCSharpCompiler::Get().ImmediatelyCompile(bForceCompileInterop);
+	if (IsRunningCommandlet())
+	{
+		FCSharpCompiler::Get().ImmediatelyCompile(bForceCompileInterop);
+	}
+	else
+	{
+		FCSharpCompiler::Get().EnqueueTask([bForceCompileInterop]()
+		{
+			FCSharpCompiler::Get().ImmediatelyCompile(bForceCompileInterop);
+		});
+	}
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
 
 	FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Broadcast();
+}
+
+void FUnrealCSharpEditorModule::RegisterMenus()
+{
+	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
+	FToolMenuOwnerScoped OwnerScoped(this);
+
+	if (UnrealCSharpPlayToolBar.IsValid())
+	{
+		UnrealCSharpPlayToolBar->Initialize();
+	}
+
+	if (UnrealCSharpBlueprintToolBar.IsValid())
+	{
+		UnrealCSharpBlueprintToolBar->Initialize();
+	}
+}
+
+void FUnrealCSharpEditorModule::UpdatePackagingSettings()
+{
+	const auto PublishDirectory = FUnrealCSharpFunctionLibrary::GetPublishDirectory();
+
+	if (const auto ProjectPackagingSettings = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UProjectPackagingSettings>())
+	{
+		bool bIsExisted{};
+
+		for (const auto& [Path] : ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS)
+		{
+			if (Path == PublishDirectory)
+			{
+				bIsExisted = true;
+
+				break;
+			}
+		}
+
+		if (!bIsExisted)
+		{
+			ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS.Add({PublishDirectory});
+
+			ProjectPackagingSettings->TryUpdateDefaultConfigFile();
+		}
+	}
+}
+
+void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const bool bForceCompileInterop)
+{
+	if (IsRunningCommandlet())
+	{
+		GeneratorInternal(InPlatformName, bForceCompileInterop, false);
+
+		return;
+	}
+
+	static bool bIsGeneratorScheduled = false;
+
+	if (bIsGeneratorScheduled)
+	{
+		return;
+	}
+
+	bIsGeneratorScheduled = true;
+
+	{
+		const auto ScriptDomainType = FUnrealCSharpFunctionLibrary::GetScriptDomainType(InPlatformName);
+
+		FScriptDomainTypeScope ScriptDomainTypeScope(ScriptDomainType);
+
+		FSolutionGenerator::Generator();
+	}
+
+	FCSharpCompiler::Get().EnqueueTask(
+		FCodeAnalysis::MakeCodeAnalysisTask({}, [InPlatformName, bForceCompileInterop]()
+		{
+			GeneratorInternal(InPlatformName, bForceCompileInterop, true);
+
+			bIsGeneratorScheduled = false;
+		}));
 }
 
 #undef LOCTEXT_NAMESPACE

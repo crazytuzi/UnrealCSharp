@@ -1,4 +1,5 @@
 #include "FCodeAnalysis.h"
+#include "Async/Async.h"
 #include "Misc/CoreMisc.h"
 #include "HAL/PlatformFileManager.h"
 #include "Misc/Paths.h"
@@ -7,76 +8,83 @@
 
 void FCodeAnalysis::CodeAnalysis()
 {
-	Compile();
+	RunCompile(MakeCompileCommand());
 
-	Analysis();
+	RunAnalysis(MakeAnalysisCommand(TArray<FString>()));
 }
 
-void FCodeAnalysis::Analysis(const FString& InFile)
+TFunction<void()> FCodeAnalysis::MakeCodeAnalysisTask(const TArray<FString>& InFiles, TFunction<void()> InOnComplete)
 {
-	const auto AnalysisParam = FString::Printf(TEXT(
-		"true \"%s\" \"%s\""
-	),
-	                                           *FPaths::ConvertRelativePathToFull(
-		                                           FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
-	                                           *InFile
-	);
+	const auto CompileCommand = MakeCompileCommand();
 
-	FUnrealCSharpFunctionLibrary::SyncProcess(GetProgramPath(), AnalysisParam, [](const int32, const FString&)
-	                                          {
-	                                          }, FString(), {}, []()
-	                                          {
-		                                          return GIsRequestingExit;
-	                                          });
+	const auto AnalysisCommand = MakeAnalysisCommand(InFiles);
+
+	return [CompileCommand, AnalysisCommand, InOnComplete]()
+	{
+		RunCompile(CompileCommand);
+
+		RunAnalysis(AnalysisCommand);
+
+		if (InOnComplete)
+		{
+			AsyncTask(ENamedThreads::GameThread, [InOnComplete]()
+			{
+				InOnComplete();
+			});
+		}
+	};
 }
 
-void FCodeAnalysis::Compile()
+FCodeAnalysis::FCommand FCodeAnalysis::MakeCompileCommand()
 {
+	FCommand Command;
+
 	if (IsProgramOutdated())
 	{
-		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+		Command.Program = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-		const auto CompileParam = FString::Printf(TEXT(
+		Command.Param = FString::Printf(TEXT(
 			"build \"%s\" --nologo -c Debug"
 		),
-		                                          *FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath()
-		);
+		                                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath());
+	}
 
-		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, [](const int32, const FString&)
-		                                          {
-		                                          }, FString(), {}, []()
-		                                          {
-			                                          return GIsRequestingExit;
-		                                          });
+	return Command;
+}
+
+FCodeAnalysis::FCommand FCodeAnalysis::MakeAnalysisCommand(const TArray<FString>& InFiles)
+{
+	FCommand Command;
+
+	Command.Program = GetProgramPath();
+
+	Command.Param = GetAnalysisParam(InFiles);
+
+	return Command;
+}
+
+void FCodeAnalysis::RunCompile(const FCommand& InCommand)
+{
+	if (!InCommand.Program.IsEmpty())
+	{
+		RunCommand(InCommand, 600.0, 120.0);
 	}
 }
 
-void FCodeAnalysis::Analysis()
+void FCodeAnalysis::RunAnalysis(const FCommand& InCommand)
 {
-	auto AnalysisParam = FString::Printf(TEXT(
-		"false \"%s\" \"%s\""
-	),
-	                                     *FPaths::ConvertRelativePathToFull(
-		                                     FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
-	                                     *FPaths::ConvertRelativePathToFull(
-		                                     FUnrealCSharpFunctionLibrary::GetGameDirectory())
-	);
+	RunCommand(InCommand, AnalysisTimeoutSeconds, AnalysisSilenceTimeoutSeconds);
+}
 
-	for (const auto& CustomProjectsDirectory : FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory())
-	{
-		AnalysisParam += FString::Printf(TEXT(
-			" \"%s\""
-		),
-		                                 *CustomProjectsDirectory
-		);
-	}
-
-	FUnrealCSharpFunctionLibrary::SyncProcess(GetProgramPath(), AnalysisParam, [](const int32, const FString&)
+void FCodeAnalysis::RunCommand(const FCommand& InCommand, const double InTimeoutSeconds,
+                               const double InSilenceTimeoutSeconds)
+{
+	FUnrealCSharpFunctionLibrary::SyncProcess(InCommand.Program, InCommand.Param, [](const int32, const FString&)
 	                                          {
 	                                          }, FString(), {}, []()
 	                                          {
-		                                          return GIsRequestingExit;
-	                                          });
+		                                          return IsEngineExitRequested();
+	                                          }, InTimeoutSeconds, InSilenceTimeoutSeconds);
 }
 
 FString FCodeAnalysis::GetProgramPath()
@@ -92,6 +100,45 @@ FString FCodeAnalysis::GetProgramPath()
 	                                       TEXT("")
 #endif
 	                       ));
+}
+
+FString FCodeAnalysis::GetAnalysisParam(const TArray<FString>& InFiles)
+{
+	auto AnalysisParam = FString::Printf(TEXT(
+		"%s \"%s\""
+	),
+	                                     InFiles.IsEmpty() ? TEXT("false") : TEXT("true"),
+	                                     *FPaths::ConvertRelativePathToFull(
+		                                     FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()));
+
+	if (InFiles.IsEmpty())
+	{
+		AnalysisParam += FString::Printf(TEXT(
+			" \"%s\""
+		),
+		                                 *FPaths::ConvertRelativePathToFull(
+			                                 FUnrealCSharpFunctionLibrary::GetGameDirectory()));
+
+		for (const auto& CustomProjectsDirectory : FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory())
+		{
+			AnalysisParam += FString::Printf(TEXT(
+				" \"%s\""
+			),
+			                                 *CustomProjectsDirectory);
+		}
+	}
+	else
+	{
+		for (const auto& File : InFiles)
+		{
+			AnalysisParam += FString::Printf(TEXT(
+				" \"%s\""
+			),
+			                                 *File);
+		}
+	}
+
+	return AnalysisParam;
 }
 
 bool FCodeAnalysis::IsProgramOutdated()

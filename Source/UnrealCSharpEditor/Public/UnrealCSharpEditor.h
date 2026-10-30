@@ -25,6 +25,8 @@ private:
 
 	void OnEditorRefreshGameplayTagTree();
 
+	static void GeneratorInternal(const FString& InPlatformName, bool bForceCompileInterop, bool bIsPrepared);
+
 private:
 	void RegisterMenus();
 

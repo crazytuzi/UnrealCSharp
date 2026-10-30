@@ -18,6 +18,7 @@
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
+#include "Async/Async.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -199,9 +200,10 @@ FEditorListener::~FEditorListener()
 
 void FEditorListener::OnPostEngineInit()
 {
-	FCodeAnalysis::CodeAnalysis();
-
-	FDynamicGenerator::CodeAnalysisGenerator();
+	FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask({}, []()
+	{
+		FDynamicGenerator::CodeAnalysisGenerator();
+	}));
 }
 
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
@@ -339,15 +341,15 @@ void FEditorListener::OnCompile(const bool bSucceeded)
 
 		for (const auto& Data : CompilingFileChanges)
 		{
-			FileChange.AddUnique(Data.Filename);
+			if (IFileManager::Get().FileExists(*Data.Filename) && !FileChange.Contains(Data.Filename))
+			{
+				FileChange.Add(Data.Filename);
+			}
 		}
 
-		for (const auto& File : FileChange)
+		if (!FileChange.IsEmpty())
 		{
-			if (IFileManager::Get().FileExists(*File))
-			{
-				FCodeAnalysis::Analysis(File);
-			}
+			FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask(FileChange));
 		}
 	}
 

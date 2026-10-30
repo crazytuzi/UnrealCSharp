@@ -95,6 +95,10 @@ uint32 FCSharpCompilerRunnable::Run()
 			{
 				DoWork();
 			}
+			else if (TFunction<void()> Task; TaskQueue.Dequeue(Task))
+			{
+				Task();
+			}
 			else if (Event != nullptr)
 			{
 				Event->Wait();
@@ -146,6 +150,16 @@ void FCSharpCompilerRunnable::EnqueueTask(const TArray<FFileChangeData>& InFileC
 
 		FileChanges.Append(InFileChangeData);
 	}
+
+	if (Event != nullptr)
+	{
+		Event->Trigger();
+	}
+}
+
+void FCSharpCompilerRunnable::EnqueueTask(const TFunction<void()>& InTask)
+{
+	TaskQueue.Enqueue(InTask);
 
 	if (Event != nullptr)
 	{

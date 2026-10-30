@@ -53,10 +53,14 @@ void FDynamicClassGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
+		                                 const auto ClassName = InClassReflection->GetName();
+
 		                                 auto Node = FDynamicDependencyGraph::FNode(
-			                                 InClassReflection->GetName(), [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection,
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName),
 				                                           EDynamicClassGeneratorType::DependencyGraph);
 			                                 });
 

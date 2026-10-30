@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IDirectoryWatcher.h"
+#include "Containers/Queue.h"
 #include "Containers/Ticker.h"
 #include "FCSharpCompileProgress.h"
 
@@ -24,6 +25,8 @@ public:
 	void EnqueueTask();
 
 	void EnqueueTask(const TArray<FFileChangeData>& InFileChangeData);
+
+	void EnqueueTask(const TFunction<void()>& InTask);
 
 	bool IsCompiling() const;
 
@@ -88,6 +91,8 @@ private:
 	FDelegateHandle OnEndGeneratorDelegateHandle;
 
 	TArray<FFileChangeData> FileChanges;
+
+	TQueue<TFunction<void()>> TaskQueue;
 
 	mutable FCriticalSection CriticalSection;
 

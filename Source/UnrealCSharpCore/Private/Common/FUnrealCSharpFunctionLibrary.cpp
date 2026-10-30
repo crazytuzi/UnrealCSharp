@@ -1653,7 +1653,9 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
                                                const FString& InWorkingDirectory,
                                                const TFunction<void(const FString&)>& InOnOutput,
-                                               const TFunction<bool()>& InIsStopped)
+                                               const TFunction<bool()>& InIsStopped,
+                                               const double InTimeoutSeconds,
+                                               const double InSilenceTimeoutSeconds)
 {
 	void* ReadPipe = nullptr;
 
@@ -1758,19 +1760,15 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
-		constexpr auto SyncProcessSilenceTimeoutSeconds = 120.0;
-
-		constexpr auto SyncProcessTimeoutSeconds = 600.0;
-
 		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
 
 		const auto Now = FPlatformTime::Seconds();
 
 		const auto bIsStopped = InIsStopped && InIsStopped();
 
-		const auto bIsTimeout = Now - StartTime > SyncProcessTimeoutSeconds;
+		const auto bIsTimeout = Now - StartTime > InTimeoutSeconds;
 
-		const auto bIsSilenceTimeout = Now - LastOutputTime > SyncProcessSilenceTimeoutSeconds;
+		const auto bIsSilenceTimeout = Now - LastOutputTime > InSilenceTimeoutSeconds;
 
 		if (bIsStopped || bIsTimeout || bIsSilenceTimeout)
 		{

@@ -281,7 +281,9 @@ public:
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
 	                        const FString& InWorkingDirectory = FString(),
 	                        const TFunction<void(const FString&)>& InOnOutput = {},
-	                        const TFunction<bool()>& InIsStopped = {});
+	                        const TFunction<bool()>& InIsStopped = {},
+	                        double InTimeoutSeconds = 600.0,
+	                        double InSilenceTimeoutSeconds = 120.0);
 #endif
 
 #if WITH_EDITOR

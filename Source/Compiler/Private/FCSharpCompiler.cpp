@@ -49,6 +49,14 @@ void FCSharpCompiler::AsyncCompile(const TArray<FFileChangeData>& InFileChangeDa
 	}
 }
 
+void FCSharpCompiler::EnqueueTask(const TFunction<void()>& InTask) const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->EnqueueTask(InTask);
+	}
+}
+
 bool FCSharpCompiler::SyncCompile() const
 {
 	return Runnable != nullptr ? Runnable->SyncCompile() : false;
