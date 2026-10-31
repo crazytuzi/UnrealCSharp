@@ -237,6 +237,8 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 	return ResultArray;
 #elif PLATFORM_MAC
 	return {TEXT("/usr/local/share/dotnet/dotnet")};
+#else
+	return {};
 #endif
 }
 

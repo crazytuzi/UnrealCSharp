@@ -7,6 +7,7 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
+	ScriptMapLayout{},
 	bNeedFreeData(InbNeedFreeData),
 	bNeedFreeProperty(InbNeedFreeProperty),
 	DataDeleter(InDataDeleter),
@@ -26,7 +27,10 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 		KeyPropertyDescriptor = FPropertyDescriptor::Factory(InKeyProperty);
 
 		ValuePropertyDescriptor = FPropertyDescriptor::Factory(InValueProperty);
+	}
 
+	if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr)
+	{
 		ScriptMapLayout = FScriptMap::GetScriptLayout(KeyPropertyDescriptor->GetSize(),
 		                                              KeyPropertyDescriptor->GetMinAlignment(),
 		                                              ValuePropertyDescriptor->GetSize(),

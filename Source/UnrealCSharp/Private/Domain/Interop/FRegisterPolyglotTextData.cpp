@@ -39,7 +39,7 @@ namespace
 				.Function("ClearLocalizedStrings", BINDING_FUNCTION(&FPolyglotTextData::ClearLocalizedStrings))
 				.Function("IsMinimalPatch",
 				          BINDING_OVERLOAD(void(FPolyglotTextData::*)(const bool), &FPolyglotTextData::IsMinimalPatch,
-				                           TArray<FString>{"InCulture", "OutLocalizedString"}))
+				                           TArray<FString>{"InIsMinimalPatch"}))
 				.Function("IsMinimalPatch",
 				          BINDING_OVERLOAD(bool(FPolyglotTextData::*)()const, &FPolyglotTextData::IsMinimalPatch))
 				.Function("GetText", BINDING_FUNCTION(&FPolyglotTextData::GetText));

@@ -16,7 +16,7 @@
 #include "Engine/UserDefinedStruct.h"
 #endif
 
-TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
+TArray<TStrongObjectPtr<UUserDefinedEnum>> FAssetGenerator::UserDefinedEnums;
 
 void FAssetGenerator::Generator()
 {
@@ -25,6 +25,8 @@ void FAssetGenerator::Generator()
 	{
 		if (UnrealCSharpEditorSetting->IsGenerateAsset())
 		{
+			UserDefinedEnums.Reset();
+
 			const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
 				TEXT("AssetRegistry"));
 
@@ -46,10 +48,10 @@ void FAssetGenerator::Generator()
 
 			for (const auto& UserDefinedEnum : UserDefinedEnums)
 			{
-				FEnumGenerator::Generator(UserDefinedEnum);
+				FEnumGenerator::Generator(UserDefinedEnum.Get());
 			}
 
-			UserDefinedEnums.Empty();
+			UserDefinedEnums.Reset();
 		}
 	}
 }

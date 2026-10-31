@@ -7,6 +7,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "HAL/PlatformFileManager.h"
 #include "HAL/PlatformMisc.h"
+#include "HAL/ThreadHeartBeat.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
@@ -85,8 +86,10 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 #if PLATFORM_WINDOWS
 	return TEXT("C:/Program Files/dotnet/dotnet.exe");
-#else
+#elif PLATFORM_MAC
 	return TEXT("/usr/local/share/dotnet/dotnet");
+#else
+	return TEXT("/usr/share/dotnet/dotnet");
 #endif
 }
 #endif
@@ -1761,6 +1764,8 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
 		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
+
+		FThreadHeartBeat::Get().HeartBeat();
 
 		const auto Now = FPlatformTime::Seconds();
 

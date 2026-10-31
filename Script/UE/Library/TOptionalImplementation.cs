@@ -19,7 +19,7 @@ namespace Script.Library
         public static unsafe void TOptional_Register2Implementation<T>(TOptional<T> InOptional, T InValue, Type InType)
         {
             __TOptional_Register2Implementation(HandleData.Alloc(InOptional, true),
-                HandleData.Alloc(InValue), HandleData.Alloc(InType));
+                InValue != null ? HandleData.Alloc(InValue) : 0, HandleData.Alloc(InType));
         }
 
         private static unsafe partial byte __TOptional_IdenticalImplementation(nint InA, nint InB);
@@ -75,7 +75,7 @@ namespace Script.Library
 
         public static unsafe void TOptional_SetImplementation<T>(nint InOptional, T InValue)
         {
-            __TOptional_SetImplementation(InOptional, HandleData.Alloc(InValue));
+            __TOptional_SetImplementation(InOptional, InValue != null ? HandleData.Alloc(InValue) : 0);
         }
     }
 }

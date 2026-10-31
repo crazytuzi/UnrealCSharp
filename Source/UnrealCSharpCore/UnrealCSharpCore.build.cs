@@ -401,20 +401,26 @@ public class UnrealCSharpCore : ModuleRules
 
 	private void GetModules(string InPathName, Dictionary<string, string> Modules)
 	{
-		var Suffix = "*.Build.cs";
+		const string Suffix = ".Build.cs";
 
 		var DirectoryInfo = new DirectoryInfo(InPathName);
 
-		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
+		foreach (var Item in DirectoryInfo.GetFiles())
 		{
-			Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
+			if (Item.Name.EndsWith(Suffix, System.StringComparison.OrdinalIgnoreCase))
+			{
+				Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length)] = Item.DirectoryName;
+			}
 		}
 
 		foreach (var Directories in DirectoryInfo.GetDirectories())
 		{
-			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
+			foreach (var Item in Directories.GetFiles("*", SearchOption.AllDirectories))
 			{
-				Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
+				if (Item.Name.EndsWith(Suffix, System.StringComparison.OrdinalIgnoreCase))
+				{
+					Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length)] = Item.DirectoryName;
+				}
 			}
 		}
 	}
