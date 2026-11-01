@@ -11,13 +11,20 @@ namespace Interop
 
         private const int UnknownParamCount = -1;
 
-        private static readonly Dictionary<string, nint> StringToMethod = new(StringComparer.Ordinal);
+        private static volatile MethodBindings Bindings = new();
 
-        private static readonly Dictionary<string, int> StringToParamCount = new(StringComparer.Ordinal);
+        private sealed class MethodBindings
+        {
+            public readonly Dictionary<string, nint> Methods = new(StringComparer.Ordinal);
+
+            public readonly Dictionary<string, int> ParamCounts = new(StringComparer.Ordinal);
+        }
 
         [UnmanagedCallersOnly]
         public static void RegisterBinding(byte** InNames, nint* InMethods, int* InParamCounts, int InLength)
         {
+            var PendingBindings = new MethodBindings();
+
             if (InNames != null && InMethods != null && InParamCounts != null)
             {
                 for (var Index = 0; Index < InLength; Index++)
@@ -28,12 +35,17 @@ namespace Interop
 
                         if (!string.IsNullOrEmpty(Name))
                         {
-                            StringToMethod[Name] = InMethods[Index];
+                            PendingBindings.Methods[Name] = InMethods[Index];
 
-                            StringToParamCount[Name] = InParamCounts[Index];
+                            PendingBindings.ParamCounts[Name] = InParamCounts[Index];
                         }
                     }
                 }
+            }
+
+            if (PendingBindings.Methods.Count > 0)
+            {
+                Bindings = PendingBindings;
             }
         }
 
@@ -149,8 +161,10 @@ namespace Interop
         {
             if (InSlot == nint.Zero)
             {
-                InSlot = StringToMethod.TryGetValue(InName, out var Method) &&
-                         StringToParamCount.TryGetValue(InName, out var ParamCount) &&
+                var BindingsSnapshot = Bindings;
+
+                InSlot = BindingsSnapshot.Methods.TryGetValue(InName, out var Method) &&
+                         BindingsSnapshot.ParamCounts.TryGetValue(InName, out var ParamCount) &&
                          (ParamCount == UnknownParamCount || ParamCount == InParamCount)
                     ? Method
                     : nint.Zero;
@@ -206,9 +220,7 @@ namespace Interop
 
         internal static void Clear()
         {
-            StringToMethod.Clear();
-
-            StringToParamCount.Clear();
+            Bindings = new MethodBindings();
         }
 
         private static void WritePrimitiveValue(nint InHandle, object InValue, Type InType)

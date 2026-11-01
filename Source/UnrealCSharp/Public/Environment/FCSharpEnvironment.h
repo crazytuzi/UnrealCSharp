@@ -322,7 +322,7 @@ public:
 private:
 	static FCSharpEnvironment Environment;
 
-	FDomain* Domain;
+	FDomain* Domain{};
 
 private:
 	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;
@@ -347,32 +347,32 @@ private:
 #endif
 
 private:
-	FDynamicRegistry* DynamicRegistry;
+	FDynamicRegistry* DynamicRegistry{};
 
-	class FCSharpBind* CSharpBind;
+	class FCSharpBind* CSharpBind{};
 
-	FClassRegistry* ClassRegistry;
+	FClassRegistry* ClassRegistry{};
 
-	FReferenceRegistry* ReferenceRegistry;
+	FReferenceRegistry* ReferenceRegistry{};
 
-	FObjectRegistry* ObjectRegistry;
+	FObjectRegistry* ObjectRegistry{};
 
-	FStructRegistry* StructRegistry;
+	FStructRegistry* StructRegistry{};
 
-	class FContainerRegistry* ContainerRegistry;
+	class FContainerRegistry* ContainerRegistry{};
 
-	class FDelegateRegistry* DelegateRegistry;
+	class FDelegateRegistry* DelegateRegistry{};
 
-	FMultiRegistry* MultiRegistry;
+	FMultiRegistry* MultiRegistry{};
 
-	FStringRegistry* StringRegistry;
+	FStringRegistry* StringRegistry{};
 
-	FFieldPathRegistry* FieldPathRegistry;
+	FFieldPathRegistry* FieldPathRegistry{};
 
-	class FBindingRegistry* BindingRegistry;
+	class FBindingRegistry* BindingRegistry{};
 
 #if UE_F_OPTIONAL_PROPERTY
-	class FOptionalRegistry* OptionalRegistry;
+	class FOptionalRegistry* OptionalRegistry{};
 #endif
 };
 
