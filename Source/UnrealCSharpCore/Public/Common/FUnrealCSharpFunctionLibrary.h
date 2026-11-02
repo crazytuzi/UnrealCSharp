@@ -287,13 +287,15 @@ public:
 #endif
 
 #if WITH_EDITOR
-	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
-
 	static EScriptDomainType GetScriptDomainType(const FString& InPlatformName);
 
 	static EScriptDomainType GetScriptDomainType();
 
 private:
+	friend struct FScriptDomainTypeScope;
+
+	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
+
 	static EScriptDomainType ScriptDomainType;
 
 	static bool bScriptChanged;

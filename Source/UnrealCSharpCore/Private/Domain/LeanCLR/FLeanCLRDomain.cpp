@@ -38,7 +38,7 @@ TMap<UPTRINT, int32> FLeanCLRDomain::PInvokeParamCounts;
 
 void FLeanCLRDomain::Initialize()
 {
-	if (bIsInitialized)
+	if (bIsInitializeCompleted)
 	{
 		return;
 	}
@@ -84,16 +84,20 @@ void FLeanCLRDomain::Initialize()
 	}
 
 	bIsInitialized = true;
+
+	bIsInitializeCompleted = true;
 }
 
 void FLeanCLRDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bIsInitializeCompleted)
 	{
 		return;
 	}
 
 	bIsInitialized = false;
+
+	bIsInitializeCompleted = false;
 
 	UnloadAssembly();
 }

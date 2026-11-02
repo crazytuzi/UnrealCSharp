@@ -269,7 +269,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
+	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value && !TIsScriptStruct<T>::Value, T>>
 	{
 	public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,

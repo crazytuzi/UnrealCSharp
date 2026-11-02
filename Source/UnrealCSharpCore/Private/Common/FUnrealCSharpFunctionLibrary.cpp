@@ -1717,7 +1717,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 		Bytes.Add(0);
 
-		const auto Output = FUTF8ToTCHAR(reinterpret_cast<const ANSICHAR*>(Bytes.GetData())).Get();
+		const auto Output = FString(UTF8_TO_TCHAR(reinterpret_cast<const ANSICHAR*>(Bytes.GetData())));
 
 		PendingBytes.RemoveAt(0, InLength);
 
@@ -1834,11 +1834,6 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 #endif
 
 #if WITH_EDITOR
-void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
-{
-	ScriptDomainType = InScriptDomainType;
-}
-
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FString& InPlatformName)
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
@@ -1852,5 +1847,10 @@ EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FStrin
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
 {
 	return ScriptDomainType;
+}
+
+void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
+{
+	ScriptDomainType = InScriptDomainType;
 }
 #endif

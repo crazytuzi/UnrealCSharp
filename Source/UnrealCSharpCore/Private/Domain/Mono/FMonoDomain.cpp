@@ -48,6 +48,11 @@ extern void* mono_aot_module_System_Private_CoreLib_info;
 
 void FMonoDomain::Initialize()
 {
+	if (bIsInitializeCompleted)
+	{
+		return;
+	}
+
 	RegisterMonoTrace();
 
 	RegisterAssemblyPreloadHook();
@@ -132,6 +137,8 @@ void FMonoDomain::Initialize()
 	RegisterLog();
 
 	InitializeAssembly(FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath());
+
+	bIsInitializeCompleted = true;
 }
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
@@ -176,12 +183,14 @@ void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 void FMonoDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bIsInitializeCompleted)
 	{
 		return;
 	}
 
 	bIsInitialized = false;
+
+	bIsInitializeCompleted = false;
 
 	UnloadAssembly();
 }

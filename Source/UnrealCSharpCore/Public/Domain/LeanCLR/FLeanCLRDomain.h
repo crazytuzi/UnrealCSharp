@@ -219,6 +219,8 @@ private:
 
 	bool bIsInitialized{};
 
+	bool bIsInitializeCompleted{};
+
 	static TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> MethodSlotSizes;
 
 	static constexpr int32 MaxPInvokeArguments = 8;

@@ -141,5 +141,7 @@ private:
 	TArray<IManagedHandle> Assemblies;
 
 	bool bIsInitialized{};
+
+	bool bIsInitializeCompleted{};
 };
 #endif

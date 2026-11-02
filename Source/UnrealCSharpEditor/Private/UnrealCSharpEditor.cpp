@@ -125,8 +125,11 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FConsoleCommandDelegate::CreateLambda(
 			[]()
 			{
-				FCSharpCompiler::Get().Compile([]()
+				FCSharpCompiler::Get().EnqueueTask([]()
 				{
+					FCSharpCompiler::Get().Compile([]()
+					{
+					});
 				});
 			}));
 

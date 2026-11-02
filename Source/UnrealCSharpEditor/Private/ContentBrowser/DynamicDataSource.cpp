@@ -40,7 +40,10 @@ void FDeleteFileChange::Apply(UObject* Object)
 	{
 		IFileManager::Get().Delete(*FilePath);
 
-		FCSharpCompiler::Get().ImmediatelyCompile();
+		FCSharpCompiler::Get().EnqueueTask([]()
+		{
+			FCSharpCompiler::Get().ImmediatelyCompile();
+		});
 	}
 }
 
@@ -48,7 +51,10 @@ void FDeleteFileChange::Revert(UObject* Object)
 {
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(*FilePath, FileContent);
 
-	FCSharpCompiler::Get().ImmediatelyCompile();
+	FCSharpCompiler::Get().EnqueueTask([]()
+	{
+		FCSharpCompiler::Get().ImmediatelyCompile();
+	});
 }
 
 FString FDeleteFileChange::ToString() const

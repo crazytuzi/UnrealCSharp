@@ -134,6 +134,8 @@ private:
 
 	bool bIsInitialized{};
 
+	bool bIsInitializeCompleted{};
+
 	static MonoDomain* Domain;
 };
 #endif

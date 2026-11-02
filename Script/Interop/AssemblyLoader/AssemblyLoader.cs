@@ -13,18 +13,25 @@ namespace Interop
         [UnmanagedCallersOnly]
         public static unsafe nint LoadFromStream(byte* InData, int InLength, char* InInPublishDirectory)
         {
-            if (InData != null && InLength > 0)
+            try
             {
-                Context ??= new UnrealAssemblyLoadContext(InInPublishDirectory is not null
-                    ? new string(InInPublishDirectory)
-                    : string.Empty);
+                if (InData != null && InLength > 0)
+                {
+                    Context ??= new UnrealAssemblyLoadContext(InInPublishDirectory is not null
+                        ? new string(InInPublishDirectory)
+                        : string.Empty);
 
-                using var Stream = new UnmanagedMemoryStream(InData, InLength);
+                    using var Stream = new UnmanagedMemoryStream(InData, InLength);
 
-                return HandleData.Alloc(Context.LoadFromStream(Stream));
+                    return HandleData.Alloc(Context.LoadFromStream(Stream));
+                }
+
+                return 0;
             }
-
-            return 0;
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         [UnmanagedCallersOnly]

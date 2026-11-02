@@ -34,7 +34,7 @@ load_assembly_and_get_function_pointer_fn FCoreCLRDomain::LoadAssemblyAndGetFunc
 
 void FCoreCLRDomain::Initialize()
 {
-	if (bIsInitialized)
+	if (bIsInitializeCompleted)
 	{
 		return;
 	}
@@ -128,6 +128,8 @@ void FCoreCLRDomain::Initialize()
 		bIsInitialized = true;
 
 		InitializeAssembly(AssemblyPublishPath);
+
+		bIsInitializeCompleted = true;
 	}
 }
 
@@ -152,6 +154,8 @@ void FCoreCLRDomain::Deinitialize()
 			}
 		}
 	}
+
+	bIsInitializeCompleted = false;
 
 	if (HostFxrHandle != nullptr && HostFxrDllHandle != nullptr)
 	{
@@ -310,7 +314,6 @@ void FCoreCLRDomain::RegisterInterop(const FString& InAssembly)
 
 #undef RESOLVE_CORECLR_METHOD
 }
-
 
 void FCoreCLRDomain::LoadAssemblyAndGetFunctionPointer(const FString& InAssembly, const FString& InType,
                                                        const FString& InMethod,
