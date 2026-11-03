@@ -11,6 +11,8 @@ class UNREALCSHARPCORE_API FDynamicGenerator
 public:
 	static void Generator();
 
+	static void Reset();
+
 	static bool IsDynamicClass(const UClass* InClass);
 
 	static bool IsDynamicStruct(const UScriptStruct* InScriptStruct);

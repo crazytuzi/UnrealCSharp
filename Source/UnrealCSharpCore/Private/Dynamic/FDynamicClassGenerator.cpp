@@ -85,6 +85,44 @@ void FDynamicClassGenerator::Generator()
 	                                 });
 }
 
+void FDynamicClassGenerator::Reset()
+{
+	for (const auto Class : DynamicClassSet)
+	{
+		if (Class != nullptr)
+		{
+#if WITH_EDITOR
+			if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(Class))
+			{
+				if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+				{
+					Blueprint->RemoveFromRoot();
+
+					Blueprint->MarkAsGarbage();
+				}
+			}
+
+#endif
+
+			Class->RemoveFromRoot();
+
+			Class->MarkAsGarbage();
+		}
+	}
+
+	DynamicClassSet.Empty();
+
+	DynamicClassMap.Empty();
+
+	NamespaceMap.Empty();
+
+	DefaultSubObjectInfoMap.Empty();
+
+	DefaultValueMap.Empty();
+
+	ClassConstructorSet.Empty();
+}
+
 #if WITH_EDITOR
 void FDynamicClassGenerator::CodeAnalysisGenerator()
 {

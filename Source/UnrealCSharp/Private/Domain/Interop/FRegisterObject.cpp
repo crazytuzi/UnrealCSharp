@@ -64,7 +64,11 @@ namespace
 			{
 				const auto Name = FoundObject->GetName();
 
-				return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Name));
+				const auto ScriptDomain = IScriptDomain::Get();
+
+				return ScriptDomain != nullptr
+					       ? ScriptDomain->NewString(TCHAR_TO_UTF8(*Name))
+					       : InvalidManagedHandle;
 			}
 
 			return InvalidManagedHandle;

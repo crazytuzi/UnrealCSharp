@@ -8,6 +8,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Binding/FBinding.h"
 #include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingMethod.h"
@@ -848,6 +849,8 @@ void FLeanCLRDomain::UnloadAssembly()
 #undef LEANCLR_METHOD_CLEAR
 
 	MethodInvokePaths.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FLeanCLRDomain::RegisterInterop()

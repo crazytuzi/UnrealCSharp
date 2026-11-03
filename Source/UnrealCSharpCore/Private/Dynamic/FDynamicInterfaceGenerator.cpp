@@ -60,6 +60,25 @@ void FDynamicInterfaceGenerator::Generator()
 	                                 });
 }
 
+void FDynamicInterfaceGenerator::Reset()
+{
+	for (const auto Class : DynamicInterfaceSet)
+	{
+		if (Class != nullptr)
+		{
+			Class->RemoveFromRoot();
+
+			Class->MarkAsGarbage();
+		}
+	}
+
+	DynamicInterfaceSet.Empty();
+
+	DynamicInterfaceMap.Empty();
+
+	NamespaceMap.Empty();
+}
+
 #if WITH_EDITOR
 void FDynamicInterfaceGenerator::CodeAnalysisGenerator()
 {

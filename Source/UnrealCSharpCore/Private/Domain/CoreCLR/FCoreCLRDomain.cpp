@@ -7,6 +7,7 @@
 #include "Misc/FileHelper.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Binding/FBinding.h"
 #include "CoreMacro/CoreCLRMacro.h"
@@ -289,6 +290,8 @@ void FCoreCLRDomain::UnloadAssembly()
 	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FCoreCLRDomain::RegisterErrorWriter() const

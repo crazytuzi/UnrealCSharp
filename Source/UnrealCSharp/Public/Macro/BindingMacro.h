@@ -38,11 +38,15 @@ auto TGet_Args()
 	return false;
 }
 
-#define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Left( \
-	F_STRING_STR(Class).Find(TEXT("::")))
+#define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) \
+	(F_STRING_STR(Class).Find(TEXT("::")) != INDEX_NONE \
+		? F_STRING_STR(Class).Left(F_STRING_STR(Class).Find(TEXT("::"))) \
+		: F_STRING_STR(Class))
 
-#define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Right( \
-	F_STRING_STR(Class).Len() - F_STRING_STR(Class).Find(TEXT("::")) - 2)
+#define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) \
+	(F_STRING_STR(Class).Find(TEXT("::")) != INDEX_NONE \
+		? F_STRING_STR(Class).Right(F_STRING_STR(Class).Len() - F_STRING_STR(Class).Find(TEXT("::")) - 2) \
+		: F_STRING_STR(Class))
 
 #define BINDING_REMOVE_PREFIX_CLASS_STR(Class) F_STRING_STR(Class).RightChop(1)
 
@@ -282,7 +286,7 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 #if WITH_FUNCTION_INFO
 #define BINDING_OVERLOADS(...) TOverloadBuilder<void*, TFunction<FFunctionInfo*()>>::Get(__VA_ARGS__)
 #else
-#define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
+#define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(__VA_ARGS__)
 #endif
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer<decltype(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke)>(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value

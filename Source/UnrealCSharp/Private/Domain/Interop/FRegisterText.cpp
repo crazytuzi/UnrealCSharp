@@ -76,8 +76,10 @@ namespace
 		{
 			const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InManagedHandle);
 
-			return Text != nullptr
-				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Text->ToString()))
+			const auto ScriptDomain = IScriptDomain::Get();
+
+			return Text != nullptr && ScriptDomain != nullptr
+				       ? ScriptDomain->NewString(TCHAR_TO_UTF8(*Text->ToString()))
 				       : InvalidManagedHandle;
 		}
 

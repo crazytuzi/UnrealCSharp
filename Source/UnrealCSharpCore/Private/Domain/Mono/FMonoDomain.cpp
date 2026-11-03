@@ -15,6 +15,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Reflection/FMethodReflection.h"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -306,9 +307,11 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 			FFileHelper::LoadFileToArray(Data, *AssemblyPath);
 
+			const auto AssemblyDirectory = StringCast<UTF16CHAR>(*FPaths::GetPath(AssemblyPath));
+
 			if (const auto Handle = AssemblyLoaderLoadFromStreamFn(Data.GetData(), Data.Num(),
-			                                                       reinterpret_cast<const char16_t*>(*FPaths::GetPath(
-				                                                       AssemblyPath)));
+			                                                       reinterpret_cast<const char16_t*>(
+				                                                       AssemblyDirectory.Get()));
 				IManagedHandleIsValid(Handle))
 			{
 				Assemblies.Add(Handle);
@@ -349,6 +352,8 @@ void FMonoDomain::UnloadAssembly()
 	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FMonoDomain::RegisterAssemblyPreloadHook()

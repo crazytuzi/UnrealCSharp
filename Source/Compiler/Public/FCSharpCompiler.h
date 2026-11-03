@@ -29,6 +29,9 @@ public:
 
 	FString GetCompileProgress() const;
 
+private:
+	void OnPreExit();
+
 public:
 	static constexpr int32 PollsPerSecond = 120;
 
@@ -38,4 +41,6 @@ private:
 	class FCSharpCompilerRunnable* Runnable;
 
 	FRunnableThread* Thread;
+
+	FDelegateHandle OnPreExitHandle;
 };

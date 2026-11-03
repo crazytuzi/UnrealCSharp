@@ -47,6 +47,17 @@ void FDynamicGenerator::Generator()
 	});
 }
 
+void FDynamicGenerator::Reset()
+{
+	FDynamicClassGenerator::Reset();
+
+	FDynamicInterfaceGenerator::Reset();
+
+	FDynamicStructGenerator::Reset();
+
+	FDynamicEnumGenerator::Reset();
+}
+
 bool FDynamicGenerator::IsDynamicClass(const UClass* InClass)
 {
 	return InClass->IsChildOf(UInterface::StaticClass())

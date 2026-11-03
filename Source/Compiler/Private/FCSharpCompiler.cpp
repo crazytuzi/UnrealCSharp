@@ -1,4 +1,5 @@
 #include "FCSharpCompiler.h"
+#include "Misc/CoreDelegates.h"
 #include "FCSharpCompilerRunnable.h"
 
 FCSharpCompiler::FCSharpCompiler() :
@@ -8,14 +9,16 @@ FCSharpCompiler::FCSharpCompiler() :
 	Runnable = new FCSharpCompilerRunnable();
 
 	Thread = FRunnableThread::Create(Runnable, TEXT("CSharpCompiler"));
+
+	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FCSharpCompiler::OnPreExit);
 }
 
 FCSharpCompiler::~FCSharpCompiler()
 {
+	OnPreExit();
+
 	if (Thread != nullptr)
 	{
-		Thread->Kill(true);
-
 		delete Thread;
 
 		Thread = nullptr;
@@ -89,4 +92,22 @@ bool FCSharpCompiler::IsCompiling() const
 FString FCSharpCompiler::GetCompileProgress() const
 {
 	return Runnable != nullptr ? Runnable->GetCompileProgress() : TEXT("");
+}
+
+void FCSharpCompiler::OnPreExit()
+{
+	if (OnPreExitHandle.IsValid())
+	{
+		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
+
+		if (Runnable != nullptr)
+		{
+			Runnable->Stop();
+		}
+
+		if (Thread != nullptr)
+		{
+			Thread->Kill(true);
+		}
+	}
 }

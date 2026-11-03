@@ -48,6 +48,25 @@ void FDynamicEnumGenerator::Generator()
 	                                 });
 }
 
+void FDynamicEnumGenerator::Reset()
+{
+	for (const auto Enum : DynamicEnumSet)
+	{
+		if (Enum != nullptr)
+		{
+			Enum->RemoveFromRoot();
+
+			Enum->MarkAsGarbage();
+		}
+	}
+
+	DynamicEnumSet.Empty();
+
+	DynamicEnumMap.Empty();
+
+	NamespaceMap.Empty();
+}
+
 #if WITH_EDITOR
 void FDynamicEnumGenerator::CodeAnalysisGenerator()
 {

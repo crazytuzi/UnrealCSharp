@@ -58,6 +58,25 @@ void FDynamicStructGenerator::Generator()
 	                                 });
 }
 
+void FDynamicStructGenerator::Reset()
+{
+	for (const auto ScriptStruct : DynamicStructSet)
+	{
+		if (ScriptStruct != nullptr)
+		{
+			ScriptStruct->RemoveFromRoot();
+
+			ScriptStruct->MarkAsGarbage();
+		}
+	}
+
+	DynamicStructSet.Empty();
+
+	DynamicStructMap.Empty();
+
+	NamespaceMap.Empty();
+}
+
 #if WITH_EDITOR
 void FDynamicStructGenerator::CodeAnalysisGenerator()
 {

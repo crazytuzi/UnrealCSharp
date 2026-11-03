@@ -11,14 +11,14 @@ namespace Interop
         internal static System.Runtime.Loader.AssemblyLoadContext? CurrentContext => Context;
 
         [UnmanagedCallersOnly]
-        public static unsafe nint LoadFromStream(byte* InData, int InLength, char* InInPublishDirectory)
+        public static unsafe nint LoadFromStream(byte* InData, int InLength, char* InPublishDirectory)
         {
             try
             {
                 if (InData != null && InLength > 0)
                 {
-                    Context ??= new UnrealAssemblyLoadContext(InInPublishDirectory is not null
-                        ? new string(InInPublishDirectory)
+                    Context ??= new UnrealAssemblyLoadContext(InPublishDirectory is not null
+                        ? new string(InPublishDirectory)
                         : string.Empty);
 
                     using var Stream = new UnmanagedMemoryStream(InData, InLength);
