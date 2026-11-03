@@ -346,7 +346,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		const auto& DefaultArguments = Function.GetDefaultArguments();
 
-		if (!Function.GetParamNames().IsEmpty())
+		if (Function.GetParamNames().Num() >= Params.Num())
 		{
 			FunctionParamName = Function.GetParamNames();
 

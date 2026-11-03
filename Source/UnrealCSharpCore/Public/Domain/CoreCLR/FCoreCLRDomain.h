@@ -129,6 +129,8 @@ private:
 	void LoadAssemblyAndGetFunctionPointer(const FString& InAssembly, const FString& InType, const FString& InMethod,
 	                                       void** OutFunctionPointer) const;
 
+	void ReleaseHostFxr();
+
 private:
 	static void* HostFxrDllHandle;
 

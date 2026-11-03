@@ -13,6 +13,8 @@ FUObjectListener::FUObjectListener()
 
 FUObjectListener::~FUObjectListener()
 {
+	RemoveListeners();
+
 	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
@@ -26,18 +28,42 @@ FUObjectListener::~FUObjectListener()
 	}
 }
 
-void FUObjectListener::OnUnrealCSharpModuleActive()
+void FUObjectListener::AddListeners()
 {
+	if (bIsRegistered)
+	{
+		return;
+	}
+
+	bIsRegistered = true;
+
 	GUObjectArray.AddUObjectCreateListener(this);
 
 	GUObjectArray.AddUObjectDeleteListener(this);
 }
 
-void FUObjectListener::OnUnrealCSharpModuleInActive()
+void FUObjectListener::RemoveListeners()
 {
+	if (!bIsRegistered)
+	{
+		return;
+	}
+
+	bIsRegistered = false;
+
 	GUObjectArray.RemoveUObjectCreateListener(this);
 
 	GUObjectArray.RemoveUObjectDeleteListener(this);
+}
+
+void FUObjectListener::OnUnrealCSharpModuleActive()
+{
+	AddListeners();
+}
+
+void FUObjectListener::OnUnrealCSharpModuleInActive()
+{
+	RemoveListeners();
 }
 
 void FUObjectListener::NotifyUObjectCreated(const UObjectBase* Object, const int32 Index)
@@ -52,5 +78,7 @@ void FUObjectListener::NotifyUObjectDeleted(const UObjectBase* Object, const int
 
 void FUObjectListener::OnUObjectArrayShutdown()
 {
+	RemoveListeners();
+
 	FCSharpEnvironment::GetEnvironment().OnUObjectArrayShutdown();
 }

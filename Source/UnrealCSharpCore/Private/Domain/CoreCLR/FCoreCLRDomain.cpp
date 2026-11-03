@@ -46,6 +46,8 @@ void FCoreCLRDomain::Initialize()
 
 		if (HostFxrDllHandle == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -72,6 +74,8 @@ void FCoreCLRDomain::Initialize()
 
 		if (HostFxrInitializeForRuntimeConfigFn == nullptr || HostFxrGetRuntimeDelegateFn == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -101,6 +105,8 @@ void FCoreCLRDomain::Initialize()
 			HostFxrInitializeForRuntimeConfigErrorCode != 0 &&
 			HostFxrInitializeForRuntimeConfigErrorCode != HostAlreadyInitializedErrorCode)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -110,6 +116,8 @@ void FCoreCLRDomain::Initialize()
 				HostFxrHandle, hdt_load_assembly_and_get_function_pointer, &OutLoadAssemblyAndGetFunctionPointerFn);
 			HostFxrGetRuntimeDelegateErrorCode != 0 || OutLoadAssemblyAndGetFunctionPointerFn == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -158,25 +166,7 @@ void FCoreCLRDomain::Deinitialize()
 
 	bIsInitializeCompleted = false;
 
-	if (HostFxrHandle != nullptr && HostFxrDllHandle != nullptr)
-	{
-		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
-			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
-		{
-			HostFxrCloseFn(HostFxrHandle);
-		}
-
-		HostFxrHandle = nullptr;
-	}
-
-	if (HostFxrDllHandle != nullptr)
-	{
-		FPlatformProcess::FreeDllHandle(HostFxrDllHandle);
-
-		HostFxrDllHandle = nullptr;
-	}
-
-	LoadAssemblyAndGetFunctionPointerFn = nullptr;
+	ReleaseHostFxr();
 }
 
 #define SCRIPT_DOMAIN_TYPE FCoreCLRDomain
@@ -332,5 +322,28 @@ void FCoreCLRDomain::LoadAssemblyAndGetFunctionPointer(const FString& InAssembly
 			nullptr,
 			OutFunctionPointer);
 	}
+}
+
+void FCoreCLRDomain::ReleaseHostFxr()
+{
+	if (HostFxrHandle != nullptr && HostFxrDllHandle != nullptr)
+	{
+		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
+			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
+		{
+			HostFxrCloseFn(HostFxrHandle);
+		}
+
+		HostFxrHandle = nullptr;
+	}
+
+	if (HostFxrDllHandle != nullptr)
+	{
+		FPlatformProcess::FreeDllHandle(HostFxrDllHandle);
+
+		HostFxrDllHandle = nullptr;
+	}
+
+	LoadAssemblyAndGetFunctionPointerFn = nullptr;
 }
 #endif

@@ -26,10 +26,7 @@ void FScriptDomainFactory::Destroy(IScriptDomain* InScriptDomain)
 {
 	if (InScriptDomain != nullptr)
 	{
-		if (InScriptDomain->IsInitialized())
-		{
-			InScriptDomain->Deinitialize();
-		}
+		InScriptDomain->Deinitialize();
 
 		delete InScriptDomain;
 

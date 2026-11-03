@@ -265,7 +265,14 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 
 #define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value
 
-#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) {[](){ return TFunctionBuilder<decltype(Function), Function>::Info(__VA_ARGS__); }}
+#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) \
+	{ \
+		[]() -> FFunctionInfo* \
+		{ \
+			static auto Instance = TFunctionBuilder<decltype(Function), Function>::Make(__VA_ARGS__); \
+			return &Instance; \
+		} \
+	}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_FUNCTION(Function, ...) BINDING_FUNCTION_BUILDER_INVOKE(Function), BINDING_FUNCTION_BUILDER_INFO(Function, ##__VA_ARGS__)
@@ -275,7 +282,14 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 
 #define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value
 
-#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) {[](){ return TFunctionBuilder<Signature, Function>::Info(__VA_ARGS__); }}
+#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) \
+	{ \
+		[]() -> FFunctionInfo* \
+		{ \
+			static auto Instance = TFunctionBuilder<Signature, Function>::Make(__VA_ARGS__); \
+			return &Instance; \
+		} \
+	}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_OVERLOAD(Signature, Function, ...) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ##__VA_ARGS__)
@@ -291,7 +305,14 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer<decltype(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke)>(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value
 
-#define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) {[](){ return TConstructorBuilder<T, ##__VA_ARGS__>::Info(); }}
+#define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) \
+	{ \
+		[]() -> FFunctionInfo* \
+		{ \
+			static auto Instance = TConstructorBuilder<T, ##__VA_ARGS__>::Make(); \
+			return &Instance; \
+		} \
+	}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_CONSTRUCTOR(T, ...) BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__), BINDING_CONSTRUCTOR_BUILDER_INFO(T, ##__VA_ARGS__)
@@ -301,7 +322,14 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 
 #define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer<decltype(&TDestructorBuilder<##__VA_ARGS__>::Invoke)>(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value
 
-#define BINDING_DESTRUCTOR_BUILDER_INFO(...) {[](){ return TDestructorBuilder<##__VA_ARGS__>::Info(); }}
+#define BINDING_DESTRUCTOR_BUILDER_INFO(...) \
+	{ \
+		[]() -> FFunctionInfo* \
+		{ \
+			static auto Instance = TDestructorBuilder<##__VA_ARGS__>::Make(); \
+			return &Instance; \
+		} \
+	}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(##__VA_ARGS__)
@@ -313,7 +341,14 @@ __VA_ARGS__ UEnum* StaticEnum<Class>();
 
 #define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value
 
-#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) {[](){ return TSubscriptBuilder<T, Result, Index>::Info(__VA_ARGS__); }}
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) \
+	{ \
+		[]() -> FFunctionInfo* \
+		{ \
+			static auto Instance = TSubscriptBuilder<T, Result, Index>::Make(__VA_ARGS__); \
+			return &Instance; \
+		} \
+	}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_SUBSCRIPT(T, Result, Index, ...) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ##__VA_ARGS__)
