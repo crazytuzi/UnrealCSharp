@@ -192,6 +192,8 @@ private:
 private:
 	void RegisterInterop();
 
+	void UnregisterLog();
+
 	void RegisterBinding() const;
 
 private:

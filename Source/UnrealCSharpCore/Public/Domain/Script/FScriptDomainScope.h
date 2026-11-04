@@ -10,6 +10,8 @@ public:
 	{
 		auto ScriptDomain = IScriptDomain::Get();
 
+		auto bNeedDestroy = false;
+
 		if (ScriptDomain == nullptr)
 		{
 			ScriptDomain = FScriptDomainFactory::Create();
@@ -17,6 +19,8 @@ public:
 			if (ScriptDomain != nullptr)
 			{
 				IScriptDomain::Set(ScriptDomain);
+
+				bNeedDestroy = true;
 			}
 		}
 
@@ -30,6 +34,10 @@ public:
 			if (ScriptDomain->IsInitialized())
 			{
 				InFunction();
+			}
+			else if (bNeedDestroy)
+			{
+				FScriptDomainFactory::Destroy(ScriptDomain);
 			}
 		}
 	}

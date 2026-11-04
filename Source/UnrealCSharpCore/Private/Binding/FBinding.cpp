@@ -40,9 +40,9 @@ FBinding::~FBinding()
 
 FBinding& FBinding::Register()
 {
-	if (!bIsRegister)
+	if (bNeedRegister)
 	{
-		bIsRegister = true;
+		bNeedRegister = false;
 
 		for (const auto& Class : ClassRegisters)
 		{
@@ -88,11 +88,16 @@ FBindingClassRegister* FBinding::Register(const TFunction<FString()>& InClassFun
 		}
 	}
 
-	return ClassRegisters.Add_GetRef(new FBindingClassRegister(InClassFunction,
-	                                                           InImplementationNameSpace,
-	                                                           InIsProjectClassFunction,
-	                                                           InIsReflectionClass,
-	                                                           InTypeInfoFunction));
+	const auto ClassRegister = ClassRegisters.Add_GetRef(
+		new FBindingClassRegister(InClassFunction,
+		                          InImplementationNameSpace,
+		                          InIsProjectClassFunction,
+		                          InIsReflectionClass,
+		                          InTypeInfoFunction));
+
+	bNeedRegister = true;
+
+	return ClassRegister;
 }
 
 FBindingEnumRegister* FBinding::Register(const TFunction<FString()>& InEnumFunction,
@@ -100,10 +105,15 @@ FBindingEnumRegister* FBinding::Register(const TFunction<FString()>& InEnumFunct
                                          const bool InIsProjectEnum,
                                          const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
-	return EnumRegisters.Add_GetRef(new FBindingEnumRegister(InEnumFunction,
-	                                                         InUnderlyingType,
-	                                                         InIsProjectEnum,
-	                                                         InTypeInfoFunction));
+	const auto EnumRegister = EnumRegisters.Add_GetRef(
+		new FBindingEnumRegister(InEnumFunction,
+		                         InUnderlyingType,
+		                         InIsProjectEnum,
+		                         InTypeInfoFunction));
+
+	bNeedRegister = true;
+
+	return EnumRegister;
 }
 
 const TArray<FBindingClass*>& FBinding::GetClasses() const

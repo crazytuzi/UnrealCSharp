@@ -259,6 +259,8 @@ void FCoreCLRDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
+	UnregisterLog();
+
 #define CORECLR_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
 
 	COMMON_BRIDGE_METHODS(CORECLR_METHOD_CLEAR)

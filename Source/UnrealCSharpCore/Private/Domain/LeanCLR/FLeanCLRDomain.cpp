@@ -109,6 +109,7 @@ void FLeanCLRDomain::Deinitialize()
 #define SCRIPT_DOMAIN_CUSTOM_INVOKE
 #define SCRIPT_DOMAIN_CUSTOM_GET_CLASSES_WITH_ATTRIBUTE
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_LOG
+#define SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_SYNCHRONIZATION_CONTEXT_TICK
 #define SCRIPT_DOMAIN_TYPE FLeanCLRDomain
@@ -116,6 +117,7 @@ void FLeanCLRDomain::Deinitialize()
 #undef SCRIPT_DOMAIN_TYPE
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_SYNCHRONIZATION_CONTEXT_TICK
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
+#undef SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_LOG
 #undef SCRIPT_DOMAIN_CUSTOM_GET_CLASSES_WITH_ATTRIBUTE
 #undef SCRIPT_DOMAIN_CUSTOM_INVOKE
@@ -832,6 +834,8 @@ void FLeanCLRDomain::UnloadAssembly()
 		Bridge_Invoke(AssemblyLoaderUnloadFn);
 	}
 
+	UnregisterLog();
+
 	Assemblies.Empty();
 
 	UEModule = nullptr;
@@ -871,6 +875,20 @@ void FLeanCLRDomain::RegisterInterop()
 	LEANCLR_INTEROP_BRIDGE_METHODS(RESOLVE_LEANCLR_METHOD)
 
 #undef RESOLVE_LEANCLR_METHOD
+}
+
+void FLeanCLRDomain::UnregisterLog()
+{
+	if (InteropModule != nullptr)
+	{
+		if (const auto Deinitialize = Class_Get_Method_From_Name(InteropModule,
+		                                                         COMBINE_FULL_NAME(
+			                                                         NAMESPACE_INTEROP, CLASS_LOG_BRIDGE),
+		                                                         FUNCTION_LOG_BRIDGE_DEINITIALIZE))
+		{
+			Bridge_Invoke(Deinitialize);
+		}
+	}
 }
 
 void FLeanCLRDomain::RegisterBinding() const

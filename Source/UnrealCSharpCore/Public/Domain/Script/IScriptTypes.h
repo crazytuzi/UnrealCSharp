@@ -14,6 +14,8 @@ typedef void (*log_bridge_set_log_fn)(PTRINT);
 
 typedef void (*log_bridge_initialize_fn)();
 
+typedef void (*log_bridge_deinitialize_fn)();
+
 typedef IManagedHandle (*type_bridge_get_class_fn)(const uint8*);
 
 typedef IManagedHandle (*type_bridge_get_type_fn)(IManagedHandle);
@@ -151,6 +153,8 @@ typedef void (*synchronization_context_tick_fn)(float);
 	\
 	Op(LogBridgeSetLog, log_bridge_set_log_fn, CLASS_LOG_BRIDGE, FUNCTION_LOG_BRIDGE_SET_LOG, 1) \
 	Op(LogBridgeInitialize, log_bridge_initialize_fn, CLASS_LOG_BRIDGE, FUNCTION_LOG_BRIDGE_INITIALIZE, 0) \
+	Op(LogBridgeDeinitialize, log_bridge_deinitialize_fn, CLASS_LOG_BRIDGE, \
+	   FUNCTION_LOG_BRIDGE_DEINITIALIZE, 0) \
 	\
 	Op(TypeBridgeGetFunctionPointer, type_bridge_get_function_pointer_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER, 3) \
 	\

@@ -45,8 +45,6 @@ namespace Interop
 
             if (Context != null)
             {
-                var ContextWeakReference = new WeakReference(Context);
-
                 try
                 {
                     Context.Unload();
@@ -54,17 +52,6 @@ namespace Interop
                 finally
                 {
                     Context = null;
-                }
-
-                const int TimeLimit = 2000;
-
-                var Stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-                while (ContextWeakReference.IsAlive && Stopwatch.ElapsedMilliseconds < TimeLimit)
-                {
-                    GC.Collect();
-
-                    GC.WaitForPendingFinalizers();
                 }
             }
         }

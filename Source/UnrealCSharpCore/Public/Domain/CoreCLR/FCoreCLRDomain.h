@@ -102,6 +102,8 @@ private:
 
 	void RegisterLog();
 
+	void UnregisterLog();
+
 	void RegisterBinding();
 
 	void RegisterSynchronizationContextTick();

@@ -607,6 +607,16 @@ void SCRIPT_DOMAIN_TYPE::RegisterLog()
 }
 #endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
+void SCRIPT_DOMAIN_TYPE::UnregisterLog()
+{
+	if (LogBridgeDeinitializeFn != nullptr)
+	{
+		LogBridgeDeinitializeFn();
+	}
+}
+#endif
+
 #ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
 void SCRIPT_DOMAIN_TYPE::RegisterBinding()
 {

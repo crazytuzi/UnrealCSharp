@@ -379,6 +379,17 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 			                                                  MapProperty, "",
 			                                                  EObjectFlags::RF_Transient);
 
+			if (MapProperty->KeyProp == nullptr || MapProperty->ValueProp == nullptr)
+			{
+				delete MapProperty->KeyProp;
+
+				delete MapProperty->ValueProp;
+
+				delete MapProperty;
+
+				return nullptr;
+			}
+
 			return MapProperty;
 		}
 
@@ -394,6 +405,13 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 			                                                    SetProperty, "",
 			                                                    EObjectFlags::RF_Transient);
 
+			if (SetProperty->ElementProp == nullptr)
+			{
+				delete SetProperty;
+
+				return nullptr;
+			}
+
 			return SetProperty;
 		}
 
@@ -408,6 +426,13 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 			ArrayProperty->Inner = Factory<IsSoftReference>(InClass->GetGenericArgument(),
 			                                                ArrayProperty, "",
 			                                                EObjectFlags::RF_Transient);
+
+			if (ArrayProperty->Inner == nullptr)
+			{
+				delete ArrayProperty;
+
+				return nullptr;
+			}
 
 			return ArrayProperty;
 		}

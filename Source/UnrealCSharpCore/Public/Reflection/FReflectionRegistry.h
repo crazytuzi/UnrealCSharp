@@ -615,6 +615,8 @@ public:
 #endif
 
 private:
+	bool bIsInitialized{};
+
 	FClassReflection* UtilsClass{};
 
 	FClassReflection* ObjectClass{};

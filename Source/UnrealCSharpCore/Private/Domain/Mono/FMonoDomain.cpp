@@ -331,6 +331,8 @@ void FMonoDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
+	UnregisterLog();
+
 #define MONO_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
 
 	COMMON_BRIDGE_METHODS(MONO_METHOD_CLEAR)

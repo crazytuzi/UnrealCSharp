@@ -871,10 +871,14 @@ void FReflectionRegistry::Initialize()
 	ArrayParamAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ARRAY_PARAM_ATTRIBUTE);
 #endif
+
+	bIsInitialized = true;
 }
 
 void FReflectionRegistry::Deinitialize()
 {
+	bIsInitialized = false;
+
 	Field2Class.Empty();
 
 	for (const auto& [PLACEHOLDER, Class] : FullName2Class)
@@ -985,7 +989,8 @@ FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, cons
 
 bool FReflectionRegistry::IsInitialized() const
 {
-	return GetUtilsClass() != nullptr
+	return bIsInitialized
+		&& GetUtilsClass() != nullptr
 		&& GetObjectClass() != nullptr
 		&& GetBooleanClass() != nullptr
 		&& GetSByteClass() != nullptr
