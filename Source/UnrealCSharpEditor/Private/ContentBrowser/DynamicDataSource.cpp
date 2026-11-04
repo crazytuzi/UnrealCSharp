@@ -800,7 +800,19 @@ bool UDynamicDataSource::IsRootInternalPath(const FName& InPath)
 
 FString UDynamicDataSource::GetVirtualPath(const UClass* InClass)
 {
-	return InClass != nullptr ? DYNAMIC_ROOT_VIRTUAL_PATH / InClass->GetFName().ToString() : FString();
+	FString VirtualPath;
+
+	if (InClass != nullptr)
+	{
+		const auto InternalPath = DYNAMIC_ROOT_INTERNAL_PATH / InClass->GetFName().ToString();
+
+		if (FName OutVirtualPath; TryConvertInternalPathToVirtual(FName(*InternalPath), OutVirtualPath))
+		{
+			VirtualPath = OutVirtualPath.ToString();
+		}
+	}
+
+	return VirtualPath;
 }
 
 TSharedPtr<const FDynamicFileItemDataPayload> UDynamicDataSource::GetFileItemDataPayload(

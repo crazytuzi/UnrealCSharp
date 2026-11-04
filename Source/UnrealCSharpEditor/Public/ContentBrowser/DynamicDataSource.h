@@ -114,7 +114,7 @@ private:
 
 	static bool IsRootInternalPath(const FName& InPath);
 
-	static FString GetVirtualPath(const UClass* InClass);
+	FString GetVirtualPath(const UClass* InClass);
 
 	TSharedPtr<const FDynamicFileItemDataPayload> GetFileItemDataPayload(
 		const FContentBrowserItemData& InItemData) const;

@@ -4,6 +4,7 @@ using System.IO;
 using EpicGames.Core;
 using UnrealBuildTool;
 using System.Collections.Generic;
+using System.Text;
 
 public class UnrealCSharpCore : ModuleRules
 {
@@ -116,11 +117,27 @@ public class UnrealCSharpCore : ModuleRules
 
 	private void AddExternalDependencies()
 	{
-		ExternalDependencies.Add(Path.Combine(Target.ProjectFile.Directory.FullName, "Config",
-			"DefaultUnrealCSharpSetting.ini"));
+		if (Target.ProjectFile == null)
+		{
+			return;
+		}
 
-		ExternalDependencies.Add(Path.Combine(Target.ProjectFile.Directory.FullName, "Config",
-			"DefaultUnrealCSharpEditorSetting.ini"));
+		var ProjectDirectory = Target.ProjectFile.Directory.FullName;
+
+		var SettingFilePath = Path.Combine(ProjectDirectory, "Config", "DefaultUnrealCSharpSetting.ini");
+
+		if (File.Exists(SettingFilePath))
+		{
+			ExternalDependencies.Add(SettingFilePath);
+		}
+
+		var EditorSettingFilePath = Path.Combine(ProjectDirectory, "Config",
+			"DefaultUnrealCSharpEditorSetting.ini");
+
+		if (File.Exists(EditorSettingFilePath))
+		{
+			ExternalDependencies.Add(EditorSettingFilePath);
+		}
 	}
 
 	private void GeneratorModules()
@@ -163,47 +180,55 @@ public class UnrealCSharpCore : ModuleRules
 
 		GetPlugins(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/")), EnginePlugins);
 
-		using var Writer = new JsonWriter(JsonFullFilename);
+		var JsonText = new StringBuilder();
 
-		Writer.WriteObjectStart();
-
-		Writer.WriteObjectStart("ProjectModules");
-
-		foreach (var Item in Target.ExtraModuleNames)
+		using (var Writer = new JsonWriter(new StringWriter(JsonText)))
 		{
-			Writer.WriteValue(Item, Path.Join(Target.ProjectFile.Directory.FullName, "Source", Item));
+			Writer.WriteObjectStart();
+
+			Writer.WriteObjectStart("ProjectModules");
+
+			foreach (var Item in Target.ExtraModuleNames)
+			{
+				Writer.WriteValue(Item, Path.Join(Target.ProjectFile.Directory.FullName, "Source", Item));
+			}
+
+			Writer.WriteObjectEnd();
+
+			Writer.WriteObjectStart("ProjectPlugins");
+
+			foreach (var Item in ProjectPlugins)
+			{
+				Writer.WriteValue(Item.Key, Item.Value);
+			}
+
+			Writer.WriteObjectEnd();
+
+			Writer.WriteObjectStart("EngineModules");
+
+			foreach (var Item in EngineModules)
+			{
+				Writer.WriteValue(Item.Key, Item.Value);
+			}
+
+			Writer.WriteObjectEnd();
+
+			Writer.WriteObjectStart("EnginePlugins");
+
+			foreach (var Item in EnginePlugins)
+			{
+				Writer.WriteValue(Item.Key, Item.Value);
+			}
+
+			Writer.WriteObjectEnd();
+
+			Writer.WriteObjectEnd();
 		}
 
-		Writer.WriteObjectEnd();
-
-		Writer.WriteObjectStart("ProjectPlugins");
-
-		foreach (var Item in ProjectPlugins)
+		if (!File.Exists(JsonFullFilename) || File.ReadAllText(JsonFullFilename) != JsonText.ToString())
 		{
-			Writer.WriteValue(Item.Key, Item.Value);
+			File.WriteAllText(JsonFullFilename, JsonText.ToString());
 		}
-
-		Writer.WriteObjectEnd();
-
-		Writer.WriteObjectStart("EngineModules");
-
-		foreach (var Item in EngineModules)
-		{
-			Writer.WriteValue(Item.Key, Item.Value);
-		}
-
-		Writer.WriteObjectEnd();
-
-		Writer.WriteObjectStart("EnginePlugins");
-
-		foreach (var Item in EnginePlugins)
-		{
-			Writer.WriteValue(Item.Key, Item.Value);
-		}
-
-		Writer.WriteObjectEnd();
-
-		Writer.WriteObjectEnd();
 	}
 
 	private void EnableExport()
