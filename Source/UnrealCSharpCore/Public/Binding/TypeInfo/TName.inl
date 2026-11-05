@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TGeneric.inl"
+#include "TStaticEnum.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
@@ -287,7 +288,7 @@ struct TName<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum
 {
 	static auto Get()
 	{
-		return FUnrealCSharpFunctionLibrary::GetFullClass(StaticEnum<std::decay_t<T>>());
+		return FUnrealCSharpFunctionLibrary::GetFullClass(TStaticEnum<std::decay_t<T>>::Get());
 	}
 };
 

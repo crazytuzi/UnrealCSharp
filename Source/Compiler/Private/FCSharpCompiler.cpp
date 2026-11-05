@@ -22,7 +22,10 @@ FCSharpCompiler::~FCSharpCompiler()
 		delete Thread;
 
 		Thread = nullptr;
+	}
 
+	if (Runnable != nullptr)
+	{
 		delete Runnable;
 
 		Runnable = nullptr;
@@ -99,6 +102,8 @@ void FCSharpCompiler::OnPreExit()
 	if (OnPreExitHandle.IsValid())
 	{
 		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
+
+		OnPreExitHandle.Reset();
 
 		if (Runnable != nullptr)
 		{

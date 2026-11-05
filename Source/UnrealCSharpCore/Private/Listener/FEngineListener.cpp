@@ -36,6 +36,8 @@ FEngineListener::~FEngineListener()
 	if (OnPreExitHandle.IsValid())
 	{
 		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
+
+		OnPreExitHandle.Reset();
 	}
 
 #if WITH_EDITOR
@@ -54,6 +56,8 @@ FEngineListener::~FEngineListener()
 	if (OnLoadingPhaseCompleteHandle.IsValid())
 	{
 		IPluginManager::Get().OnLoadingPhaseComplete().Remove(OnLoadingPhaseCompleteHandle);
+
+		OnLoadingPhaseCompleteHandle.Reset();
 	}
 }
 

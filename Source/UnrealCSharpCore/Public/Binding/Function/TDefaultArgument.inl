@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Binding/TypeInfo/TStaticEnum.inl"
 #include "UEVersion.h"
 
 inline FString SanitizeFloat(double InFloat, const int32 InMinFractionalDigits = 1)
@@ -449,12 +450,17 @@ struct TDefaultArgument<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !
 {
 	static auto Get(const T& InValue)
 	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *StaticEnum<std::decay_t<T>>()->GetName(),
-		                       *StaticEnum<std::decay_t<T>>()->GetNameStringByValue(static_cast<int64>(InValue))
-		);
+		if (const auto Enum = TStaticEnum<std::decay_t<T>>::Get())
+		{
+			return FString::Printf(TEXT(
+				"%s.%s"
+			),
+			                       *Enum->GetName(),
+			                       *Enum->GetNameStringByValue(static_cast<int64>(InValue))
+			);
+		}
+
+		return FString{};
 	}
 };
 
@@ -463,13 +469,17 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Val
 {
 	static auto Get(const T& InValue)
 	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->GetName(),
-		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->
-		                       GetNameStringByValue(static_cast<int64>(InValue))
-		);
+		if (const auto Enum = TStaticEnum<typename std::decay_t<T>::EnumType>::Get())
+		{
+			return FString::Printf(TEXT(
+				"%s.%s"
+			),
+			                       *Enum->GetName(),
+			                       *Enum->GetNameStringByValue(static_cast<int64>(InValue))
+			);
+		}
+
+		return FString{};
 	}
 };
 

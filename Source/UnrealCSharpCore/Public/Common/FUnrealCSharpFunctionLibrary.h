@@ -296,6 +296,13 @@ private:
 
 	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
 
+	static bool IsDotNetSdkSupported(const FString& InDotNetPath);
+
+	static bool GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion, int32& OutMinorVersion);
+
+	static TArray<FString> GetDotNetPathArray();
+
+private:
 	static EScriptDomainType ScriptDomainType;
 
 	static bool bScriptChanged;
