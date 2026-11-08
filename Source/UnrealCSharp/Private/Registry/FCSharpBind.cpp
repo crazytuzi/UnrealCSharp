@@ -155,6 +155,38 @@ void FCSharpBind::ResumeDummyOwnerClasses()
 }
 #endif
 
+void FCSharpBind::RemoveFunctionFromClass(UFunction* InFunction)
+{
+	if (InFunction != nullptr)
+	{
+		if (const auto Class = Cast<UClass>(InFunction->GetOuter()))
+		{
+			Class->RemoveFunctionFromFunctionMap(InFunction);
+
+			UField* PrevField{};
+
+			for (auto Field = Class->Children; Field != nullptr; Field = Field->Next)
+			{
+				if (Field == InFunction)
+				{
+					if (PrevField != nullptr)
+					{
+						PrevField->Next = Field->Next;
+					}
+					else
+					{
+						Class->Children = Field->Next;
+					}
+
+					break;
+				}
+
+				PrevField = Field;
+			}
+		}
+	}
+}
+
 bool FCSharpBind::BindImplementation(UStruct* InStruct)
 {
 	if (InStruct == nullptr)

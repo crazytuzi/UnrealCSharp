@@ -119,8 +119,6 @@ void FDynamicClassGenerator::Reset()
 	DefaultSubObjectInfoMap.Empty();
 
 	DefaultValueMap.Empty();
-
-	ClassConstructorSet.Empty();
 }
 
 #if WITH_EDITOR

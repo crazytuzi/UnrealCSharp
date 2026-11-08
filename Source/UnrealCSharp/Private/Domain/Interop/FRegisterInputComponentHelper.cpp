@@ -19,6 +19,12 @@ IManagedHandle FRegisterInputComponentHelper::GetDynamicBindingObject(const IMan
 			DynamicBindingObject = NewObject<UDynamicBlueprintBinding>(GetTransientPackage(), BindingClass);
 
 			ThisClass->DynamicBindingObjects.Add(DynamicBindingObject);
+
+			if (ThisClass->HasAnyInternalFlags(EInternalObjectFlags::RootSet) ||
+				GUObjectArray.IsDisregardForGC(ThisClass))
+			{
+				DynamicBindingObject->AddToRoot();
+			}
 		}
 
 		return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
@@ -55,6 +61,11 @@ void FRegisterInputComponentHelper::BindFunction(UClass* InClass, const FName* I
 	Function->Next = InClass->Children;
 
 	InClass->Children = Function;
+
+	if (InClass->HasAnyInternalFlags(EInternalObjectFlags::RootSet) || GUObjectArray.IsDisregardForGC(InClass))
+	{
+		Function->AddToRoot();
+	}
 
 	FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 		                                                     FClassRegistry>()->GetClassDescriptor(InClass),
