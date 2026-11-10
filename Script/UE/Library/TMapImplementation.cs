@@ -41,20 +41,6 @@ namespace Script.Library
             return __TMap_IsEmptyImplementation(InMap) != 0;
         }
 
-        private static unsafe partial int __TMap_GetMaxIndexImplementation(nint InMap);
-
-        public static int TMap_GetMaxIndexImplementation(nint InMap)
-        {
-            return __TMap_GetMaxIndexImplementation(InMap);
-        }
-
-        private static unsafe partial byte __TMap_IsValidIndexImplementation(nint InMap, int InIndex);
-
-        public static bool TMap_IsValidIndexImplementation(nint InMap, int InIndex)
-        {
-            return __TMap_IsValidIndexImplementation(InMap, InIndex) != 0;
-        }
-
         private static unsafe partial void __TMap_AddImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer);
 
         public static void TMap_AddImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer)
@@ -67,13 +53,6 @@ namespace Script.Library
         public static int TMap_RemoveImplementation(nint InMap, byte* InKeyBuffer)
         {
             return __TMap_RemoveImplementation(InMap, InKeyBuffer);
-        }
-
-        private static unsafe partial byte __TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer);
-
-        public static bool TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer)
-        {
-            return __TMap_ContainsImplementation(InMap, InKeyBuffer) != 0;
         }
 
         private static unsafe partial void __TMap_FindKeyImplementation(nint InMap, byte* InValueBuffer, byte* ReturnBuffer);
@@ -90,6 +69,13 @@ namespace Script.Library
             __TMap_FindImplementation(InMap, InKeyBuffer, ReturnBuffer);
         }
 
+        private static unsafe partial byte __TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer);
+
+        public static bool TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer)
+        {
+            return __TMap_ContainsImplementation(InMap, InKeyBuffer) != 0;
+        }
+
         private static unsafe partial void __TMap_GetImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer);
 
         public static void TMap_GetImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer)
@@ -104,6 +90,20 @@ namespace Script.Library
             __TMap_SetImplementation(InMap, InKeyBuffer, InValueBuffer);
         }
 
+        private static unsafe partial int __TMap_GetMaxIndexImplementation(nint InMap);
+
+        public static int TMap_GetMaxIndexImplementation(nint InMap)
+        {
+            return __TMap_GetMaxIndexImplementation(InMap);
+        }
+
+        private static unsafe partial byte __TMap_IsValidIndexImplementation(nint InMap, int InIndex);
+
+        public static bool TMap_IsValidIndexImplementation(nint InMap, int InIndex)
+        {
+            return __TMap_IsValidIndexImplementation(InMap, InIndex) != 0;
+        }
+
         private static unsafe partial void __TMap_GetEnumeratorKeyImplementation(nint InMap, int InIndex, byte* ReturnBuffer);
 
         public static void TMap_GetEnumeratorKeyImplementation(nint InMap, int InIndex, byte* ReturnBuffer)
@@ -116,6 +116,30 @@ namespace Script.Library
         public static void TMap_GetEnumeratorValueImplementation(nint InMap, int InIndex, byte* ReturnBuffer)
         {
             __TMap_GetEnumeratorValueImplementation(InMap, InIndex, ReturnBuffer);
+        }
+
+        private static unsafe partial int __TMap_GetKeyTypeSizeImplementation(nint InMap);
+
+        public static int TMap_GetKeyTypeSizeImplementation(nint InMap)
+        {
+            return __TMap_GetKeyTypeSizeImplementation(InMap);
+        }
+
+        private static unsafe partial int __TMap_GetValueTypeSizeImplementation(nint InMap);
+
+        public static int TMap_GetValueTypeSizeImplementation(nint InMap)
+        {
+            return __TMap_GetValueTypeSizeImplementation(InMap);
+        }
+
+        private static unsafe partial int __TMap_GetPairsImplementation(nint InMap, int InIndex,
+            int InCount, byte* OutBuffer, int InBufferSize, int* OutNextIndex);
+
+        public static int TMap_GetPairsImplementation(nint InMap, int InIndex, int InCount,
+            byte* OutBuffer, int InBufferSize, int* OutNextIndex)
+        {
+            return __TMap_GetPairsImplementation(InMap, InIndex, InCount,
+                OutBuffer, InBufferSize, OutNextIndex);
         }
 
         public static TKey TMap_FindKeyCompoundImplementation<TKey>(nint InMap, byte* InValueBuffer)

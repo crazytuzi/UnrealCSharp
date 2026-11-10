@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "UEVersion.h"
@@ -200,6 +200,8 @@ public:
 
 	static TArray<FString> GetFullAssemblyPublishPath();
 
+	static bool IsAssembliesFileExists(const TArray<FString>& InAssemblies);
+
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
 
@@ -279,15 +281,26 @@ public:
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
 	                        const FString& InWorkingDirectory = FString(),
 	                        const TFunction<void(const FString&)>& InOnOutput = {},
-	                        const TFunction<bool()>& InIsStopped = {});
+	                        const TFunction<bool()>& InIsStopped = {},
+	                        double InTimeoutSeconds = 600.0,
+	                        double InSilenceTimeoutSeconds = 120.0);
 #endif
 
 #if WITH_EDITOR
-	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
-
 	static EScriptDomainType GetScriptDomainType(const FString& InPlatformName);
 
 	static EScriptDomainType GetScriptDomainType();
+
+private:
+	friend struct FScriptDomainTypeScope;
+
+	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
+
+	static bool IsDotNetSdkSupported(const FString& InDotNetPath);
+
+	static bool GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion, int32& OutMinorVersion);
+
+	static TArray<FString> GetDotNetPathArray();
 
 private:
 	static EScriptDomainType ScriptDomainType;

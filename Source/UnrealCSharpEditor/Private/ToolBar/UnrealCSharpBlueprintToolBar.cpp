@@ -3,6 +3,7 @@
 #include "SourceCodeNavigation.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/FileHelper.h"
+#include "FCSharpCompiler.h"
 #include "FCodeAnalysis.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -77,7 +78,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction(const TSharedRef<FUICommandList>
 			{
 				if (IFileManager::Get().FileExists(*OverrideFile))
 				{
-					FCodeAnalysis::Analysis(OverrideFile);
+					FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask({OverrideFile}));
 				}
 			}
 		}), FCanExecuteAction());
@@ -86,7 +87,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction(const TSharedRef<FUICommandList>
 		FUnrealCSharpEditorCommands::Get().OverrideBlueprint,
 		FExecuteAction::CreateLambda([this, InBlueprint]
 		{
-			if (InBlueprint.IsValid())
+			if (InBlueprint.IsValid() && InBlueprint->GeneratedClass != nullptr)
 			{
 				static TArray<UClass*> TemplateClasses =
 				{
@@ -226,7 +227,7 @@ void FUnrealCSharpBlueprintToolBar::SetCodeAnalysisOverrideFilesMap()
 
 bool FUnrealCSharpBlueprintToolBar::HasOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (InBlueprint.IsValid())
+	if (InBlueprint.IsValid() && InBlueprint->GeneratedClass != nullptr)
 	{
 		const auto Class = FString::Printf(TEXT(
 			"%s.%s"
@@ -243,7 +244,7 @@ bool FUnrealCSharpBlueprintToolBar::HasOverrideFile(const TWeakObjectPtr<UBluepr
 
 FString FUnrealCSharpBlueprintToolBar::GetOverrideFile(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (InBlueprint.IsValid())
+	if (InBlueprint.IsValid() && InBlueprint->GeneratedClass != nullptr)
 	{
 		const auto Class = FString::Printf(TEXT(
 			"%s.%s"
@@ -268,7 +269,7 @@ FString FUnrealCSharpBlueprintToolBar::GetOverrideFile(const TWeakObjectPtr<UBlu
 
 FString FUnrealCSharpBlueprintToolBar::GetFileName(const TWeakObjectPtr<UBlueprint>& InBlueprint) const
 {
-	if (InBlueprint.IsValid())
+	if (InBlueprint.IsValid() && InBlueprint->GeneratedClass != nullptr)
 	{
 		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InBlueprint->GeneratedClass);
 

@@ -10,21 +10,23 @@ class UNREALCSHARPCORE_API FBinding
 private:
 	FBinding() = default;
 
+	~FBinding();
+
 public:
 	static FBinding& Get();
 
 	FBinding& Register();
 
-	FBindingClassRegister*& Register(const TFunction<FString()>& InClassFunction,
-	                                 const FString& InImplementationNameSpace,
-	                                 const TFunction<bool()>& InIsProjectClassFunction,
-	                                 bool InIsReflectionClass,
-	                                 const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction);
+	FBindingClassRegister* Register(const TFunction<FString()>& InClassFunction,
+	                                const FString& InImplementationNameSpace,
+	                                const TFunction<bool()>& InIsProjectClassFunction,
+	                                bool InIsReflectionClass,
+	                                const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction);
 
-	FBindingEnumRegister*& Register(const TFunction<FString()>& InEnumFunction,
-	                                const FString& InUnderlyingType,
-	                                bool InIsProjectEnum,
-	                                const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
+	FBindingEnumRegister* Register(const TFunction<FString()>& InEnumFunction,
+	                               const FString& InUnderlyingType,
+	                               bool InIsProjectEnum,
+	                               const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
 	const TArray<FBindingClass*>& GetClasses() const;
 
@@ -35,7 +37,7 @@ public:
 	bool IsProjectEnum(const FString& InEnum) const;
 
 private:
-	bool bIsRegister;
+	bool bNeedRegister{};
 
 	TArray<FBindingClass*> Classes;
 

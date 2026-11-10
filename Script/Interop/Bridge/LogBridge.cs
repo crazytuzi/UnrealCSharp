@@ -48,6 +48,10 @@ public sealed class LogBridge : TextWriter
     {
         bIsLeanCLR = true;
 
+        ConsoleOut = Console.Out;
+
+        ConsoleError = Console.Error;
+
         RedirectConsole();
     }
 

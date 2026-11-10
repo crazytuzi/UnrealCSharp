@@ -18,6 +18,7 @@
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
+#include "Async/Async.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -199,9 +200,10 @@ FEditorListener::~FEditorListener()
 
 void FEditorListener::OnPostEngineInit()
 {
-	FCodeAnalysis::CodeAnalysis();
-
-	FDynamicGenerator::CodeAnalysisGenerator();
+	FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask({}, []()
+	{
+		FDynamicGenerator::CodeAnalysisGenerator();
+	}));
 }
 
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
@@ -339,18 +341,16 @@ void FEditorListener::OnCompile(const bool bSucceeded)
 
 		for (const auto& Data : CompilingFileChanges)
 		{
-			FileChange.AddUnique(Data.Filename);
-		}
-
-		for (const auto& File : FileChange)
-		{
-			if (IFileManager::Get().FileExists(*File))
+			if (IFileManager::Get().FileExists(*Data.Filename) && !FileChange.Contains(Data.Filename))
 			{
-				FCodeAnalysis::Analysis(File);
+				FileChange.Add(Data.Filename);
 			}
 		}
 
-		FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+		if (!FileChange.IsEmpty())
+		{
+			FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask(FileChange));
+		}
 	}
 
 	CompilingFileChanges.Reset();
@@ -377,8 +377,10 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
+void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData)
 {
+	CrcCompiledSignatures.Remove(InAssetData.ToSoftObjectPath());
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
@@ -389,8 +391,10 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const
+void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath)
 {
+	CrcCompiledSignatures.Remove(FSoftObjectPath(InOldObjectPath));
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
@@ -504,7 +508,8 @@ void FEditorListener::CompileChangedBlueprints()
 		{
 			if (Blueprint->GeneratedClass != nullptr)
 			{
-				if (const auto AssetData = FAssetData(Blueprint);
+				if (const auto AssetData = FAssetData(Blueprint,
+				                                      FAssetData::ECreationFlags::SkipAssetRegistryTagsGathering);
 					FGeneratorCore::IsSupported(AssetData))
 				{
 					const auto SoftObjectPath = FSoftObjectPath(Blueprint);
@@ -520,7 +525,7 @@ void FEditorListener::CompileChangedBlueprints()
 						if (!IFileManager::Get().FileExists(
 							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
 						{
-							FAssetGenerator::Generator(AssetData);
+							FAssetGenerator::Generator(FAssetData(Blueprint));
 						}
 
 						continue;
@@ -530,7 +535,7 @@ void FEditorListener::CompileChangedBlueprints()
 					{
 						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
 
-						FAssetGenerator::Generator(AssetData);
+						FAssetGenerator::Generator(FAssetData(Blueprint));
 					}
 				}
 			}

@@ -77,3 +77,14 @@ bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 
 	return false;
 }
+
+void FBindingRegistry::RemoveBindingAddress(void* InAddress, const IManagedHandle InManagedHandle)
+{
+	if (const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(InAddress))
+	{
+		if (*FoundManagedHandle != InManagedHandle && !FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+		{
+			(void)RemoveReference(*FoundManagedHandle);
+		}
+	}
+}

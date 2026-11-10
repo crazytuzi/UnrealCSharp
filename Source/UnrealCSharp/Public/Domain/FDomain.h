@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Tickable.h"
 #include "Domain/Script/IManagedHandle.h"

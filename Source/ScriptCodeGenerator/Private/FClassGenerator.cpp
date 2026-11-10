@@ -1,4 +1,4 @@
-﻿#include "FClassGenerator.h"
+#include "FClassGenerator.h"
 #include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
@@ -862,9 +862,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	const auto FileName = FGeneratorCore::GetFileName(InClass);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,

@@ -32,6 +32,10 @@ void FUnrealCSharpPlayToolBar::Initialize()
 
 void FUnrealCSharpPlayToolBar::Deinitialize()
 {
+	if (const auto ToolMenus = UToolMenus::TryGet())
+	{
+		ToolMenus->RemoveSection("LevelEditor.LevelEditorToolBar.PlayToolBar", "UnrealCSharpEditor");
+	}
 }
 
 void FUnrealCSharpPlayToolBar::BuildAction()

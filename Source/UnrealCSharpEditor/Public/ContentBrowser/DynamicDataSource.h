@@ -68,6 +68,8 @@ public:
 	                              const FName InAttributeKey,
 	                              FContentBrowserItemDataAttributeValue& OutAttributeValue) override;
 
+	virtual bool GetItemPhysicalPath(const FContentBrowserItemData& InItem, FString& OutDiskPath) override;
+
 	virtual bool CanEditItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg) override;
 
 	virtual bool EditItem(const FContentBrowserItemData& InItem) override;
@@ -112,7 +114,7 @@ private:
 
 	static bool IsRootInternalPath(const FName& InPath);
 
-	static FString GetVirtualPath(const UClass* InClass);
+	FString GetVirtualPath(const UClass* InClass);
 
 	TSharedPtr<const FDynamicFileItemDataPayload> GetFileItemDataPayload(
 		const FContentBrowserItemData& InItemData) const;

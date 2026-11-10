@@ -3,6 +3,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Registry/FCSharpBind.h"
 #include "UEVersion.h"
 
 namespace
@@ -18,6 +19,8 @@ namespace
 				{
 					if (const auto Function = FoundClass->FindFunctionByName(*Name))
 					{
+						FCSharpBind::RemoveFunctionFromClass(Function);
+
 						if (Function->IsRooted())
 						{
 							Function->RemoveFromRoot();
@@ -26,8 +29,6 @@ namespace
 						{
 							Function->MarkAsGarbage();
 						}
-
-						FoundClass->RemoveFunctionFromFunctionMap(Function);
 					}
 				}
 			}

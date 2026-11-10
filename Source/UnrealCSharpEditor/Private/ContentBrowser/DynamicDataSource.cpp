@@ -40,7 +40,10 @@ void FDeleteFileChange::Apply(UObject* Object)
 	{
 		IFileManager::Get().Delete(*FilePath);
 
-		FCSharpCompiler::Get().ImmediatelyCompile();
+		FCSharpCompiler::Get().EnqueueTask([]()
+		{
+			FCSharpCompiler::Get().ImmediatelyCompile();
+		});
 	}
 }
 
@@ -48,7 +51,10 @@ void FDeleteFileChange::Revert(UObject* Object)
 {
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(*FilePath, FileContent);
 
-	FCSharpCompiler::Get().ImmediatelyCompile();
+	FCSharpCompiler::Get().EnqueueTask([]()
+	{
+		FCSharpCompiler::Get().ImmediatelyCompile();
+	});
 }
 
 FString FDeleteFileChange::ToString() const
@@ -417,6 +423,11 @@ void UDynamicDataSource::EnumerateItemsAtPath(const FName InPath,
 		return;
 	}
 
+	if (!DynamicHierarchy.IsValid())
+	{
+		return;
+	}
+
 	if (EnumHasAnyFlags(InItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFolders))
 	{
 		if (DynamicHierarchy->FindNode(InternalPath))
@@ -515,9 +526,30 @@ bool UDynamicDataSource::GetItemAttribute(const FContentBrowserItemData& InItem,
 	return FileItemDataPayload ? FileItemDataPayload->GetItemAttribute(InAttributeKey, OutAttributeValue) : false;
 }
 
+bool UDynamicDataSource::GetItemPhysicalPath(const FContentBrowserItemData& InItem, FString& OutDiskPath)
+{
+	auto bIsPhysicalPath = false;
+
+	if (const auto InternalPath = InItem.GetInternalPath().ToString(); !InternalPath.IsEmpty())
+	{
+		const auto DiskPath = InItem.IsFolder()
+			                      ? FDynamicHierarchy::ConvertInternalPathToFileSystemPath(InternalPath)
+			                      : InternalPath;
+
+		if (IFileManager::Get().DirectoryExists(*DiskPath) || IFileManager::Get().FileExists(*DiskPath))
+		{
+			OutDiskPath = DiskPath;
+
+			bIsPhysicalPath = true;
+		}
+	}
+
+	return bIsPhysicalPath;
+}
+
 bool UDynamicDataSource::CanEditItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
 {
-	return true;
+	return GetFileItemDataPayload(InItem).IsValid();
 }
 
 bool UDynamicDataSource::EditItem(const FContentBrowserItemData& InItem)
@@ -531,17 +563,19 @@ bool UDynamicDataSource::EditItem(const FContentBrowserItemData& InItem)
 
 bool UDynamicDataSource::BulkEditItems(TArrayView<const FContentBrowserItemData> InItems)
 {
+	auto bIsEdited = true;
+
 	for (const auto& Item : InItems)
 	{
-		EditItem(Item);
+		bIsEdited = EditItem(Item) && bIsEdited;
 	}
 
-	return true;
+	return bIsEdited;
 }
 
 bool UDynamicDataSource::CanDeleteItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
 {
-	return true;
+	return GetFileItemDataPayload(InItem).IsValid();
 }
 
 bool UDynamicDataSource::DeleteItem(const FContentBrowserItemData& InItem)
@@ -766,7 +800,19 @@ bool UDynamicDataSource::IsRootInternalPath(const FName& InPath)
 
 FString UDynamicDataSource::GetVirtualPath(const UClass* InClass)
 {
-	return InClass != nullptr ? DYNAMIC_ROOT_VIRTUAL_PATH / InClass->GetFName().ToString() : FString();
+	FString VirtualPath;
+
+	if (InClass != nullptr)
+	{
+		const auto InternalPath = DYNAMIC_ROOT_INTERNAL_PATH / InClass->GetFName().ToString();
+
+		if (FName OutVirtualPath; TryConvertInternalPathToVirtual(FName(*InternalPath), OutVirtualPath))
+		{
+			VirtualPath = OutVirtualPath.ToString();
+		}
+	}
+
+	return VirtualPath;
 }
 
 TSharedPtr<const FDynamicFileItemDataPayload> UDynamicDataSource::GetFileItemDataPayload(
@@ -854,6 +900,11 @@ bool UDynamicDataSource::GetClassPaths(
 #endif
 ) const
 {
+	if (CollectionManager == nullptr)
+	{
+		return false;
+	}
+
 	if (!InCollections.IsEmpty())
 	{
 		const auto CollectionRecursionFlags = bIncludeChildCollections

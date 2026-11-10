@@ -2,6 +2,8 @@
 #include "FCSharpCompiler.h"
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/FEnvironmentVariableScope.h"
+#include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Log/UnrealCSharpLog.h"
@@ -93,6 +95,10 @@ uint32 FCSharpCompilerRunnable::Run()
 			{
 				DoWork();
 			}
+			else if (TFunction<void()> Task; TaskQueue.Dequeue(Task))
+			{
+				Task();
+			}
 			else if (Event != nullptr)
 			{
 				Event->Wait();
@@ -151,6 +157,16 @@ void FCSharpCompilerRunnable::EnqueueTask(const TArray<FFileChangeData>& InFileC
 	}
 }
 
+void FCSharpCompilerRunnable::EnqueueTask(const TFunction<void()>& InTask)
+{
+	TaskQueue.Enqueue(InTask);
+
+	if (Event != nullptr)
+	{
+		Event->Trigger();
+	}
+}
+
 bool FCSharpCompilerRunnable::IsCompiling() const
 {
 	FScopeLock ScopeLock(&CriticalSection);
@@ -185,7 +201,7 @@ bool FCSharpCompilerRunnable::SyncCompile()
 
 	auto bSucceeded = false;
 
-	if (CompileInterop(false))
+	if (CompileInterop(false, IsInteropOutdated()))
 	{
 		FString Result;
 
@@ -231,7 +247,72 @@ FString FCSharpCompilerRunnable::GetBuildConfiguration()
 	return TEXT("Debug");
 }
 
-bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
+bool FCSharpCompilerRunnable::IsInteropOutdated()
+{
+	const auto InteropDirectory = FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory() / INTEROP_NAME;
+
+	const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
+
+	auto Timestamp = FDateTime::MinValue();
+
+	if (IFileManager::Get().FileExists(*InteropPath))
+	{
+		Timestamp = IFileManager::Get().GetTimeStamp(*InteropPath);
+	}
+
+	auto bIsIOutdated = false;
+
+	IFileManager::Get().IterateDirectoryRecursively(
+		*InteropDirectory,
+		[&bIsIOutdated, Timestamp](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
+		{
+			if (!bIsDirectory &&
+				FPaths::GetExtension(InFilenameOrDirectory) == CSHARP_SUFFIX.RightChop(1) &&
+				IFileManager::Get().GetTimeStamp(InFilenameOrDirectory) > Timestamp)
+			{
+				bIsIOutdated = true;
+
+				return false;
+			}
+
+			return true;
+		});
+
+	return bIsIOutdated;
+}
+
+FString FCSharpCompilerRunnable::GetFirstErrorLine(const FString& InResult)
+{
+	TArray<FString> Lines;
+
+	InResult.ParseIntoArrayLines(Lines, false);
+
+	FString Fallback;
+
+	for (const auto& Line : Lines)
+	{
+		const auto TrimmedLine = Line.TrimStartAndEnd();
+
+		if (TrimmedLine.IsEmpty())
+		{
+			continue;
+		}
+
+		if (TrimmedLine.Contains(TEXT(": error ")))
+		{
+			return TrimmedLine;
+		}
+
+		if (Fallback.IsEmpty())
+		{
+			Fallback = TrimmedLine;
+		}
+	}
+
+	return Fallback;
+}
+
+bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop, const bool bInteropOutdated)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
 
@@ -241,7 +322,7 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 	}
 
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
-		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
+		bForceCompileInterop || bInteropOutdated || !IFileManager::Get().FileExists(*InteropPath))
 	{
 		CompileNotification->Progress.SetStage(FCSharpCompileProgress::StageCompilingInterop);
 
@@ -261,6 +342,8 @@ bool FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 		);
 
 		auto bSucceeded = false;
+
+		const FEnvironmentVariableScope EnvironmentVariableScope(TEXT("DOTNET_CLI_UI_LANGUAGE"), TEXT("en"));
 
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
 		                                          [this, &bSucceeded](const int32 InReturnCode, const FString& InResult)
@@ -441,12 +524,16 @@ bool FCSharpCompilerRunnable::Compile()
 		                                       ? FCSharpCompileProgress::StageSucceeded
 		                                       : FCSharpCompileProgress::StageFailed);
 
+	FString ErrorMessage;
+
 	if (!bSucceeded)
 	{
 		UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
+
+		ErrorMessage = GetFirstErrorLine(Result);
 	}
 
-	ShowCompileResultNotification(bSucceeded);
+	ShowCompileResultNotification(bSucceeded, ErrorMessage);
 
 	AsyncTask(ENamedThreads::GameThread, [Notification = CompileNotification]()
 	{
@@ -494,6 +581,8 @@ bool FCSharpCompilerRunnable::CompileGame(FString& OutResult, const TFunction<vo
 		                                          bDisableBuildServers ? TEXT(" --disable-build-servers") : TEXT("")
 		);
 
+		const FEnvironmentVariableScope EnvironmentVariableScope(TEXT("DOTNET_CLI_UI_LANGUAGE"), TEXT("en"));
+
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
 		                                          [&bBuildSucceeded, &OutResult](const int32 InReturnCode,
 		                                          const FString& InResult)
@@ -534,33 +623,28 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 		{
 			CompileNotification->Progress.SetStage(FCSharpCompileProgress::StagePreparing);
 
-			if (bCompileInterop)
+			if (const auto bIsInteropOutdated = IsInteropOutdated();
+				bCompileInterop || bIsInteropOutdated)
 			{
-				CompileInterop(bForceCompileInterop);
+				CompileInterop(bForceCompileInterop, bIsInteropOutdated);
 			}
 
 			TArray<FFileChangeData> FileChangesSnapshot;
 
-			const auto bSucceeded = Compile();
-
-			if (bSucceeded)
 			{
 				FScopeLock ScopeLock(&CriticalSection);
 
 				FileChangesSnapshot = MoveTemp(FileChanges);
 			}
 
-			AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+			if (Compile())
 			{
-				FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(bSucceeded);
-			});
-
-			if (bSucceeded)
-			{
-				const auto bHasDynamicFileChanged = FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot);
-
-				const auto Reload = [InFunction, bReloadImmediately, bHasDynamicFileChanged, FileChangesSnapshot]()
+				auto Reload = [InFunction, bReloadImmediately, FileChangesSnapshot]()
 				{
+					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(true);
+
+					FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+
 					if (GExitPurge)
 					{
 						return;
@@ -575,7 +659,8 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 						return;
 					}
 
-					if (UnrealCSharpCoreModule.IsLoaded() && (bReloadImmediately || bHasDynamicFileChanged))
+					if (UnrealCSharpCoreModule.IsLoaded() &&
+						(bReloadImmediately || FDynamicGenerator::HasDynamicFileChanged(FileChangesSnapshot)))
 					{
 						UnrealCSharpCoreModule.Deactivate();
 
@@ -592,7 +677,7 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 				};
 
 				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-					Reload,
+					MoveTemp(Reload),
 					TStatId(),
 					nullptr,
 					ENamedThreads::GameThread);
@@ -604,6 +689,13 @@ void FCSharpCompilerRunnable::CompileInternal(const TFunction<void(const TArray<
 						FPlatformProcess::SleepNoStats(FCSharpCompiler::PollIntervalSeconds);
 					}
 				}
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, []()
+				{
+					FUnrealCSharpCoreModuleDelegates::OnCompile.Broadcast(false);
+				});
 			}
 		}
 	}
@@ -642,9 +734,9 @@ void FCSharpCompilerRunnable::ReleaseCompile()
 	bIsCompiling = false;
 }
 
-void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded) const
+void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceeded, const FString& InErrorMessage) const
 {
-	AsyncTask(ENamedThreads::GameThread, [bSucceeded]()
+	AsyncTask(ENamedThreads::GameThread, [bSucceeded, InErrorMessage]()
 	{
 		if (GExitPurge)
 		{
@@ -655,8 +747,14 @@ void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceede
 
 		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
 
-		const auto NotificationInfo = new FNotificationInfo(
-			FText::FromString(bSucceeded ? TEXT("Compilation succeeded") : TEXT("Compilation failed")));
+		auto Title = bSucceeded ? FString(TEXT("Compilation succeeded")) : FString(TEXT("Compilation failed"));
+
+		if (!InErrorMessage.IsEmpty())
+		{
+			Title = FString::Printf(TEXT("%s: %s"), *Title, *InErrorMessage.Left(200));
+		}
+
+		const auto NotificationInfo = new FNotificationInfo(FText::FromString(Title));
 
 		NotificationInfo->bUseSuccessFailIcons = true;
 
@@ -673,25 +771,11 @@ void FCSharpCompilerRunnable::ShowCompileResultNotification(const bool bSucceede
 void FCSharpCompilerRunnable::OnBeginGenerator()
 {
 	bIsGenerating = true;
-
-	FScopeLock ScopeLock(&CriticalSection);
-
-	bIsPending = false;
-
-	FileChanges.Empty();
 }
 
 void FCSharpCompilerRunnable::OnEndGenerator()
 {
 	bIsGenerating = false;
-
-	{
-		FScopeLock ScopeLock(&CriticalSection);
-
-		bIsPending = false;
-
-		FileChanges.Empty();
-	}
 
 	if (Event != nullptr)
 	{

@@ -1,10 +1,13 @@
-﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
+#include "Containers/StringConv.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "HAL/PlatformFileManager.h"
+#include "HAL/PlatformMisc.h"
+#include "HAL/ThreadHeartBeat.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
@@ -49,11 +52,33 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 		}
 	}
 
+	FString Fallback;
+
+	for (const auto& Path : GetDotNetPathArray())
+	{
+		if (Fallback.IsEmpty())
+		{
+			Fallback = Path;
+		}
+
+		if (IsDotNetSdkSupported(Path))
+		{
+			return Path;
+		}
+	}
+
+	if (Fallback.IsEmpty())
+	{
 #if PLATFORM_WINDOWS
-	return TEXT("C:/Program Files/dotnet/dotnet.exe");
+		return TEXT("C:/Program Files/dotnet/dotnet.exe");
+#elif PLATFORM_MAC
+		return TEXT("/usr/local/share/dotnet/dotnet");
 #else
-	return TEXT("/usr/local/share/dotnet/dotnet");
+		return TEXT("/usr/share/dotnet/dotnet");
 #endif
+	}
+
+	return Fallback;
 }
 #endif
 
@@ -163,7 +188,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	if (const auto& ProjectModuleList = GetProjectModuleList();
 		ProjectModuleList.Contains(OutArray[0]) ||
 		OutArray[0] == TEXT("Game") ||
-		(OutArray[0] == TEXT("Script") && ProjectModuleList.Contains(OutArray[1])))
+		(OutArray[0] == TEXT("Script") &&
+			OutArray.IsValidIndex(1) && ProjectModuleList.Contains(OutArray[1])))
 	{
 		ModuleName = FApp::GetProjectName();
 	}
@@ -391,25 +417,29 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 		return TEXT("");
 	}
 
+	const auto bIsNativeName = (InStruct->IsNative() ||
+			FDynamicClassGenerator::IsDynamicClass(InStruct) ||
+			FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
+		!FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct);
+
 	return Encode(FString::Printf(TEXT(
 		              "%s%s"
 	              ),
-	                              (InStruct->IsNative() ||
-		                              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
-		                              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
-	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+	                              bIsNativeName
 		                              ? InStruct->GetPrefixCPP()
 		                              : TEXT(""),
 	                              *InStruct->GetName()),
-	              (InStruct->IsNative() ||
-		              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
-		              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
-	              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+	              bIsNativeName
 	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
+	if (InStruct == nullptr)
+	{
+		return TEXT("");
+	}
+
 	return Encode(FString::Printf(TEXT(
 		              "I%s"
 	              ),
@@ -707,7 +737,18 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 
 FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData, const FString& InAssetName)
 {
-	auto ModuleName = InAssetData.PackagePath.ToString().Replace(TEXT("Game"), FApp::GetProjectName());
+	const auto GameRoot = FString(TEXT("/Game"));
+
+	auto ModuleName = InAssetData.PackagePath.ToString();
+
+	if (ModuleName == GameRoot || ModuleName.StartsWith(GameRoot + TEXT("/"), ESearchCase::CaseSensitive))
+	{
+		ModuleName = FString::Printf(TEXT(
+			"/%s%s"
+		),
+		                             FApp::GetProjectName(),
+		                             *ModuleName.RightChop(GameRoot.Len()));
+	}
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
@@ -912,7 +953,12 @@ FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
 
 FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
 {
-	return IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir();
+	if (const auto Plugin = IPluginManager::Get().FindPlugin(PLUGIN_NAME))
+	{
+		return Plugin->GetBaseDir();
+	}
+
+	return FPaths::ProjectPluginsDir() / PLUGIN_NAME;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetPluginDirectory()
@@ -1006,6 +1052,7 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 		ProjectModuleList.Contains(Splits[0]) ||
 		Splits[0] == TEXT("Game") ||
 		(Splits[0] == NAMESPACE_SCRIPT &&
+			Splits.IsValidIndex(1) &&
 			ProjectModuleList.Contains(Splits[1])))
 	{
 		static auto GameProxyPath = GetGameProxyDirectory();
@@ -1084,6 +1131,21 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	       Add(GetFullGamePublishPath()).
 	       Append(GetFullCustomProjectsPublishPath()).
 	       Build();
+}
+
+bool FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(const TArray<FString>& InAssemblies)
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	for (const auto& Assembly : InAssemblies)
+	{
+		if (!PlatformFile.FileExists(*Assembly))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 #if WITH_EDITOR
@@ -1267,6 +1329,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
 	return TArrayBuilder<FString>().
 	       Add(GetPluginScriptDirectory() / DEFAULT_UE_NAME).
+	       Add(GetPluginScriptDirectory() / INTEROP_NAME).
 	       Add(GetGameDirectory()).
 	       Append(GetCustomProjectsDirectory()).
 	       Build();
@@ -1340,20 +1403,24 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FProperty* InProperty)
 {
-	return Encode(InProperty->GetName(), InProperty->IsNative());
+	return InProperty != nullptr ? Encode(InProperty->GetName(), InProperty->IsNative()) : TEXT("");
 }
 
 FString FUnrealCSharpFunctionLibrary::Encode(const UFunction* InFunction)
 {
-	return Encode(InFunction->GetName(), InFunction->IsNative());
+	return InFunction != nullptr ? Encode(InFunction->GetName(), InFunction->IsNative()) : TEXT("");
 }
 
 const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 {
 	static TArray<FString> EngineModuleList;
 
-	if (EngineModuleList.IsEmpty())
+	static bool bIsLoaded = false;
+
+	if (!bIsLoaded)
 	{
+		bIsLoaded = true;
+
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
 		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))
@@ -1400,8 +1467,12 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 {
 	static TArray<FString> ProjectModuleList;
 
-	if (ProjectModuleList.IsEmpty())
+	static bool bIsLoaded = false;
+
+	if (!bIsLoaded)
 	{
+		bIsLoaded = true;
+
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
 		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))
@@ -1573,7 +1644,9 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
                                                const TFunction<void(const int32, const FString&)>& InOnComplete,
                                                const FString& InWorkingDirectory,
                                                const TFunction<void(const FString&)>& InOnOutput,
-                                               const TFunction<bool()>& InIsStopped)
+                                               const TFunction<bool()>& InIsStopped,
+                                               const double InTimeoutSeconds,
+                                               const double InSilenceTimeoutSeconds)
 {
 	void* ReadPipe = nullptr;
 
@@ -1605,22 +1678,67 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		WritePipe,
 		ReadPipe);
 
-	const auto ReadOutput = [&]() -> bool
+	if (!ProcessHandle.IsValid())
 	{
-		if (const auto Output = FPlatformProcess::ReadPipe(ReadPipe);
-			!Output.IsEmpty())
+		Result = FString::Printf(TEXT("Failed to launch '%s' %s."), *InURL, *InParms);
+
+		if (InOnComplete)
 		{
-			Result.Append(Output);
-
-			if (InOnOutput)
-			{
-				InOnOutput(Output);
-			}
-
-			return true;
+			InOnComplete(-1, Result);
 		}
 
-		return false;
+		FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+		return;
+	}
+
+	TArray<uint8> PendingBytes;
+
+	const auto AppendBytes = [&](const int32 InLength)
+	{
+		if (InLength <= 0)
+		{
+			return;
+		}
+
+		TArray<uint8> Bytes(PendingBytes.GetData(), InLength);
+
+		Bytes.Add(0);
+
+		const auto Output = FString(UTF8_TO_TCHAR(reinterpret_cast<const ANSICHAR*>(Bytes.GetData())));
+
+		PendingBytes.RemoveAt(0, InLength);
+
+		Result.Append(Output);
+
+		if (InOnOutput)
+		{
+			InOnOutput(Output);
+		}
+	};
+
+	const auto ReadOutput = [&]() -> bool
+	{
+		TArray<uint8> Buffer;
+
+		if (!FPlatformProcess::ReadPipeToArray(ReadPipe, Buffer) || Buffer.IsEmpty())
+		{
+			return false;
+		}
+
+		PendingBytes.Append(Buffer);
+
+		for (auto Index = PendingBytes.Num() - 1; Index >= 0; --Index)
+		{
+			if (PendingBytes[Index] == '\n')
+			{
+				AppendBytes(Index + 1);
+
+				break;
+			}
+		}
+
+		return true;
 	};
 
 	const auto StartTime = FPlatformTime::Seconds();
@@ -1629,27 +1747,38 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	auto bCancelled = false;
 
+	const TCHAR* CancelReason{};
+
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
-		constexpr auto SyncProcessSilenceTimeoutSeconds = 120.0;
-
-		constexpr auto SyncProcessTimeoutSeconds = 600.0;
-
 		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
+
+		FThreadHeartBeat::Get().HeartBeat();
 
 		const auto Now = FPlatformTime::Seconds();
 
 		const auto bIsStopped = InIsStopped && InIsStopped();
 
-		const auto bIsTimeout = Now - StartTime > SyncProcessTimeoutSeconds;
+		const auto bIsTimeout = Now - StartTime > InTimeoutSeconds;
 
-		const auto bIsSilenceTimeout = Now - LastOutputTime > SyncProcessSilenceTimeoutSeconds;
+		const auto bIsSilenceTimeout = Now - LastOutputTime > InSilenceTimeoutSeconds;
 
 		if (bIsStopped || bIsTimeout || bIsSilenceTimeout)
 		{
 			bCancelled = true;
 
-			FPlatformProcess::TerminateProc(ProcessHandle, true);
+			if (bIsStopped)
+			{
+				CancelReason = TEXT("stopped");
+			}
+			else if (bIsTimeout)
+			{
+				CancelReason = TEXT("timeout");
+			}
+			else
+			{
+				CancelReason = TEXT("silence");
+			}
 
 			break;
 		}
@@ -1664,10 +1793,16 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	ReadOutput();
 
+	AppendBytes(PendingBytes.Num());
+
 	auto ReturnCode = 0;
 
 	if (bCancelled)
 	{
+		FPlatformProcess::TerminateProc(ProcessHandle, true);
+
+		Result.Append(FString::Printf(TEXT("\nCancelled (%s)."), CancelReason));
+
 		ReturnCode = -2;
 	}
 	else if (!FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
@@ -1675,22 +1810,18 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		ReturnCode = -1;
 	}
 
-	InOnComplete(ReturnCode, Result);
+	if (InOnComplete)
+	{
+		InOnComplete(ReturnCode, Result);
+	}
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::TerminateProc(ProcessHandle, true);
 
 	FPlatformProcess::CloseProc(ProcessHandle);
 }
 #endif
 
 #if WITH_EDITOR
-void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
-{
-	ScriptDomainType = InScriptDomainType;
-}
-
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FString& InPlatformName)
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
@@ -1704,5 +1835,116 @@ EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FStrin
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
 {
 	return ScriptDomainType;
+}
+
+void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
+{
+	ScriptDomainType = InScriptDomainType;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsDotNetSdkSupported(const FString& InDotNetPath)
+{
+	int32 MajorVersion = 0;
+
+	int32 MinorVersion = 0;
+
+	if (!GetDotNetSdkVersion(InDotNetPath, MajorVersion, MinorVersion))
+	{
+		return false;
+	}
+
+	if (const auto DotnetVersion = GetDotnetVersion(); MajorVersion != DotnetVersion)
+	{
+		return MajorVersion > DotnetVersion;
+	}
+
+	return MinorVersion >= DOTNET_MINOR_VERSION;
+}
+
+bool FUnrealCSharpFunctionLibrary::GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion,
+                                                       int32& OutMinorVersion)
+{
+	TArray<FString> Directories;
+
+	IFileManager::Get().FindFiles(Directories,
+	                              *(FPaths::Combine(FPaths::GetPath(InDotNetPath), TEXT("sdk")) / TEXT("*")),
+	                              false,
+	                              true);
+
+	auto bIsFound = false;
+
+	for (const auto& Directory : Directories)
+	{
+		TArray<FString> Version;
+
+		Directory.ParseIntoArray(Version, TEXT("."));
+
+		if (Version.Num() < 2 || !Version[0].IsNumeric() || !Version[1].IsNumeric())
+		{
+			continue;
+		}
+
+		const auto MajorVersion = FCString::Atoi(*Version[0]);
+
+		const auto MinorVersion = FCString::Atoi(*Version[1]);
+
+		if (!bIsFound ||
+			MajorVersion > OutMajorVersion ||
+			(MajorVersion == OutMajorVersion && MinorVersion > OutMinorVersion))
+		{
+			OutMajorVersion = MajorVersion;
+
+			OutMinorVersion = MinorVersion;
+
+			bIsFound = true;
+		}
+	}
+
+	return bIsFound;
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetDotNetPathArray()
+{
+#if PLATFORM_WINDOWS
+	const auto ExecutableName = TEXT("dotnet.exe");
+
+	const auto PathDelimiter = TEXT(";");
+#else
+	const auto ExecutableName = TEXT("dotnet");
+
+	const auto PathDelimiter = TEXT(":");
+#endif
+
+	TArray<FString> SearchPaths;
+
+	FPlatformMisc::GetEnvironmentVariable(TEXT("PATH")).ParseIntoArray(SearchPaths, PathDelimiter);
+
+	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("DOTNET_ROOT")));
+
+#if PLATFORM_WINDOWS
+	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")) / TEXT("Microsoft/dotnet"));
+
+	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("ProgramFiles")) / TEXT("dotnet"));
+#elif PLATFORM_MAC
+	SearchPaths.Add(TEXT("/usr/local/share/dotnet"));
+#else
+	SearchPaths.Add(TEXT("/usr/share/dotnet"));
+#endif
+
+	TArray<FString> Result;
+
+	for (const auto& SearchPath : SearchPaths)
+	{
+		if (!SearchPath.IsEmpty())
+		{
+			if (const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(SearchPath, ExecutableName));
+				IFileManager::Get().FileExists(*File))
+			{
+				Result.AddUnique(File);
+			}
+		}
+	}
+
+	return Result;
 }
 #endif

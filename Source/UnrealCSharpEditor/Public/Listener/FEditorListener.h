@@ -32,9 +32,9 @@ private:
 
 	void OnAssetAdded(const FAssetData& InAssetData) const;
 
-	void OnAssetRemoved(const FAssetData& InAssetData) const;
+	void OnAssetRemoved(const FAssetData& InAssetData);
 
-	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const;
+	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath);
 
 	void OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const;
 

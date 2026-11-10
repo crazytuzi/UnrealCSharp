@@ -46,6 +46,8 @@
 
 #define FUNCTION_LOG_BRIDGE_INITIALIZE FString(TEXT("Initialize"))
 
+#define FUNCTION_LOG_BRIDGE_DEINITIALIZE FString(TEXT("Deinitialize"))
+
 #if WITH_LEANCLR
 #define FUNCTION_LOG_BRIDGE_INITIALIZE_LEANCLR FString(TEXT("InitializeLeanCLR"))
 

@@ -35,7 +35,7 @@ struct FCustomProject
 
 	FString GUID() const
 	{
-		const auto Hex = FString::Printf(TEXT("%X"), GetTypeHash(Name));
+		const auto Hex = FString::Printf(TEXT("%08X"), GetTypeHash(Name));
 
 		return FString::Printf(TEXT(
 			"%s-%s-%s-%s-%s%s"

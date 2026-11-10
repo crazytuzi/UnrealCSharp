@@ -1,4 +1,4 @@
-﻿#include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif
@@ -237,6 +237,8 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 	return ResultArray;
 #elif PLATFORM_MAC
 	return {TEXT("/usr/local/share/dotnet/dotnet")};
+#else
+	return {};
 #endif
 }
 

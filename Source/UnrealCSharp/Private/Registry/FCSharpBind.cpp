@@ -36,15 +36,16 @@ void FCSharpBind::Initialize()
 {
 	NotOverrideTypes.Empty();
 
-	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
-		this, &FCSharpBind::OnCSharpEnvironmentInitialize);
+	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+		AddRaw(this, &FCSharpBind::OnCSharpEnvironmentInitialize);
 }
 
 void FCSharpBind::Deinitialize()
 {
 	if (OnCSharpEnvironmentInitializeDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+			Remove(OnCSharpEnvironmentInitializeDelegateHandle);
 	}
 
 #if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
@@ -85,9 +86,7 @@ IManagedHandle FCSharpBind::Bind(UObject* InObject)
 
 IManagedHandle FCSharpBind::Bind(UClass* InClass)
 {
-	Bind<false>(InClass);
-
-	return Bind(static_cast<UObject*>(InClass));
+	return Bind<false>(InClass) ? Bind(static_cast<UObject*>(InClass)) : InvalidManagedHandle;
 }
 
 bool FCSharpBind::Bind(const IManagedHandle InManagedObject, const FName& InStructName)
@@ -156,6 +155,38 @@ void FCSharpBind::ResumeDummyOwnerClasses()
 }
 #endif
 
+void FCSharpBind::RemoveFunctionFromClass(UFunction* InFunction)
+{
+	if (InFunction != nullptr)
+	{
+		if (const auto Class = Cast<UClass>(InFunction->GetOuter()))
+		{
+			Class->RemoveFunctionFromFunctionMap(InFunction);
+
+			UField* PrevField{};
+
+			for (auto Field = Class->Children; Field != nullptr; Field = Field->Next)
+			{
+				if (Field == InFunction)
+				{
+					if (PrevField != nullptr)
+					{
+						PrevField->Next = Field->Next;
+					}
+					else
+					{
+						Class->Children = Field->Next;
+					}
+
+					break;
+				}
+
+				PrevField = Field;
+			}
+		}
+	}
+}
+
 bool FCSharpBind::BindImplementation(UStruct* InStruct)
 {
 	if (InStruct == nullptr)
@@ -211,26 +242,16 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	for (const auto& [PropertyName, Property] : Properties)
 	{
-		for (const auto& Field : Fields)
+		if (Fields.Remove(PropertyName) > 0)
 		{
-			if (Field == PropertyName)
+			auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
+
+			if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *PropertyName)))
 			{
-				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
-
-				if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-					"__%s"
-				),
-				                                                      *Field)))
-				{
-					FoundField->SetValue(Class, &FieldHash);
-				}
-
-				FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
-
-				Fields.Remove(Field);
-
-				break;
+				FoundField->SetValue(Class, &FieldHash);
 			}
+
+			FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
 		}
 	}
 
@@ -263,27 +284,17 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& Field : Fields)
+			if (Fields.Remove(FunctionName) > 0)
 			{
-				if (Field == FunctionName)
+				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
+
+				if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *FunctionName)))
 				{
-					auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
-
-					if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-						"__%s"
-					),
-					                                                      *Field)))
-					{
-						FoundField->SetValue(Class, &FieldHash);
-					}
-
-					FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
-						FieldHash, NewClassDescriptor, Function);
-
-					Fields.Remove(Field);
-
-					break;
+					FoundField->SetValue(Class, &FieldHash);
 				}
+
+				FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
+					FieldHash, NewClassDescriptor, Function);
 			}
 		}
 
@@ -459,7 +470,14 @@ bool FCSharpBind::BindImplementation(const IManagedHandle InManagedObject, const
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject);
+	if (!FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject))
+	{
+		InScriptStruct->DestroyStruct(Structure);
+
+		FMemory::Free(Structure);
+
+		return false;
+	}
 
 	return true;
 }
@@ -739,7 +757,17 @@ void FCSharpBind::RegisterScriptTick(const UClass* InClass, const UFunction* InF
 
 							if (bIsTick && !bHasScriptImplementedTick)
 							{
+#if UE_U_USER_WIDGET_UPDATE_CAN_TICK
 								Widget->UpdateCanTick();
+#else
+								if (Widget->GetDesiredTickFrequency() != EWidgetTickFrequency::Never)
+								{
+									if (const auto CachedWidget = Widget->GetCachedWidget(); CachedWidget.IsValid())
+									{
+										CachedWidget->SetCanTick(true);
+									}
+								}
+#endif
 							}
 						}
 					}

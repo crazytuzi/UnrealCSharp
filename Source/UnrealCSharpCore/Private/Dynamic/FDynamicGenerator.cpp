@@ -1,4 +1,5 @@
 #include "Dynamic/FDynamicGenerator.h"
+#include "Misc/ScopeExit.h"
 #include "CoreMacro/Macro.h"
 #include "Domain/Script/FScriptDomainScope.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
@@ -23,6 +24,15 @@ void FDynamicGenerator::Generator()
 	bIsFullGenerator = true;
 #endif
 
+	ON_SCOPE_EXIT
+	{
+		FDynamicGeneratorCore::Reset();
+
+#if WITH_EDITOR
+		bIsFullGenerator = false;
+#endif
+	};
+
 	FScriptDomainScope([]()
 	{
 		FDynamicEnumGenerator::Generator();
@@ -35,12 +45,17 @@ void FDynamicGenerator::Generator()
 
 		FDynamicGeneratorCore::Generator();
 	});
+}
 
-	FDynamicGeneratorCore::Empty();
+void FDynamicGenerator::Reset()
+{
+	FDynamicClassGenerator::Reset();
 
-#if WITH_EDITOR
-	bIsFullGenerator = false;
-#endif
+	FDynamicInterfaceGenerator::Reset();
+
+	FDynamicStructGenerator::Reset();
+
+	FDynamicEnumGenerator::Reset();
 }
 
 bool FDynamicGenerator::IsDynamicClass(const UClass* InClass)

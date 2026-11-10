@@ -5,6 +5,7 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
+#include "CoreMacro/Macro.h"
 
 TSharedPtr<FSlateStyleSet> FUnrealCSharpEditorStyle::StyleInstance = nullptr;
 
@@ -20,11 +21,14 @@ void FUnrealCSharpEditorStyle::Initialize()
 
 void FUnrealCSharpEditorStyle::Shutdown()
 {
-	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
+	if (StyleInstance.IsValid())
+	{
+		ensure(StyleInstance.IsUnique());
 
-	ensure(StyleInstance.IsUnique());
+		FSlateStyleRegistry::UnRegisterSlateStyle(*StyleInstance);
 
-	StyleInstance.Reset();
+		StyleInstance.Reset();
+	}
 }
 
 FName FUnrealCSharpEditorStyle::GetStyleSetName()
@@ -48,7 +52,10 @@ TSharedRef<FSlateStyleSet> FUnrealCSharpEditorStyle::Create()
 {
 	TSharedRef<FSlateStyleSet> Style = MakeShareable(new FSlateStyleSet("UnrealCSharpEditorStyle"));
 
-	Style->SetContentRoot(IPluginManager::Get().FindPlugin("UnrealCSharp")->GetBaseDir() / TEXT("Resources"));
+	if (const auto Plugin = IPluginManager::Get().FindPlugin(PLUGIN_NAME))
+	{
+		Style->SetContentRoot(Plugin->GetBaseDir() / TEXT("Resources"));
+	}
 
 	Style->Set("UnrealCSharpEditor.PluginAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 

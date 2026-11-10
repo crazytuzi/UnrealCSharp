@@ -99,43 +99,43 @@ void FDynamicNewClassUtils::GetDynamicClassContent(const UClass* InParentClass, 
 	                                                *InNewClassName
 	);
 
-	const auto TemplateFileName = FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(AncestorClass);
+	if (const auto TemplateFileName = FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(AncestorClass);
+		FFileHelper::LoadFileToString(OutContent, *TemplateFileName))
+	{
+		AddNamespace(ParentNamespace, OutContent);
 
-	FFileHelper::LoadFileToString(OutContent, *TemplateFileName);
+		OutContent.ReplaceInline(*FString::Printf(TEXT(
+			                         ": %s"
+		                         ),
+		                                          *FUnrealCSharpFunctionLibrary::GetFullClass(AncestorClass)
+		                         ),
+		                         *FString::Printf(TEXT(
+			                         ": %s"
+		                         ),
+		                                          *ParentClassName
+		                         )
+		);
 
-	AddNamespace(ParentNamespace, OutContent);
+		const auto OldClassFullName = FString::Printf(TEXT(
+			"%s%s%s"
+		),
+		                                              AncestorClass->GetPrefixCPP(),
+		                                              *DYNAMIC_CLASS_DEFAULT_PREFIX,
+		                                              *AncestorClass->GetName()
+		);
 
-	OutContent.ReplaceInline(*FString::Printf(TEXT(
-		                         ": %s"
-	                         ),
-	                                          *FUnrealCSharpFunctionLibrary::GetFullClass(AncestorClass)
-	                         ),
-	                         *FString::Printf(TEXT(
-		                         ": %s"
-	                         ),
-	                                          *ParentClassName
-	                         )
-	);
-
-	const auto OldClassFullName = FString::Printf(TEXT(
-		"%s%s%s"
-	),
-	                                              AncestorClass->GetPrefixCPP(),
-	                                              *DYNAMIC_CLASS_DEFAULT_PREFIX,
-	                                              *AncestorClass->GetName()
-	);
-
-	OutContent.ReplaceInline(*FString::Printf(TEXT(
-		                         "%s"
-	                         ),
-	                                          *OldClassFullName
-	                         ),
-	                         *FString::Printf(TEXT(
-		                         "%s"
-	                         ),
-	                                          *GeneratedClassName
-	                         )
-	);
+		OutContent.ReplaceInline(*FString::Printf(TEXT(
+			                         "%s"
+		                         ),
+		                                          *OldClassFullName
+		                         ),
+		                         *FString::Printf(TEXT(
+			                         "%s"
+		                         ),
+		                                          *GeneratedClassName
+		                         )
+		);
+	}
 }
 
 FString FDynamicNewClassUtils::GetAssetGeneratedClassName(const FAssetData& InAssetData)

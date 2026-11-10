@@ -1,4 +1,5 @@
 #include "DetailCustomization/DirectoryPathCustomization.h"
+#include "HAL/PlatformFileManager.h"
 #include "Misc/MessageDialog.h"
 #include "Modules/ModuleManager.h"
 #include "Framework/Application/SlateApplication.h"
@@ -96,43 +97,34 @@ FReply FDirectoryPathCustomization::OnPickDirectory(const TSharedRef<IPropertyHa
 			StartDirectory = AbsoluteDirectory;
 		}
 
-		for (;;)
+		if (FString Directory;
+			DesktopPlatform->OpenDirectoryDialog(ParentWindowHandle,
+			                                     LOCTEXT("FolderDialogTitle", "Choose a directory").ToString(),
+			                                     StartDirectory, Directory))
 		{
-			if (FString Directory;
-				DesktopPlatform->OpenDirectoryDialog(ParentWindowHandle,
-				                                     LOCTEXT("FolderDialogTitle", "Choose a directory").ToString(),
-				                                     StartDirectory, Directory))
+			FText FailureReason;
+
+			if (IsValidPath(Directory, bUseRelativePath, &FailureReason))
 			{
-				FText FailureReason;
+				FEditorDirectories::Get().SetLastDirectory(ELastDirectory::GENERIC_IMPORT, Directory);
 
-				if (IsValidPath(Directory, bUseRelativePath, &FailureReason))
+				if (bUseRelativePath)
 				{
-					FEditorDirectories::Get().SetLastDirectory(ELastDirectory::GENERIC_IMPORT, Directory);
-
-					if (bUseRelativePath)
-					{
-						Directory.RightChopInline(AbsoluteDirectory.Len(),
+					Directory.RightChopInline(AbsoluteDirectory.Len(),
 #if UE_F_STRING_LEFT_CHOP_IN_LINE_E_ALLOW_SHRINKING
-						                          EAllowShrinking::No
+					                          EAllowShrinking::No
 #else
-						                          false
+					                          false
 #endif
-						);
-					}
-
-					PropertyHandle->SetValue(Directory);
+					);
 				}
-				else
-				{
-					StartDirectory = Directory;
 
-					FMessageDialog::Open(EAppMsgType::Ok, FailureReason);
-
-					continue;
-				}
+				PropertyHandle->SetValue(Directory);
 			}
-
-			break;
+			else
+			{
+				FMessageDialog::Open(EAppMsgType::Ok, FailureReason);
+			}
 		}
 	}
 
@@ -142,22 +134,33 @@ FReply FDirectoryPathCustomization::OnPickDirectory(const TSharedRef<IPropertyHa
 bool FDirectoryPathCustomization::IsValidPath(const FString& AbsolutePath, const bool bUseRelativePath,
                                               FText* const OutReason) const
 {
-	if (bUseRelativePath)
-	{
-		if (!AbsolutePath.StartsWith(AbsoluteDirectory))
-		{
-			if (OutReason)
-			{
-				*OutReason = FText::Format(LOCTEXT(
-					"Error_InvalidRootPath", "The chosen directory must be within {0}"),
-				                           FText::FromString(AbsoluteDirectory));
-			}
+	const auto RootDirectory = AbsoluteDirectory.EndsWith(TEXT("/")) || AbsoluteDirectory.EndsWith(TEXT("\\"))
+		                           ? AbsoluteDirectory
+		                           : AbsoluteDirectory + TEXT("/");
 
-			return false;
-		}
+	auto FailureReason = FText::GetEmpty();
+
+	if (bUseRelativePath &&
+		!AbsolutePath.StartsWith(RootDirectory) &&
+		AbsolutePath != AbsoluteDirectory &&
+		AbsolutePath + TEXT("/") != RootDirectory)
+	{
+		FailureReason = FText::Format(LOCTEXT(
+			"Error_InvalidRootPath", "The chosen directory must be within {0}"),
+		                              FText::FromString(AbsoluteDirectory));
 	}
 
-	return true;
+	if (FailureReason.IsEmpty() && !FPlatformFileManager::Get().GetPlatformFile().DirectoryExists(*AbsolutePath))
+	{
+		FailureReason = LOCTEXT("Error_InvalidDirectory", "The chosen directory does not exist");
+	}
+
+	if (OutReason != nullptr && !FailureReason.IsEmpty())
+	{
+		*OutReason = FailureReason;
+	}
+
+	return FailureReason.IsEmpty();
 }
 
 #undef LOCTEXT_NAMESPACE

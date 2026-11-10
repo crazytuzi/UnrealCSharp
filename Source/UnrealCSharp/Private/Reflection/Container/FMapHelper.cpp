@@ -7,6 +7,7 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
+	ScriptMapLayout{},
 	bNeedFreeData(InbNeedFreeData),
 	bNeedFreeProperty(InbNeedFreeProperty),
 	DataDeleter(InDataDeleter),
@@ -26,7 +27,10 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 		KeyPropertyDescriptor = FPropertyDescriptor::Factory(InKeyProperty);
 
 		ValuePropertyDescriptor = FPropertyDescriptor::Factory(InValueProperty);
+	}
 
+	if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr)
+	{
 		ScriptMapLayout = FScriptMap::GetScriptLayout(KeyPropertyDescriptor->GetSize(),
 		                                              KeyPropertyDescriptor->GetMinAlignment(),
 		                                              ValuePropertyDescriptor->GetSize(),
@@ -66,15 +70,24 @@ void FMapHelper::Deinitialize()
 		ScriptMap = nullptr;
 	}
 
-	if (bNeedFreeProperty && KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr)
+	if (KeyPropertyDescriptor != nullptr)
 	{
-		KeyPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			KeyPropertyDescriptor->DestroyProperty();
+		}
 
 		delete KeyPropertyDescriptor;
 
 		KeyPropertyDescriptor = nullptr;
+	}
 
-		ValuePropertyDescriptor->DestroyProperty();
+	if (ValuePropertyDescriptor != nullptr)
+	{
+		if (bNeedFreeProperty)
+		{
+			ValuePropertyDescriptor->DestroyProperty();
+		}
 
 		delete ValuePropertyDescriptor;
 
@@ -86,7 +99,7 @@ void FMapHelper::EnsureRehash() const
 {
 	if (bNeedRehash)
 	{
-		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
+		ScriptMap->Rehash(ScriptMapLayout, [this](const void* Src)
 		{
 			return KeyPropertyDescriptor->GetValueTypeHash(Src);
 		});
@@ -163,11 +176,11 @@ int32 FMapHelper::Remove(const void* InKey) const
 
 		const auto Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
 
+		EnsureRehash();
+
 		KeyPropertyDescriptor->DestroyValue(Data);
 
 		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
-
-		EnsureRehash();
 
 		ScriptMap->RemoveAt(KeyIndex, ScriptMapLayout);
 	}

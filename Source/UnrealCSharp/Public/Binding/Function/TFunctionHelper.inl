@@ -36,12 +36,12 @@ struct TFunctionHelper<std::tuple<Result, std::tuple<Args...>>>
 	template <typename Class, typename Function, auto... Index>
 	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
+		std::tuple<TArgument<Args, Args>...> Argument(
+			IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);
+
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 		{
-			std::tuple<TArgument<Args, Args>...> Argument(
-				IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);
-
 			if constexpr (std::is_same_v<Result, void>)
 			{
 				(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...);
@@ -51,8 +51,12 @@ struct TFunctionHelper<std::tuple<Result, std::tuple<Args...>>>
 				TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>((FoundObject->*InFunction)(
 					                     std::forward<Args>(std::get<Index>(Argument).Get())...)));
 			}
-
-			TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);
 		}
+		else if constexpr (!std::is_same_v<Result, void>)
+		{
+			TReturnValue<Result>(RETURN_BUFFER, Result{});
+		}
+
+		TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);
 	}
 };

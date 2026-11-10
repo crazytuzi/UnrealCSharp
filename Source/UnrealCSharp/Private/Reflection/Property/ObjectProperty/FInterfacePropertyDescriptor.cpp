@@ -3,16 +3,21 @@
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
+	auto Object = InvalidManagedHandle;
 
-	if (!IManagedHandleIsValid(Object))
+	if (Property->GetPropertyValue(Src).GetObject() != nullptr)
 	{
-		if (Class != nullptr)
-		{
-			Object = Class->NewObject(true);
+		Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
-				Class, Object, Src);
+		if (!IManagedHandleIsValid(Object))
+		{
+			if (Class != nullptr)
+			{
+				Object = Class->NewObject(true);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
+					Class, Object, Src);
+			}
 		}
 	}
 

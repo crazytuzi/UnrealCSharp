@@ -9,7 +9,7 @@
 
 void FBindingClassGenerator::Generator()
 {
-	for (const auto& Class : FBinding::Get().GetClasses())
+	for (const auto& Class : FBinding::Get().Register().GetClasses())
 	{
 		Generator(Class);
 	}
@@ -23,6 +23,16 @@ void FBindingClassGenerator::Generator(const FBindingClass* InClass)
 
 		GeneratorImplementation(InClass);
 	}
+}
+
+bool FBindingClassGenerator::IsSubscriptValid(const FBindingClass* InClass)
+{
+	const auto& Subscript = InClass->GetSubscript();
+
+	return Subscript.IsSet() &&
+		Subscript.GetParams().Num() == 1 &&
+		Subscript.GetParamNames().Num() == 1 &&
+		Subscript.GetReturn() != nullptr;
 }
 
 void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
@@ -43,7 +53,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	bool bHasEqualTo = false;
 
-	if (InClass->GetSubscript().IsSet())
+	if (IsSubscriptValid(InClass))
 	{
 		auto Param = InClass->GetSubscript().GetParams()[0];
 
@@ -336,7 +346,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		const auto& DefaultArguments = Function.GetDefaultArguments();
 
-		if (!Function.GetParamNames().IsEmpty())
+		if (Function.GetParamNames().Num() >= Params.Num())
 		{
 			FunctionParamName = Function.GetParamNames();
 
@@ -652,10 +662,43 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			);
 		}
 
+		FString FunctionGuardBody;
+
+		if (Function.IsStatic() && Params.Num() == 2 && FunctionParamName.Num() == 2)
+		{
+			if (const auto& FunctionName = Function.GetFunctionName();
+				(FunctionName == TEXT("operator ==") || FunctionName == TEXT("operator !=")) &&
+				Params[0]->GetName() == ClassContent && Params[1]->GetName() == ClassContent)
+			{
+				const auto bIsEqual = FunctionName == TEXT("operator ==");
+
+				FunctionGuardBody = FString::Printf(TEXT(
+					"\t\t\tif (%s is null && %s is null)\n"
+					"\t\t\t{\n"
+					"\t\t\t\treturn %s;\n"
+					"\t\t\t}\n"
+					"\n"
+					"\t\t\tif (%s is null || %s is null)\n"
+					"\t\t\t{\n"
+					"\t\t\t\treturn %s;\n"
+					"\t\t\t}\n"
+					"\n"
+				),
+				                                    *FunctionParamName[0],
+				                                    *FunctionParamName[1],
+				                                    bIsEqual ? TEXT("true") : TEXT("false"),
+				                                    *FunctionParamName[0],
+				                                    *FunctionParamName[1],
+				                                    bIsEqual ? TEXT("false") : TEXT("true")
+				);
+			}
+		}
+
 		FunctionContent += FString::Printf(TEXT(
 			"%s"
 			"\t\t%s\n"
 			"\t\t{\n"
+			"%s"
 			"\t\t\tunsafe\n"
 			"\t\t\t{\n"
 			"%s"
@@ -664,6 +707,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		),
 		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
 		                                   *FunctionDeclaration,
+		                                   *FunctionGuardBody,
 		                                   *FunctionImplementationBody
 		);
 	}
@@ -736,9 +780,10 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + CSHARP_SUFFIX;
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClass)
@@ -809,7 +854,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		);
 	};
 
-	if (InClass->GetSubscript().IsSet())
+	if (IsSubscriptValid(InClass))
 	{
 		UsingNameSpaces.Append(InClass->GetSubscript().GetReturn()->GetNameSpace());
 
@@ -1010,7 +1055,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	const auto FileName = FPaths::Combine(DirectoryName,
 	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + CSHARP_SUFFIX;
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }

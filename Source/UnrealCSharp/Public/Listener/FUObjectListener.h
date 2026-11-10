@@ -8,6 +8,10 @@ public:
 	virtual ~FUObjectListener() override;
 
 private:
+	void AddListeners();
+
+	void RemoveListeners();
+
 	void OnUnrealCSharpModuleActive();
 
 	void OnUnrealCSharpModuleInActive();
@@ -23,4 +27,6 @@ private:
 	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;
 
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
+
+	bool bIsRegistered{};
 };

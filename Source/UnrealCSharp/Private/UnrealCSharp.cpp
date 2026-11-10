@@ -44,12 +44,12 @@ void FUnrealCSharpModule::OnUnrealCSharpCoreModuleActive()
 	FDynamicGenerator::Generator();
 #endif
 
-	FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Broadcast();
+	FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().Broadcast();
 }
 
 void FUnrealCSharpModule::OnUnrealCSharpCoreModuleInActive()
 {
-	FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Broadcast();
+	FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().Broadcast();
 }
 
 #undef LOCTEXT_NAMESPACE

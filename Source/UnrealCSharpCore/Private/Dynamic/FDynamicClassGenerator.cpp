@@ -53,10 +53,14 @@ void FDynamicClassGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
+		                                 const auto ClassName = InClassReflection->GetName();
+
 		                                 auto Node = FDynamicDependencyGraph::FNode(
-			                                 InClassReflection->GetName(), [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection,
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName),
 				                                           EDynamicClassGeneratorType::DependencyGraph);
 			                                 });
 
@@ -79,6 +83,42 @@ void FDynamicClassGenerator::Generator()
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
+}
+
+void FDynamicClassGenerator::Reset()
+{
+	for (const auto Class : DynamicClassSet)
+	{
+		if (Class != nullptr)
+		{
+#if WITH_EDITOR
+			if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(Class))
+			{
+				if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+				{
+					Blueprint->RemoveFromRoot();
+
+					Blueprint->MarkAsGarbage();
+				}
+			}
+
+#endif
+
+			Class->RemoveFromRoot();
+
+			Class->MarkAsGarbage();
+		}
+	}
+
+	DynamicClassSet.Empty();
+
+	DynamicClassMap.Empty();
+
+	NamespaceMap.Empty();
+
+	DefaultSubObjectInfoMap.Empty();
+
+	DefaultValueMap.Empty();
 }
 
 #if WITH_EDITOR
@@ -327,6 +367,8 @@ void FDynamicClassGenerator::ProcessGenerator(FClassReflection* InClassReflectio
 	GeneratorFunction(InClassReflection, InClass);
 
 	GeneratorInterface(InClassReflection, InClass);
+
+	FDynamicGeneratorCore::GeneratorAccessor(InClassReflection, InClass);
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)

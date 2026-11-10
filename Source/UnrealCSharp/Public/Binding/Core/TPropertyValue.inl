@@ -69,7 +69,7 @@ struct TStringPropertyValue
 			{
 				SrcManagedHandle = FoundClass->NewObject(true);
 
-				FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, true>(
+				FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, false>(
 					FoundClass, SrcManagedHandle, InMember);
 			}
 		}
@@ -112,18 +112,40 @@ struct TStringPropertyValue
 template <typename T>
 struct TMultiPropertyValue
 {
+	template <typename U = std::decay_t<T>>
+	static bool IsNull(const U& InValue)
+	{
+		if constexpr (TIsTSoftObjectPtr<U>::Value || TIsTSoftClassPtr<U>::Value)
+		{
+			return InValue.IsNull();
+		}
+		else if constexpr (TIsTScriptInterface<U>::Value)
+		{
+			return InValue.GetObject() == nullptr;
+		}
+		else
+		{
+			return InValue.Get() == nullptr;
+		}
+	}
+
 	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
+		auto SrcManagedHandle = InvalidManagedHandle;
 
-		if (!IManagedHandleIsValid(SrcManagedHandle))
+		if (InMember != nullptr && !IsNull(*InMember))
 		{
-			if (const auto FoundClass = TPropertyClass<T, T>::Get())
-			{
-				SrcManagedHandle = FoundClass->NewObject(true);
+			SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
 
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, true>(
-					FoundClass, SrcManagedHandle, InMember);
+			if (!IManagedHandleIsValid(SrcManagedHandle))
+			{
+				if (const auto FoundClass = TPropertyClass<T, T>::Get())
+				{
+					SrcManagedHandle = FoundClass->NewObject(true);
+
+					FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, true>(
+						FoundClass, SrcManagedHandle, InMember);
+				}
 			}
 		}
 

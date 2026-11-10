@@ -126,6 +126,65 @@ namespace
 			}
 		}
 
+		static int32 GetTypeSizeImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
+			{
+				return SetHelper->GetElementPropertyDescriptor() != nullptr
+					       ? SetHelper->GetElementPropertyDescriptor()->GetBufferSize()
+					       : 0;
+			}
+
+			return 0;
+		}
+
+		static int32 GetElementsImplementation(const IManagedHandle InManagedHandle, const int32 InIndex,
+		                                       const int32 InCount, uint8* OutBuffer, const int32 InBufferSize,
+		                                       int32* OutNextIndex)
+		{
+			if (OutNextIndex != nullptr)
+			{
+				*OutNextIndex = InIndex;
+			}
+
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
+			{
+				const auto ElementSize = SetHelper->GetElementPropertyDescriptor() != nullptr
+					                         ? SetHelper->GetElementPropertyDescriptor()->GetBufferSize()
+					                         : 0;
+
+				if (ElementSize > 0 && InIndex >= 0 && InCount > 0 && OutBuffer != nullptr &&
+					static_cast<int64>(InCount) * ElementSize <= InBufferSize)
+				{
+					const auto MaxIndex = SetHelper->GetMaxIndex();
+
+					auto Index = InIndex;
+
+					auto Count = 0;
+
+					for (; Index < MaxIndex && Count < InCount; ++Index)
+					{
+						if (SetHelper->IsValidIndex(Index))
+						{
+							FMemory::Memcpy(OutBuffer + static_cast<int64>(Count) * ElementSize,
+							                SetHelper->GetEnumerator(Index), ElementSize);
+
+							++Count;
+						}
+					}
+
+					if (OutNextIndex != nullptr)
+					{
+						*OutNextIndex = Index;
+					}
+
+					return Count;
+				}
+			}
+
+			return 0;
+		}
+
 		FRegisterSet()
 		{
 			FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY)
@@ -139,7 +198,9 @@ namespace
 				.Function("Remove", RemoveImplementation)
 				.Function("Contains", ContainsImplementation)
 				.Function("IsValidIndex", IsValidIndexImplementation)
-				.Function("GetEnumerator", GetEnumeratorImplementation);
+				.Function("GetEnumerator", GetEnumeratorImplementation)
+				.Function("GetTypeSize", GetTypeSizeImplementation)
+				.Function("GetElements", GetElementsImplementation);
 		}
 	};
 

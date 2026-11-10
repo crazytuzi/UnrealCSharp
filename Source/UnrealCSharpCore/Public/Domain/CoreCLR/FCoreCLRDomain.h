@@ -54,7 +54,8 @@ public:
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
 	                                 void* InValue) override;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) override;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) override;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName,
 	                              void** InParams) override;
@@ -101,7 +102,9 @@ private:
 
 	void RegisterLog();
 
-	void RegisterBinding() const;
+	void UnregisterLog();
+
+	void RegisterBinding();
 
 	void RegisterSynchronizationContextTick();
 
@@ -128,6 +131,8 @@ private:
 	void LoadAssemblyAndGetFunctionPointer(const FString& InAssembly, const FString& InType, const FString& InMethod,
 	                                       void** OutFunctionPointer) const;
 
+	void ReleaseHostFxr();
+
 private:
 	static void* HostFxrDllHandle;
 
@@ -140,5 +145,7 @@ private:
 	TArray<IManagedHandle> Assemblies;
 
 	bool bIsInitialized{};
+
+	bool bIsInitializeCompleted{};
 };
 #endif

@@ -4,6 +4,7 @@
 #include "EnhancedInputActionDelegateBinding.h"
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Interop/FRegisterInputComponentHelper.h"
 #include "Domain/Script/IManagedHandle.h"
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
@@ -40,72 +41,9 @@ namespace
 
 	struct FRegisterEnhancedInputComponent
 	{
-		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
-		                                                            const IManagedHandle InBindingClass)
-		{
-			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
-				UBlueprintGeneratedClass>(InThisClass);
-
-			const auto BindingClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InBindingClass);
-
-			if (ThisClass != nullptr && BindingClass != nullptr)
-			{
-				auto DynamicBindingObject = UBlueprintGeneratedClass::GetDynamicBindingObject(ThisClass, BindingClass);
-
-				if (DynamicBindingObject == nullptr)
-				{
-					DynamicBindingObject = NewObject<UDynamicBlueprintBinding>(GetTransientPackage(), BindingClass);
-
-					ThisClass->DynamicBindingObjects.Add(DynamicBindingObject);
-				}
-
-				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
-			}
-
-			return InvalidManagedHandle;
-		}
-
-		static void BindFunction(UClass* InClass, const FName* InFunctionName,
-		                         const TFunction<void(UFunction* InFunction)>& InProperty)
-		{
-			if (InClass == nullptr || InFunctionName == nullptr)
-			{
-				return;
-			}
-
-			if (const auto FoundFunction = InClass->FindFunctionByName(*InFunctionName))
-			{
-				FoundFunction->RemoveFromRoot();
-
-				return;
-			}
-
-			const auto Function = NewObject<UFunction>(InClass, *InFunctionName, EObjectFlags::RF_Transient);
-
-			Function->FunctionFlags = FUNC_BlueprintEvent;
-
-			InProperty(Function);
-
-			Function->Bind();
-
-			Function->StaticLink(true);
-
-			InClass->AddFunctionToFunctionMap(Function, *InFunctionName);
-
-			Function->Next = InClass->Children;
-
-			InClass->Children = Function;
-
-			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
-				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
-			                                                     InClass,
-			                                                     Function
-			);
-		}
-
 		static void BindActionFunction(UClass* InClass, const FName* InFunctionName)
 		{
-			BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
+			FRegisterInputComponentHelper::BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 			{
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 				const auto SourceActionProperty = new FObjectProperty(InFunction, TEXT("SourceAction"),
@@ -169,9 +107,14 @@ namespace
 		{
 			for (const auto& ActionEventBinding : InEnhancedInputComponent->GetActionEventBindings())
 			{
+#if UE_F_ENHANCED_INPUT_ACTION_EVENT_BINDING_IS_BOUND_TO_OBJECT
 				if (ActionEventBinding->GetAction() == InInputAction &&
 					ActionEventBinding->GetTriggerEvent() == InTriggerEvent &&
-					ActionEventBinding->GetUObject() == InObject)
+					ActionEventBinding->IsBoundToObject(InObject))
+#else
+				if (ActionEventBinding->GetAction() == InInputAction &&
+					ActionEventBinding->GetTriggerEvent() == InTriggerEvent)
+#endif
 				{
 					return true;
 				}
@@ -221,8 +164,8 @@ namespace
 					const auto Object = FoundClass->NewObject();
 
 					FCSharpEnvironment::GetEnvironment().AddBindingReference<
-						std::decay_t<FEnhancedInputActionEventBinding>, false>(
-						FoundClass, Object, &EnhancedInputActionEventBinding);
+						std::decay_t<FEnhancedInputActionEventBinding>>(
+						InManagedHandle, FoundClass, Object, &EnhancedInputActionEventBinding);
 
 					return Object;
 				}
@@ -253,13 +196,15 @@ namespace
 				{
 					FoundObject->RemoveBinding(*EnhancedInputActionEventBinding);
 				}
+
+				(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InEnhancedInputActionEventBinding);
 			}
 		}
 
 		FRegisterEnhancedInputComponent()
 		{
 			TBindingClassBuilder<UEnhancedInputComponent>(NAMESPACE_LIBRARY)
-				.Function("GetDynamicBindingObject", GetDynamicBindingObjectImplementation)
+				.Function("GetDynamicBindingObject", FRegisterInputComponentHelper::GetDynamicBindingObject)
 				.Function("BindAction", BindActionImplementation)
 				.Function("RemoveBinding", RemoveBindingImplementation)
 				.Function("GetNumActionEventBindings", GetNumActionEventBindingsImplementation);

@@ -3,7 +3,6 @@
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
-#include "CoreMacro/AccessPrivateMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
@@ -12,8 +11,6 @@
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #endif
-
-ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
 
 using FSignalHandler = void (*)(int32);
 
@@ -28,7 +25,10 @@ static FSignalHandler SignalHandlers[MaxSignalCount] = {};
 static void ScriptSignalHandler(int32 Signal)
 {
 #if PLATFORM_MAC
-	sigaction(Signal, &SignalActions[Signal], nullptr);
+	if (const auto FoundAction = SignalActions.Find(Signal))
+	{
+		sigaction(Signal, FoundAction, nullptr);
+	}
 #else
 	if (Signal >= 0 && Signal < MaxSignalCount)
 	{
@@ -43,23 +43,27 @@ FCSharpEnvironment FCSharpEnvironment::Environment;
 
 FCSharpEnvironment::FCSharpEnvironment()
 {
-	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
 
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
+	Deinitialize();
+
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+			Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
 	}
 
 	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+			Remove(OnUnrealCSharpModuleActiveDelegateHandle);
 	}
 }
 
@@ -156,11 +160,26 @@ void FCSharpEnvironment::Initialize()
 #endif
 	}
 
-	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
+	FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().Broadcast();
 }
 
 void FCSharpEnvironment::Deinitialize()
 {
+#if PLATFORM_MAC
+	for (const auto& [Signal, Action] : SignalActions)
+	{
+		sigaction(Signal, &Action, nullptr);
+	}
+#else
+	for (auto Index = 0; Index < MaxSignalCount; ++Index)
+	{
+		if (SignalHandlers[Index] != nullptr)
+		{
+			signal(Index, SignalHandlers[Index]);
+		}
+	}
+#endif
+
 	AsyncLoadingObjectArray.Empty();
 
 #if WITH_EDITOR
@@ -426,8 +445,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 			auto Object = ObjectPtr.Get();
 
-			if (Object->*TAccessPrivate<UObjectBase_ObjectFlags>::Value & ~RF_AllFlags ||
-				Object->HasAnyFlags(RF_NeedPostLoad) ||
+			if (Object->HasAnyFlags(RF_NeedPostLoad) ||
 				Object->HasAnyInternalFlags(
 #if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
 					EInternalObjectFlags_AsyncLoading
@@ -668,7 +686,14 @@ bool FCSharpEnvironment::RemoveOptionalReference(const IManagedHandle InManagedH
 
 bool FCSharpEnvironment::AddReference(const IManagedHandle InOwner, FReference* InReference) const
 {
-	return ReferenceRegistry != nullptr ? ReferenceRegistry->AddReference(InOwner, InReference) : false;
+	if (ReferenceRegistry != nullptr && IManagedHandleIsValid(InOwner))
+	{
+		return ReferenceRegistry->AddReference(InOwner, InReference);
+	}
+
+	delete InReference;
+
+	return false;
 }
 
 bool FCSharpEnvironment::RemoveReference(const IManagedHandle InOwner) const

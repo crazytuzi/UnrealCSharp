@@ -1,4 +1,4 @@
-﻿#include "Domain/Mono/FMonoDomain.h"
+#include "Domain/Mono/FMonoDomain.h"
 #if WITH_MONO
 #include "Misc/FileHelper.h"
 #include "Domain/Mono/FMonoFunctionLibrary.h"
@@ -15,6 +15,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Reflection/FMethodReflection.h"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -48,6 +49,11 @@ extern void* mono_aot_module_System_Private_CoreLib_info;
 
 void FMonoDomain::Initialize()
 {
+	if (bIsInitializeCompleted)
+	{
+		return;
+	}
+
 	RegisterMonoTrace();
 
 	RegisterAssemblyPreloadHook();
@@ -132,6 +138,8 @@ void FMonoDomain::Initialize()
 	RegisterLog();
 
 	InitializeAssembly(FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath());
+
+	bIsInitializeCompleted = true;
 }
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
@@ -166,17 +174,24 @@ void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	FReflectionRegistry::Get().Initialize();
 
+	if (FReflectionRegistry::Get().IsInitialized() == false)
+	{
+		bIsInitialized = false;
+	}
+
 	RegisterBinding();
 }
 
 void FMonoDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bIsInitializeCompleted)
 	{
 		return;
 	}
 
 	bIsInitialized = false;
+
+	bIsInitializeCompleted = false;
 
 	UnloadAssembly();
 }
@@ -292,16 +307,18 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 			FFileHelper::LoadFileToArray(Data, *AssemblyPath);
 
+			const auto AssemblyDirectory = StringCast<UTF16CHAR>(*FPaths::GetPath(AssemblyPath));
+
 			if (const auto Handle = AssemblyLoaderLoadFromStreamFn(Data.GetData(), Data.Num(),
-			                                                       reinterpret_cast<const char16_t*>(*FPaths::GetPath(
-				                                                       AssemblyPath)));
+			                                                       reinterpret_cast<const char16_t*>(
+				                                                       AssemblyDirectory.Get()));
 				IManagedHandleIsValid(Handle))
 			{
 				Assemblies.Add(Handle);
 			}
 		}
 
-		bIsInitialized = true;
+		bIsInitialized = FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(InAssemblies);
 	}
 }
 
@@ -313,6 +330,8 @@ void FMonoDomain::UnloadAssembly()
 	{
 		AssemblyLoaderUnloadFn();
 	}
+
+	UnregisterLog();
 
 #define MONO_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
 
@@ -335,6 +354,8 @@ void FMonoDomain::UnloadAssembly()
 	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FMonoDomain::RegisterAssemblyPreloadHook()

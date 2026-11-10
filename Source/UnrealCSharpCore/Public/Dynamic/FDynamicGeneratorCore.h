@@ -30,7 +30,7 @@ public:
 
 	static void Generator();
 
-	static void Empty();
+	static void Reset();
 
 	static void GeneratorField(FReflection* InReflection, const FClassReflection* InClassReflection,
 	                           FDynamicDependencyGraph::FNode& OutNode);
@@ -40,6 +40,10 @@ public:
 	static void GeneratorFunction(const FClassReflection* InClassReflection, FDynamicDependencyGraph::FNode& OutNode);
 
 	static void GeneratorInterface(const FClassReflection* InClassReflection, FDynamicDependencyGraph::FNode& OutNode);
+
+	static void GeneratorAccessor(const FClassReflection* InClassReflection, UClass* InClass);
+
+	static void GeneratorAccessor(UClass* InClass);
 
 	static void Generator(const FClassReflection* InClassReflection,
 	                      const TFunction<void(FClassReflection*)>& InGenerator);
@@ -118,4 +122,6 @@ private:
 #if WITH_EDITOR
 	static TMap<FString, TArray<FString>> DynamicMap;
 #endif
+
+	static TMap<TObjectPtr<UClass>, TArray<TTuple<FString, const FClassReflection*, FName>>> PendingAccessors;
 };

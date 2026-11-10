@@ -16,7 +16,7 @@
 #include "Engine/UserDefinedStruct.h"
 #endif
 
-TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
+TArray<TStrongObjectPtr<UUserDefinedEnum>> FAssetGenerator::UserDefinedEnums;
 
 void FAssetGenerator::Generator()
 {
@@ -25,6 +25,8 @@ void FAssetGenerator::Generator()
 	{
 		if (UnrealCSharpEditorSetting->IsGenerateAsset())
 		{
+			UserDefinedEnums.Reset();
+
 			const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
 				TEXT("AssetRegistry"));
 
@@ -46,10 +48,10 @@ void FAssetGenerator::Generator()
 
 			for (const auto& UserDefinedEnum : UserDefinedEnums)
 			{
-				FEnumGenerator::Generator(UserDefinedEnum);
+				FEnumGenerator::Generator(UserDefinedEnum.Get());
 			}
 
-			UserDefinedEnums.Empty();
+			UserDefinedEnums.Reset();
 		}
 	}
 }
@@ -141,11 +143,23 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	FString UsingNameSpaceContent;
 
-	const auto NameSpaceContent = FString::Printf(TEXT(
-		"%s%s"
-	),
-	                                              *NAMESPACE_ROOT,
-	                                              *InAssetData.PackagePath.ToString().Replace(TEXT("/"), TEXT(".")));
+	auto NameSpaceContent = NAMESPACE_ROOT;
+
+	TArray<FString> NameSpaces;
+
+	InAssetData.PackagePath.ToString().ParseIntoArray(NameSpaces, TEXT("/"), true);
+
+	for (const auto& NameSpace : NameSpaces)
+	{
+		if (const auto EncodedNameSpace = FUnrealCSharpFunctionLibrary::Encode(NameSpace, false);
+			!EncodedNameSpace.IsEmpty())
+		{
+			NameSpaceContent += FString::Printf(TEXT(
+				".%s"
+			),
+			                                    *EncodedNameSpace);
+		}
+	}
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
@@ -192,7 +206,8 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }

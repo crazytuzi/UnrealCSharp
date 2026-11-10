@@ -31,5 +31,5 @@ public:
 	}
 
 private:
-	FBindingEnumRegister*& EnumRegister;
+	FBindingEnumRegister* EnumRegister;
 };

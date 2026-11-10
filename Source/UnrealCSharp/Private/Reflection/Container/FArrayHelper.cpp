@@ -54,9 +54,12 @@ void FArrayHelper::Deinitialize()
 		ScriptArray = nullptr;
 	}
 
-	if (bNeedFreeProperty && InnerPropertyDescriptor != nullptr)
+	if (InnerPropertyDescriptor != nullptr)
 	{
-		InnerPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			InnerPropertyDescriptor->DestroyProperty();
+		}
 
 		delete InnerPropertyDescriptor;
 
@@ -212,7 +215,13 @@ int32 FArrayHelper::AddUninitialized(const int32 InCount) const
 	{
 		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-		return ScriptArrayHelper.AddUninitializedValues(InCount);
+		const auto PropertyFlags = InnerPropertyDescriptor->GetPropertyFlags();
+
+		const auto bNeedConstruct = !(PropertyFlags & (CPF_IsPlainOldData | CPF_NoDestructor));
+
+		return bNeedConstruct
+			       ? ScriptArrayHelper.AddValues(InCount)
+			       : ScriptArrayHelper.AddUninitializedValues(InCount);
 	}
 
 	return INDEX_NONE;
@@ -222,8 +231,21 @@ void FArrayHelper::InsertZeroed(const int32 InIndex, const int32 InCount) const
 {
 	if (InCount >= 0 && InIndex >= 0 && InIndex <= Num())
 	{
-		ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize(),
-		                          __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+
+		const auto PropertyFlags = InnerPropertyDescriptor->GetPropertyFlags();
+
+		const auto bNeedConstruct = !(PropertyFlags & (CPF_IsPlainOldData | CPF_NoDestructor));
+
+		if (bNeedConstruct)
+		{
+			ScriptArrayHelper.InsertValues(InIndex, InCount);
+		}
+		else
+		{
+			ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize(),
+			                          __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+		}
 	}
 }
 
@@ -318,9 +340,21 @@ int32 FArrayHelper::Add(void* InValue) const
 
 int32 FArrayHelper::AddZeroed(const int32 InCount) const
 {
-	return InCount >= 0
-		       ? ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__)
-		       : INDEX_NONE;
+	if (InCount >= 0)
+	{
+		auto ScriptArrayHelper = CreateHelperFormInnerProperty();
+
+		const auto PropertyFlags = InnerPropertyDescriptor->GetPropertyFlags();
+
+		const auto bNeedConstruct = !(PropertyFlags & (CPF_IsPlainOldData | CPF_NoDestructor));
+
+		return bNeedConstruct
+			       ? ScriptArrayHelper.AddValues(InCount)
+			       : ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize(),
+			                                __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+	}
+
+	return INDEX_NONE;
 }
 
 int32 FArrayHelper::AddUnique(void* InValue) const
@@ -352,17 +386,25 @@ int32 FArrayHelper::Remove(const void* InValue) const
 {
 	auto RemovedNum = 0;
 
-	TArray<int32> x;
+	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	auto Index = Find(InValue);
-
-	while (Index != INDEX_NONE)
+	for (auto Index = 0; Index < Num();)
 	{
-		++RemovedNum;
+		if (InnerPropertyDescriptor->Identical(ScriptArrayHelper.GetRawPtr(Index), InValue))
+		{
+			RemoveAt(Index, 1, false);
 
-		RemoveAt(Index, 1, true);
+			++RemovedNum;
+		}
+		else
+		{
+			++Index;
+		}
+	}
 
-		Index = Find(InValue);
+	if (RemovedNum > 0)
+	{
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
 	}
 
 	return RemovedNum;

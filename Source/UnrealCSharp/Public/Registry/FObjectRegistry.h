@@ -12,7 +12,7 @@ private:
 		typedef typename TObjectMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
-	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
+	typedef TObjectMapping<const UObject*> FObjectMapping;
 
 public:
 	FObjectRegistry();

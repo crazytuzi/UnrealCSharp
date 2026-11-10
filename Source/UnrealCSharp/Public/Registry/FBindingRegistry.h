@@ -87,6 +87,9 @@ public:
 	bool RemoveReference(const IManagedHandle InManagedHandle);
 
 private:
+	void RemoveBindingAddress(void* InAddress, const IManagedHandle InManagedHandle);
+
+private:
 	FBindingValueMapping::FManagedHandle2Value ManagedHandle2BindingAddress;
 
 	FBindingValueMapping::FAddress2ManagedHandle BindingAddress2ManagedHandle;

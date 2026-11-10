@@ -62,9 +62,12 @@ void FSetHelper::Deinitialize()
 		ScriptSet = nullptr;
 	}
 
-	if (bNeedFreeProperty && ElementPropertyDescriptor != nullptr)
+	if (ElementPropertyDescriptor != nullptr)
 	{
-		ElementPropertyDescriptor->DestroyProperty();
+		if (bNeedFreeProperty)
+		{
+			ElementPropertyDescriptor->DestroyProperty();
+		}
 
 		delete ElementPropertyDescriptor;
 
@@ -76,7 +79,7 @@ void FSetHelper::EnsureRehash() const
 {
 	if (bNeedRehash)
 	{
-		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
+		ScriptSet->Rehash(ScriptSetLayout, [this](const void* Src)
 		{
 			return ElementPropertyDescriptor->GetValueTypeHash(Src);
 		});
@@ -175,9 +178,9 @@ int32 FSetHelper::Remove(const void* InValue) const
 
 	const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
 
-	ElementPropertyDescriptor->DestroyValue(Data);
-
 	EnsureRehash();
+
+	ElementPropertyDescriptor->DestroyValue(Data);
 
 	ScriptSet->RemoveAt(ValueIndex, ScriptSetLayout);
 

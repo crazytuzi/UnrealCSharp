@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IDirectoryWatcher.h"
+#include "Containers/Queue.h"
 #include "Containers/Ticker.h"
 #include "FCSharpCompileProgress.h"
 
@@ -25,6 +26,8 @@ public:
 
 	void EnqueueTask(const TArray<FFileChangeData>& InFileChangeData);
 
+	void EnqueueTask(const TFunction<void()>& InTask);
+
 	bool IsCompiling() const;
 
 	FString GetCompileProgress() const;
@@ -41,7 +44,11 @@ public:
 private:
 	static FString GetBuildConfiguration();
 
-	bool CompileInterop(bool bForceCompileInterop);
+	static bool IsInteropOutdated();
+
+	static FString GetFirstErrorLine(const FString& InResult);
+
+	bool CompileInterop(bool bForceCompileInterop, bool bInteropOutdated = false);
 
 	static bool PublishInterop(const FString& InSourcePath, const FString& InTargetPath, const FString& InBackupPath);
 
@@ -58,7 +65,7 @@ private:
 
 	void ReleaseCompile();
 
-	void ShowCompileResultNotification(bool bSucceeded) const;
+	void ShowCompileResultNotification(bool bSucceeded, const FString& InErrorMessage) const;
 
 private:
 	void OnBeginGenerator();
@@ -84,6 +91,8 @@ private:
 	FDelegateHandle OnEndGeneratorDelegateHandle;
 
 	TArray<FFileChangeData> FileChanges;
+
+	TQueue<TFunction<void()>> TaskQueue;
 
 	mutable FCriticalSection CriticalSection;
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Script.Library;
 using Interop;
 
@@ -13,6 +14,8 @@ namespace Script.CoreUObject
 
     public class TArray<T> : IEnumerable<T>, IDisposable
     {
+        private const int EnumeratorChunkSize = 256;
+
         public TArray() => TArrayImplementation.TArray_RegisterImplementation(this, GetType());
 
         ~TArray() => Dispose();
@@ -55,20 +58,74 @@ namespace Script.CoreUObject
 
         public override int GetHashCode() => 0;
 
+        private T GetValue(nint InHandle, int InIndex)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    TArrayImplementation.TArray_GetImplementation(InHandle, InIndex, ValueBuffer, sizeof(T));
+
+                    return *(T*)ValueBuffer;
+                }
+                else
+                {
+                    return TArrayImplementation.TArray_GetCompoundImplementation<T>(InHandle, InIndex);
+                }
+            }
+        }
+
         public IEnumerator<T> GetEnumerator()
         {
-            for (var Index = 0; Index < Num(); Index++)
+            var Handle = HandleData.GetHandle(this);
+
+            var ElementSize = Unsafe.SizeOf<T>();
+
+            if (typeof(T).IsValueType &&
+                TArrayImplementation.TArray_GetTypeSizeImplementation(Handle) == ElementSize)
             {
-                yield return this[Index];
+                var Buffer = new byte[EnumeratorChunkSize * ElementSize];
+
+                var Index = 0;
+
+                while (true)
+                {
+                    var Count = GetElements(Handle, Index, EnumeratorChunkSize, Buffer);
+
+                    for (var Offset = 0; Offset < Count; Offset++)
+                    {
+                        yield return Unsafe.ReadUnaligned<T>(ref Buffer[Offset * ElementSize]);
+                    }
+
+                    if (Count < EnumeratorChunkSize)
+                    {
+                        yield break;
+                    }
+
+                    Index += Count;
+                }
+            }
+
+            for (var Index = 0; Index < TArrayImplementation.TArray_NumImplementation(Handle); Index++)
+            {
+                yield return GetValue(Handle, Index);
+            }
+        }
+
+        private static unsafe int GetElements(nint InHandle, int InIndex, int InCount, byte[] InBuffer)
+        {
+            fixed (byte* Buffer = InBuffer)
+            {
+                return TArrayImplementation.TArray_GetElementsImplementation(InHandle, InIndex, InCount,
+                    Buffer, InBuffer.Length);
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (var Index = 0; Index < Num(); Index++)
-            {
-                yield return this[Index];
-            }
+            return GetEnumerator();
         }
 
         public int GetTypeSize() => TArrayImplementation.TArray_GetTypeSizeImplementation(HandleData.GetHandle(this));
@@ -86,26 +143,7 @@ namespace Script.CoreUObject
 
         public T this[int InIndex]
         {
-            get
-            {
-                unsafe
-                {
-                    if (typeof(T).IsValueType)
-                    {
-                        var ValueBuffer = stackalloc byte[sizeof(T)];
-
-                        TArrayImplementation.TArray_GetImplementation(HandleData.GetHandle(this), InIndex, ValueBuffer,
-                            sizeof(T));
-
-                        return *(T*)ValueBuffer;
-                    }
-                    else
-                    {
-                        return TArrayImplementation.TArray_GetCompoundImplementation<T>(
-                            HandleData.GetHandle(this), InIndex);
-                    }
-                }
-            }
+            get => GetValue(HandleData.GetHandle(this), InIndex);
 
             set
             {

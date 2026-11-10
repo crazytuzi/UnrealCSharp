@@ -34,16 +34,37 @@ void FDynamicEnumGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
 		                                 const auto ClassName = InClassReflection->GetName();
 
 		                                 const auto Node = FDynamicDependencyGraph::FNode(
-			                                 ClassName, [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection);
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName));
 			                                 });
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
+}
+
+void FDynamicEnumGenerator::Reset()
+{
+	for (const auto Enum : DynamicEnumSet)
+	{
+		if (Enum != nullptr)
+		{
+			Enum->RemoveFromRoot();
+
+			Enum->MarkAsGarbage();
+		}
+	}
+
+	DynamicEnumSet.Empty();
+
+	DynamicEnumMap.Empty();
+
+	NamespaceMap.Empty();
 }
 
 #if WITH_EDITOR
@@ -286,10 +307,11 @@ void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassR
 		{
 			if (const auto ScriptDomain = IScriptDomain::Get())
 			{
-				const auto FieldValue = reinterpret_cast<int64>(ScriptDomain->GetFieldStaticValue(
-					InClassReflection->GetManagedClass(), Name));
-
-				InNames.Add({FName(Name), FieldValue});
+				if (int64 FieldValue = 0;
+					ScriptDomain->GetFieldStaticValue(InClassReflection->GetManagedClass(), Name, FieldValue))
+				{
+					InNames.Add({FName(Name), FieldValue});
+				}
 			}
 		}
 	}

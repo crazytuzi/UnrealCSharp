@@ -48,4 +48,4 @@ struct FRegisterObjectFlags
 	}
 };
 
-[[maybe_unused]] static FRegisterObjectFlags RegisterObjectFlags;
+[[maybe_unused]] inline FRegisterObjectFlags RegisterObjectFlags;

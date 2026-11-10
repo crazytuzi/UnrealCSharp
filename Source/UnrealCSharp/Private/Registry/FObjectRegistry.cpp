@@ -35,14 +35,14 @@ void* FObjectRegistry::GetAddress(const IManagedHandle InManagedHandle)
 {
 	const auto FoundObject = ManagedHandle2Object.Find(InManagedHandle);
 
-	return FoundObject != nullptr ? const_cast<UObject*>(FoundObject->Get()) : nullptr;
+	return FoundObject != nullptr ? const_cast<UObject*>(*FoundObject) : nullptr;
 }
 
 void* FObjectRegistry::GetAddress(const IManagedHandle InManagedHandle, UStruct*& InStruct)
 {
 	if (const auto FoundObject = ManagedHandle2Object.Find(InManagedHandle))
 	{
-		if (const auto Object = FoundObject->Get())
+		if (const auto Object = *FoundObject)
 		{
 			InStruct = Object->GetClass();
 
@@ -132,7 +132,7 @@ bool FObjectRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 {
 	if (const auto FoundValue = ManagedHandle2Object.Find(InManagedHandle))
 	{
-		const auto Object = FoundValue->Get();
+		const auto Object = *FoundValue;
 
 		if (const auto FoundManagedHandle = Object2ManagedHandle.Find(Object))
 		{

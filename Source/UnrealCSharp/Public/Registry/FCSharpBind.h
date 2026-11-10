@@ -52,6 +52,8 @@ public:
 	static void ResumeDummyOwnerClasses();
 #endif
 
+	static void RemoveFunctionFromClass(UFunction* InFunction);
+
 private:
 	template <auto IsNeedOverride>
 	static auto BindImplementation(UObject* InObject) -> IManagedHandle;

@@ -5,9 +5,9 @@
 #include "Misc/Paths.h"
 #include "Misc/App.h"
 #include "Misc/FileHelper.h"
-#include "HAL/FileManager.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Binding/FBinding.h"
 #include "CoreMacro/CoreCLRMacro.h"
@@ -35,7 +35,7 @@ load_assembly_and_get_function_pointer_fn FCoreCLRDomain::LoadAssemblyAndGetFunc
 
 void FCoreCLRDomain::Initialize()
 {
-	if (bIsInitialized)
+	if (bIsInitializeCompleted)
 	{
 		return;
 	}
@@ -46,6 +46,8 @@ void FCoreCLRDomain::Initialize()
 
 		if (HostFxrDllHandle == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -72,6 +74,8 @@ void FCoreCLRDomain::Initialize()
 
 		if (HostFxrInitializeForRuntimeConfigFn == nullptr || HostFxrGetRuntimeDelegateFn == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -101,6 +105,8 @@ void FCoreCLRDomain::Initialize()
 			HostFxrInitializeForRuntimeConfigErrorCode != 0 &&
 			HostFxrInitializeForRuntimeConfigErrorCode != HostAlreadyInitializedErrorCode)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -110,6 +116,8 @@ void FCoreCLRDomain::Initialize()
 				HostFxrHandle, hdt_load_assembly_and_get_function_pointer, &OutLoadAssemblyAndGetFunctionPointerFn);
 			HostFxrGetRuntimeDelegateErrorCode != 0 || OutLoadAssemblyAndGetFunctionPointerFn == nullptr)
 		{
+			ReleaseHostFxr();
+
 			return;
 		}
 
@@ -119,56 +127,46 @@ void FCoreCLRDomain::Initialize()
 
 	const auto InteropAssembly = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
 
-	if (!IFileManager::Get().FileExists(*InteropAssembly))
+	if (const auto AssemblyPublishPath = FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath();
+		FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(AssemblyPublishPath))
 	{
+		RegisterInterop(InteropAssembly);
+
+		RegisterLog();
+
 		bIsInitialized = true;
 
-		return;
+		InitializeAssembly(AssemblyPublishPath);
+
+		bIsInitializeCompleted = true;
 	}
-
-	RegisterInterop(InteropAssembly);
-
-	RegisterLog();
-
-	bIsInitialized = true;
-
-	InitializeAssembly(FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath());
 }
 
 void FCoreCLRDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (bIsInitialized)
 	{
-		return;
-	}
+		bIsInitialized = false;
 
-	bIsInitialized = false;
+		UnloadAssembly();
 
-	UnloadAssembly();
-
-	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-		UUnrealCSharpSetting>())
-	{
-		if (UnrealCSharpSetting->IsEnableDebug())
+		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+			UUnrealCSharpSetting>())
 		{
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics"), TEXT("0"));
+			if (UnrealCSharpSetting->IsEnableDebug())
+			{
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics"), TEXT("0"));
 
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics_Debugger"), TEXT("0"));
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_EnableDiagnostics_Debugger"), TEXT("0"));
 
-			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_DiagnosticPorts"), TEXT(""));
+				FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_DiagnosticPorts"), TEXT(""));
+			}
 		}
 	}
 
-	if (HostFxrHandle != nullptr)
-	{
-		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
-			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
-		{
-			HostFxrCloseFn(HostFxrHandle);
-		}
+	bIsInitializeCompleted = false;
 
-		HostFxrHandle = nullptr;
-	}
+	ReleaseHostFxr();
 }
 
 #define SCRIPT_DOMAIN_TYPE FCoreCLRDomain
@@ -203,6 +201,11 @@ void FCoreCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 		RegisterSynchronizationContextTick();
 
 		FReflectionRegistry::Get().Initialize();
+
+		if (FReflectionRegistry::Get().IsInitialized() == false)
+		{
+			bIsInitialized = false;
+		}
 
 		RegisterBinding();
 	}
@@ -256,6 +259,8 @@ void FCoreCLRDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
+	UnregisterLog();
+
 #define CORECLR_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
 
 	COMMON_BRIDGE_METHODS(CORECLR_METHOD_CLEAR)
@@ -277,6 +282,8 @@ void FCoreCLRDomain::UnloadAssembly()
 	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FCoreCLRDomain::RegisterErrorWriter() const
@@ -303,7 +310,6 @@ void FCoreCLRDomain::RegisterInterop(const FString& InAssembly)
 #undef RESOLVE_CORECLR_METHOD
 }
 
-
 void FCoreCLRDomain::LoadAssemblyAndGetFunctionPointer(const FString& InAssembly, const FString& InType,
                                                        const FString& InMethod,
                                                        void** OutFunctionPointer) const
@@ -318,5 +324,28 @@ void FCoreCLRDomain::LoadAssemblyAndGetFunctionPointer(const FString& InAssembly
 			nullptr,
 			OutFunctionPointer);
 	}
+}
+
+void FCoreCLRDomain::ReleaseHostFxr()
+{
+	if (HostFxrHandle != nullptr && HostFxrDllHandle != nullptr)
+	{
+		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
+			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
+		{
+			HostFxrCloseFn(HostFxrHandle);
+		}
+
+		HostFxrHandle = nullptr;
+	}
+
+	if (HostFxrDllHandle != nullptr)
+	{
+		FPlatformProcess::FreeDllHandle(HostFxrDllHandle);
+
+		HostFxrDllHandle = nullptr;
+	}
+
+	LoadAssemblyAndGetFunctionPointerFn = nullptr;
 }
 #endif

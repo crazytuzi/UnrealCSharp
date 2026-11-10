@@ -60,7 +60,8 @@ public:
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
 	                                 void* InValue) override;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) override;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) override;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName,
 	                              void** InParams) override;
@@ -191,6 +192,8 @@ private:
 private:
 	void RegisterInterop();
 
+	void UnregisterLog();
+
 	void RegisterBinding() const;
 
 private:
@@ -217,6 +220,8 @@ private:
 	TArray<IManagedHandle> Assemblies;
 
 	bool bIsInitialized{};
+
+	bool bIsInitializeCompleted{};
 
 	static TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> MethodSlotSizes;
 

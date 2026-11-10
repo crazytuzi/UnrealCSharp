@@ -9,8 +9,9 @@ void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			for (const TArray<FDelegateWrapper, TInlineAllocator<4>> DelegateWrappersCopy(DelegateWrappers);
-			     const auto& [Key, Value] : DelegateWrappersCopy)
+			const TArray<FDelegateWrapper, TInlineAllocator<4>> DelegateWrappersCopy(DelegateWrappers);
+
+			for (const auto& [Key, Value] : DelegateWrappersCopy)
 			{
 				DelegateDescriptor->CallDelegate(Key.Get(), Value, Parms);
 			}

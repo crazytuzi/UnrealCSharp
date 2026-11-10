@@ -14,7 +14,7 @@ auto FClassBuilder::Function(const FString& InName,
 
 	return Function(InName,
 	                InName,
-	                FunctionPointer.Value.Pointer
+	                FunctionPointer.Value
 #if WITH_FUNCTION_INFO
 	                , InFunctionInfoFunction
 #endif
@@ -40,21 +40,21 @@ auto FClassBuilder::Property(const FString& InName,
 	if (InTypeInfoFunction.IsSet())
 	{
 		ClassRegister->BindingProperty(InName,
-		                               GetFunctionPointer.Value.Pointer,
-		                               SetFunctionPointer.Value.Pointer,
+		                               GetFunctionPointer.Value,
+		                               SetFunctionPointer.Value,
 		                               InTypeInfoFunction,
 		                               InPropertyInteract
 		);
 	}
 #endif
 
-	return Function(BINDING_PROPERTY_GET + InName, GetFunctionPointer.Value.Pointer).
-		Function(BINDING_PROPERTY_SET + InName, SetFunctionPointer.Value.Pointer);
+	return Function(BINDING_PROPERTY_GET + InName, GetFunctionPointer.Value).
+		Function(BINDING_PROPERTY_SET + InName, SetFunctionPointer.Value);
 }
 
 template <typename T>
 auto FClassBuilder::Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod,
                              const int32 InParamCount)
 {
-	ClassRegister->BindingMethod(InImplementationName, InMethod.Value.Pointer, InParamCount);
+	ClassRegister->BindingMethod(InImplementationName, InMethod.Value, InParamCount);
 }

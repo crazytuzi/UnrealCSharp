@@ -8,37 +8,13 @@
 #include "Engine/InputVectorAxisDelegateBinding.h"
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Interop/FRegisterInputComponentHelper.h"
 #include "UEVersion.h"
 
 namespace
 {
 	struct FRegisterInputComponent
 	{
-		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
-		                                                            const IManagedHandle InBindingClass)
-		{
-			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
-				UBlueprintGeneratedClass>(InThisClass);
-
-			const auto BindingClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InBindingClass);
-
-			if (ThisClass != nullptr && BindingClass != nullptr)
-			{
-				auto DynamicBindingObject = UBlueprintGeneratedClass::GetDynamicBindingObject(ThisClass, BindingClass);
-
-				if (DynamicBindingObject == nullptr)
-				{
-					DynamicBindingObject = NewObject<UDynamicBlueprintBinding>(GetTransientPackage(), BindingClass);
-
-					ThisClass->DynamicBindingObjects.Add(DynamicBindingObject);
-				}
-
-				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
-			}
-
-			return InvalidManagedHandle;
-		}
-
 		template <typename TUnifiedDelegate>
 		static bool IsBoundTo(const TUnifiedDelegate& InUnifiedDelegate, const UObject* InObject,
 		                      const FName& InFunctionName)
@@ -112,7 +88,13 @@ namespace
 			{
 				if (IsBoundTo(InBindings[Index].*TUnifiedDelegate, InObject, InFunctionName))
 				{
-					InBindings.RemoveAt(Index, EAllowShrinking::No);
+					InBindings.RemoveAt(Index,
+#if UE_F_ARRAY_REMOVE_AT_E_ALLOW_SHRINKING
+					                    EAllowShrinking::No
+#else
+					                    1, false
+#endif
+					);
 				}
 			}
 		}
@@ -170,7 +152,7 @@ namespace
 					if (!HasActionBinding(InFoundObject, InObjectToBindTo, InBinding.InputActionName,
 					                      InBinding.InputKeyEvent))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -220,7 +202,7 @@ namespace
 					if (!HasBinding<&FInputAxisBinding::AxisDelegate>(InFoundObject->AxisBindings, InObjectToBindTo,
 					                                                  InBinding.FunctionNameToBind))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -263,7 +245,7 @@ namespace
 					                                                     InObjectToBindTo,
 					                                                     InBinding.FunctionNameToBind))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -304,7 +286,7 @@ namespace
 				{
 					if (!HasKeyBinding(InFoundObject, InObjectToBindTo, InBinding.InputChord, InBinding.InputKeyEvent))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -354,7 +336,7 @@ namespace
 					if (!HasBinding<&FInputTouchBinding::TouchDelegate>(InFoundObject->TouchBindings, InObjectToBindTo,
 					                                                    InBinding.FunctionNameToBind))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -428,7 +410,7 @@ namespace
 					                                                        InObjectToBindTo,
 					                                                        InBinding.FunctionNameToBind))
 					{
-						BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
+						FRegisterInputComponentHelper::BindFunction(InObjectToBindTo->GetClass(), &InBinding.FunctionNameToBind,
 						             [](UFunction* InFunction)
 						             {
 #if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
@@ -535,7 +517,13 @@ namespace
 						if (IsBoundTo(InFoundObject->KeyBindings[Index], InObjectToBindTo, *InInputChord,
 						              static_cast<EInputEvent>(InKeyEvent)))
 						{
-							InFoundObject->KeyBindings.RemoveAt(Index, EAllowShrinking::No);
+							InFoundObject->KeyBindings.RemoveAt(Index,
+#if UE_F_ARRAY_REMOVE_AT_E_ALLOW_SHRINKING
+							                                    EAllowShrinking::No
+#else
+							                                    1, false
+#endif
+							);
 						}
 					}
 				});
@@ -571,44 +559,6 @@ namespace
 				});
 		}
 
-		static void BindFunction(UClass* InClass, const FName* InFunctionName,
-		                         const TFunction<void(UFunction* InFunction)>& InProperty)
-		{
-			if (InClass == nullptr || InFunctionName == nullptr)
-			{
-				return;
-			}
-
-			if (const auto FoundFunction = InClass->FindFunctionByName(*InFunctionName))
-			{
-				FoundFunction->RemoveFromRoot();
-
-				return;
-			}
-
-			const auto Function = NewObject<UFunction>(InClass, *InFunctionName, EObjectFlags::RF_Transient);
-
-			Function->FunctionFlags = FUNC_BlueprintEvent;
-
-			InProperty(Function);
-
-			Function->Bind();
-
-			Function->StaticLink(true);
-
-			InClass->AddFunctionToFunctionMap(Function, *InFunctionName);
-
-			Function->Next = InClass->Children;
-
-			InClass->Children = Function;
-
-			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
-				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
-			                                                     InClass,
-			                                                     Function
-			);
-		}
-
 		static int32 GetNumActionBindingsImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UInputComponent>(
@@ -632,7 +582,7 @@ namespace
 		FRegisterInputComponent()
 		{
 			TBindingClassBuilder<UInputComponent>(NAMESPACE_LIBRARY)
-				.Function("GetDynamicBindingObject", GetDynamicBindingObjectImplementation)
+				.Function("GetDynamicBindingObject", FRegisterInputComponentHelper::GetDynamicBindingObject)
 				.Function("BindAction", BindActionImplementation)
 				.Function("BindAxis", BindAxisImplementation)
 				.Function("BindAxisKey", BindAxisKeyImplementation)

@@ -1,5 +1,6 @@
 #include "Reflection/Function/FCSharpFunctionRegister.h"
 #include "Reflection/Function/CSharpFunction.h"
+#include "Registry/FCSharpBind.h"
 
 #if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
 TSet<FCSharpFunctionRegister*> FCSharpFunctionRegister::Registers;
@@ -97,10 +98,7 @@ FCSharpFunctionRegister::~FCSharpFunctionRegister()
 			FunctionRemove = InCallCSharpFunction;
 		}
 
-		if (const auto Class = Cast<UClass>(FunctionRemove->GetOuter()))
-		{
-			Class->RemoveFunctionFromFunctionMap(FunctionRemove);
-		}
+		FCSharpBind::RemoveFunctionFromClass(FunctionRemove);
 
 		FunctionRemove->Rename(
 			*MakeUniqueObjectName(

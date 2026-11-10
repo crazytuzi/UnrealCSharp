@@ -94,6 +94,10 @@ private:
 	TSharedRef<SWidget> MakeWidgetForSelectedModuleCombo(TSharedPtr<FProjectContent> Value);
 
 private:
+	static bool IsUnderSourcePath(const FString& InClassPath, const FString& InSourcePath);
+
+	static bool IsKeyword(const FString& InNewClassName);
+
 	void UpdateInputValidity();
 
 	void SetupDefaultCommonParentClassItems();

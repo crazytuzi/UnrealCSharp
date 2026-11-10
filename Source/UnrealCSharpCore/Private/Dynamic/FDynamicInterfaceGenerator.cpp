@@ -33,10 +33,14 @@ void FDynamicInterfaceGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
+		                                 const auto ClassName = InClassReflection->GetName();
+
 		                                 auto Node = FDynamicDependencyGraph::FNode(
-			                                 InClassReflection->GetName(), [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection);
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName));
 			                                 });
 
 		                                 if (const auto Parent = InClassReflection->GetParent())
@@ -54,6 +58,25 @@ void FDynamicInterfaceGenerator::Generator()
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
+}
+
+void FDynamicInterfaceGenerator::Reset()
+{
+	for (const auto Class : DynamicInterfaceSet)
+	{
+		if (Class != nullptr)
+		{
+			Class->RemoveFromRoot();
+
+			Class->MarkAsGarbage();
+		}
+	}
+
+	DynamicInterfaceSet.Empty();
+
+	DynamicInterfaceMap.Empty();
+
+	NamespaceMap.Empty();
 }
 
 #if WITH_EDITOR

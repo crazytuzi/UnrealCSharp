@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Script.Library;
 using Interop;
 
@@ -8,6 +9,8 @@ namespace Script.CoreUObject
 {
     public class TSet<T> : IEnumerable<T>, IDisposable
     {
+        private const int EnumeratorChunkSize = 256;
+
         public TSet() => TSetImplementation.TSet_RegisterImplementation(this, GetType());
 
         ~TSet() => Dispose();
@@ -28,12 +31,56 @@ namespace Script.CoreUObject
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (var Index = 0; Index < GetMaxIndex(); Index++)
+            var Handle = HandleData.GetHandle(this);
+
+            var ElementSize = TSetImplementation.TSet_GetTypeSizeImplementation(Handle);
+
+            if (typeof(T).IsValueType && ElementSize == Unsafe.SizeOf<T>())
             {
-                if (IsValidIndex(Index))
+                var Buffer = new byte[EnumeratorChunkSize * ElementSize];
+
+                var Index = 0;
+
+                while (true)
                 {
-                    yield return this[Index];
+                    var Count = GetElements(Handle, Index, EnumeratorChunkSize, Buffer, out var NextIndex);
+
+                    for (var ElementIndex = 0; ElementIndex < Count; ElementIndex++)
+                    {
+                        yield return Unsafe.ReadUnaligned<T>(ref Buffer[ElementIndex * ElementSize]);
+                    }
+
+                    if (Count < EnumeratorChunkSize)
+                    {
+                        yield break;
+                    }
+
+                    Index = NextIndex;
                 }
+            }
+
+            for (var Index = 0; Index < TSetImplementation.TSet_GetMaxIndexImplementation(Handle); Index++)
+            {
+                if (IsValidIndex(Handle, Index))
+                {
+                    yield return GetValue(Handle, Index);
+                }
+            }
+        }
+
+        private static unsafe int GetElements(nint InHandle, int InIndex, int InCount, byte[] InBuffer,
+            out int OutNextIndex)
+        {
+            fixed (byte* Buffer = InBuffer)
+            {
+                var NextIndex = 0;
+
+                var Count = TSetImplementation.TSet_GetElementsImplementation(InHandle, InIndex, InCount,
+                    Buffer, InBuffer.Length, &NextIndex);
+
+                OutNextIndex = NextIndex;
+
+                return Count;
             }
         }
 
@@ -120,29 +167,24 @@ namespace Script.CoreUObject
             }
         }
 
-        private bool IsValidIndex(int InIndex) =>
-            TSetImplementation.TSet_IsValidIndexImplementation(HandleData.GetHandle(this), InIndex);
+        private bool IsValidIndex(nint InHandle, int InIndex) =>
+            TSetImplementation.TSet_IsValidIndexImplementation(InHandle, InIndex);
 
-        private T this[int InIndex]
+        private T GetValue(nint InHandle, int InIndex)
         {
-            get
+            unsafe
             {
-                unsafe
+                if (typeof(T).IsValueType)
                 {
-                    if (typeof(T).IsValueType)
-                    {
-                        var ValueBuffer = stackalloc byte[sizeof(T)];
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
 
-                        TSetImplementation.TSet_GetEnumeratorImplementation(HandleData.GetHandle(this), InIndex,
-                            ValueBuffer);
+                    TSetImplementation.TSet_GetEnumeratorImplementation(InHandle, InIndex, ValueBuffer);
 
-                        return *(T*)ValueBuffer;
-                    }
-                    else
-                    {
-                        return TSetImplementation.TSet_GetEnumeratorCompoundImplementation<T>(
-                            HandleData.GetHandle(this), InIndex);
-                    }
+                    return *(T*)ValueBuffer;
+                }
+                else
+                {
+                    return TSetImplementation.TSet_GetEnumeratorCompoundImplementation<T>(InHandle, InIndex);
                 }
             }
         }

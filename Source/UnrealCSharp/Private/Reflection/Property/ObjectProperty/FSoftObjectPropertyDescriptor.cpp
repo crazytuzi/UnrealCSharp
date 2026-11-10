@@ -3,16 +3,21 @@
 
 void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftObjectPtr<UObject>>(Src);
+	auto Object = InvalidManagedHandle;
 
-	if (!IManagedHandleIsValid(Object))
+	if (!Property->GetPropertyValue(Src).IsNull())
 	{
-		if (Class != nullptr)
-		{
-			Object = Class->NewObject(true);
+		Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftObjectPtr<UObject>>(Src);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, false, true>(
-				Class, Object, Src);
+		if (!IManagedHandleIsValid(Object))
+		{
+			if (Class != nullptr)
+			{
+				Object = Class->NewObject(true);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, false, true>(
+					Class, Object, Src);
+			}
 		}
 	}
 

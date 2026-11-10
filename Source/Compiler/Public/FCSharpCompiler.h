@@ -17,6 +17,8 @@ public:
 
 	void AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const;
 
+	void EnqueueTask(const TFunction<void()>& InTask) const;
+
 	bool SyncCompile() const;
 
 	void Compile(const TFunction<void()>& InFunction) const;
@@ -27,6 +29,9 @@ public:
 
 	FString GetCompileProgress() const;
 
+private:
+	void OnPreExit();
+
 public:
 	static constexpr int32 PollsPerSecond = 120;
 
@@ -36,4 +41,6 @@ private:
 	class FCSharpCompilerRunnable* Runnable;
 
 	FRunnableThread* Thread;
+
+	FDelegateHandle OnPreExitHandle;
 };

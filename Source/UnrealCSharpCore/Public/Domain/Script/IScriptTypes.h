@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Domain/Script/IManagedHandle.h"
 
@@ -13,6 +13,8 @@ typedef void (*handle_data_free_fn)(PTRINT);
 typedef void (*log_bridge_set_log_fn)(PTRINT);
 
 typedef void (*log_bridge_initialize_fn)();
+
+typedef void (*log_bridge_deinitialize_fn)();
 
 typedef IManagedHandle (*type_bridge_get_class_fn)(const uint8*);
 
@@ -80,7 +82,7 @@ typedef IManagedHandle (*object_bridge_new_object_fn)(IManagedHandle, int32);
 
 typedef void (*field_bridge_set_static_value_fn)(IManagedHandle, const uint8*, IManagedHandle);
 
-typedef IManagedHandle (*field_bridge_get_static_value_fn)(IManagedHandle, const uint8*);
+typedef uint8 (*field_bridge_get_static_value_fn)(IManagedHandle, const uint8*, int64*);
 
 typedef void (*method_bridge_register_binding_fn)(const uint8* const*, const PTRINT*, const int32*, int32);
 
@@ -136,7 +138,7 @@ typedef void (*synchronization_context_tick_fn)(float);
 	Op(ObjectBridgeNewObject, object_bridge_new_object_fn, CLASS_OBJECT_BRIDGE, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT, 2) \
 	\
 	Op(FieldBridgeSetStaticValue, field_bridge_set_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE, 3) \
-	Op(FieldBridgeGetStaticValue, field_bridge_get_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE, 2) \
+	Op(FieldBridgeGetStaticValue, field_bridge_get_static_value_fn, CLASS_FIELD_BRIDGE, FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE, 3) \
 	\
 	Op(MethodBridgeInvoke, method_bridge_invoke_fn, CLASS_METHOD_BRIDGE, FUNCTION_METHOD_BRIDGE_INVOKE, 4) \
 	\
@@ -151,6 +153,8 @@ typedef void (*synchronization_context_tick_fn)(float);
 	\
 	Op(LogBridgeSetLog, log_bridge_set_log_fn, CLASS_LOG_BRIDGE, FUNCTION_LOG_BRIDGE_SET_LOG, 1) \
 	Op(LogBridgeInitialize, log_bridge_initialize_fn, CLASS_LOG_BRIDGE, FUNCTION_LOG_BRIDGE_INITIALIZE, 0) \
+	Op(LogBridgeDeinitialize, log_bridge_deinitialize_fn, CLASS_LOG_BRIDGE, \
+	   FUNCTION_LOG_BRIDGE_DEINITIALIZE, 0) \
 	\
 	Op(TypeBridgeGetFunctionPointer, type_bridge_get_function_pointer_fn, CLASS_TYPE_BRIDGE, FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER, 3) \
 	\

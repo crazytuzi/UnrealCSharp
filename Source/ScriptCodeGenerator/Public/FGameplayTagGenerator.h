@@ -16,7 +16,8 @@ private:
 
 	static void GeneratorDocComment(FString& OutContent, const FString& InPad, const FString& InComment);
 
-	static void GeneratorChildren(FString& OutContent, const FGameplayTagTreeNode& InNode, int32 InIndent);
+	static void GeneratorChildren(FString& OutContent, const FGameplayTagTreeNode& InNode, int32 InIndent,
+	                              const FString& InClassName);
 
 	static FString MakeUniqueName(const FString& InName, TSet<FString>& InOutUsedNames);
 

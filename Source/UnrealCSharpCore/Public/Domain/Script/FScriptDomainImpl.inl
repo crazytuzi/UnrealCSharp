@@ -412,12 +412,13 @@ void SCRIPT_DOMAIN_TYPE::SetFieldStaticValue(const IManagedHandle InManagedClass
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_GET_FIELD_STATIC_VALUE
-void* SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName)
+bool SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+                                             int64& OutValue)
 {
 	return IManagedHandleIsValid(InManagedClass) && FieldBridgeGetStaticValueFn != nullptr
-		       ? IManagedHandleToObject(SCRIPT_DOMAIN_INVOKE(IManagedHandle, FieldBridgeGetStaticValueFn,
-		                                                     InManagedClass, SCRIPT_DOMAIN_STRING_CAST(InName)))
-		       : nullptr;
+		       ? SCRIPT_DOMAIN_INVOKE(uint8, FieldBridgeGetStaticValueFn, InManagedClass,
+		                              SCRIPT_DOMAIN_STRING_CAST(InName), &OutValue) != 0
+		       : false;
 }
 #endif
 
@@ -606,8 +607,18 @@ void SCRIPT_DOMAIN_TYPE::RegisterLog()
 }
 #endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
+void SCRIPT_DOMAIN_TYPE::UnregisterLog()
+{
+	if (LogBridgeDeinitializeFn != nullptr)
+	{
+		LogBridgeDeinitializeFn();
+	}
+}
+#endif
+
 #ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
-void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
+void SCRIPT_DOMAIN_TYPE::RegisterBinding()
 {
 	if (MethodBridgeRegisterBindingFn != nullptr)
 	{
@@ -641,8 +652,19 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 			}
 		}
 
-		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
-		                              MethodNames.Num());
+		if (!MethodNames.IsEmpty())
+		{
+			MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
+			                              MethodNames.Num());
+		}
+		else
+		{
+			bIsInitialized = false;
+		}
+	}
+	else
+	{
+		bIsInitialized = false;
 	}
 }
 #endif

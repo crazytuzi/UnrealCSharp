@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -18,7 +20,32 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
 
     public static void Deinitialize()
     {
+        var OldContext = Context;
+
         SetSynchronizationContext(null);
+
+        if (OldContext != null)
+        {
+            List<TaskInfo> Tasks;
+
+            lock (OldContext.TaskList)
+            {
+                Tasks = new List<TaskInfo>(OldContext.TaskList);
+
+                OldContext.TaskList.Clear();
+            }
+
+            foreach (var Task in Tasks)
+            {
+                try
+                {
+                    Task.Invoke();
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
 
         Context = null;
     }
@@ -46,7 +73,13 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
 
         foreach (var Task in PendingTaskList)
         {
-            Task.Invoke();
+            try
+            {
+                Task.Invoke();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         PendingTaskList.Clear();
@@ -76,19 +109,33 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
 
         using var ResetEvent = new ManualResetEvent(false);
 
+        ExceptionDispatchInfo? Error = null;
+
         lock (TaskList)
         {
             TaskList.Add(new TaskInfo
             {
-                CallBack = InCallback,
+                CallBack = _ =>
+                {
+                    try
+                    {
+                        InCallback(InState);
+                    }
+                    catch (Exception Exception)
+                    {
+                        Error = ExceptionDispatchInfo.Capture(Exception);
+                    }
+                },
 
-                State = InState,
+                State = null,
 
                 WaitHandle = ResetEvent
             });
         }
 
         ResetEvent.WaitOne();
+
+        Error?.Throw();
     }
 
     private int ThreadId;
