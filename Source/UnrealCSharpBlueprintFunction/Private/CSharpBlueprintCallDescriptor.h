@@ -4,10 +4,6 @@
 #include "CSharpBlueprintMember.h"
 #include "Reflection/Function/FManagedFunctionDescriptor.h"
 
-/**
- * 蓝图变参调用 → C# 成员的运行时描述符。
- * 持有一个仅用于封送的签名 UFunction（Transient 包，不属于任何 UClass）。
- */
 class FCSharpBlueprintCallDescriptor final : public FManagedFunctionDescriptor
 {
 public:
@@ -20,10 +16,10 @@ public:
 	virtual ~FCSharpBlueprintCallDescriptor() override;
 
 public:
-	/** 读取 Stack 上的变参、调用 C#、回写输出。返回后 Stack.Code 停在 EX_EndFunctionParms。 */
 	void Call(UObject* InTarget, FFrame& InStack);
 
-	/** 不调用 C#，只把 Stack 上剩余的变参安全地消费到 EX_EndFunctionParms。 */
+	void CallWithParams(UObject* InTarget, void* InParams);
+
 	static void SkipParams(FFrame& InStack);
 
 	UFunction* GetSignature() const;
@@ -46,7 +42,6 @@ public:
 	static FCSharpBlueprintCallCache& Get();
 
 public:
-	/** 找不到或 C# 未就绪返回 nullptr；负结果也会缓存，直到 Reset。 */
 	FCSharpBlueprintCallDescriptor* Resolve(UClass* InClass, ECSharpBlueprintMemberKind InKind, const FName& InName,
 	                                        int32 InParamCount);
 

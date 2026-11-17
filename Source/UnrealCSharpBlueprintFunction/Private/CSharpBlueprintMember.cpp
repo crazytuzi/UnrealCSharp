@@ -239,7 +239,6 @@ bool FCSharpBlueprintMemberLibrary::ResolveDeclared(FClassReflection* InClassRef
 			}
 		}
 
-		// 参数个数变了（C# 改了签名）：同名且可供蓝图调用的方法唯一时仍视为同一个成员，节点据此刷新引脚
 		FMethodReflection* UniqueMethod = nullptr;
 
 		for (const auto& [Pair, Methods] : InClassReflection->GetMethods())
@@ -329,7 +328,6 @@ UFunction* FCSharpBlueprintMemberLibrary::BuildSignature(const FCSharpBlueprintM
 
 	auto bFailed = false;
 
-	// AddCppProperty 头插，调用顺序需与最终顺序相反：先返回值，再倒序参数
 	const auto AddParam = [Function, &bHasOutParms, &bFailed](FClassReflection* InType, const FName& InName,
 	                                                          const EPropertyFlags InFlags)
 	{
@@ -356,7 +354,6 @@ UFunction* FCSharpBlueprintMemberLibrary::BuildSignature(const FCSharpBlueprintM
 	{
 	case ECSharpBlueprintMemberKind::Function:
 		{
-			// void 在反射里是 System.Void 类型，Factory 返回 null，与动态类生成器一致：视为无返回值
 			if (const auto Return = InInfo.Method->GetReturn())
 			{
 				if (const auto Property = FTypeBridge::Factory(Return, Function, TEXT("ReturnValue"),

@@ -1,4 +1,5 @@
 #include "CSharpBlueprintCallDescriptor.h"
+#include "CSharpDelegateProxy.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Modules/ModuleManager.h"
 
@@ -7,7 +8,6 @@ class FUnrealCSharpBlueprintFunctionModule final : public IModuleInterface
 public:
 	virtual void StartupModule() override
 	{
-		// C# 域重载后反射指针全部失效，描述符缓存必须跟着清空
 		OnModuleActiveHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().AddStatic(
 			&FUnrealCSharpBlueprintFunctionModule::ResetCache);
 
@@ -28,6 +28,8 @@ public:
 		}
 
 		ResetCache();
+
+		UCSharpDelegateProxy::ResetRegistry();
 	}
 
 private:

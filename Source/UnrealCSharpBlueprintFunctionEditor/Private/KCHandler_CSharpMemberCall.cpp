@@ -31,22 +31,13 @@ void FKCHandler_CSharpMemberCall::RegisterNets(FKismetFunctionContext& Context, 
 
 		if (Pin == TargetPin)
 		{
-			// 未连接的 Target 走 self，与 DefaultToSelf 一致
-			if (Pin->LinkedTo.IsEmpty() && FKismetCompilerUtilities::ValidateSelfCompatibility(Pin, Context))
-			{
-				const auto Term = Context.RegisterLiteral(Pin);
-
-				Term->Type.PinSubCategory = UEdGraphSchema_K2::PN_Self;
-
-				Context.NetMap.Add(Pin, Term);
-			}
+			MemberNode->RegisterTargetNetIfUnlinked(Context, Pin);
 
 			continue;
 		}
 
 		if (Pin->Direction == EGPD_Input)
 		{
-			// ref / 容器输入已在 ExpandNode 中接到临时变量，这里只剩普通字面量
 			if (Pin->LinkedTo.IsEmpty())
 			{
 				RegisterLiteral(Context, Pin);
@@ -70,7 +61,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 	if (LibraryFunction == nullptr)
 	{
-		CompilerContext.MessageLog.Error(*LOCTEXT("LibraryFunctionMissing", "@@ 找不到 UCSharpBlueprintFunctionLibrary 入口函数").
+		CompilerContext.MessageLog.Error(*LOCTEXT("LibraryFunctionMissing", "@@ could not find the UCSharpBlueprintFunctionLibrary entry function").
 		                                 ToString(), Node);
 
 		return;
@@ -80,12 +71,11 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 	if (TargetPin == nullptr)
 	{
-		CompilerContext.MessageLog.Error(*LOCTEXT("TargetPinMissing", "@@ 缺少 Target 引脚").ToString(), Node);
+		CompilerContext.MessageLog.Error(*LOCTEXT("TargetPinMissing", "@@ is missing its Target pin").ToString(), Node);
 
 		return;
 	}
 
-	// 接口值是 16 字节的 FScriptInterface，不能直接当 UObject* 读；CallFunction 处理器会插转换，这里直接拒绝
 	const auto IsLinkedToInterface = [](const UEdGraphPin* InPin)
 	{
 		return InPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Object &&
@@ -95,7 +85,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 	if (IsLinkedToInterface(TargetPin))
 	{
-		CompilerContext.MessageLog.Error(*LOCTEXT("InterfaceTarget", "@@ 不能直接连接接口引脚，请先 Cast 为对象").ToString(),
+		CompilerContext.MessageLog.Error(*LOCTEXT("InterfaceTarget", "@@ cannot be connected to an interface pin directly, cast it to an object first").ToString(),
 		                                 TargetPin);
 
 		return;
@@ -105,7 +95,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 	if (TargetTerm == nullptr)
 	{
-		CompilerContext.MessageLog.Error(*LOCTEXT("TargetTermMissing", "无法解析 @@ 的 Target").ToString(), TargetPin);
+		CompilerContext.MessageLog.Error(*LOCTEXT("TargetTermMissing", "Failed to resolve the Target of @@").ToString(), TargetPin);
 
 		return;
 	}
@@ -133,7 +123,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 		if (FoundTerm == nullptr)
 		{
-			CompilerContext.MessageLog.Error(*LOCTEXT("TermMissing", "无法解析传入 @@ 的值").ToString(), Pin);
+			CompilerContext.MessageLog.Error(*LOCTEXT("TermMissing", "Failed to resolve the value passed into @@").ToString(), Pin);
 
 			bHasError = true;
 
@@ -146,7 +136,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 		{
 			if (IsLinkedToInterface(Pin))
 			{
-				CompilerContext.MessageLog.Error(*LOCTEXT("InterfaceParam", "@@ 不能直接连接接口引脚，请先 Cast 为对象").
+				CompilerContext.MessageLog.Error(*LOCTEXT("InterfaceParam", "@@ cannot be connected to an interface pin directly, cast it to an object first").
 				                                 ToString(), Pin);
 
 				bHasError = true;
@@ -157,7 +147,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 				if (Pin->PinType.bIsReference)
 				{
 					CompilerContext.MessageLog.Error(*LOCTEXT("RefImplicitCast",
-					                                          "引用参数 @@ 不支持 float/double 隐式转换，请连接相同精度的变量").
+					                                          "Reference parameter @@ does not support implicit float/double conversion, connect a variable of the same precision").
 					                                 ToString(), Pin);
 
 					bHasError = true;
@@ -168,7 +158,7 @@ void FKCHandler_CSharpMemberCall::Compile(FKismetFunctionContext& Context, UEdGr
 
 			if (Pin->PinType.bIsReference && !Term->IsTermWritable())
 			{
-				CompilerContext.MessageLog.Error(*LOCTEXT("RefReadOnly", "不能把只读变量传给引用参数 @@").ToString(), Pin);
+				CompilerContext.MessageLog.Error(*LOCTEXT("RefReadOnly", "Cannot pass a read-only variable to reference parameter @@").ToString(), Pin);
 
 				bHasError = true;
 			}

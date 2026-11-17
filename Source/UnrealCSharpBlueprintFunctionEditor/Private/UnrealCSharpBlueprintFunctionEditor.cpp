@@ -7,15 +7,13 @@
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "K2Node_CallCSharpFunction.h"
+#include "K2Node_CreateCSharpDelegate.h"
 #include "K2Node_CSharpPropertyAccess.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Reflection/FClassReflection.h"
 #include "UnrealCSharpCore.h"
 #include "UObject/UObjectIterator.h"
 
-/**
- * 负责在 C# 重新编译 / 域重载 / Override 类所属蓝图加载后，刷新节点菜单并重建签名已变化的节点。
- */
 class FUnrealCSharpBlueprintFunctionEditorModule final : public IModuleInterface
 {
 public:
@@ -70,7 +68,6 @@ private:
 
 	void OnAssetLoaded(UObject* InObject)
 	{
-		// 只有 Override 类对应的蓝图加载后才需要刷新菜单（GetMenuActions 只为已加载的类注册动作）
 		if (const auto Blueprint = Cast<UBlueprint>(InObject);
 			Blueprint != nullptr && Blueprint->GeneratedClass != nullptr &&
 			OverrideClassNames.Contains(Blueprint->GeneratedClass->GetFName()))
@@ -103,7 +100,6 @@ private:
 			return;
 		}
 
-		// 编辑器下 C# 编译后域默认只标记 Outdated、到 PIE 才重载，节点签名会一直是旧的；这里主动重载
 		if (auto& CoreModule = FUnrealCSharpCoreModule::Get(); CoreModule.IsOutdated() && !GIsPlayInEditorWorld)
 		{
 			CoreModule.Deactivate();
@@ -118,6 +114,8 @@ private:
 			ActionDatabase->RefreshClassActions(UK2Node_CallCSharpFunction::StaticClass());
 
 			ActionDatabase->RefreshClassActions(UK2Node_CSharpPropertyAccess::StaticClass());
+
+			ActionDatabase->RefreshClassActions(UK2Node_CreateCSharpDelegate::StaticClass());
 		}
 
 		RefreshLiveNodes();
@@ -136,7 +134,6 @@ private:
 		});
 	}
 
-	// 已放进图里的节点：签名变化就重建，让引脚跟上 C# 代码
 	void RefreshLiveNodes()
 	{
 		TSet<UBlueprint*> ModifiedBlueprints;

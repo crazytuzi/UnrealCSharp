@@ -52,7 +52,6 @@ static FOutParmRec* FindOutParmRec(FOutParmRec* InOutParm, const FProperty* InPr
 
 void FCSharpBlueprintCallDescriptor::SkipParams(FFrame& InStack)
 {
-	// 变量项只写 MostRecentPropertyAddress；常量项会把值写进结果地址，给足够大的临时空间
 	alignas(16) uint8 Scratch[256];
 
 	while (InStack.Code != nullptr && *InStack.Code != EX_EndFunctionParms)
@@ -133,7 +132,6 @@ void FCSharpBlueprintCallDescriptor::Call(UObject* InTarget, FFrame& InStack)
 
 		if (Property->HasAnyPropertyFlags(CPF_ReturnParm))
 		{
-			// 返回值项一定是调用方的局部变量，只取地址不拷贝
 			if (bHasArgument)
 			{
 				InStack.StepCompiledIn<FProperty>(nullptr);
@@ -184,13 +182,13 @@ void FCSharpBlueprintCallDescriptor::Call(UObject* InTarget, FFrame& InStack)
 	if (bArgumentMismatch)
 	{
 		UE_LOG(LogUnrealCSharp, Error,
-		       TEXT("CSharpBlueprintCall: %s 的蓝图调用参数个数与 C# 签名不一致，请重新编译蓝图 (%s)"),
+		       TEXT("CSharpBlueprintCall: argument count of %s does not match the C# signature, recompile the Blueprint (%s)"),
 		       *FoundFunction->GetName(), *GetPathNameSafe(InStack.Node));
 	}
 	else if (const auto ManagedHandle = FCSharpEnvironment::GetEnvironment().Bind(InTarget);
 		!IManagedHandleIsValid(ManagedHandle))
 	{
-		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpBlueprintCall: %s 无法绑定到 C# 对象 (%s)"),
+		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpBlueprintCall: failed to bind %s to a C# object (%s)"),
 		       *GetPathNameSafe(InTarget), *FoundFunction->GetName());
 	}
 	else
@@ -237,7 +235,6 @@ void FCSharpBlueprintCallDescriptor::Call(UObject* InTarget, FFrame& InStack)
 		     DestructorLink != nullptr;
 		     DestructorLink = DestructorLink->DestructorLinkNext)
 		{
-			// 返回值槽位从未初始化，不能析构
 			if (!DestructorLink->HasAnyPropertyFlags(CPF_ReturnParm))
 			{
 				DestructorLink->DestroyValue_InContainer(Params);
@@ -246,6 +243,40 @@ void FCSharpBlueprintCallDescriptor::Call(UObject* InTarget, FFrame& InStack)
 
 		BufferAllocator->Free(Params);
 	}
+}
+
+void FCSharpBlueprintCallDescriptor::CallWithParams(UObject* InTarget, void* InParams)
+{
+	if (Method == nullptr || !Function.IsValid())
+	{
+		return;
+	}
+
+	const auto ManagedHandle = FCSharpEnvironment::GetEnvironment().Bind(InTarget);
+
+	if (!IManagedHandleIsValid(ManagedHandle))
+	{
+		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpBlueprintCall: failed to bind %s to a C# object (%s)"),
+		       *GetPathNameSafe(InTarget), *Function->GetName());
+
+		return;
+	}
+
+	Invoke(
+		Method,
+		ManagedHandle,
+		[this, InParams](const int32 Index) -> void*
+		{
+			return InParams != nullptr ? PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams) : nullptr;
+		},
+		ReturnPropertyDescriptor != nullptr && InParams != nullptr
+			? ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams)
+			: nullptr,
+		[InParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
+		{
+			return InParams != nullptr ? InPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams) : nullptr;
+		}
+	);
 }
 
 FCSharpBlueprintCallCache& FCSharpBlueprintCallCache::Get()
@@ -292,7 +323,7 @@ FCSharpBlueprintCallDescriptor* FCSharpBlueprintCallCache::Resolve(UClass* InCla
 
 	if (!Descriptor.IsValid())
 	{
-		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpBlueprintCall: %s.%s (Kind=%d, ParamCount=%d) 无法解析为 C# 成员"),
+		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpBlueprintCall: %s.%s (Kind=%d, ParamCount=%d) could not be resolved to a C# member"),
 		       *InClass->GetName(), *InName.ToString(), static_cast<int32>(InKind), InParamCount);
 	}
 

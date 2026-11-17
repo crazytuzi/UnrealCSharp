@@ -2,6 +2,7 @@
 
 #include "CSharpBlueprintCallDescriptor.h"
 #include "CSharpBlueprintMember.h"
+#include "CSharpDelegateProxy.h"
 #include "Log/UnrealCSharpLog.h"
 
 static void LogOnce(const UObject* InTarget, const FName& InMemberName, const TCHAR* InMessage)
@@ -34,11 +35,11 @@ static void ExecCSharpMember(FFrame& Stack, const ECSharpBlueprintMemberKind InK
 
 	if (Target == nullptr)
 	{
-		LogOnce(nullptr, MemberName, TEXT("Target 为空"));
+		LogOnce(nullptr, MemberName, TEXT("Target is null"));
 	}
 	else if (!FCSharpBlueprintMemberLibrary::IsRuntimeActive())
 	{
-		LogOnce(Target, MemberName, TEXT("C# 运行时未激活，跳过调用"));
+		LogOnce(Target, MemberName, TEXT("C# runtime is not active, call skipped"));
 	}
 	else
 	{
@@ -46,7 +47,7 @@ static void ExecCSharpMember(FFrame& Stack, const ECSharpBlueprintMemberKind InK
 
 		if (Descriptor != nullptr && Descriptor->GetSignatureHash() != static_cast<uint32>(SignatureHash))
 		{
-			LogOnce(Target, MemberName, TEXT("蓝图编译时的 C# 签名与当前不一致，请重新编译蓝图"));
+			LogOnce(Target, MemberName, TEXT("C# signature changed since the Blueprint was compiled, recompile the Blueprint"));
 
 			Descriptor = nullptr;
 		}
@@ -96,6 +97,19 @@ DEFINE_FUNCTION(UCSharpBlueprintFunctionLibrary::execSetCSharpProperty)
 	ExecCSharpMember(Stack, ECSharpBlueprintMemberKind::PropertySet);
 }
 
+UObject* UCSharpBlueprintFunctionLibrary::GetCSharpDelegateProxy(UObject* Target, const FName FunctionName,
+                                                                 const int32 ParamCount, const int32 SignatureHash)
+{
+	if (Target == nullptr)
+	{
+		LogOnce(nullptr, FunctionName, TEXT("Target is null, cannot create delegate"));
+
+		return nullptr;
+	}
+
+	return UCSharpDelegateProxy::GetOrCreate(Target, FunctionName, ParamCount, static_cast<uint32>(SignatureHash));
+}
+
 UFunction* UCSharpBlueprintFunctionLibrary::GetCallFunction()
 {
 	return StaticClass()->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UCSharpBlueprintFunctionLibrary, CallCSharpFunction));
@@ -109,4 +123,10 @@ UFunction* UCSharpBlueprintFunctionLibrary::GetGetPropertyFunction()
 UFunction* UCSharpBlueprintFunctionLibrary::GetSetPropertyFunction()
 {
 	return StaticClass()->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UCSharpBlueprintFunctionLibrary, SetCSharpProperty));
+}
+
+UFunction* UCSharpBlueprintFunctionLibrary::GetDelegateProxyFunction()
+{
+	return StaticClass()->FindFunctionByName(
+		GET_FUNCTION_NAME_CHECKED(UCSharpBlueprintFunctionLibrary, GetCSharpDelegateProxy));
 }

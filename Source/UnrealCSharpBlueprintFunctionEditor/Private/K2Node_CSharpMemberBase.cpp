@@ -38,16 +38,7 @@ void UK2Node_CSharpMemberBase::AllocateDefaultPins()
 
 	const auto Blueprint = FBlueprintEditorUtils::FindBlueprintForNode(this);
 
-	if (OwnerClass != nullptr && Blueprint != nullptr && Blueprint->GeneratedClass == OwnerClass)
-	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, nullptr,
-		          UEdGraphSchema_K2::PN_Self);
-	}
-	else
-	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object,
-		          OwnerClass != nullptr ? OwnerClass.Get() : UObject::StaticClass(), UEdGraphSchema_K2::PN_Self);
-	}
+	CreateTargetPin();
 
 	for (const auto& Description : CachedPins)
 	{
@@ -71,7 +62,7 @@ FText UK2Node_CSharpMemberBase::GetTooltipText() const
 		return FText::FromString(ToolTip);
 	}
 
-	return FText::Format(LOCTEXT("DefaultTooltip", "访问 C# 类 {0} 的成员 {1}"),
+	return FText::Format(LOCTEXT("DefaultTooltip", "Access member {1} of C# class {0}"),
 	                     GetOwnerClassDisplayName(), FText::FromName(MemberName));
 }
 
@@ -127,7 +118,7 @@ void UK2Node_CSharpMemberBase::GetPinHoverText(const UEdGraphPin& Pin, FString& 
 
 	if (&Pin == GetTargetPin())
 	{
-		HoverTextOut = FText::Format(LOCTEXT("TargetPinHover", "{0}\n调用目标，需是 {1} 或其子类；不连接时默认为 self"),
+		HoverTextOut = FText::Format(LOCTEXT("TargetPinHover", "{0}\nTarget must be {1} or a subclass; defaults to self when unconnected"),
 		                             FText::FromString(HoverTextOut), GetOwnerClassDisplayName()).ToString();
 	}
 }
@@ -176,7 +167,6 @@ void UK2Node_CSharpMemberBase::GetMenuActions(FBlueprintActionDatabaseRegistrar&
 							UBlueprintNodeSpawner::FCustomizeNodeDelegate::CreateStatic(
 								&UK2Node_CSharpMemberBase::CustomizeNewNode, SpawnData));
 
-						// 模板节点尚未生成，菜单显示信息直接由 SpawnData 推导
 						auto& MenuSignature = Spawner->DefaultMenuSignature;
 
 						MenuSignature.MenuName = FText::FromString(GetMenuNameForSpawnData(SpawnData));
@@ -190,7 +180,7 @@ void UK2Node_CSharpMemberBase::GetMenuActions(FBlueprintActionDatabaseRegistrar&
 						MenuSignature.Tooltip = !SpawnData.ToolTip.IsEmpty()
 							                        ? FText::FromString(SpawnData.ToolTip)
 							                        : FText::Format(
-								                        LOCTEXT("DefaultTooltip", "访问 C# 类 {0} 的成员 {1}"),
+								                        LOCTEXT("DefaultTooltip", "Access member {1} of C# class {0}"),
 								                        FoundOwnerClass->GetDisplayNameText(),
 								                        FText::FromName(SpawnData.MemberName));
 
@@ -235,7 +225,7 @@ void UK2Node_CSharpMemberBase::ValidateNodeDuringCompilation(FCompilerResultsLog
 
 	if (OwnerClass == nullptr)
 	{
-		MessageLog.Error(*FText::Format(LOCTEXT("OwnerClassMissing", "@@ 引用的 C# 成员 {0} 所属类无法加载"),
+		MessageLog.Error(*FText::Format(LOCTEXT("OwnerClassMissing", "The owner class of C# member {0} referenced by @@ could not be loaded"),
 		                                FText::FromName(MemberName)).ToString(), this);
 
 		return;
@@ -250,7 +240,7 @@ void UK2Node_CSharpMemberBase::ValidateNodeDuringCompilation(FCompilerResultsLog
 
 	if (!bDomainReady)
 	{
-		MessageLog.Note(*LOCTEXT("DomainNotReady", "C# 运行时未就绪，@@ 使用缓存签名编译").ToString(), this);
+		MessageLog.Note(*LOCTEXT("DomainNotReady", "C# runtime is not ready, @@ is compiled with its cached signature").ToString(), this);
 
 		return;
 	}
@@ -259,7 +249,7 @@ void UK2Node_CSharpMemberBase::ValidateNodeDuringCompilation(FCompilerResultsLog
 
 	if (!ResolveMember(Info))
 	{
-		MessageLog.Error(*FText::Format(LOCTEXT("MemberMissing", "在 C# 类 {0} 中找不到可供蓝图访问的成员 {1} (@@)"),
+		MessageLog.Error(*FText::Format(LOCTEXT("MemberMissing", "Blueprint-accessible member {1} was not found in C# class {0} (@@)"),
 		                                GetOwnerClassDisplayName(), FText::FromName(MemberName)).ToString(), this);
 
 		return;
@@ -273,14 +263,14 @@ void UK2Node_CSharpMemberBase::ValidateNodeDuringCompilation(FCompilerResultsLog
 
 	if (!BuildPinDescriptions(Info, ReflectedPins, Hash, bPure))
 	{
-		MessageLog.Error(*LOCTEXT("UnsupportedSignature", "@@ 的 C# 签名包含蓝图不支持的类型").ToString(), this);
+		MessageLog.Error(*LOCTEXT("UnsupportedSignature", "The C# signature of @@ contains a type not supported by Blueprint").ToString(), this);
 
 		return;
 	}
 
 	if (Hash != SignatureHash || ReflectedPins != CachedPins || bPure != bIsPure || Info.GetParamCount() != ParamCount)
 	{
-		MessageLog.Error(*LOCTEXT("SignatureChanged", "@@ 的引脚与当前 C# 签名不一致，请在节点上右键 Refresh Nodes 后重新编译").
+		MessageLog.Error(*LOCTEXT("SignatureChanged", "Pins of @@ do not match the current C# signature, right-click the node and Refresh Nodes, then recompile").
 		                 ToString(), this);
 	}
 }
@@ -295,7 +285,6 @@ void UK2Node_CSharpMemberBase::ExpandNode(FKismetCompilerContext& CompilerContex
 
 	GetMemberPins(MemberPins);
 
-	// 未连接的 ref / 容器输入：编译器无法为其生成可寻址的字面量，这里补一个临时变量（等价于 AutoCreateRefTerm）
 	for (const auto Pin : MemberPins)
 	{
 		if (Pin->Direction != EGPD_Input || Pin->LinkedTo.Num() > 0)
@@ -324,7 +313,7 @@ void UK2Node_CSharpMemberBase::ExpandNode(FKismetCompilerContext& CompilerContex
 		{
 			if (!Schema->TryCreateConnection(TemporaryVariable->GetVariablePin(), Pin))
 			{
-				CompilerContext.MessageLog.Error(*LOCTEXT("TempVarConnectFailed", "无法为 @@ 创建临时变量").ToString(),
+				CompilerContext.MessageLog.Error(*LOCTEXT("TempVarConnectFailed", "Failed to create a temporary variable for @@").ToString(),
 				                                 Pin);
 			}
 
@@ -346,7 +335,7 @@ void UK2Node_CSharpMemberBase::ExpandNode(FKismetCompilerContext& CompilerContex
 
 		if (!bVariableConnected || !bDefaultMoved || !bOutputConnected)
 		{
-			CompilerContext.MessageLog.Error(*LOCTEXT("TempVarAssignFailed", "无法为 @@ 赋默认值").ToString(), Pin);
+			CompilerContext.MessageLog.Error(*LOCTEXT("TempVarAssignFailed", "Failed to assign the default value of @@").ToString(), Pin);
 		}
 	}
 }
@@ -527,7 +516,6 @@ bool UK2Node_CSharpMemberBase::BuildPinDescriptions(const FCSharpBlueprintMember
 
 		const auto bIsReturn = Property->HasAnyPropertyFlags(CPF_ReturnParm);
 
-		// ref 参数与 UK2Node_CallFunction 一致：只生成一个按引用的输入引脚
 		Description.Direction = bIsReturn ? EGPD_Output : EGPD_Input;
 
 		Description.PinType.bIsReference = !bIsReturn &&
@@ -583,7 +571,7 @@ FCSharpBlueprintMemberSpawnData UK2Node_CSharpMemberBase::MakeSpawnData(const FC
 
 FText UK2Node_CSharpMemberBase::GetOwnerClassDisplayName() const
 {
-	return OwnerClass != nullptr ? OwnerClass->GetDisplayNameText() : LOCTEXT("UnknownClass", "<未知类>");
+	return OwnerClass != nullptr ? OwnerClass->GetDisplayNameText() : LOCTEXT("UnknownClass", "<Unknown Class>");
 }
 
 bool UK2Node_CSharpMemberBase::IsTargetSelf() const
@@ -592,6 +580,38 @@ bool UK2Node_CSharpMemberBase::IsTargetSelf() const
 
 	return TargetPin != nullptr && TargetPin->LinkedTo.IsEmpty() &&
 		TargetPin->PinType.PinSubCategory == UEdGraphSchema_K2::PSC_Self;
+}
+
+UEdGraphPin* UK2Node_CSharpMemberBase::CreateTargetPin()
+{
+	const auto Blueprint = FBlueprintEditorUtils::FindBlueprintForNode(this);
+
+	if (OwnerClass != nullptr && Blueprint != nullptr && Blueprint->GeneratedClass == OwnerClass)
+	{
+		return CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, nullptr,
+		                 UEdGraphSchema_K2::PN_Self);
+	}
+
+	return CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object,
+	                 OwnerClass != nullptr ? OwnerClass.Get() : UObject::StaticClass(), UEdGraphSchema_K2::PN_Self);
+}
+
+FBPTerminal* UK2Node_CSharpMemberBase::RegisterTargetNetIfUnlinked(FKismetFunctionContext& Context,
+                                                                   UEdGraphPin* TargetPin) const
+{
+	if (TargetPin == nullptr || !TargetPin->LinkedTo.IsEmpty() ||
+		!FKismetCompilerUtilities::ValidateSelfCompatibility(TargetPin, Context))
+	{
+		return nullptr;
+	}
+
+	const auto Term = Context.RegisterLiteral(TargetPin);
+
+	Term->Type.PinSubCategory = UEdGraphSchema_K2::PN_Self;
+
+	Context.NetMap.Add(TargetPin, Term);
+
+	return Term;
 }
 
 void UK2Node_CSharpMemberBase::CustomizeNewNode(UEdGraphNode* InNode, bool, FCSharpBlueprintMemberSpawnData InData)

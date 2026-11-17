@@ -4,7 +4,6 @@
 #include "K2Node_CSharpMemberBase.h"
 #include "K2Node_CSharpPropertyAccess.generated.h"
 
-/** 读写 C# Override 类上的 [UProperty, BlueprintReadWrite/BlueprintReadOnly] 属性 */
 UCLASS()
 class UNREALCSHARPBLUEPRINTFUNCTIONEDITOR_API UK2Node_CSharpPropertyAccess : public UK2Node_CSharpMemberBase
 {

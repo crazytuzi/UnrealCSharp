@@ -6,8 +6,9 @@
 #include "K2Node_CSharpMemberBase.generated.h"
 
 class FBlueprintActionDatabaseRegistrar;
+struct FBPTerminal;
+struct FKismetFunctionContext;
 
-/** 节点生成所需的最小信息，不持有任何 C# 反射指针 */
 struct FCSharpBlueprintMemberSpawnData
 {
 	TWeakObjectPtr<UClass> OwnerClass;
@@ -27,7 +28,6 @@ struct FCSharpBlueprintMemberSpawnData
 	FString ToolTip;
 };
 
-/** 序列化在节点上的引脚描述；C# 反射不可用（程序集未编译/运行时未激活）时据此重建引脚，保证连线不丢。 */
 USTRUCT()
 struct FCSharpBlueprintPinDescription
 {
@@ -50,17 +50,12 @@ struct FCSharpBlueprintPinDescription
 	bool operator!=(const FCSharpBlueprintPinDescription& InOther) const { return !(*this == InOther); }
 };
 
-/**
- * 访问 C# Override 类成员的 K2 节点基类。
- * 编译产物只引用 UCSharpBlueprintFunctionLibrary 的稳定原生函数 + 成员名字面量，不依赖任何临时 UFunction。
- */
 UCLASS(Abstract)
 class UNREALCSHARPBLUEPRINTFUNCTIONEDITOR_API UK2Node_CSharpMemberBase : public UK2Node
 {
 	GENERATED_BODY()
 
 public:
-	//~ UEdGraphNode
 	virtual void AllocateDefaultPins() override;
 
 	virtual FText GetTooltipText() const override;
@@ -73,7 +68,6 @@ public:
 
 	virtual void GetPinHoverText(const UEdGraphPin& Pin, FString& HoverTextOut) const override;
 
-	//~ UK2Node
 	virtual bool IsNodePure() const override { return bIsPure; }
 
 	virtual FText GetMenuCategory() const override;
@@ -99,20 +93,16 @@ public:
 
 	virtual FString GetMenuNameForSpawnData(const FCSharpBlueprintMemberSpawnData& InData) const;
 
-	/** 编译处理器要调用的库函数 */
 	UFunction* GetLibraryFunction() const;
 
 	UEdGraphPin* GetTargetPin() const;
 
-	/** 变参引脚，顺序与 C# 签名一致（输入/ref 参数，最后是返回值） */
 	void GetMemberPins(TArray<UEdGraphPin*>& OutPins) const;
 
-	/** 用当前 C# 反射刷新缓存签名；返回签名是否发生变化。反射不可用时返回 false 且不改动缓存。 */
 	bool RefreshFromReflection();
 
 	bool ResolveMember(FCSharpBlueprintMemberInfo& OutInfo) const;
 
-	/** 域就绪时直接执行；编辑器下按需创建脚本域；Commandlet 下不创建 */
 	static void WithScriptDomain(const TFunctionRef<void()>& InFunction);
 
 	static bool BuildPinDescriptions(const FCSharpBlueprintMemberInfo& InInfo,
@@ -121,16 +111,19 @@ public:
 
 	static FCSharpBlueprintMemberSpawnData MakeSpawnData(const FCSharpBlueprintMemberInfo& InInfo);
 
+	FBPTerminal* RegisterTargetNetIfUnlinked(FKismetFunctionContext& Context, UEdGraphPin* TargetPin) const;
+
 protected:
 	FText GetOwnerClassDisplayName() const;
 
 	bool IsTargetSelf() const;
 
+	UEdGraphPin* CreateTargetPin();
+
 private:
 	static void CustomizeNewNode(UEdGraphNode* InNode, bool bIsTemplateNode, FCSharpBlueprintMemberSpawnData InData);
 
 public:
-	/** 声明该成员的 C# Override 类所绑定的 UClass */
 	UPROPERTY()
 	TObjectPtr<UClass> OwnerClass;
 
