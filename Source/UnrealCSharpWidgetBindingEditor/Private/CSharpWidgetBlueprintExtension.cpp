@@ -46,7 +46,7 @@ const TArray<FCSharpWidgetBinding>& UCSharpWidgetBlueprintExtension::GetBindings
 FName UCSharpWidgetBlueprintExtension::GetWidgetKey(const UWidgetBlueprint* InWidgetBlueprint, const UWidget* InWidget)
 {
 	if (InWidgetBlueprint == nullptr || InWidget == nullptr || InWidgetBlueprint->WidgetTree == nullptr ||
-		InWidgetBlueprint->WidgetTree->FindWidget(InWidget->GetFName()) != InWidget)
+		InWidgetBlueprint->WidgetTree->FindWidget(InWidget->GetFName()) == nullptr)
 	{
 		return NAME_None;
 	}
