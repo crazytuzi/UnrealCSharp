@@ -13,20 +13,22 @@ namespace
 	{
 		TWeakObjectPtr<UObject> Target;
 
-		FName FunctionName;
+		ECSharpBlueprintMemberKind Kind;
+
+		FName MemberName;
 
 		int32 ParamCount;
 
 		bool operator==(const FProxyKey& InOther) const
 		{
-			return Target == InOther.Target && FunctionName == InOther.FunctionName &&
+			return Target == InOther.Target && Kind == InOther.Kind && MemberName == InOther.MemberName &&
 				ParamCount == InOther.ParamCount;
 		}
 
 		friend uint32 GetTypeHash(const FProxyKey& InKey)
 		{
-			return HashCombine(HashCombine(GetTypeHash(InKey.Target), GetTypeHash(InKey.FunctionName)),
-			                   static_cast<uint32>(InKey.ParamCount));
+			return HashCombine(HashCombine(GetTypeHash(InKey.Target), GetTypeHash(InKey.MemberName)),
+			                   HashCombine(static_cast<uint32>(InKey.Kind), static_cast<uint32>(InKey.ParamCount)));
 		}
 	};
 
@@ -40,12 +42,13 @@ namespace
 			return Registry;
 		}
 
-		UCSharpDelegateProxy* GetOrCreate(UObject* InTarget, const FName& InFunctionName, const int32 InParamCount,
+		UCSharpDelegateProxy* GetOrCreate(UObject* InTarget, const ECSharpBlueprintMemberKind InKind,
+		                                  const FName& InMemberName, const int32 InParamCount,
 		                                  const uint32 InSignatureHash)
 		{
 			EnsureHooked();
 
-			const FProxyKey Key{InTarget, InFunctionName, InParamCount};
+			const FProxyKey Key{InTarget, InKind, InMemberName, InParamCount};
 
 			if (const auto Found = Proxies.Find(Key))
 			{
@@ -63,7 +66,9 @@ namespace
 
 			Proxy->Target = InTarget;
 
-			Proxy->FunctionName = InFunctionName;
+			Proxy->Kind = InKind;
+
+			Proxy->MemberName = InMemberName;
 
 			Proxy->ParamCount = InParamCount;
 
@@ -150,14 +155,13 @@ void UCSharpDelegateProxy::ProcessEvent(UFunction* Function, void* Parms)
 	if (!FCSharpBlueprintMemberLibrary::IsRuntimeActive())
 	{
 		UE_LOG(LogUnrealCSharp, Warning, TEXT("CSharpDelegateProxy: C# runtime is not active, skipped %s.%s"),
-		       *FoundTarget->GetClass()->GetName(), *FunctionName.ToString());
+		       *FoundTarget->GetClass()->GetName(), *MemberName.ToString());
 
 		return;
 	}
 
-	const auto Descriptor = FCSharpBlueprintCallCache::Get().Resolve(FoundTarget->GetClass(),
-	                                                                 ECSharpBlueprintMemberKind::Function,
-	                                                                 FunctionName, ParamCount);
+	const auto Descriptor = FCSharpBlueprintCallCache::Get().Resolve(FoundTarget->GetClass(), Kind, MemberName,
+	                                                                 ParamCount);
 
 	if (Descriptor == nullptr)
 	{
@@ -168,7 +172,7 @@ void UCSharpDelegateProxy::ProcessEvent(UFunction* Function, void* Parms)
 	{
 		UE_LOG(LogUnrealCSharp, Error,
 		       TEXT("CSharpDelegateProxy: delegate signature of %s.%s does not match the current C# signature, recompile the Blueprint"),
-		       *FoundTarget->GetClass()->GetName(), *FunctionName.ToString());
+		       *FoundTarget->GetClass()->GetName(), *MemberName.ToString());
 
 		return;
 	}
@@ -183,15 +187,16 @@ FName UCSharpDelegateProxy::GetInvokeFunctionName()
 	return Name;
 }
 
-UCSharpDelegateProxy* UCSharpDelegateProxy::GetOrCreate(UObject* InTarget, const FName& InFunctionName,
-                                                        const int32 InParamCount, const uint32 InSignatureHash)
+UCSharpDelegateProxy* UCSharpDelegateProxy::GetOrCreate(UObject* InTarget, const ECSharpBlueprintMemberKind InKind,
+                                                        const FName& InMemberName, const int32 InParamCount,
+                                                        const uint32 InSignatureHash)
 {
 	if (InTarget == nullptr)
 	{
 		return nullptr;
 	}
 
-	return FProxyRegistry::Get().GetOrCreate(InTarget, InFunctionName, InParamCount, InSignatureHash);
+	return FProxyRegistry::Get().GetOrCreate(InTarget, InKind, InMemberName, InParamCount, InSignatureHash);
 }
 
 void UCSharpDelegateProxy::ResetRegistry()

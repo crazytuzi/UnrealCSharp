@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CSharpBlueprintMember.h"
 #include "UObject/Object.h"
 #include "CSharpDelegateProxy.generated.h"
 
@@ -18,15 +19,17 @@ public:
 public:
 	static FName GetInvokeFunctionName();
 
-	static UCSharpDelegateProxy* GetOrCreate(UObject* InTarget, const FName& InFunctionName, int32 InParamCount,
-	                                         uint32 InSignatureHash);
+	static UCSharpDelegateProxy* GetOrCreate(UObject* InTarget, ECSharpBlueprintMemberKind InKind,
+	                                         const FName& InMemberName, int32 InParamCount, uint32 InSignatureHash);
 
 	static void ResetRegistry();
 
 public:
 	TWeakObjectPtr<UObject> Target;
 
-	FName FunctionName;
+	ECSharpBlueprintMemberKind Kind = ECSharpBlueprintMemberKind::Function;
+
+	FName MemberName;
 
 	int32 ParamCount = 0;
 

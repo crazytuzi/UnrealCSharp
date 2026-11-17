@@ -107,7 +107,8 @@ UObject* UCSharpBlueprintFunctionLibrary::GetCSharpDelegateProxy(UObject* Target
 		return nullptr;
 	}
 
-	return UCSharpDelegateProxy::GetOrCreate(Target, FunctionName, ParamCount, static_cast<uint32>(SignatureHash));
+	return UCSharpDelegateProxy::GetOrCreate(Target, ECSharpBlueprintMemberKind::Function, FunctionName, ParamCount,
+	                                         static_cast<uint32>(SignatureHash));
 }
 
 UFunction* UCSharpBlueprintFunctionLibrary::GetCallFunction()

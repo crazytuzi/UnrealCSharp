@@ -57,6 +57,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "UnrealCSharpWidgetBindingEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostDefault"
+		},
+		{
 			"Name": "SourceCodeGenerator",
 			"Type": "Program",
 			"LoadingPhase": "PostConfigInit"
