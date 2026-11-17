@@ -367,10 +367,13 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 				{
 					if (Params[Index]->IsPrimitive())
 					{
-						DefaultParam = FString::Printf(TEXT(
-							" = %s"),
-						                               *DefaultArguments[DefaultArgumentIndex]
-						);
+						if (const auto& DefaultArgument = DefaultArguments[DefaultArgumentIndex];
+							!DefaultArgument.IsEmpty())
+						{
+							DefaultParam = TEXT(" = ");
+
+							DefaultParam += DefaultArgument;
+						}
 					}
 					else
 					{
@@ -729,6 +732,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	UsingNameSpaces.Remove(NameSpaceContent[0]);
 
+	UsingNameSpaces.Remove(TEXT(""));
+
 	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
@@ -1017,6 +1022,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	}
 
 	UsingNameSpaceContent += TEXT("using Interop;\n");
+
+	UsingNameSpaces.Remove(TEXT(""));
 
 	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 

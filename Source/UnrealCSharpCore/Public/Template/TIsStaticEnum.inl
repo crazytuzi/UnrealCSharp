@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UObject/ReflectedTypeAccessors.h"
+
 template <typename T>
 struct TIsStaticEnum
 {

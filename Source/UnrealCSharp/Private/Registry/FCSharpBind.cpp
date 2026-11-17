@@ -178,6 +178,8 @@ void FCSharpBind::RemoveFunctionFromClass(UFunction* InFunction)
 						Class->Children = Field->Next;
 					}
 
+					Field->Next = nullptr;
+
 					break;
 				}
 

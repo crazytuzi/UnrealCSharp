@@ -149,6 +149,8 @@ void FClassCollector::RequestPopulateClassHierarchy()
 
 void FClassCollector::PopulateClassHierarchy()
 {
+	FCoreDelegates::OnEndFrame.Remove(OnEndFrameDelegateHandle);
+
 	OnEndFrameDelegateHandle.Reset();
 
 	PopulateClassInMemory();

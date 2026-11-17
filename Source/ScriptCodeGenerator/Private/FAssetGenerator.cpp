@@ -165,6 +165,8 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass));
 
+	UsingNameSpaces.Remove(TEXT(""));
+
 	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)

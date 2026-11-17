@@ -17,7 +17,7 @@ namespace
 			{
 				if (const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName))
 				{
-					if (const auto Function = FoundClass->FindFunctionByName(*Name))
+					if (const auto Function = FoundClass->FindFunctionByName(*Name, EIncludeSuperFlag::ExcludeSuper))
 					{
 						FCSharpBind::RemoveFunctionFromClass(Function);
 
