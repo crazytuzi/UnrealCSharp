@@ -17,7 +17,7 @@ struct FPropertyArgument
 	};
 };
 
-class FPropertyDescriptor
+class UNREALCSHARP_API FPropertyDescriptor
 {
 public:
 	static FPropertyDescriptor* Factory(FProperty* InProperty);

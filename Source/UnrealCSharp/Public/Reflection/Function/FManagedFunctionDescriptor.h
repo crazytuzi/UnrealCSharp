@@ -2,7 +2,7 @@
 
 #include "FFunctionDescriptor.h"
 
-class FManagedFunctionDescriptor : public FFunctionDescriptor
+class UNREALCSHARP_API FManagedFunctionDescriptor : public FFunctionDescriptor
 {
 public:
 	using FFunctionDescriptor::FFunctionDescriptor;
