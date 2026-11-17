@@ -19,6 +19,7 @@ bool FCSharpPropertyBindingExtension::CanExtend(const UWidgetBlueprint* WidgetBl
                                                 TSharedPtr<const IPropertyHandle> PropertyHandle) const
 {
 	if (WidgetBlueprint == nullptr || Widget == nullptr || !PropertyHandle.IsValid() ||
+		UCSharpWidgetBlueprintExtension::GetWidgetKey(WidgetBlueprint, Widget).IsNone() ||
 		FindDelegateProperty(Widget, PropertyHandle) == nullptr)
 	{
 		return false;
@@ -294,7 +295,9 @@ void FCSharpPropertyBindingExtension::ApplyBinding(const UWidgetBlueprint* Widge
 {
 	const auto MutableWidgetBlueprint = const_cast<UWidgetBlueprint*>(WidgetBlueprint);
 
-	if (MutableWidgetBlueprint == nullptr || Widget == nullptr)
+	const auto WidgetKey = UCSharpWidgetBlueprintExtension::GetWidgetKey(WidgetBlueprint, Widget);
+
+	if (MutableWidgetBlueprint == nullptr || Widget == nullptr || WidgetKey.IsNone())
 	{
 		return;
 	}
@@ -312,7 +315,7 @@ void FCSharpPropertyBindingExtension::ApplyBinding(const UWidgetBlueprint* Widge
 
 	FCSharpWidgetBinding Binding;
 
-	Binding.WidgetName = UCSharpWidgetBlueprintExtension::GetWidgetKey(WidgetBlueprint, Widget);
+	Binding.WidgetName = WidgetKey;
 
 	Binding.PropertyName = PropertyName;
 

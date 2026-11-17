@@ -48,6 +48,8 @@ public:
 	void Reset();
 
 private:
+	void Prune();
+
 	struct FKey
 	{
 		TWeakObjectPtr<UClass> Class;
@@ -72,4 +74,6 @@ private:
 	};
 
 	TMap<FKey, TUniquePtr<FCSharpBlueprintCallDescriptor>> Descriptors;
+
+	FDelegateHandle PostGarbageCollectHandle;
 };

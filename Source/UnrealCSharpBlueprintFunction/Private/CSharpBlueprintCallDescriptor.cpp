@@ -3,6 +3,8 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Log/UnrealCSharpLog.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "UObject/FieldPath.h"
+#include "UObject/SoftObjectPtr.h"
 
 FCSharpBlueprintCallDescriptor::FCSharpBlueprintCallDescriptor(const FCSharpBlueprintMemberInfo& InInfo,
                                                                UFunction* InSignature,
@@ -52,45 +54,118 @@ static FOutParmRec* FindOutParmRec(FOutParmRec* InOutParm, const FProperty* InPr
 
 void FCSharpBlueprintCallDescriptor::SkipParams(FFrame& InStack)
 {
-	alignas(16) uint8 Scratch[256];
-
 	while (InStack.Code != nullptr && *InStack.Code != EX_EndFunctionParms)
 	{
 		InStack.MostRecentPropertyAddress = nullptr;
 
-		if (*InStack.Code == EX_StructConst)
+		switch (*InStack.Code)
 		{
-			const auto SavedCode = InStack.Code;
-
-			++InStack.Code;
-
-			const auto ScriptStruct = Cast<UScriptStruct>(InStack.ReadObject());
-
-			const auto StructSize = InStack.ReadInt<int32>();
-
-			InStack.Code = SavedCode;
-
-			TArray<uint8, TAlignedHeapAllocator<16>> Buffer;
-
-			Buffer.AddZeroed(FMath::Max(StructSize, 1));
-
-			if (ScriptStruct != nullptr)
+		case EX_StructConst:
 			{
-				ScriptStruct->InitializeStruct(Buffer.GetData());
+				const auto SavedCode = InStack.Code;
+
+				++InStack.Code;
+
+				const auto ScriptStruct = Cast<UScriptStruct>(InStack.ReadObject());
+
+				const auto StructSize = InStack.ReadInt<int32>();
+
+				InStack.Code = SavedCode;
+
+				TArray<uint8, TAlignedHeapAllocator<16>> Buffer;
+
+				Buffer.AddZeroed(FMath::Max(StructSize, 1));
+
+				if (ScriptStruct != nullptr)
+				{
+					ScriptStruct->InitializeStruct(Buffer.GetData());
+				}
+
+				InStack.Step(InStack.Object, Buffer.GetData());
+
+				if (ScriptStruct != nullptr)
+				{
+					ScriptStruct->DestroyStruct(Buffer.GetData());
+				}
+
+				break;
 			}
 
-			InStack.Step(InStack.Object, Buffer.GetData());
-
-			if (ScriptStruct != nullptr)
+		case EX_StringConst:
+		case EX_UnicodeStringConst:
 			{
-				ScriptStruct->DestroyStruct(Buffer.GetData());
-			}
-		}
-		else
-		{
-			FMemory::Memzero(Scratch);
+				FString Temp;
 
-			InStack.Step(InStack.Object, Scratch);
+				InStack.Step(InStack.Object, &Temp);
+
+				break;
+			}
+
+		case EX_TextConst:
+			{
+				FText Temp;
+
+				InStack.Step(InStack.Object, &Temp);
+
+				break;
+			}
+
+		case EX_SoftObjectConst:
+			{
+				FSoftObjectPtr Temp;
+
+				InStack.Step(InStack.Object, &Temp);
+
+				break;
+			}
+
+		case EX_FieldPathConst:
+			{
+				FFieldPath Temp;
+
+				InStack.Step(InStack.Object, &Temp);
+
+				break;
+			}
+
+		case EX_IntConst:
+		case EX_Int64Const:
+		case EX_UInt64Const:
+		case EX_FloatConst:
+		case EX_DoubleConst:
+		case EX_ByteConst:
+		case EX_IntConstByte:
+		case EX_IntZero:
+		case EX_IntOne:
+		case EX_True:
+		case EX_False:
+		case EX_NameConst:
+		case EX_ObjectConst:
+		case EX_NoObject:
+		case EX_NoInterface:
+		case EX_Self:
+		case EX_SkipOffsetConst:
+		case EX_PropertyConst:
+		case EX_BitFieldConst:
+		case EX_InstanceDelegate:
+		case EX_RotationConst:
+		case EX_VectorConst:
+		case EX_Vector3fConst:
+		case EX_TransformConst:
+			{
+				alignas(16) uint8 Scratch[128] = {};
+
+				InStack.Step(InStack.Object, Scratch);
+
+				break;
+			}
+
+		default:
+			{
+				InStack.Step(InStack.Object, nullptr);
+
+				break;
+			}
 		}
 	}
 }
@@ -295,6 +370,12 @@ FCSharpBlueprintCallDescriptor* FCSharpBlueprintCallCache::Resolve(UClass* InCla
 		return nullptr;
 	}
 
+	if (!PostGarbageCollectHandle.IsValid())
+	{
+		PostGarbageCollectHandle = FCoreUObjectDelegates::GetPostGarbageCollect().AddRaw(
+			this, &FCSharpBlueprintCallCache::Prune);
+	}
+
 	const FKey Key{InClass, InKind, InName, InParamCount};
 
 	if (const auto Found = Descriptors.Find(Key))
@@ -333,4 +414,22 @@ FCSharpBlueprintCallDescriptor* FCSharpBlueprintCallCache::Resolve(UClass* InCla
 void FCSharpBlueprintCallCache::Reset()
 {
 	Descriptors.Empty();
+
+	if (PostGarbageCollectHandle.IsValid())
+	{
+		FCoreUObjectDelegates::GetPostGarbageCollect().Remove(PostGarbageCollectHandle);
+
+		PostGarbageCollectHandle.Reset();
+	}
+}
+
+void FCSharpBlueprintCallCache::Prune()
+{
+	for (auto It = Descriptors.CreateIterator(); It; ++It)
+	{
+		if (!It.Key().Class.IsValid())
+		{
+			It.RemoveCurrent();
+		}
+	}
 }

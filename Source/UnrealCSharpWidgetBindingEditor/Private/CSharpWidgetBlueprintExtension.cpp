@@ -45,14 +45,13 @@ const TArray<FCSharpWidgetBinding>& UCSharpWidgetBlueprintExtension::GetBindings
 
 FName UCSharpWidgetBlueprintExtension::GetWidgetKey(const UWidgetBlueprint* InWidgetBlueprint, const UWidget* InWidget)
 {
-	if (InWidget == nullptr)
+	if (InWidgetBlueprint == nullptr || InWidget == nullptr || InWidgetBlueprint->WidgetTree == nullptr ||
+		InWidgetBlueprint->WidgetTree->FindWidget(InWidget->GetFName()) != InWidget)
 	{
 		return NAME_None;
 	}
 
-	return InWidgetBlueprint != nullptr && InWidget->GetFName() == InWidgetBlueprint->GetFName()
-		       ? NAME_None
-		       : InWidget->GetFName();
+	return InWidget->GetFName();
 }
 
 void UCSharpWidgetBlueprintExtension::HandleBeginCompilation(FWidgetBlueprintCompilerContext& InCreationContext)
@@ -121,11 +120,7 @@ bool UCSharpWidgetBlueprintExtension::ValidateBinding(const FCSharpWidgetBinding
 
 	const UWidget* Widget = nullptr;
 
-	if (InBinding.WidgetName.IsNone())
-	{
-		Widget = Cast<UWidget>(InClass->GetDefaultObject(false));
-	}
-	else if (WidgetBlueprint != nullptr && WidgetBlueprint->WidgetTree != nullptr)
+	if (!InBinding.WidgetName.IsNone() && WidgetBlueprint != nullptr && WidgetBlueprint->WidgetTree != nullptr)
 	{
 		Widget = WidgetBlueprint->WidgetTree->FindWidget(InBinding.WidgetName);
 	}

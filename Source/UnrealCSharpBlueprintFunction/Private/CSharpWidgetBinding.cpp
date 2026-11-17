@@ -28,9 +28,7 @@ void UCSharpWidgetBindingClassExtension::Initialize(UUserWidget* UserWidget)
 
 	for (const auto& Binding : Bindings)
 	{
-		const auto Widget = Binding.WidgetName.IsNone()
-			                    ? static_cast<UWidget*>(UserWidget)
-			                    : UserWidget->GetWidgetFromName(Binding.WidgetName);
+		const auto Widget = UserWidget->GetWidgetFromName(Binding.WidgetName);
 
 		if (Widget == nullptr)
 		{
