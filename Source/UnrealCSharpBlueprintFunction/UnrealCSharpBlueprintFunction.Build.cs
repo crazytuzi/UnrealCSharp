@@ -6,13 +6,8 @@ public class UnrealCSharpBlueprintFunction : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine"]);
+        PublicDependencyModuleNames.AddRange(["Core", "CoreUObject", "Engine", "UnrealCSharpCore"]);
 
-        PrivateDependencyModuleNames.AddRange(["UnrealCSharp", "UnrealCSharpCore"]);
-
-        if (Target.bBuildEditor)
-        {
-            PrivateDependencyModuleNames.AddRange(["UnrealEd", "BlueprintGraph"]);
-        }
+        PrivateDependencyModuleNames.AddRange(["UnrealCSharp"]);
     }
 }

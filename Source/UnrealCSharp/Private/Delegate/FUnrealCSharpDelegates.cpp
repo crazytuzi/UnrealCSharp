@@ -20,10 +20,3 @@ auto FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize() -> FOnCSha
 
 	return OnCSharpEnvironmentInitialize;
 }
-
-auto FUnrealCSharpModuleDelegates::GetOnCSharpClassBinding() -> FOnCSharpClassBinding&
-{
-	static FOnCSharpClassBinding OnCSharpClassBinding;
-
-	return OnCSharpClassBinding;
-}

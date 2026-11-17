@@ -319,11 +319,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (FunctionIterator->HasMetaData(TEXT("CSharpFunctionInjected")))
-		{
-			continue;
-		}
-
 		if (BindingFunctions.Contains(FunctionName))
 		{
 			continue;
