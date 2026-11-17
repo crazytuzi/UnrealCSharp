@@ -31,7 +31,9 @@ namespace
 				             TArray<FString>{"InObject"})
 				.Function("ToString", BINDING_OVERLOAD(FString(FSoftObjectPath::*)()const, &FSoftObjectPath::ToString,
 				                                       EFunctionInteract::New))
-				.Function("GetAssetPathName", BINDING_FUNCTION(&FSoftObjectPath::GetAssetName))
+#if UE_F_SOFT_OBJECT_PATH_GET_ASSET_PATH_NAME
+				.Function("GetAssetPathName", BINDING_FUNCTION(&FSoftObjectPath::GetAssetPathName))
+#endif
 #if UE_F_SOFT_OBJECT_PATH_SET_ASSET_PATH_NAME
 				.Function("SetAssetPathName", BINDING_FUNCTION(&FSoftObjectPath::SetAssetPathName,
 				                                               TArray<FString>{"InAssetPathName"}))

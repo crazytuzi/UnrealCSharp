@@ -13,6 +13,13 @@ namespace Script.Library
             return __UObject_IdenticalImplementation(InA, InB) != 0;
         }
 
+        private static unsafe partial int __UObject_GetTypeHashImplementation(nint InObject);
+
+        public static unsafe int UObject_GetTypeHashImplementation(nint InObject)
+        {
+            return __UObject_GetTypeHashImplementation(InObject);
+        }
+
         private static unsafe partial nint __UObject_StaticClassImplementation(byte* InClassName);
 
         public static unsafe UClass UObject_StaticClassImplementation(string InClassName)

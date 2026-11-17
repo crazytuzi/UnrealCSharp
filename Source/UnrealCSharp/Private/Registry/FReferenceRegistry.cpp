@@ -6,15 +6,22 @@
 
 FReferenceRegistry::~FReferenceRegistry()
 {
+	TArray<FReference*> References;
+
 	for (const auto& [PLACEHOLDER, Value] : ReferenceRelationship.Get())
 	{
 		for (const auto& Reference : Value)
 		{
-			delete Reference;
+			References.Add(Reference);
 		}
 	}
 
 	ReferenceRelationship.Empty();
+
+	for (const auto Reference : References)
+	{
+		delete Reference;
+	}
 
 	ObjectArray.Empty();
 }
@@ -43,14 +50,23 @@ bool FReferenceRegistry::AddReference(const IManagedHandle InOwner, FReference* 
 
 bool FReferenceRegistry::RemoveReference(const IManagedHandle InOwner)
 {
+	TArray<FReference*> References;
+
 	if (const auto FoundReferences = ReferenceRelationship.Find(InOwner))
 	{
+		References.Reserve(FoundReferences->Num());
+
 		for (const auto& Reference : *FoundReferences)
 		{
-			delete Reference;
+			References.Add(Reference);
 		}
 
 		ReferenceRelationship.Remove(InOwner);
+	}
+
+	for (const auto Reference : References)
+	{
+		delete Reference;
 	}
 
 	return true;

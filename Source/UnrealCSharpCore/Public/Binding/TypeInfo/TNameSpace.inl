@@ -2,6 +2,7 @@
 
 #include "FNameSpace.h"
 #include "TGeneric.inl"
+#include "TStaticEnum.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Containers/ArrayBuilder.h"
 #include "Template/TTemplateTypeTraits.inl"
@@ -246,7 +247,7 @@ struct TNameSpace<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNot
 	static auto Get()
 	{
 		return TArray<FString>{
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<std::decay_t<T>>())
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(TStaticEnum<std::decay_t<T>>::Get())
 		};
 	}
 };

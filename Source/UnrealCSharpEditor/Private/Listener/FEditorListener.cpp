@@ -18,6 +18,7 @@
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
+#include "Async/Async.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -88,12 +89,16 @@ FEditorListener::FEditorListener() :
 
 		for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 		{
+			FDelegateHandle OnDirectoryChangedDelegateHandle;
+
 			DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
 				Directory,
 				IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
 				OnDirectoryChangedDelegateHandle,
 				IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
 			);
+
+			OnDirectoryChangedDelegateHandles.Add(Directory, OnDirectoryChangedDelegateHandle);
 		}
 	}
 }
@@ -107,16 +112,18 @@ FEditorListener::~FEditorListener()
 			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
 		}
 
-		if (OnDirectoryChangedDelegateHandle.IsValid())
+		if (!OnDirectoryChangedDelegateHandles.IsEmpty())
 		{
 			auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 				TEXT("DirectoryWatcher"));
 
-			for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+			for (const auto& [Directory, OnDirectoryChangedDelegateHandle] : OnDirectoryChangedDelegateHandles)
 			{
 				DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
 					Directory, OnDirectoryChangedDelegateHandle);
 			}
+
+			OnDirectoryChangedDelegateHandles.Empty();
 		}
 
 		if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
@@ -175,14 +182,28 @@ FEditorListener::~FEditorListener()
 			FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
 #endif
 		}
+
+		if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		{
+			AssetRegistryModule->Get().OnFilesLoaded().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetAdded().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetRemoved().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetRenamed().RemoveAll(this);
+
+			AssetRegistryModule->Get().OnAssetUpdatedOnDisk().RemoveAll(this);
+		}
 	}
 }
 
 void FEditorListener::OnPostEngineInit()
 {
-	FCodeAnalysis::CodeAnalysis();
-
-	FDynamicGenerator::CodeAnalysisGenerator();
+	FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask({}, []()
+	{
+		FDynamicGenerator::CodeAnalysisGenerator();
+	}));
 }
 
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
@@ -320,18 +341,16 @@ void FEditorListener::OnCompile(const bool bSucceeded)
 
 		for (const auto& Data : CompilingFileChanges)
 		{
-			FileChange.AddUnique(Data.Filename);
-		}
-
-		for (const auto& File : FileChange)
-		{
-			if (IFileManager::Get().FileExists(*File))
+			if (IFileManager::Get().FileExists(*Data.Filename) && !FileChange.Contains(Data.Filename))
 			{
-				FCodeAnalysis::Analysis(File);
+				FileChange.Add(Data.Filename);
 			}
 		}
 
-		FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+		if (!FileChange.IsEmpty())
+		{
+			FCSharpCompiler::Get().EnqueueTask(FCodeAnalysis::MakeCodeAnalysisTask(FileChange));
+		}
 	}
 
 	CompilingFileChanges.Reset();
@@ -358,8 +377,10 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
+void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData)
 {
+	CrcCompiledSignatures.Remove(InAssetData.ToSoftObjectPath());
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
@@ -370,8 +391,10 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const
+void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath)
 {
+	CrcCompiledSignatures.Remove(FSoftObjectPath(InOldObjectPath));
+
 	OnAssetChanged(InAssetData, [&]
 	{
 		if (FPlatformFileManager::Get().GetPlatformFile().DeleteFile(
@@ -485,7 +508,8 @@ void FEditorListener::CompileChangedBlueprints()
 		{
 			if (Blueprint->GeneratedClass != nullptr)
 			{
-				if (const auto AssetData = FAssetData(Blueprint);
+				if (const auto AssetData = FAssetData(Blueprint,
+				                                      FAssetData::ECreationFlags::SkipAssetRegistryTagsGathering);
 					FGeneratorCore::IsSupported(AssetData))
 				{
 					const auto SoftObjectPath = FSoftObjectPath(Blueprint);
@@ -501,7 +525,7 @@ void FEditorListener::CompileChangedBlueprints()
 						if (!IFileManager::Get().FileExists(
 							*FGeneratorCore::GetFileName(static_cast<UClass*>(Blueprint->GeneratedClass))))
 						{
-							FAssetGenerator::Generator(AssetData);
+							FAssetGenerator::Generator(FAssetData(Blueprint));
 						}
 
 						continue;
@@ -511,7 +535,7 @@ void FEditorListener::CompileChangedBlueprints()
 					{
 						CrcCompiledSignatures.Add(SoftObjectPath, CrcLastCompiledSignature);
 
-						FAssetGenerator::Generator(AssetData);
+						FAssetGenerator::Generator(FAssetData(Blueprint));
 					}
 				}
 			}
@@ -545,7 +569,7 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 
 					if (FUnrealCSharpFunctionLibrary::IsScriptChanged())
 					{
-						FCSharpCompiler::Get().Compile();
+						FCSharpCompiler::Get().AsyncCompile();
 					}
 				}
 
@@ -590,6 +614,11 @@ bool FEditorListener::IsCompileRequired() const
 		{
 			FallbackTimestamp = FMath::Min(FallbackTimestamp, PlatformFile.GetTimeStamp(*AssemblyPath));
 		}
+	}
+
+	if (FUnrealCSharpFunctionLibrary::IsScriptPublishOutdated())
+	{
+		return true;
 	}
 
 	for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
@@ -639,13 +668,13 @@ void FEditorListener::Compile()
 	{
 		CompilingFileChanges = FileChanges;
 
-		FCSharpCompiler::Get().Compile(FileChanges);
+		FCSharpCompiler::Get().AsyncCompile(FileChanges);
 
 		FileChanges.Reset();
 	}
 	else
 	{
-		FCSharpCompiler::Get().Compile();
+		FCSharpCompiler::Get().AsyncCompile();
 	}
 }
 
@@ -713,7 +742,9 @@ void FEditorListener::WaitForCompile()
 
 	auto LastTime = StartTime;
 
-	constexpr auto IntervalSecond = 1.0 / 60.0;
+	constexpr auto IntervalSeconds = 1.0 / 60.0;
+
+	constexpr auto CompileWaitTimeoutSeconds = 600.0;
 
 	while (FCSharpCompiler::Get().IsCompiling())
 	{
@@ -722,7 +753,7 @@ void FEditorListener::WaitForCompile()
 		if (const auto Now = FPlatformTime::Seconds();
 			ProgressWindow.IsValid() &&
 			ProgressDialog.IsValid() &&
-			Now - LastTime >= IntervalSecond)
+			Now - LastTime >= IntervalSeconds)
 		{
 			LastTime = Now;
 
@@ -735,13 +766,21 @@ void FEditorListener::WaitForCompile()
 			TickProgressWindow(ProgressWindow);
 		}
 
-		FPlatformProcess::SleepNoStats(0.0005f);
+		FPlatformProcess::SleepNoStats(FCSharpCompiler::PollIntervalSeconds);
 
 		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
 
 		FThreadManager::Get().Tick();
 
 		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+
+		if (FPlatformTime::Seconds() - StartTime >= CompileWaitTimeoutSeconds)
+		{
+			FTSTicker::GetCoreTicker().AddTicker(
+				FTickerDelegate::CreateStatic(&FEditorListener::PumpTaskGraphWhileCompiling));
+
+			break;
+		}
 	}
 
 	if (ProgressWindow.IsValid())
@@ -752,4 +791,16 @@ void FEditorListener::WaitForCompile()
 
 		TickProgressWindow(ProgressWindow);
 	}
+}
+
+bool FEditorListener::PumpTaskGraphWhileCompiling(float InDeltaTime)
+{
+	if (FCSharpCompiler::Get().IsCompiling())
+	{
+		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+
+		return true;
+	}
+
+	return false;
 }

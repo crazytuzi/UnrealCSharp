@@ -94,6 +94,9 @@ void FReflectionRegistry::Initialize()
 	TArrayClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY);
 
+	TFieldPathClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_FIELD_PATH);
+
 #if UE_F_OPTIONAL_PROPERTY
 	TOptionalClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL);
@@ -228,6 +231,9 @@ void FReflectionRegistry::Initialize()
 	AutoCollapseCategoriesAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE);
 
+	DontAutoCollapseCategoriesAttributeClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DONT_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE);
+
 	CollapseCategoriesAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_COLLAPSE_CATEGORIES_ATTRIBUTE);
 
@@ -245,6 +251,9 @@ void FReflectionRegistry::Initialize()
 
 	SparseClassDataTypeAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE);
+
+	CustomThunkTemplatesAttributeClass = GetClass(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CUSTOM_THUNK_TEMPLATES_ATTRIBUTE);
 
 	GlobalConfigAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_GLOBAL_CONFIG_ATTRIBUTE);
@@ -862,10 +871,14 @@ void FReflectionRegistry::Initialize()
 	ArrayParamAttributeClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ARRAY_PARAM_ATTRIBUTE);
 #endif
+
+	bIsInitialized = true;
 }
 
 void FReflectionRegistry::Deinitialize()
 {
+	bIsInitialized = false;
+
 	Field2Class.Empty();
 
 	for (const auto& [PLACEHOLDER, Class] : FullName2Class)
@@ -974,6 +987,50 @@ FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, cons
 	return nullptr;
 }
 
+bool FReflectionRegistry::IsInitialized() const
+{
+	return bIsInitialized
+		&& GetUtilsClass() != nullptr
+		&& GetObjectClass() != nullptr
+		&& GetBooleanClass() != nullptr
+		&& GetSByteClass() != nullptr
+		&& GetInt16Class() != nullptr
+		&& GetInt32Class() != nullptr
+		&& GetInt64Class() != nullptr
+		&& GetByteClass() != nullptr
+		&& GetUInt16Class() != nullptr
+		&& GetUInt32Class() != nullptr
+		&& GetUInt64Class() != nullptr
+		&& GetSingleClass() != nullptr
+		&& GetDoubleClass() != nullptr
+		&& GetEnumClass() != nullptr
+		&& GetUClassClass() != nullptr
+		&& GetUObjectClass() != nullptr
+		&& GetTSubclassOfClass() != nullptr
+		&& GetNameClass() != nullptr
+		&& GetTScriptInterfaceClass() != nullptr
+		&& GetStringClass() != nullptr
+#if UE_F_UTF8_STR_PROPERTY
+		&& GetUtf8StringClass() != nullptr
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+		&& GetAnsiStringClass() != nullptr
+#endif
+		&& GetTextClass() != nullptr
+		&& GetTWeakObjectPtrClass() != nullptr
+		&& GetTLazyObjectPtrClass() != nullptr
+		&& GetTSoftClassPtrClass() != nullptr
+		&& GetTSoftObjectPtrClass() != nullptr
+		&& GetTMapClass() != nullptr
+		&& GetTSetClass() != nullptr
+		&& GetTArrayClass() != nullptr
+		&& GetTFieldPathClass() != nullptr
+#if UE_F_OPTIONAL_PROPERTY
+		&& GetTOptionalClass() != nullptr
+#endif
+		;
+}
+
 FClassReflection* FReflectionRegistry::GetUtilsClass() const
 {
 	return UtilsClass;
@@ -1064,7 +1121,7 @@ FClassReflection* FReflectionRegistry::GetNameClass() const
 	return NameClass;
 }
 
-FClassReflection* FReflectionRegistry::GetTScriptInterfaceClass()
+FClassReflection* FReflectionRegistry::GetTScriptInterfaceClass() const
 {
 	return TScriptInterfaceClass;
 }
@@ -1126,6 +1183,11 @@ FClassReflection* FReflectionRegistry::GetTSetClass() const
 FClassReflection* FReflectionRegistry::GetTArrayClass() const
 {
 	return TArrayClass;
+}
+
+FClassReflection* FReflectionRegistry::GetTFieldPathClass() const
+{
+	return TFieldPathClass;
 }
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -1350,6 +1412,11 @@ FClassReflection* FReflectionRegistry::GetAutoCollapseCategoriesAttributeClass()
 	return AutoCollapseCategoriesAttributeClass;
 }
 
+FClassReflection* FReflectionRegistry::GetDontAutoCollapseCategoriesAttributeClass() const
+{
+	return DontAutoCollapseCategoriesAttributeClass;
+}
+
 FClassReflection* FReflectionRegistry::GetCollapseCategoriesAttributeClass() const
 {
 	return CollapseCategoriesAttributeClass;
@@ -1378,6 +1445,11 @@ FClassReflection* FReflectionRegistry::GetEarlyAccessPreviewAttributeClass() con
 FClassReflection* FReflectionRegistry::GetSparseClassDataTypeAttributeClass() const
 {
 	return SparseClassDataTypeAttributeClass;
+}
+
+FClassReflection* FReflectionRegistry::GetCustomThunkTemplatesAttributeClass() const
+{
+	return CustomThunkTemplatesAttributeClass;
 }
 
 FClassReflection* FReflectionRegistry::GetGlobalConfigAttributeClass() const
@@ -2406,4 +2478,3 @@ FClassReflection* FReflectionRegistry::GetArrayParamAttributeClass() const
 	return ArrayParamAttributeClass;
 }
 #endif
-

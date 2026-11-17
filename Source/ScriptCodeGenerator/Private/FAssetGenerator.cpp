@@ -16,7 +16,7 @@
 #include "Engine/UserDefinedStruct.h"
 #endif
 
-TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
+TArray<TStrongObjectPtr<UUserDefinedEnum>> FAssetGenerator::UserDefinedEnums;
 
 void FAssetGenerator::Generator()
 {
@@ -25,6 +25,8 @@ void FAssetGenerator::Generator()
 	{
 		if (UnrealCSharpEditorSetting->IsGenerateAsset())
 		{
+			UserDefinedEnums.Reset();
+
 			const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
 				TEXT("AssetRegistry"));
 
@@ -46,10 +48,10 @@ void FAssetGenerator::Generator()
 
 			for (const auto& UserDefinedEnum : UserDefinedEnums)
 			{
-				FEnumGenerator::Generator(UserDefinedEnum);
+				FEnumGenerator::Generator(UserDefinedEnum.Get());
 			}
 
-			UserDefinedEnums.Empty();
+			UserDefinedEnums.Reset();
 		}
 	}
 }
@@ -141,23 +143,46 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	FString UsingNameSpaceContent;
 
-	const auto NameSpaceContent = FString::Printf(TEXT(
-		"%s%s"
-	),
-	                                              *NAMESPACE_ROOT,
-	                                              *InAssetData.PackagePath.ToString().Replace(TEXT("/"), TEXT(".")));
+	auto NameSpaceContent = NAMESPACE_ROOT;
+
+	TArray<FString> NameSpaces;
+
+	InAssetData.PackagePath.ToString().ParseIntoArray(NameSpaces, TEXT("/"), true);
+
+	for (const auto& NameSpace : NameSpaces)
+	{
+		if (const auto EncodedNameSpace = FUnrealCSharpFunctionLibrary::Encode(NameSpace, false);
+			!EncodedNameSpace.IsEmpty())
+		{
+			NameSpaceContent += FString::Printf(TEXT(
+				".%s"
+			),
+			                                    *EncodedNameSpace);
+		}
+	}
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass));
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
 		),
 		                                         *UsingNameSpace);
 	}
+
+	const auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FUnrealCSharpFunctionLibrary::GetObjectPathName(
+#if UE_F_ASSET_DATA_GET_OBJECT_PATH_STRING
+			InAssetData, InAssetData.GetObjectPathString()
+#else
+			InAssetData, InAssetData.ObjectPath.ToString()
+#endif
+		));
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
@@ -173,12 +198,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
-	                                     *FUnrealCSharpFunctionLibrary::GetObjectPathName(
-#if UE_F_ASSET_DATA_GET_OBJECT_PATH_STRING
-		                                     InAssetData, InAssetData.GetObjectPathString()),
-#else
-		                                     InAssetData, InAssetData.ObjectPath.ToString()),
-#endif
+	                                     *PathNameAttributeContent,
 	                                     *ClassName,
 	                                     *FUnrealCSharpFunctionLibrary::GetAssetClass(
 		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))
@@ -186,7 +206,8 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }

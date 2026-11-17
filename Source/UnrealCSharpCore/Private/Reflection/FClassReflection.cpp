@@ -209,11 +209,15 @@ void FClassReflection::ParseProperties(const FManagedReader& InManagedReader, IM
 		return;
 	}
 
+	const auto PropertyCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Properties.Reserve(Properties.Num() + PropertyCount);
+
 	auto PropertyAttributeIndex = 0;
 
 	auto PropertyAttributeValueIndex = 0;
 
-	for (auto PropertyIndex = 0; PropertyIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++PropertyIndex)
+	for (auto PropertyIndex = 0; PropertyIndex < PropertyCount; ++PropertyIndex)
 	{
 		auto PropertyName = InManagedReader.ArrayGetString(InParams[2], PropertyIndex);
 
@@ -245,12 +249,14 @@ void FClassReflection::ParseProperties(const FManagedReader& InManagedReader, IM
 
 		PropertyAttributeIndex += AttributeCount;
 
-		Properties.Add(PropertyName, new FPropertyReflection(PropertyName,
-		                                                     InManagedReader.ArrayGet(InParams[3], PropertyIndex),
-		                                                     FReflectionRegistry::Get().GetClass(
-			                                                     InManagedReader.ArrayGet(InParams[4], PropertyIndex)),
-		                                                     PropertyAttributes,
-		                                                     PropertyAttributeValues));
+		auto PropertyReflection = new FPropertyReflection(PropertyName,
+		                                                  InManagedReader.ArrayGet(InParams[3], PropertyIndex),
+		                                                  FReflectionRegistry::Get().GetClass(
+			                                                  InManagedReader.ArrayGet(InParams[4], PropertyIndex)),
+		                                                  PropertyAttributes,
+		                                                  PropertyAttributeValues);
+
+		Properties.Add(MoveTemp(PropertyName), PropertyReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -275,11 +281,17 @@ void FClassReflection::ParseFields(const FManagedReader& InManagedReader, IManag
 		return;
 	}
 
-	for (auto FieldIndex = 0; FieldIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++FieldIndex)
+	const auto FieldCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Fields.Reserve(Fields.Num() + FieldCount);
+
+	for (auto FieldIndex = 0; FieldIndex < FieldCount; ++FieldIndex)
 	{
 		auto FieldName = InManagedReader.ArrayGetString(InParams[2], FieldIndex);
 
-		Fields.Add(FieldName, new FFieldReflection(FieldName, InManagedReader.ArrayGet(InParams[3], FieldIndex)));
+		auto FieldReflection = new FFieldReflection(FieldName, InManagedReader.ArrayGet(InParams[3], FieldIndex));
+
+		Fields.Add(MoveTemp(FieldName), FieldReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -294,11 +306,15 @@ void FClassReflection::ParseMethods(const FManagedReader& InManagedReader, IMana
 		return;
 	}
 
+	const auto MethodCount = InManagedReader.ManagedHandle2Int32(InParams[1]);
+
+	Methods.Reserve(Methods.Num() + MethodCount);
+
 	auto MethodAttributeIndex = 0;
 
 	auto MethodAttributeValueIndex = 0;
 
-	for (auto MethodIndex = 0; MethodIndex < InManagedReader.ManagedHandle2Int32(InParams[1]); ++MethodIndex)
+	for (auto MethodIndex = 0; MethodIndex < MethodCount; ++MethodIndex)
 	{
 		auto MethodName = InManagedReader.ArrayGetString(InParams[2], MethodIndex);
 
@@ -366,15 +382,16 @@ void FClassReflection::ParseMethods(const FManagedReader& InManagedReader, IMana
 			}
 		}
 
-		Methods.Add({MethodName, MethodParamCount},
-		            new FMethodReflection(MethodName,
-		                                  MethodParamCount,
-		                                  InManagedReader.ArrayGet(InParams[3], MethodIndex),
-		                                  bMethodIsStatic,
-		                                  ReturnType,
-		                                  ParamReflections,
-		                                  MethodAttributes,
-		                                  MethodAttributeValue));
+		auto MethodReflection = new FMethodReflection(MethodName,
+		                                              MethodParamCount,
+		                                              InManagedReader.ArrayGet(InParams[3], MethodIndex),
+		                                              bMethodIsStatic,
+		                                              ReturnType,
+		                                              ParamReflections,
+		                                              MethodAttributes,
+		                                              MethodAttributeValue);
+
+		Methods.FindOrAdd(TTuple<FString, int32>(MoveTemp(MethodName), MethodParamCount)).Add(MethodReflection);
 	}
 
 	InManagedReader.Free(InParams, 2);
@@ -427,9 +444,9 @@ void FClassReflection::EnsureDescriptorImplementation()
 		ScriptDomain->GetClassDescriptor(ManagedClass, reinterpret_cast<PTRINT*>(&Params[1]));
 
 		ParseDescriptor(FManagedReader{ScriptDomain}, &Params[0]);
-	}
 
-	bDescriptorLoaded = true;
+		bDescriptorLoaded = true;
+	}
 }
 
 void FClassReflection::EnsureMemberImplementation(
@@ -457,9 +474,9 @@ void FClassReflection::EnsureMemberImplementation(
 		(ScriptDomain->*GetMemberFunction)(ManagedClass, reinterpret_cast<PTRINT*>(&Params[1]));
 
 		(this->*ParseMemberFunction)(FManagedReader{ScriptDomain}, &Params[0]);
-	}
 
-	bLoaded = true;
+		bLoaded = true;
+	}
 }
 
 void FClassReflection::EnsurePropertiesImplementation()
@@ -496,9 +513,12 @@ void FClassReflection::Deinitialize()
 
 	Fields.Empty();
 
-	for (const auto& [PLACEHOLDER, Method] : Methods)
+	for (const auto& [PLACEHOLDER, FoundMethods] : Methods)
 	{
-		delete Method;
+		for (const auto Method : FoundMethods)
+		{
+			delete Method;
+		}
 	}
 
 	Methods.Empty();
@@ -653,7 +673,7 @@ FFieldReflection* FClassReflection::GetField(const FString& InName) const
 	return FoundField != nullptr ? *FoundField : nullptr;
 }
 
-const TMap<TTuple<FString, int32>, FMethodReflection*>& FClassReflection::GetMethods() const
+const TMap<TTuple<FString, int32>, TArray<FMethodReflection*>>& FClassReflection::GetMethods() const
 {
 	EnsureMethods();
 
@@ -664,21 +684,17 @@ FMethodReflection* FClassReflection::GetMethod(const FString& InName, const int3
 {
 	EnsureMethods();
 
-	const auto FoundMethod = Methods.Find({InName, InParamCount});
-
-	return FoundMethod != nullptr ? *FoundMethod : nullptr;
-}
-
-FMethodReflection* FClassReflection::GetMethod(const IManagedHandle InManagedMethod)
-{
-	EnsureMethods();
-
-	for (const auto& [PLACEHOLDER, Method] : Methods)
+	if (const auto FoundMethods = Methods.Find({InName, InParamCount}))
 	{
-		if (Method->GetManagedMethod() == InManagedMethod)
+		for (const auto Method : *FoundMethods)
 		{
-			return Method;
+			if (Method->IsOverride())
+			{
+				return Method;
+			}
 		}
+
+		return (*FoundMethods)[0];
 	}
 
 	return nullptr;
@@ -701,11 +717,11 @@ FMethodReflection* FClassReflection::GetParentMethod(const FString& InName, cons
 	return nullptr;
 }
 
-IManagedHandle FClassReflection::NewObject() const
+IManagedHandle FClassReflection::NewObject(const bool bIsWeak) const
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		return ScriptDomain->NewObject(ManagedClass);
+		return ScriptDomain->NewObject(ManagedClass, bIsWeak);
 	}
 
 	return InvalidManagedHandle;

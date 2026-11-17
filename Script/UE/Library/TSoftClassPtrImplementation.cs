@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TSoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
             nint InClass, Type InType) where T : UObject
         {
-            __TSoftClassPtr_RegisterImplementation(HandleData.Alloc(InSoftClassPtr), InClass,
+            __TSoftClassPtr_RegisterImplementation(HandleData.Alloc(InSoftClassPtr, true), InClass,
                 HandleData.Alloc(InType));
         }
 
@@ -20,6 +20,13 @@ namespace Script.Library
         public static unsafe bool TSoftClassPtr_IdenticalImplementation(nint InA, nint InB)
         {
             return __TSoftClassPtr_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __TSoftClassPtr_GetTypeHashImplementation(nint InSoftClassPtr);
+
+        public static unsafe int TSoftClassPtr_GetTypeHashImplementation(nint InSoftClassPtr)
+        {
+            return __TSoftClassPtr_GetTypeHashImplementation(InSoftClassPtr);
         }
 
         private static unsafe partial void __TSoftClassPtr_UnRegisterImplementation(nint InSoftClassPtr);

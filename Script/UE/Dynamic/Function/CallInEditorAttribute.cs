@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class CallInEditorAttribute : Attribute
     {
-        public CallInEditorAttribute()
-        {
-            Value = "true";
-        }
-
-        public CallInEditorAttribute(string InValue)
+        public CallInEditorAttribute(string InValue = "true")
         {
             Value = InValue;
         }

@@ -10,6 +10,8 @@
 
 EPropertyTypeExtent FTypeBridge::GetPropertyType(const FClassReflection* InClass)
 {
+	if (InClass == nullptr) return EPropertyTypeExtent::None;
+
 	const auto TypeDefinition = InClass->GetTypeDefinition();
 
 	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetByteClass()))
@@ -160,6 +162,18 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(const FClassReflection* InClass
 	{
 		return EPropertyTypeExtent::Array;
 	}
+
+	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetTFieldPathClass()))
+	{
+		return EPropertyTypeExtent::FieldPath;
+	}
+
+#if UE_F_OPTIONAL_PROPERTY
+	if (TypeDefinition->IsAssignableFrom(FReflectionRegistry::Get().GetTOptionalClass()))
+	{
+		return EPropertyTypeExtent::Optional;
+	}
+#endif
 
 	return EPropertyTypeExtent::None;
 }
@@ -342,10 +356,9 @@ FClassReflection* FTypeBridge::GetClass(FProperty* InProperty)
 		return GetClass(SetProperty);
 	}
 
-	// @TODO
-	if (CastField<FFieldPathProperty>(InProperty))
+	if (const auto FieldPathProperty = CastField<FFieldPathProperty>(InProperty))
 	{
-		return nullptr;
+		return GetClass(FieldPathProperty);
 	}
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -583,6 +596,36 @@ FClassReflection* FTypeBridge::GetClass(const FSetProperty* InProperty)
 		const auto FoundClass = GetClass(InProperty->ElementProp);
 
 		return MakeGenericTypeInstance(FoundGenericClass, FoundClass);
+	}
+
+	return nullptr;
+}
+
+FClassReflection* FTypeBridge::GetClass(const FFieldPathProperty* InProperty)
+{
+	if (InProperty != nullptr)
+	{
+		const auto FoundGenericClass = FReflectionRegistry::Get().GetTFieldPathClass();
+
+		const auto FoundClass = GetClass(InProperty->PropertyClass);
+
+		return MakeGenericTypeInstance(FoundGenericClass, FoundClass);
+	}
+
+	return nullptr;
+}
+
+FClassReflection* FTypeBridge::GetClass(const FFieldClass* InFieldClass)
+{
+	if (InFieldClass != nullptr)
+	{
+		return FReflectionRegistry::Get().GetClass(
+			COMBINE_NAMESPACE(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_REFLECTION),
+			                  NAMESPACE_REFLECTION_PROPERTY),
+			FString::Printf(TEXT(
+				"F%s"
+			),
+			                *InFieldClass->GetName()));
 	}
 
 	return nullptr;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TValueMapping.inl"
-#include "Reflection/FClassReflection.h"
 #include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FObjectRegistry
@@ -13,7 +12,7 @@ private:
 		typedef typename TObjectMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
-	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
+	typedef TObjectMapping<const UObject*> FObjectMapping;
 
 public:
 	FObjectRegistry();
@@ -37,7 +36,7 @@ public:
 	IManagedHandle GetManagedHandle(const UObject* InObject);
 
 public:
-	bool AddReference(const FClassReflection* InClass, UObject* InObject, const IManagedHandle InManagedHandle);
+	IManagedHandle AddReference(UObject* InObject, const IManagedHandle InManagedHandle);
 
 	bool RemoveReference(const UObject* InObject);
 

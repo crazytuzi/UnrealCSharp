@@ -3,6 +3,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Registry/FCSharpBind.h"
 #include "UEVersion.h"
 
 namespace
@@ -14,20 +15,21 @@ namespace
 			if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(
 				InManagedHandle))
 			{
-				const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName);
-
-				if (const auto Function = FoundClass->FindFunctionByName(*Name))
+				if (const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName))
 				{
-					if (Function->IsRooted())
+					if (const auto Function = FoundClass->FindFunctionByName(*Name))
 					{
-						Function->RemoveFromRoot();
-					}
-					else
-					{
-						Function->MarkAsGarbage();
-					}
+						FCSharpBind::RemoveFunctionFromClass(Function);
 
-					FoundClass->RemoveFunctionFromFunctionMap(Function);
+						if (Function->IsRooted())
+						{
+							Function->RemoveFromRoot();
+						}
+						else
+						{
+							Function->MarkAsGarbage();
+						}
+					}
 				}
 			}
 		}

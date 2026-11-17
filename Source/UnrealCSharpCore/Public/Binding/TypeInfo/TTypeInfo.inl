@@ -76,6 +76,11 @@ struct TTypeInfo<void> final : FTypeInfo
 		return Instance;
 	}
 
+	virtual auto GetBufferSize() const -> int32 override
+	{
+		return 0;
+	}
+
 	virtual auto IsRef() const -> bool override
 	{
 		return false;

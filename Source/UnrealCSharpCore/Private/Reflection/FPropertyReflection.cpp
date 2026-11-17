@@ -19,12 +19,10 @@ FPropertyReflection::~FPropertyReflection()
 {
 	if (IManagedHandleIsValid(ManagedProperty))
 	{
-#if WITH_CORECLR
 		if (const auto ScriptDomain = IScriptDomain::Get())
 		{
 			ScriptDomain->Free(ManagedProperty);
 		}
-#endif
 
 		ManagedProperty = InvalidManagedHandle;
 	}

@@ -22,7 +22,7 @@ namespace Script.Library
 
             fixed (byte* BufferPtr = Buffer, TextNamespacePtr = TextNamespace, PackageNamespacePtr = PackageNamespace)
             {
-                __FText_RegisterImplementation(HandleData.Alloc(InText), BufferPtr, TextNamespacePtr,
+                __FText_RegisterImplementation(HandleData.Alloc(InText, true), BufferPtr, TextNamespacePtr,
                     PackageNamespacePtr, (byte)(bRequiresQuotes ? 1 : 0));
             }
         }
@@ -47,7 +47,16 @@ namespace Script.Library
         {
             var Handle = __FText_ToStringImplementation(InText);
 
-            return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Result = (string)HandleData.GetObject(Handle);
+
+                HandleData.FreeImplementation(Handle);
+
+                return Result;
+            }
+
+            return null;
         }
     }
 }

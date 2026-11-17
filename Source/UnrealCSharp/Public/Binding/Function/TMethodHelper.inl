@@ -69,27 +69,30 @@ public:
 
 		IManagedHandle ManagedHandles[ArraySize] = {};
 
-		IManagedHandle ShadowManagedHandles[ArraySize] = {};
-
 		void* Params[ArraySize] = {};
 
 		auto ShadowArgs = std::tuple<std::decay_t<Args>...>(std::forward<Args>(InArgs)...);
 
-		ArgumentToParams(std::index_sequence_for<Args...>{}, ShadowArgs, ManagedHandles, ShadowManagedHandles, Params);
+		ArgumentToParams(std::index_sequence_for<Args...>{}, ShadowArgs, ManagedHandles, Params);
 
 		const auto ReturnValue = Method->Runtime_Invoke(Object, Size > 0 ? Params : nullptr);
 
 		if constexpr (Size > 0)
 		{
 			GetReferenceValue(std::index_sequence_for<Args...>{}, std::tie(InArgs...), ShadowArgs,
-			                  ManagedHandles, ShadowManagedHandles);
+			                  ManagedHandles);
 		}
 
 		if constexpr (!std::is_void_v<Result>)
 		{
-			auto Value = TPropertyValue<Result, Result>::Get(ReturnValue);
+			Result Value{};
 
-			FDomain::GCHandle_Free(ReturnValue);
+			if (ReturnValue != ExceptionManagedHandle && IManagedHandleIsValid(ReturnValue))
+			{
+				Value = TPropertyValue<Result, Result>::Get(ReturnValue);
+
+				FDomain::GCHandle_Free(ReturnValue);
+			}
 
 			return Value;
 		}
@@ -100,7 +103,6 @@ private:
 	static void ArgumentToParams(std::index_sequence<Index...>,
 	                             std::tuple<std::decay_t<Args>...>& InShadowArgs,
 	                             IManagedHandle* InManagedHandles,
-	                             IManagedHandle* InShadowManagedHandles,
 	                             void** InParams)
 	{
 		([&]
@@ -116,8 +118,6 @@ private:
 				InManagedHandles[Index] = IManagedHandleFromObject(
 					TPropertyBuilder<Type*, nullptr>::Get(std::get<Index>(InShadowArgs)));
 
-				InShadowManagedHandles[Index] = InManagedHandles[Index];
-
 				InParams[Index] = &InManagedHandles[Index];
 			}
 		}(), ...);
@@ -127,8 +127,7 @@ private:
 	static void GetReferenceValue(std::index_sequence<Index...>,
 	                              ArgsTuple InArgs,
 	                              std::tuple<std::decay_t<Args>...>& InShadowArgs,
-	                              IManagedHandle* InManagedHandles,
-	                              IManagedHandle* InShadowManagedHandles
+	                              IManagedHandle* InManagedHandles
 	)
 	{
 		([&]
@@ -142,9 +141,11 @@ private:
 				{
 					std::get<Index>(InArgs) = std::get<Index>(InShadowArgs);
 				}
-				else if (InManagedHandles[Index] != InShadowManagedHandles[Index])
+				else
 				{
 					std::get<Index>(InArgs) = TPropertyValue<Type, Type>::Get(InManagedHandles[Index]);
+
+					FDomain::GCHandle_Free(InManagedHandles[Index]);
 				}
 			}
 		}(), ...);

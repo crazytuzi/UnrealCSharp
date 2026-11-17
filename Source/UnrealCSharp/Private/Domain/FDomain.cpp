@@ -28,7 +28,10 @@ void FDomain::Initialize()
 		IScriptDomain::Set(ScriptDomain);
 	}
 
-	ScriptDomain->Initialize();
+	if (ScriptDomain != nullptr)
+	{
+		ScriptDomain->Initialize();
+	}
 
 	InitializeSynchronizationContext();
 }
@@ -71,16 +74,6 @@ void* FDomain::Object_Unbox(const IManagedHandle InManagedHandle)
 	return nullptr;
 }
 
-IManagedHandle FDomain::String_New(const char* InText)
-{
-	if (const auto ScriptDomain = IScriptDomain::Get())
-	{
-		return ScriptDomain->NewString(InText);
-	}
-
-	return InvalidManagedHandle;
-}
-
 FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
@@ -89,6 +82,16 @@ FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 	}
 
 	return FString();
+}
+
+bool FDomain::GCHandle_IsAlive(const IManagedHandle InManagedHandle)
+{
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->IsAlive(InManagedHandle);
+	}
+
+	return true;
 }
 
 void FDomain::GCHandle_Free(const IManagedHandle InManagedHandle)
@@ -117,9 +120,14 @@ FString FDomain::GetTraceback()
 		{
 			const auto Traceback = TracebackMethod->Runtime_Invoke();
 
-			auto Result = StringToFString(Traceback);
+			FString Result;
 
-			GCHandle_Free(Traceback);
+			if (Traceback != ExceptionManagedHandle && IManagedHandleIsValid(Traceback))
+			{
+				Result = StringToFString(Traceback);
+
+				GCHandle_Free(Traceback);
+			}
 
 			return Result;
 		}

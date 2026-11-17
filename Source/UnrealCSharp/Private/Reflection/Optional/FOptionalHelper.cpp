@@ -18,10 +18,14 @@ FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* In
 	}
 	else
 	{
-		Data = FMemory::Malloc(ValuePropertyDescriptor->GetSize(), ValuePropertyDescriptor->GetMinAlignment());
+		Data = FMemory::Malloc(
+			Align(ValuePropertyDescriptor->GetSize() + 1, ValuePropertyDescriptor->GetMinAlignment()),
+			ValuePropertyDescriptor->GetMinAlignment());
 
 		InOptionalProperty->InitializeValueInternal(Data);
 	}
+
+	Initialize();
 }
 
 FOptionalHelper::~FOptionalHelper()
@@ -37,17 +41,25 @@ void FOptionalHelper::Deinitialize()
 {
 	if (bNeedFreeData && Data != nullptr)
 	{
+		if (OptionalProperty != nullptr)
+		{
+			OptionalProperty->MarkUnset(Data);
+		}
+
 		FMemory::Free(Data);
 
 		Data = nullptr;
 	}
 
-	if (bNeedFreeProperty && ValuePropertyDescriptor != nullptr && OptionalProperty != nullptr)
+	if (ValuePropertyDescriptor != nullptr)
 	{
 		delete ValuePropertyDescriptor;
 
 		ValuePropertyDescriptor = nullptr;
+	}
 
+	if (bNeedFreeProperty && OptionalProperty != nullptr)
+	{
 		delete OptionalProperty;
 
 		OptionalProperty = nullptr;
@@ -81,12 +93,16 @@ bool FOptionalHelper::IsSet() const
 
 void* FOptionalHelper::Get() const
 {
-	return OptionalProperty->GetValuePointerForReadOrReplace(Data);
+	return OptionalProperty != nullptr && Data != nullptr && OptionalProperty->IsSet(Data)
+		       ? OptionalProperty->GetValuePointerForReadOrReplace(Data)
+		       : nullptr;
 }
 
 void FOptionalHelper::Set(void* InValue) const
 {
 	OptionalProperty->MarkSetAndGetInitializedValuePointerToReplace(Data);
+
+	ValuePropertyDescriptor->DestroyValue(Data);
 
 	ValuePropertyDescriptor->Set(InValue, Data);
 }

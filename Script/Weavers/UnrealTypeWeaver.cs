@@ -44,6 +44,18 @@ namespace Weavers
 
         private TypeDefinition _pathNameAttributeType;
 
+        private TypeDefinition _uclassAttributeType;
+
+        private TypeDefinition _ustructAttributeType;
+
+        private TypeDefinition _uenumAttributeType;
+
+        private TypeDefinition _uinterfaceAttributeType;
+
+        private TypeDefinition _upropertyAttributeType;
+
+        private TypeDefinition _iinterfaceType;
+
         private TypeDefinition _ufunctionAttributeType;
 
         private TypeDefinition _serverAttributeType;
@@ -56,9 +68,14 @@ namespace Weavers
 
         private TypeDefinition _overrideAttributeType;
 
+        private bool bHasMetaError;
+
         public override void Execute()
         {
-            GetAllMeta();
+            if (!GetAllMeta())
+            {
+                return;
+            }
 
             GetAllDynamic();
 
@@ -331,11 +348,60 @@ namespace Weavers
             foreach (var property in Type.Properties)
             {
                 if (property.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                        Attribute.AttributeType.FullName == _upropertyAttributeType.FullName))
                 {
                     ProcessUClassProperty(Type, property);
                 }
             }
+        }
+
+        private static bool IsBackingFieldReference(Instruction Instruction, FieldDefinition BackingField)
+        {
+            return Instruction.Operand is FieldReference Field && Field.Resolve() == BackingField;
+        }
+
+        private static bool RewriteBackingFieldReferences(TypeDefinition Type, PropertyDefinition Property,
+            FieldDefinition BackingField)
+        {
+            var Methods = Type.Methods
+                .Where(Method => Method.HasBody)
+                .Where(Method => Method != Property.GetMethod && Method != Property.SetMethod)
+                .ToList();
+
+            var Instructions = Methods
+                .SelectMany(Method => Method.Body.Instructions)
+                .Where(Instruction => IsBackingFieldReference(Instruction, BackingField))
+                .ToList();
+
+            if (Instructions.Count == 0)
+            {
+                return true;
+            }
+
+            if (BackingField.IsStatic || Instructions.Any(Instruction => Instruction.OpCode != OpCodes.Stfld))
+            {
+                return false;
+            }
+
+            foreach (var Method in Methods)
+            {
+                var ILProcessor = Method.Body.GetILProcessor();
+
+                foreach (var Instruction in Method.Body.Instructions.ToList())
+                {
+                    if (IsBackingFieldReference(Instruction, BackingField) &&
+                        Instruction.OpCode == OpCodes.Stfld)
+                    {
+                        ILProcessor.InsertAfter(Instruction, Instruction.Create(OpCodes.Pop));
+
+                        ILProcessor.InsertAfter(Instruction, Instruction.Create(OpCodes.Pop));
+
+                        ILProcessor.Remove(Instruction);
+                    }
+                }
+            }
+
+            return true;
         }
 
         private void ProcessUClassProperty(TypeDefinition Type, PropertyDefinition Property)
@@ -346,7 +412,7 @@ namespace Weavers
             var backingField = Type.Fields.FirstOrDefault(Field =>
                 Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
 
-            if (backingField != null)
+            if (backingField != null && RewriteBackingFieldReferences(Type, Property, backingField))
             {
                 Type.Fields.Remove(backingField);
             }
@@ -374,6 +440,10 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
+                Property.SetMethod.Body.Variables.Clear();
+
+                Property.SetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.SetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -387,7 +457,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -471,6 +541,10 @@ namespace Weavers
 
                 var bIsCompound = IsCompound(Property.PropertyType);
 
+                Property.GetMethod.Body.Variables.Clear();
+
+                Property.GetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -490,7 +564,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -550,7 +624,7 @@ namespace Weavers
             foreach (var property in Type.Properties)
             {
                 if (property.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                        Attribute.AttributeType.FullName == _upropertyAttributeType.FullName))
                 {
                     ProcessUStructProperty(Type, property);
                 }
@@ -565,7 +639,7 @@ namespace Weavers
             var backingField = Type.Fields.FirstOrDefault(Field =>
                 Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
 
-            if (backingField != null)
+            if (backingField != null && RewriteBackingFieldReferences(Type, Property, backingField))
             {
                 Type.Fields.Remove(backingField);
             }
@@ -593,6 +667,10 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
+                Property.SetMethod.Body.Variables.Clear();
+
+                Property.SetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.SetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -606,7 +684,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -690,6 +768,10 @@ namespace Weavers
 
                 var bIsCompound = IsCompound(Property.PropertyType);
 
+                Property.GetMethod.Body.Variables.Clear();
+
+                Property.GetMethod.Body.ExceptionHandlers.Clear();
+
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
@@ -709,7 +791,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Nop));
 
-                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                ilProcessor.Append(GetLdcI4(BufferSize));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -863,7 +945,7 @@ namespace Weavers
             return Instruction.Create(OpCodes.Ldind_Ref);
         }
 
-        private static sbyte GetTypeSize(TypeReference Type)
+        private static int GetTypeSize(TypeReference Type)
         {
             switch (Type.MetadataType)
             {
@@ -899,7 +981,14 @@ namespace Weavers
                 }
             }
 
-            return (sbyte)IntPtr.Size;
+            return IntPtr.Size;
+        }
+
+        private static Instruction GetLdcI4(int InValue)
+        {
+            return InValue >= sbyte.MinValue && InValue <= sbyte.MaxValue
+                ? Instruction.Create(OpCodes.Ldc_I4_S, (sbyte)InValue)
+                : Instruction.Create(OpCodes.Ldc_I4, InValue);
         }
 
         private void ModifyRpcMethod(TypeDefinition Type, MethodDefinition Method)
@@ -915,7 +1004,7 @@ namespace Weavers
 
             if (Method.Parameters.Count > 0)
             {
-                sbyte BufferSize = 0;
+                int BufferSize = 0;
 
                 foreach (var param in Method.Parameters)
                 {
@@ -930,7 +1019,7 @@ namespace Weavers
 
                 Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
 
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                Method.Body.GetILProcessor().Append(GetLdcI4(BufferSize));
 
                 Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Conv_U));
 
@@ -946,7 +1035,7 @@ namespace Weavers
 
                     if (BufferSize != 0)
                     {
-                        Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+                        Method.Body.GetILProcessor().Append(GetLdcI4(BufferSize));
 
                         Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Add));
                     }
@@ -1069,95 +1158,166 @@ namespace Weavers
             foreach (var type in ModuleDefinition.Types)
             {
                 if (type.CustomAttributes.Any(Attribute =>
-                        Attribute.AttributeType.FullName == "Script.Dynamic.UClassAttribute"))
+                        Attribute.AttributeType.FullName == _uclassAttributeType.FullName))
                 {
                     _classTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UStructAttribute"))
+                             Attribute.AttributeType.FullName == _ustructAttributeType.FullName))
                 {
                     _structTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UEnumAttribute"))
+                             Attribute.AttributeType.FullName == _uenumAttributeType.FullName))
                 {
                     _enumTypes.Add(type);
                 }
                 else if (type.CustomAttributes.Any(Attribute =>
-                             Attribute.AttributeType.FullName == "Script.Dynamic.UInterfaceAttribute"))
+                             Attribute.AttributeType.FullName == _uinterfaceAttributeType.FullName))
                 {
                     _interfaceTypes.Add(type);
                 }
                 else if (type.IsInterface && type.Interfaces.ToList().Any(Interface =>
-                             Interface.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
+                             Interface.InterfaceType.FullName == _iinterfaceType.FullName))
                 {
                     _interfaceTypes.Add(type);
                 }
             }
         }
 
-        private void GetAllMeta()
+        private bool GetAllMeta()
         {
+            bHasMetaError = false;
+
             var definition = ModuleDefinition;
 
             if (definition.Name != "DefinitionPlaceholder")
             {
                 var path = GetUEAssemblyPath(AssemblyFilePath);
 
+                if (!File.Exists(path))
+                {
+                    WriteError($"[UnrealCSharp] required assembly not found: {path}");
+
+                    return false;
+                }
+
                 definition = ModuleDefinition.ReadModule(path);
             }
 
-            _pathNameAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
+            var structImplementation = GetMetaType(definition, "Script.Library.UStructImplementation");
 
-            _structRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "UStruct_RegisterImplementation");
+            var propertyImplementation = GetMetaType(definition, "Script.Library.FPropertyImplementation");
 
-            _structUnRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "UStruct_UnRegisterImplementation");
+            var functionImplementation = GetMetaType(definition, "Script.Library.FFunctionImplementation");
 
-            _ufunctionAttributeType = definition.GetType("Script.Dynamic.UFunctionAttribute");
+            var handleData = GetInteropType("Interop.HandleData");
 
-            _clientAttributeType = definition.GetType("Script.Dynamic.ClientAttribute");
+            _pathNameAttributeType = GetMetaType(definition, "Script.CoreUObject.PathNameAttribute");
 
-            _serverAttributeType = definition.GetType("Script.Dynamic.ServerAttribute");
+            _uclassAttributeType = GetMetaType(definition, "Script.Dynamic.UClassAttribute");
 
-            _netMulticastAttributeType = definition.GetType("Script.Dynamic.NetMulticastAttribute");
+            _ustructAttributeType = GetMetaType(definition, "Script.Dynamic.UStructAttribute");
 
-            _notPlaceableAttributeType = definition.GetType("Script.Dynamic.NotPlaceableAttribute");
+            _uenumAttributeType = GetMetaType(definition, "Script.Dynamic.UEnumAttribute");
 
-            _overrideAttributeType = definition.GetType("Script.CoreUObject.OverrideAttribute");
+            _uinterfaceAttributeType = GetMetaType(definition, "Script.Dynamic.UInterfaceAttribute");
 
-            _getObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_GetObjectPropertyImplementation");
+            _upropertyAttributeType = GetMetaType(definition, "Script.Dynamic.UPropertyAttribute");
 
-            _setObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_SetObjectPropertyImplementation");
+            _iinterfaceType = GetMetaType(definition, "Script.CoreUObject.IInterface");
 
-            _getStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_GetStructPropertyImplementation");
+            _ufunctionAttributeType = GetMetaType(definition, "Script.Dynamic.UFunctionAttribute");
 
-            _setStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
-                .Methods
-                .FirstOrDefault(Method => Method.Name == "FProperty_SetStructPropertyImplementation");
+            _clientAttributeType = GetMetaType(definition, "Script.Dynamic.ClientAttribute");
 
-            _getObject = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
-                    .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
-                .Methods.FirstOrDefault(Method => Method.Name == "GetObject");
+            _serverAttributeType = GetMetaType(definition, "Script.Dynamic.ServerAttribute");
 
-            _genericCall24Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall24Implementation");
+            _netMulticastAttributeType = GetMetaType(definition, "Script.Dynamic.NetMulticastAttribute");
 
-            _genericCall26Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall26Implementation");
+            _notPlaceableAttributeType = GetMetaType(definition, "Script.Dynamic.NotPlaceableAttribute");
 
-            _getHandle = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
-                    .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
-                .Methods.FirstOrDefault(Method => Method.Name == "GetHandle");
+            _overrideAttributeType = GetMetaType(definition, "Script.CoreUObject.OverrideAttribute");
+
+            _structRegisterImplementation =
+                GetMetaMethod(structImplementation, "UStruct_RegisterImplementation");
+
+            _structUnRegisterImplementation =
+                GetMetaMethod(structImplementation, "UStruct_UnRegisterImplementation");
+
+            _getObjectPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_GetObjectPropertyImplementation");
+
+            _setObjectPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_SetObjectPropertyImplementation");
+
+            _getStructPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_GetStructPropertyImplementation");
+
+            _setStructPropertyImplementation =
+                GetMetaMethod(propertyImplementation, "FProperty_SetStructPropertyImplementation");
+
+            _genericCall24Implementation =
+                GetMetaMethod(functionImplementation, "FFunction_GenericCall24Implementation");
+
+            _genericCall26Implementation =
+                GetMetaMethod(functionImplementation, "FFunction_GenericCall26Implementation");
+
+            _getObject = GetMetaMethod(handleData, "GetObject");
+
+            _getHandle = GetMetaMethod(handleData, "GetHandle");
+
+            return !bHasMetaError;
         }
 
+        private TypeDefinition GetMetaType(ModuleDefinition Definition, string TypeName)
+        {
+            var Type = Definition.GetType(TypeName);
+
+            if (Type == null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required type not found: {TypeName}");
+            }
+
+            return Type;
+        }
+
+        private MethodDefinition GetMetaMethod(TypeDefinition Type, string MethodName)
+        {
+            var Method = Type?.Methods.FirstOrDefault(Candidate => Candidate.Name == MethodName);
+
+            if (Method == null && Type != null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required method not found: {MethodName}");
+            }
+
+            return Method;
+        }
+
+        private TypeDefinition GetInteropType(string TypeName)
+        {
+            var Reference = ModuleDefinition.AssemblyReferences
+                .FirstOrDefault(Candidate => Candidate.Name == "Interop");
+
+            var Module = Reference != null
+                ? ModuleDefinition.AssemblyResolver.Resolve(Reference).MainModule
+                : null;
+
+            var Type = Module?.GetType(TypeName);
+
+            if (Type == null)
+            {
+                bHasMetaError = true;
+
+                WriteError($"[UnrealCSharp] required Interop type not found: {TypeName}");
+            }
+
+            return Type;
+        }
         private string GetUEAssemblyPath(string assemblyFilePath)
         {
             var scriptPathName = "ScriptPathPlaceholder";

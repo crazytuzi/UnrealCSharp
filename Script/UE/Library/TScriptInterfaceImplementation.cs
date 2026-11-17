@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
             nint InObject, Type InType) where T : IInterface
         {
-            __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface), InObject,
+            __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface, true), InObject,
                 HandleData.Alloc(InType));
         }
 
@@ -20,6 +20,13 @@ namespace Script.Library
         public static unsafe bool TScriptInterface_IdenticalImplementation(nint InA, nint InB)
         {
             return __TScriptInterface_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __TScriptInterface_GetTypeHashImplementation(nint InScriptInterface);
+
+        public static unsafe int TScriptInterface_GetTypeHashImplementation(nint InScriptInterface)
+        {
+            return __TScriptInterface_GetTypeHashImplementation(InScriptInterface);
         }
 
         private static unsafe partial void __TScriptInterface_UnRegisterImplementation(nint InScriptInterface);

@@ -4,7 +4,7 @@
     <GenerateDependencyFile>false</GenerateDependencyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\Plugins\UnrealCSharp\Script\Interop\**" Exclude="..\..\Plugins\UnrealCSharp\Script\Interop\**\*.DS_Store"></Compile>
+    <Compile Include="../../Plugins/UnrealCSharp/Script/Interop/**" Exclude="../../Plugins/UnrealCSharp/Script/Interop/**/*.DS_Store"></Compile>
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework></TargetFramework>

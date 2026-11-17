@@ -34,7 +34,7 @@ public:
 
 	virtual FString GetFullName(const IManagedHandle InManagedClass) override;
 
-	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) override;
+	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass, const bool bIsWeak = false) override;
 
 	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) override;
 
@@ -43,6 +43,8 @@ public:
 	virtual IManagedHandle NewString(const char* InText) override;
 
 	virtual FString StringToFString(const IManagedHandle InManagedHandle) override;
+
+	virtual bool IsAlive(const IManagedHandle InManagedHandle) override;
 
 	virtual void Free(const IManagedHandle InManagedHandle) override;
 
@@ -58,7 +60,8 @@ public:
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
 	                                 void* InValue) override;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) override;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) override;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName,
 	                              void** InParams) override;
@@ -189,6 +192,8 @@ private:
 private:
 	void RegisterInterop();
 
+	void UnregisterLog();
+
 	void RegisterBinding() const;
 
 private:
@@ -216,11 +221,15 @@ private:
 
 	bool bIsInitialized{};
 
+	bool bIsInitializeCompleted{};
+
 	static TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> MethodSlotSizes;
 
 	static constexpr int32 MaxPInvokeArguments = 8;
 
 	static TMap<const leanclr::metadata::RtMethodInfo*, FPInvokeSignature> PInvokeSignatures;
+
+	static TMap<UPTRINT, int32> PInvokeParamCounts;
 };
 
 #include "FLeanCLRDomain.inl"

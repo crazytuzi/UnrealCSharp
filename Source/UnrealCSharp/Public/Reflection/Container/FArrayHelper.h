@@ -5,8 +5,11 @@
 class UNREALCSHARP_API FArrayHelper
 {
 public:
+	using FDataDeleter = void (*)(void*);
+
 	explicit FArrayHelper(FProperty* InProperty, void* InData,
-	                      bool InbNeedFreeData, bool InbNeedFreeProperty);
+	                      bool InbNeedFreeData, bool InbNeedFreeProperty,
+	                      FDataDeleter InDataDeleter = nullptr);
 
 	~FArrayHelper();
 
@@ -87,4 +90,6 @@ private:
 	bool bNeedFreeData;
 
 	bool bNeedFreeProperty;
+
+	FDataDeleter DataDeleter;
 };

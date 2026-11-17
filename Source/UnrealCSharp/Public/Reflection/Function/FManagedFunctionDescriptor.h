@@ -13,4 +13,7 @@ protected:
 	            const TFunctionRef<void*(int32)>& InPropertyAddress,
 	            void* InReturnAddress,
 	            const TFunctionRef<void*(const FPropertyDescriptor*)>& InOutPropertyAddress);
+
+private:
+	static bool IsCopyValueProperty(const FProperty* InProperty);
 };

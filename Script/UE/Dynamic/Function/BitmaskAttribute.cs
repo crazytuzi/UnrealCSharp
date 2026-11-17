@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class BitmaskAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public BitmaskAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

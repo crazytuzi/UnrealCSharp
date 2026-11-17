@@ -11,33 +11,40 @@ namespace Interop
         internal static System.Runtime.Loader.AssemblyLoadContext? CurrentContext => Context;
 
         [UnmanagedCallersOnly]
-        public static unsafe nint LoadFromStream(byte* InData, int InLength, char* InInPublishDirectory)
+        public static unsafe nint LoadFromStream(byte* InData, int InLength, char* InPublishDirectory)
         {
-            if (InData != null && InLength > 0)
+            try
             {
-                Context ??= new UnrealAssemblyLoadContext(InInPublishDirectory is not null
-                    ? new string(InInPublishDirectory)
-                    : string.Empty);
+                if (InData != null && InLength > 0)
+                {
+                    Context ??= new UnrealAssemblyLoadContext(InPublishDirectory is not null
+                        ? new string(InPublishDirectory)
+                        : string.Empty);
 
-                using var Stream = new UnmanagedMemoryStream(InData, InLength);
+                    using var Stream = new UnmanagedMemoryStream(InData, InLength);
 
-                return HandleData.Alloc(Context.LoadFromStream(Stream));
+                    return HandleData.Alloc(Context.LoadFromStream(Stream));
+                }
+
+                return 0;
             }
-
-            return 0;
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         [UnmanagedCallersOnly]
         public static void Unload()
         {
+            HandleData.Clear();
+
+            TypeBridge.Clear();
+
+            MethodBridge.Clear();
+
             if (Context != null)
             {
-                HandleData.Clear();
-
-                TypeBridge.Clear();
-
-                var ContextWeakReference = new WeakReference(Context);
-
                 try
                 {
                     Context.Unload();
@@ -45,17 +52,6 @@ namespace Interop
                 finally
                 {
                     Context = null;
-                }
-
-                const int TimeLimit = 2000;
-
-                var Stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-                while (ContextWeakReference.IsAlive && Stopwatch.ElapsedMilliseconds < TimeLimit)
-                {
-                    GC.Collect();
-
-                    GC.WaitForPendingFinalizers();
                 }
             }
         }

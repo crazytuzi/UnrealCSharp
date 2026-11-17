@@ -30,7 +30,7 @@ namespace Script.Library
 
             fixed (byte* Ptr = UTF8)
             {
-                __UStruct_RegisterImplementation(HandleData.Alloc(InObject), Ptr);
+                __UStruct_RegisterImplementation(HandleData.Alloc(InObject, true), Ptr);
             }
         }
 
@@ -39,6 +39,13 @@ namespace Script.Library
         public static unsafe bool UStruct_IdenticalImplementation(nint InScriptStruct, nint InA, nint InB)
         {
             return __UStruct_IdenticalImplementation(InScriptStruct, InA, InB) != 0;
+        }
+
+        private static unsafe partial int __UStruct_GetTypeHashImplementation(nint InScriptStruct, nint InStruct);
+
+        public static unsafe int UStruct_GetTypeHashImplementation(nint InScriptStruct, nint InStruct)
+        {
+            return __UStruct_GetTypeHashImplementation(InScriptStruct, InStruct);
         }
 
         private static unsafe partial void __UStruct_UnRegisterImplementation(nint InObject);

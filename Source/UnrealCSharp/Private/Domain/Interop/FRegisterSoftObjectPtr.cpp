@@ -35,13 +35,32 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundSoftObjectPtr = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TSoftObjectPtr<UObject>>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundSoftObjectPtr));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftObjectPtr<UObject>>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftObjectPtr<UObject>>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle GetImplementation(const IManagedHandle InManagedHandle)
@@ -49,7 +68,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().
 				GetMulti<TSoftObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->Get())
+				       : InvalidManagedHandle;
 		}
 
 		static IManagedHandle LoadSynchronousImplementation(const IManagedHandle InManagedHandle)
@@ -57,7 +78,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().
 				GetMulti<TSoftObjectPtr<UObject>>(InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterSoftObjectPtr()
@@ -65,6 +88,7 @@ namespace
 			FClassBuilder(TEXT("TSoftObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Get", GetImplementation)
 				.Function("LoadSynchronous", LoadSynchronousImplementation);

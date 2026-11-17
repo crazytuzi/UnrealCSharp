@@ -4,17 +4,21 @@
 #include "FDelegateBaseHelper.h"
 #include "MulticastDelegateHandler.h"
 
+class FMulticastDelegateProperty;
+
 class FMulticastDelegateHelper final : public FDelegateBaseHelper
 {
 public:
 	FMulticastDelegateHelper();
 
-	FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
+	FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction,
+	                         FMulticastDelegateProperty* InProperty = nullptr, void* InAddress = nullptr);
 
 	virtual ~FMulticastDelegateHelper() override;
 
 public:
-	void Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
+	void Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction,
+	                FMulticastDelegateProperty* InProperty = nullptr, void* InAddress = nullptr);
 
 	void Deinitialize();
 

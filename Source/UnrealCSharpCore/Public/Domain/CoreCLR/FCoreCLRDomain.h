@@ -28,7 +28,7 @@ public:
 
 	virtual FString GetFullName(const IManagedHandle InManagedClass) override;
 
-	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) override;
+	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass, const bool bIsWeak = false) override;
 
 	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) override;
 
@@ -37,6 +37,8 @@ public:
 	virtual IManagedHandle NewString(const char* InText) override;
 
 	virtual FString StringToFString(const IManagedHandle InManagedHandle) override;
+
+	virtual bool IsAlive(const IManagedHandle InManagedHandle) override;
 
 	virtual void Free(const IManagedHandle InManagedHandle) override;
 
@@ -52,7 +54,8 @@ public:
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
 	                                 void* InValue) override;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) override;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) override;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName,
 	                              void** InParams) override;
@@ -99,7 +102,9 @@ private:
 
 	void RegisterLog();
 
-	void RegisterBinding() const;
+	void UnregisterLog();
+
+	void RegisterBinding();
 
 	void RegisterSynchronizationContextTick();
 
@@ -126,6 +131,8 @@ private:
 	void LoadAssemblyAndGetFunctionPointer(const FString& InAssembly, const FString& InType, const FString& InMethod,
 	                                       void** OutFunctionPointer) const;
 
+	void ReleaseHostFxr();
+
 private:
 	static void* HostFxrDllHandle;
 
@@ -138,5 +145,7 @@ private:
 	TArray<IManagedHandle> Assemblies;
 
 	bool bIsInitialized{};
+
+	bool bIsInitializeCompleted{};
 };
 #endif

@@ -77,9 +77,13 @@ FString FNameEncode::Encode(const FString& InName, const bool bEncodeWideString)
 
 		if (C == ESCAPE_HEAD_NUMBER)
 		{
-			// @TODO
+			Ret.AppendChars(ESCAPE_SYMBOL, ESCAPE_SYMBOL_LEN);
 
-			return {};
+			Ret.AppendChars(ESCAPE_HEAD_NUMBER_SYMBOL, 2);
+
+			Ret.AppendChar(ESCAPE_END_SYMBOL);
+
+			LastState = kEscapeChar;
 		}
 
 		const auto bEscapeSymbol = C == ESCAPE_SYMBOL_FIRST && i != LastIndex && InName[i + 1] == ESCAPE_SYMBOL_SECOND;

@@ -9,9 +9,8 @@
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "MulticastDelegateHandler.generated.h"
 
-/**
- * 
- */
+class FMulticastDelegateProperty;
+
 UCLASS()
 class UNREALCSHARP_API UMulticastDelegateHandler final : public UObject
 {
@@ -24,7 +23,8 @@ public:
 	void CSharpCallBack();
 
 public:
-	void Initialize(FMulticastScriptDelegate* InMulticastScriptDelegate, UFunction* InSignatureFunction);
+	void Initialize(FMulticastScriptDelegate* InMulticastScriptDelegate, UFunction* InSignatureFunction,
+	                FMulticastDelegateProperty* InProperty = nullptr, void* InAddress = nullptr);
 
 	void Deinitialize();
 
@@ -119,4 +119,8 @@ private:
 	FScriptDelegate ScriptDelegate;
 
 	TArray<FDelegateWrapper> DelegateWrappers;
+
+	FMulticastDelegateProperty* Property;
+
+	void* Address;
 };

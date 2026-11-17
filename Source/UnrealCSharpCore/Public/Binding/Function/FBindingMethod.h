@@ -4,9 +4,10 @@ struct FBindingMethod
 {
 	FBindingMethod() = default;
 
-	FBindingMethod(const FString& InMethod, const void* InFunction) :
+	FBindingMethod(const FString& InMethod, const void* InFunction, const int32 InParamCount = INDEX_NONE) :
 		Method(InMethod),
-		Function(InFunction)
+		Function(InFunction),
+		ParamCount(InParamCount)
 	{
 	}
 
@@ -20,8 +21,15 @@ struct FBindingMethod
 		return Function;
 	}
 
+	int32 GetParamCount() const
+	{
+		return ParamCount;
+	}
+
 private:
 	FString Method;
 
 	const void* Function;
+
+	int32 ParamCount{INDEX_NONE};
 };

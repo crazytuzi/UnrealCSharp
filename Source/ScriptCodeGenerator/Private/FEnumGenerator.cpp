@@ -44,11 +44,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
 
+	const auto bIsBitflags = InEnum->HasMetaData(TEXT("Bitflags"));
+
 	FString UsingNameSpaceContent;
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
 
-	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
+	const auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FGeneratorCore::GetPathNameAttribute(InEnum));
 
 	const auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InEnum);
 
@@ -57,6 +60,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	auto ClassName = InEnum->GetName();
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
+
+	if (bIsBitflags)
+	{
+		UsingNameSpaces.Add(TEXT("System"));
+	}
 
 	const auto UnderlyingTypeName = GetEnumUnderlyingTypeName(InEnum);
 
@@ -84,7 +92,9 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
@@ -92,11 +102,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		                                         *UsingNameSpace);
 	}
 
+	const FString FlagsAttributeContent = bIsBitflags ? TEXT("\t[Flags]\n") : TEXT("");
+
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
+		"%s"
 		"\t[PathName(\"%s\")]\n"
 		"\tpublic enum %s : %s\n"
 		"\t{\n"
@@ -107,6 +120,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
+	                                     *FlagsAttributeContent,
 	                                     *PathNameAttributeContent,
 	                                     *FullClassContent,
 	                                     *UnderlyingTypeName,
@@ -115,9 +129,10 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto FileName = FGeneratorCore::GetFileName(InEnum);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty)
@@ -183,7 +198,8 @@ void FEnumGenerator::GeneratorCollisionChannel()
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
 
-	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
+	const auto PathNameAttributeContent = FGeneratorCore::GetEscapedStringLiteral(
+		FGeneratorCore::GetPathNameAttribute(InEnum));
 
 	const auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InEnum);
 
@@ -213,7 +229,9 @@ void FEnumGenerator::GeneratorCollisionChannel()
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
-	for (auto UsingNameSpace : UsingNameSpaces)
+	UsingNameSpaces.Sort([](const FString& A, const FString& B) { return A < B; });
+
+	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
 			"using %s;\n"
@@ -222,6 +240,7 @@ void FEnumGenerator::GeneratorCollisionChannel()
 	}
 
 	const auto Content = FString::Printf(TEXT(
+		"%s\n"
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
@@ -232,6 +251,7 @@ void FEnumGenerator::GeneratorCollisionChannel()
 		"\t}\n"
 		"}"
 	),
+	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
@@ -242,9 +262,10 @@ void FEnumGenerator::GeneratorCollisionChannel()
 
 	const auto FileName = FGeneratorCore::GetFileName(InEnum);
 
-	FGeneratorCore::AddGeneratorFile(FileName);
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	if (FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+	{
+		FGeneratorCore::AddGeneratorFile(FileName);
+	}
 }
 
 FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
@@ -267,7 +288,58 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 		return EnumUnderlyingTypeName[*FoundEnumUnderlyingType];
 	}
 
-	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("byte") : TEXT("long");
+	auto UnderlyingTypeName = FString(TEXT("long"));
+
+	if (InEnum->IsA(UUserDefinedEnum::StaticClass()))
+	{
+		UnderlyingTypeName = TEXT("byte");
+	}
+	else
+	{
+		auto MinValue = MAX_int64;
+
+		auto MaxValue = MIN_int64;
+
+		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+		{
+			const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+			MinValue = FMath::Min(MinValue, EnumeratorValue);
+
+			MaxValue = FMath::Max(MaxValue, EnumeratorValue);
+		}
+
+		if (MinValue >= 0 && MaxValue <= MAX_uint8)
+		{
+			UnderlyingTypeName = TEXT("byte");
+		}
+		else if (MinValue >= MIN_int8 && MaxValue <= MAX_int8)
+		{
+			UnderlyingTypeName = TEXT("sbyte");
+		}
+		else if (MinValue >= 0 && MaxValue <= MAX_uint16)
+		{
+			UnderlyingTypeName = TEXT("ushort");
+		}
+		else if (MinValue >= MIN_int16 && MaxValue <= MAX_int16)
+		{
+			UnderlyingTypeName = TEXT("short");
+		}
+		else if (MinValue >= 0 && MaxValue <= MAX_uint32)
+		{
+			UnderlyingTypeName = TEXT("uint");
+		}
+		else if (MinValue >= MIN_int32 && MaxValue <= MAX_int32)
+		{
+			UnderlyingTypeName = TEXT("int");
+		}
+		else if (MinValue >= 0)
+		{
+			UnderlyingTypeName = TEXT("ulong");
+		}
+	}
+
+	return UnderlyingTypeName;
 }
 
 bool FEnumGenerator::IsValueInUnderlyingTypeRange(const int64 InValue, const FString& InUnderlyingTypeName)

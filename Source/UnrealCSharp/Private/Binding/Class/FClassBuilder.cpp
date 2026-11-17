@@ -62,6 +62,7 @@ FClassBuilder& FClassBuilder::Function(const FString& InName,
 #if WITH_FUNCTION_INFO
                                        , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction
 #endif
+                                       , const int32 InParamCount
 )
 {
 	const auto FunctionImplementationName = GetFunctionImplementationName(InName, InImplementationName);
@@ -75,7 +76,7 @@ FClassBuilder& FClassBuilder::Function(const FString& InName,
 	}
 #endif
 
-	Function(FunctionImplementationName, TFunctionPointer<decltype(InMethod)>(InMethod));
+	Function(FunctionImplementationName, TFunctionPointer<decltype(InMethod)>(InMethod), InParamCount);
 
 	return *this;
 }

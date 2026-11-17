@@ -21,17 +21,20 @@ private:
 		void* Value;
 	};
 
-	template <typename T>
+	template <typename T, auto IsNeedFree>
 	struct TBindingAddressWrapper final : FBindingAddressWrapper
 	{
-		explicit TBindingAddressWrapper(T* InValue) :
+		explicit TBindingAddressWrapper(const T* InValue) :
 			FBindingAddressWrapper((decltype(Value))InValue)
 		{
 		}
 
 		virtual ~TBindingAddressWrapper() override
 		{
-			delete static_cast<T*>(Value);
+			if constexpr (IsNeedFree)
+			{
+				delete static_cast<const T*>(Value);
+			}
 		}
 	};
 
@@ -39,15 +42,12 @@ private:
 	{
 		typedef FBindingAddressWrapper FWrapperType;
 
-		explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true) :
-			AddressWrapper(InAddressWrapper),
-			bNeedFree(InNeedFree)
+		explicit FBindingAddress(FWrapperType* InAddressWrapper) :
+			AddressWrapper(InAddressWrapper)
 		{
 		}
 
 		FWrapperType* AddressWrapper;
-
-		bool bNeedFree;
 	};
 
 	template <typename Address, typename Value>
@@ -85,6 +85,9 @@ public:
 	                  FClassReflection* InClass, const IManagedHandle InManagedHandle);
 
 	bool RemoveReference(const IManagedHandle InManagedHandle);
+
+private:
+	void RemoveBindingAddress(void* InAddress, const IManagedHandle InManagedHandle);
 
 private:
 	FBindingValueMapping::FManagedHandle2Value ManagedHandle2BindingAddress;

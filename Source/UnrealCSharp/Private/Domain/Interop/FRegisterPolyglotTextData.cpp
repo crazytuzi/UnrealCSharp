@@ -16,8 +16,8 @@ namespace
 				.Function("SetCategory", BINDING_FUNCTION(&FPolyglotTextData::SetCategory,
 				                                          TArray<FString>{"InCategory"}))
 				.Function("GetCategory", BINDING_FUNCTION(&FPolyglotTextData::GetCategory))
-				.Function("SetCategory", BINDING_FUNCTION(&FPolyglotTextData::SetNativeCulture,
-				                                          TArray<FString>{"InNativeCulture"}))
+				.Function("SetNativeCulture", BINDING_FUNCTION(&FPolyglotTextData::SetNativeCulture,
+				                                               TArray<FString>{"InNativeCulture"}))
 				.Function("GetNativeCulture", BINDING_FUNCTION(&FPolyglotTextData::GetNativeCulture))
 				.Function("ResolveNativeCulture", BINDING_FUNCTION(&FPolyglotTextData::ResolveNativeCulture))
 				.Function("GetLocalizedCultures", BINDING_FUNCTION(&FPolyglotTextData::GetLocalizedCultures))
@@ -39,7 +39,7 @@ namespace
 				.Function("ClearLocalizedStrings", BINDING_FUNCTION(&FPolyglotTextData::ClearLocalizedStrings))
 				.Function("IsMinimalPatch",
 				          BINDING_OVERLOAD(void(FPolyglotTextData::*)(const bool), &FPolyglotTextData::IsMinimalPatch,
-				                           TArray<FString>{"InCulture", "OutLocalizedString"}))
+				                           TArray<FString>{"InIsMinimalPatch"}))
 				.Function("IsMinimalPatch",
 				          BINDING_OVERLOAD(bool(FPolyglotTextData::*)()const, &FPolyglotTextData::IsMinimalPatch))
 				.Function("GetText", BINDING_FUNCTION(&FPolyglotTextData::GetText));

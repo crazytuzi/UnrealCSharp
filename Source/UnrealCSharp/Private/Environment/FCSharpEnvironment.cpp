@@ -3,7 +3,6 @@
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
-#include "CoreMacro/AccessPrivateMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
@@ -13,44 +12,58 @@
 #include "Engine/Blueprint.h"
 #endif
 
-ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
+using FSignalHandler = void (*)(int32);
+
+static constexpr int32 MaxSignalCount = 32;
 
 #if PLATFORM_MAC
 TMap<int32, struct sigaction> SignalActions;
+#else
+static FSignalHandler SignalHandlers[MaxSignalCount] = {};
 #endif
 
-void SignalHandler(int32 Signal)
+static void ScriptSignalHandler(int32 Signal)
 {
-	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *FDomain::GetTraceback());
-
-	GLog->Flush();
-
 #if PLATFORM_MAC
-	sigaction(Signal, &SignalActions[Signal], nullptr);
+	if (const auto FoundAction = SignalActions.Find(Signal))
+	{
+		sigaction(Signal, FoundAction, nullptr);
+	}
+#else
+	if (Signal >= 0 && Signal < MaxSignalCount)
+	{
+		signal(Signal, SignalHandlers[Signal]);
+	}
 #endif
+
+	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *FDomain::GetTraceback());
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
 
 FCSharpEnvironment::FCSharpEnvironment()
 {
-	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
 
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+		AddRaw(this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
+	Deinitialize();
+
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleInActive().
+			Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
 	}
 
 	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnUnrealCSharpModuleActive().
+			Remove(OnUnrealCSharpModuleActiveDelegateHandle);
 	}
 }
 
@@ -77,6 +90,8 @@ void FCSharpEnvironment::Initialize()
 	MultiRegistry = new FMultiRegistry();
 
 	StringRegistry = new FStringRegistry();
+
+	FieldPathRegistry = new FFieldPathRegistry();
 
 	BindingRegistry = new FBindingRegistry();
 
@@ -124,7 +139,7 @@ void FCSharpEnvironment::Initialize()
 
 		FMemory::Memzero(&SigAction, sizeof(struct sigaction));
 
-		SigAction.sa_handler = SignalHandler;
+		SigAction.sa_handler = ScriptSignalHandler;
 
 		sigemptyset(&SigAction.sa_mask);
 
@@ -137,15 +152,34 @@ void FCSharpEnvironment::Initialize()
 			sigaction(SignalType, &SigAction, nullptr);
 		}
 #else
-		signal(SignalType, SignalHandler);
+		if (const auto SignalHandler = signal(SignalType, ScriptSignalHandler);
+			SignalHandler != SIG_ERR)
+		{
+			SignalHandlers[SignalType] = SignalHandler;
+		}
 #endif
 	}
 
-	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
+	FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().Broadcast();
 }
 
 void FCSharpEnvironment::Deinitialize()
 {
+#if PLATFORM_MAC
+	for (const auto& [Signal, Action] : SignalActions)
+	{
+		sigaction(Signal, &Action, nullptr);
+	}
+#else
+	for (auto Index = 0; Index < MaxSignalCount; ++Index)
+	{
+		if (SignalHandlers[Index] != nullptr)
+		{
+			signal(Index, SignalHandlers[Index]);
+		}
+	}
+#endif
+
 	AsyncLoadingObjectArray.Empty();
 
 #if WITH_EDITOR
@@ -195,6 +229,13 @@ void FCSharpEnvironment::Deinitialize()
 		delete StringRegistry;
 
 		StringRegistry = nullptr;
+	}
+
+	if (FieldPathRegistry != nullptr)
+	{
+		delete FieldPathRegistry;
+
+		FieldPathRegistry = nullptr;
 	}
 
 	if (MultiRegistry != nullptr)
@@ -307,10 +348,8 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		{
 			RemoveClassDescriptor(InStruct);
 		}
-		else
-		{
-			(void)RemoveObjectReference(InObject);
-		}
+
+		(void)RemoveObjectReference(InObject);
 
 		{
 			FScopeLock Lock(&CriticalSection);
@@ -337,6 +376,10 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 #if WITH_EDITOR
 void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 {
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::SuspendDummyOwnerClasses();
+#endif
+
 	if (InBlueprint != nullptr &&
 		InBlueprint->GeneratedClass != nullptr &&
 		GetClassDescriptor(InBlueprint->GeneratedClass) != nullptr)
@@ -349,6 +392,10 @@ void FCSharpEnvironment::OnBlueprintPreCompile(UBlueprint* InBlueprint)
 
 void FCSharpEnvironment::OnBlueprintCompiled()
 {
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::ResumeDummyOwnerClasses();
+#endif
+
 	for (const auto& PendingBindClass : PendingBindClasses)
 	{
 		if (const auto Class = PendingBindClass.Get())
@@ -363,6 +410,10 @@ void FCSharpEnvironment::OnBlueprintCompiled()
 	}
 
 	PendingBindClasses.Empty();
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpBind::ResumeDummyOwnerClasses();
+#endif
 }
 #endif
 
@@ -394,8 +445,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 			auto Object = ObjectPtr.Get();
 
-			if (Object->*TAccessPrivate<UObjectBase_ObjectFlags>::Value & ~RF_AllFlags ||
-				Object->HasAnyFlags(RF_NeedPostLoad) ||
+			if (Object->HasAnyFlags(RF_NeedPostLoad) ||
 				Object->HasAnyInternalFlags(
 #if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
 					EInternalObjectFlags_AsyncLoading
@@ -524,10 +574,9 @@ void FCSharpEnvironment::RemovePropertyDescriptor(const uint32 InPropertyHash) c
 	}
 }
 
-bool FCSharpEnvironment::AddObjectReference(const FClassReflection* InClass, UObject* InObject,
-                                            const IManagedHandle InManagedHandle) const
+IManagedHandle FCSharpEnvironment::AddObjectReference(UObject* InObject, const IManagedHandle InManagedHandle) const
 {
-	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InClass, InObject, InManagedHandle) : false;
+	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InManagedHandle) : InvalidManagedHandle;
 }
 
 IManagedHandle FCSharpEnvironment::GetObject(const UObject* InObject) const
@@ -561,6 +610,31 @@ IManagedHandle FCSharpEnvironment::GetObject(UScriptStruct* InScriptStruct, cons
 bool FCSharpEnvironment::RemoveStructReference(const IManagedHandle InManagedHandle) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InManagedHandle) : false;
+}
+
+IManagedHandle FCSharpEnvironment::GetFieldPathObject(const void* InAddress) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetManagedHandle(InAddress) : InvalidManagedHandle;
+}
+
+FFieldPath* FCSharpEnvironment::GetFieldPath(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetFieldPath(InManagedHandle) : nullptr;
+}
+
+FField* FCSharpEnvironment::GetField(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetField(InManagedHandle) : nullptr;
+}
+
+IManagedHandle FCSharpEnvironment::GetFieldObject(FField* InField) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->GetFieldObject(InField) : InvalidManagedHandle;
+}
+
+bool FCSharpEnvironment::RemoveFieldPathReference(const IManagedHandle InManagedHandle) const
+{
+	return FieldPathRegistry != nullptr ? FieldPathRegistry->RemoveReference(InManagedHandle) : false;
 }
 
 IManagedHandle FCSharpEnvironment::GeManagedHandle(const UObject* InObject) const
@@ -612,7 +686,14 @@ bool FCSharpEnvironment::RemoveOptionalReference(const IManagedHandle InManagedH
 
 bool FCSharpEnvironment::AddReference(const IManagedHandle InOwner, FReference* InReference) const
 {
-	return ReferenceRegistry != nullptr ? ReferenceRegistry->AddReference(InOwner, InReference) : false;
+	if (ReferenceRegistry != nullptr && IManagedHandleIsValid(InOwner))
+	{
+		return ReferenceRegistry->AddReference(InOwner, InReference);
+	}
+
+	delete InReference;
+
+	return false;
 }
 
 bool FCSharpEnvironment::RemoveReference(const IManagedHandle InOwner) const

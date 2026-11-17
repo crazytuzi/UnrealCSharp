@@ -91,8 +91,6 @@ public:
 	UFUNCTION()
 	TArray<FString> GetClassList();
 
-	const TArray<FString>& GetClassBlacklist() const;
-
 	ESolutionConfiguration GetEditorConfiguration() const;
 
 	ESolutionConfiguration GetRuntimeConfiguration() const;

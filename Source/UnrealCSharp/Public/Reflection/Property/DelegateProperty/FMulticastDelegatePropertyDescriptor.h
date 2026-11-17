@@ -16,11 +16,14 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const override;
 
+public:
+	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
+
 protected:
 	virtual const FMulticastScriptDelegate* GetMulticastDelegate(void* InAddress) const;
 
 private:
 	IManagedHandle NewRef(void* InAddress) const;
 
-	IManagedHandle NewWeakRef(void* InAddress) const;
+	IManagedHandle NewWeakRef(void* InAddress, void* InPropertyAddress) const;
 };

@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class UsesHierarchyAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public UsesHierarchyAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

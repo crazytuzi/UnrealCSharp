@@ -11,15 +11,15 @@ namespace Script.Library
 
         public static unsafe void TOptional_Register1Implementation<T>(TOptional<T> InOptional, Type InType)
         {
-            __TOptional_Register1Implementation(HandleData.Alloc(InOptional), HandleData.Alloc(InType));
+            __TOptional_Register1Implementation(HandleData.Alloc(InOptional, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __TOptional_Register2Implementation(nint InOptional, nint InValue, nint InType);
 
         public static unsafe void TOptional_Register2Implementation<T>(TOptional<T> InOptional, T InValue, Type InType)
         {
-            __TOptional_Register2Implementation(HandleData.Alloc(InOptional),
-                HandleData.Alloc(InValue), HandleData.Alloc(InType));
+            __TOptional_Register2Implementation(HandleData.Alloc(InOptional, true),
+                InValue != null ? HandleData.Alloc(InValue) : 0, HandleData.Alloc(InType));
         }
 
         private static unsafe partial byte __TOptional_IdenticalImplementation(nint InA, nint InB);
@@ -52,18 +52,30 @@ namespace Script.Library
 
         private static unsafe partial nint __TOptional_GetImplementation(nint InOptional);
 
-        public static unsafe object TOptional_GetImplementation(nint InOptional)
+        public static unsafe T TOptional_GetImplementation<T>(nint InOptional)
         {
             var Handle = __TOptional_GetImplementation(InOptional);
 
-            return Handle != 0 ? HandleData.GetObject(Handle) : null;
+            if (Handle != 0)
+            {
+                var Object = HandleData.GetObject(Handle);
+
+                if (typeof(T).IsValueType)
+                {
+                    HandleData.FreeImplementation(Handle);
+                }
+
+                return (T)Object;
+            }
+
+            return default;
         }
 
         private static unsafe partial void __TOptional_SetImplementation(nint InOptional, nint InValue);
 
         public static unsafe void TOptional_SetImplementation<T>(nint InOptional, T InValue)
         {
-            __TOptional_SetImplementation(InOptional, HandleData.Alloc(InValue));
+            __TOptional_SetImplementation(InOptional, InValue != null ? HandleData.Alloc(InValue) : 0);
         }
     }
 }

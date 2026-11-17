@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class HideAssetPickerAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public HideAssetPickerAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

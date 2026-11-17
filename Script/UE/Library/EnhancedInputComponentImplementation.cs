@@ -34,5 +34,12 @@ namespace Script.Library
         {
             __UEnhancedInputComponent_RemoveBindingImplementation(InObject, InEnhancedInputActionEventBinding);
         }
+
+        private static unsafe partial int __UEnhancedInputComponent_GetNumActionEventBindingsImplementation(nint InObject);
+
+        public static unsafe int UEnhancedInputComponent_GetNumActionEventBindingsImplementation(nint InObject)
+        {
+            return __UEnhancedInputComponent_GetNumActionEventBindingsImplementation(InObject);
+        }
     }
 }

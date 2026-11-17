@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IDirectoryWatcher.h"
+#include "Containers/Queue.h"
 #include "Containers/Ticker.h"
 #include "FCSharpCompileProgress.h"
 
@@ -25,6 +26,8 @@ public:
 
 	void EnqueueTask(const TArray<FFileChangeData>& InFileChangeData);
 
+	void EnqueueTask(const TFunction<void()>& InTask);
+
 	bool IsCompiling() const;
 
 	FString GetCompileProgress() const;
@@ -33,17 +36,36 @@ public:
 
 	void ImmediatelyDoWork(bool bForceCompileInterop = false);
 
+	bool SyncCompile();
+
 	void Compile(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction, bool bCompileInterop = false,
 	             bool bForceCompileInterop = false, bool bReloadImmediately = false);
 
 private:
 	static FString GetBuildConfiguration();
 
-	bool CompileInterop(bool bForceCompileInterop);
+	static bool IsInteropOutdated();
+
+	static FString GetFirstErrorLine(const FString& InResult);
+
+	bool CompileInterop(bool bForceCompileInterop, bool bInteropOutdated = false);
+
+	static bool PublishInterop(const FString& InSourcePath, const FString& InTargetPath, const FString& InBackupPath);
+
+	static void ShutdownBuildServer();
 
 	bool Compile();
 
-	void ShowCompileResultNotification(bool bSucceeded) const;
+	bool CompileGame(FString& OutResult, const TFunction<void(const FString&)>& InOnOutput);
+
+	void CompileInternal(const TFunction<void(const TArray<FFileChangeData>&)>& InFunction, bool bCompileInterop,
+	                     bool bForceCompileInterop, bool bReloadImmediately);
+
+	void AcquireCompile();
+
+	void ReleaseCompile();
+
+	void ShowCompileResultNotification(bool bSucceeded, const FString& InErrorMessage) const;
 
 private:
 	void OnBeginGenerator();
@@ -51,27 +73,38 @@ private:
 	void OnEndGenerator();
 
 private:
+	struct FCSharpCompileNotification
+	{
+		FCSharpCompileProgress Progress;
+
+		TSharedPtr<SNotificationItem> NotificationItem;
+
+		FTSTicker::FDelegateHandle ProgressTickerHandle;
+
+		std::atomic<bool> bIsCompiling{false};
+
+		std::atomic<bool> bIsAlive{true};
+	};
+
 	FDelegateHandle OnBeginGeneratorDelegateHandle;
 
 	FDelegateHandle OnEndGeneratorDelegateHandle;
 
-	FTSTicker::FDelegateHandle ProgressTickerHandle;
-
-	TQueue<bool> Tasks;
-
 	TArray<FFileChangeData> FileChanges;
 
-	FCriticalSection CriticalSection;
+	TQueue<TFunction<void()>> TaskQueue;
+
+	mutable FCriticalSection CriticalSection;
 
 	FEvent* Event;
 
 	std::atomic<bool> bIsCompiling;
 
-	bool bIsGenerating;
+	std::atomic<bool> bIsGenerating;
 
-	bool bIsStopped;
+	std::atomic<bool> bIsStopped;
 
-	FCSharpCompileProgress CompileProgress;
+	std::atomic<bool> bIsPending;
 
-	TSharedPtr<SNotificationItem> NotificationItem;
+	const TSharedRef<FCSharpCompileNotification> CompileNotification = MakeShared<FCSharpCompileNotification>();
 };

@@ -15,6 +15,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Reflection/FMethodReflection.h"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -48,6 +49,11 @@ extern void* mono_aot_module_System_Private_CoreLib_info;
 
 void FMonoDomain::Initialize()
 {
+	if (bIsInitializeCompleted)
+	{
+		return;
+	}
+
 	RegisterMonoTrace();
 
 	RegisterAssemblyPreloadHook();
@@ -132,6 +138,8 @@ void FMonoDomain::Initialize()
 	RegisterLog();
 
 	InitializeAssembly(FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath());
+
+	bIsInitializeCompleted = true;
 }
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
@@ -166,17 +174,24 @@ void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	FReflectionRegistry::Get().Initialize();
 
+	if (FReflectionRegistry::Get().IsInitialized() == false)
+	{
+		bIsInitialized = false;
+	}
+
 	RegisterBinding();
 }
 
 void FMonoDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bIsInitializeCompleted)
 	{
 		return;
 	}
 
 	bIsInitialized = false;
+
+	bIsInitializeCompleted = false;
 
 	UnloadAssembly();
 }
@@ -185,61 +200,12 @@ void FMonoDomain::Deinitialize()
 #include "Domain/Script/FScriptDomainImpl.inl"
 #undef SCRIPT_DOMAIN_TYPE
 
-MonoObject* FMonoDomain::Object_New(MonoClass* InManagedClass)
-{
-	return Domain != nullptr && InManagedClass != nullptr
-		       ? mono_object_new(Domain, InManagedClass)
-		       : nullptr;
-}
-
-MonoObject* FMonoDomain::Value_Box(MonoClass* InManagedClass, void* InValue)
-{
-	return Domain != nullptr && InManagedClass != nullptr
-		       ? mono_value_box(Domain, InManagedClass, InValue)
-		       : nullptr;
-}
-
-MonoString* FMonoDomain::String_New(const char* InText)
-{
-	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
-}
-
 MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InManagedClass, const FString& InName,
                                                     const int32 InParamCount)
 {
 	return InManagedClass != nullptr
 		       ? mono_class_get_method_from_name(InManagedClass, TCHAR_TO_ANSI(*InName), InParamCount)
 		       : nullptr;
-}
-
-MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InManagedMethod, MonoObject* InManagedObject,
-                                        void** InParams)
-{
-	MonoObject* Exception{};
-
-	const auto ReturnValue = Runtime_Invoke(InManagedMethod, InManagedObject, InParams, &Exception);
-
-	if (Exception != nullptr)
-	{
-		Unhandled_Exception(Exception);
-
-		return nullptr;
-	}
-
-	return ReturnValue;
-}
-
-MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InManagedMethod, MonoObject* InManagedObject,
-                                        void** InParams, MonoObject** InExc)
-{
-	return InManagedMethod != nullptr
-		       ? mono_runtime_invoke(InManagedMethod, InManagedObject, InParams, InExc)
-		       : nullptr;
-}
-
-void FMonoDomain::Unhandled_Exception(MonoObject* InManagedObject)
-{
-	mono_unhandled_exception(InManagedObject);
 }
 
 void FMonoDomain::Free(void* InPointer)
@@ -257,77 +223,6 @@ void* FMonoDomain::Method_Get_Unmanaged_Callers_Only_Ftnptr(MonoMethod* InManage
 	Error.init = 0;
 
 	return mono_method_get_unmanaged_callers_only_ftnptr(InManagedMethod, &Error);
-}
-
-MonoObject* FMonoDomain::Object_Init(MonoClass* InManagedClass, const int32 InParamCount, void** InParams)
-{
-	if (const auto Object = Object_New(InManagedClass); Object != nullptr)
-	{
-		Object_Constructor(Object, InParamCount, InParams);
-
-		return Object;
-	}
-
-	return nullptr;
-}
-
-void FMonoDomain::Object_Constructor(MonoObject* InManagedObject, const int32 InParamCount, void** InParams)
-{
-	if (const auto FoundClass = mono_object_get_class(InManagedObject))
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundClass, FUNCTION_OBJECT_CONSTRUCTOR,
-		                                                        InParamCount))
-		{
-			Runtime_Invoke(FoundMethod, InManagedObject, InParams);
-		}
-	}
-}
-
-MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InManagedClass, const FString& InName,
-                                                      const TArray<MonoType*>& InParams)
-{
-	void* MethodIter{};
-
-	while (const auto Method = mono_class_get_methods(InManagedClass, &MethodIter))
-	{
-		if (strcmp(mono_method_get_name(Method), TCHAR_TO_ANSI(*InName)))
-		{
-			continue;
-		}
-
-		const auto Signature = mono_method_signature(Method);
-
-		if (mono_signature_get_param_count(Signature) != InParams.Num())
-		{
-			continue;
-		}
-
-		void* ParamIter{};
-
-		auto Index = 0;
-
-		auto bIsSame = true;
-
-		while (const auto ParamType = mono_signature_get_params(Signature, &ParamIter))
-		{
-			if (strcmp(mono_type_get_name_full(ParamType, MONO_TYPE_NAME_FORMAT_FULL_NAME),
-			           mono_type_get_name_full(InParams[Index], MONO_TYPE_NAME_FORMAT_FULL_NAME)))
-			{
-				bIsSame = false;
-
-				break;
-			}
-
-			Index++;
-		}
-
-		if (bIsSame == true)
-		{
-			return Method;
-		}
-	}
-
-	return nullptr;
 }
 
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InManagedAssemblyName,
@@ -412,16 +307,18 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 			FFileHelper::LoadFileToArray(Data, *AssemblyPath);
 
+			const auto AssemblyDirectory = StringCast<UTF16CHAR>(*FPaths::GetPath(AssemblyPath));
+
 			if (const auto Handle = AssemblyLoaderLoadFromStreamFn(Data.GetData(), Data.Num(),
-			                                                       reinterpret_cast<const char16_t*>(*FPaths::GetPath(
-				                                                       AssemblyPath)));
+			                                                       reinterpret_cast<const char16_t*>(
+				                                                       AssemblyDirectory.Get()));
 				IManagedHandleIsValid(Handle))
 			{
 				Assemblies.Add(Handle);
 			}
 		}
 
-		bIsInitialized = true;
+		bIsInitialized = FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(InAssemblies);
 	}
 }
 
@@ -433,6 +330,8 @@ void FMonoDomain::UnloadAssembly()
 	{
 		AssemblyLoaderUnloadFn();
 	}
+
+	UnregisterLog();
 
 #define MONO_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
 
@@ -455,6 +354,8 @@ void FMonoDomain::UnloadAssembly()
 	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FMonoDomain::RegisterAssemblyPreloadHook()

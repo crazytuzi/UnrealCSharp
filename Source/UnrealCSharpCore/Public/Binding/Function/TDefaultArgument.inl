@@ -1,16 +1,22 @@
 #pragma once
 
-#include <iomanip>
-#include <sstream>
+#include "Binding/TypeInfo/TStaticEnum.inl"
 #include "UEVersion.h"
 
-inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDigits = 1)
+inline FString SanitizeFloat(double InFloat, const int32 InMinFractionalDigits = 1)
 {
-	std::stringstream StringStream;
+	InFloat = InFloat == 0.0 ? 0.0 : InFloat;
 
-	StringStream << std::fixed << std::setprecision(std::numeric_limits<float>::max_digits10) << InFloat;
+	FString TempString;
 
-	FString TempString = StringStream.str().c_str();
+	if (InFloat != 0.0 && FMath::IsNearlyZero(InFloat, 0.5e-6))
+	{
+		TempString = FString::Printf(TEXT("%.9f"), InFloat);
+	}
+	else
+	{
+		TempString = FString::Printf(TEXT("%f"), InFloat);
+	}
 
 	int32 TrimIndex = INDEX_NONE;
 
@@ -62,6 +68,11 @@ inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDi
 				TempString.AppendChar(TEXT('0'));
 			}
 		}
+	}
+
+	if (InFloat != 0.0 && FMath::IsNearlyZero(InFloat, 0.5e-9))
+	{
+		TempString = FString::Printf(TEXT("%.9g"), InFloat);
 	}
 
 	return TempString;
@@ -439,12 +450,17 @@ struct TDefaultArgument<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !
 {
 	static auto Get(const T& InValue)
 	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *StaticEnum<std::decay_t<T>>()->GetName(),
-		                       *StaticEnum<std::decay_t<T>>()->GetNameStringByValue(static_cast<int64>(InValue))
-		);
+		if (const auto Enum = TStaticEnum<std::decay_t<T>>::Get())
+		{
+			return FString::Printf(TEXT(
+				"%s.%s"
+			),
+			                       *Enum->GetName(),
+			                       *Enum->GetNameStringByValue(static_cast<int64>(InValue))
+			);
+		}
+
+		return FString{};
 	}
 };
 
@@ -453,13 +469,17 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Val
 {
 	static auto Get(const T& InValue)
 	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->GetName(),
-		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->
-		                       GetNameStringByValue(static_cast<int64>(InValue))
-		);
+		if (const auto Enum = TStaticEnum<typename std::decay_t<T>::EnumType>::Get())
+		{
+			return FString::Printf(TEXT(
+				"%s.%s"
+			),
+			                       *Enum->GetName(),
+			                       *Enum->GetNameStringByValue(static_cast<int64>(InValue))
+			);
+		}
+
+		return FString{};
 	}
 };
 

@@ -1,22 +1,36 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TSoftObjectPtr<T> where T : UObject
+    public class TSoftObjectPtr<T> : IDisposable where T : UObject
     {
         public TSoftObjectPtr()
         {
         }
 
-        ~TSoftObjectPtr() =>
-            TSoftObjectPtrImplementation.TSoftObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TSoftObjectPtr() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TSoftObjectPtrImplementation.TSoftObjectPtr_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public TSoftObjectPtr(T InObject) =>
             TSoftObjectPtrImplementation.TSoftObjectPtr_RegisterImplementation(
                 this, HandleData.GetHandle(InObject), GetType());
 
-        public static implicit operator TSoftObjectPtr<T>(T InObject) => new(InObject);
+        public static explicit operator TSoftObjectPtr<T>(T InObject) => new(InObject);
 
         public static bool operator ==(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B)
         {
@@ -40,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TSoftObjectPtr<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TSoftObjectPtrImplementation.TSoftObjectPtr_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public T Get() => TSoftObjectPtrImplementation.TSoftObjectPtr_GetImplementation<T>(HandleData.GetHandle(this));
 

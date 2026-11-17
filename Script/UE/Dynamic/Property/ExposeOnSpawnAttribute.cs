@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ExposeOnSpawnAttribute : Attribute
     {
-        public ExposeOnSpawnAttribute()
-        {
-            Value = "true";
-        }
-
-        public ExposeOnSpawnAttribute(string InValue)
+        public ExposeOnSpawnAttribute(string InValue = "true")
         {
             Value = InValue;
         }

@@ -20,8 +20,6 @@ public:
 public:
 	int32 GetParamCount() const;
 
-	IManagedHandle GetManagedMethod() const;
-
 	bool IsOverride() const;
 
 	bool IsUFunction() const;

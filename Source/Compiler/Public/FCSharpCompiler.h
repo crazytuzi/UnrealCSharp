@@ -13,20 +13,34 @@ public:
 	static FCSharpCompiler& Get();
 
 public:
-	void Compile() const;
+	void AsyncCompile() const;
 
-	void ImmediatelyCompile(bool bForceCompileInterop = false) const;
+	void AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const;
 
-	void Compile(const TArray<FFileChangeData>& InFileChangeData) const;
+	void EnqueueTask(const TFunction<void()>& InTask) const;
+
+	bool SyncCompile() const;
 
 	void Compile(const TFunction<void()>& InFunction) const;
+
+	void ImmediatelyCompile(bool bForceCompileInterop = false) const;
 
 	bool IsCompiling() const;
 
 	FString GetCompileProgress() const;
 
 private:
+	void OnPreExit();
+
+public:
+	static constexpr int32 PollsPerSecond = 120;
+
+	static constexpr float PollIntervalSeconds = 1.0f / PollsPerSecond;
+
+private:
 	class FCSharpCompilerRunnable* Runnable;
 
 	FRunnableThread* Thread;
+
+	FDelegateHandle OnPreExitHandle;
 };

@@ -1,4 +1,7 @@
 #include "Registry/FCSharpBind.h"
+#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Domain/Script/IManagedHandle.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/CSharpFunction.h"
@@ -12,6 +15,12 @@
 #include "UEVersion.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+TMap<TWeakObjectPtr<UClass>, TWeakObjectPtr<UClass>> FCSharpBind::OriginalOwnerClass2DummyOwnerClass;
+
+const TCHAR* const FCSharpBind::DummyOwnerClassNamePrefix = TEXT("DummyOwnerClass");
+#endif
 
 FCSharpBind::FCSharpBind()
 {
@@ -27,34 +36,57 @@ void FCSharpBind::Initialize()
 {
 	NotOverrideTypes.Empty();
 
-	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
-		this, &FCSharpBind::OnCSharpEnvironmentInitialize);
+	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+		AddRaw(this, &FCSharpBind::OnCSharpEnvironmentInitialize);
 }
 
 void FCSharpBind::Deinitialize()
 {
 	if (OnCSharpEnvironmentInitializeDelegateHandle.IsValid())
 	{
-		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
+		FUnrealCSharpModuleDelegates::GetOnCSharpEnvironmentInitialize().
+			Remove(OnCSharpEnvironmentInitializeDelegateHandle);
 	}
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	for (auto Iterator = OriginalOwnerClass2DummyOwnerClass.CreateIterator(); Iterator; ++Iterator)
+	{
+		if (const auto DummyOwnerClass = Iterator.Value().GetEvenIfUnreachable())
+		{
+			if (DummyOwnerClass->IsRooted())
+			{
+				DummyOwnerClass->RemoveFromRoot();
+			}
+			else
+			{
+				DummyOwnerClass->MarkAsGarbage();
+			}
+		}
+
+		Iterator.RemoveCurrent();
+	}
+#endif
 }
 
 IManagedHandle FCSharpBind::Bind(UObject* InObject)
 {
-	if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-		IManagedHandleIsValid(FoundManagedHandle))
+	if (InObject != nullptr)
 	{
-		return FoundManagedHandle;
+		if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+			IManagedHandleIsValid(FoundManagedHandle))
+		{
+			return FoundManagedHandle;
+		}
+
+		return Bind<false>(InObject);
 	}
 
-	return Bind<false>(InObject);
+	return InvalidManagedHandle;
 }
 
 IManagedHandle FCSharpBind::Bind(UClass* InClass)
 {
-	Bind<false>(InClass);
-
-	return Bind(static_cast<UObject*>(InClass));
+	return Bind<false>(InClass) ? Bind(static_cast<UObject*>(InClass)) : InvalidManagedHandle;
 }
 
 bool FCSharpBind::Bind(const IManagedHandle InManagedObject, const FName& InStructName)
@@ -101,6 +133,58 @@ bool FCSharpBind::BindClassDefaultObject(UObject* InObject)
 	}
 
 	return false;
+}
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+void FCSharpBind::SuspendDummyOwnerClasses()
+{
+	FCSharpFunctionRegister::IteratorRegister(
+		[](const FCSharpFunctionRegister& InRegister)
+		{
+			InRegister.SuspendDummyOwnerClass();
+		});
+}
+
+void FCSharpBind::ResumeDummyOwnerClasses()
+{
+	FCSharpFunctionRegister::IteratorRegister(
+		[](const FCSharpFunctionRegister& InRegister)
+		{
+			InRegister.ResumeDummyOwnerClass();
+		});
+}
+#endif
+
+void FCSharpBind::RemoveFunctionFromClass(UFunction* InFunction)
+{
+	if (InFunction != nullptr)
+	{
+		if (const auto Class = Cast<UClass>(InFunction->GetOuter()))
+		{
+			Class->RemoveFunctionFromFunctionMap(InFunction);
+
+			UField* PrevField{};
+
+			for (auto Field = Class->Children; Field != nullptr; Field = Field->Next)
+			{
+				if (Field == InFunction)
+				{
+					if (PrevField != nullptr)
+					{
+						PrevField->Next = Field->Next;
+					}
+					else
+					{
+						Class->Children = Field->Next;
+					}
+
+					break;
+				}
+
+				PrevField = Field;
+			}
+		}
+	}
 }
 
 bool FCSharpBind::BindImplementation(UStruct* InStruct)
@@ -158,32 +242,22 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	for (const auto& [PropertyName, Property] : Properties)
 	{
-		for (const auto& Field : Fields)
+		if (Fields.Remove(PropertyName) > 0)
 		{
-			if (Field == PropertyName)
+			auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Property);
+
+			if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *PropertyName)))
 			{
-				auto FieldHash = GetTypeHash(Property);
-
-				if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-					"__%s"
-				),
-				                                                      *Field)))
-				{
-					FoundField->SetValue(Class, &FieldHash);
-				}
-
-				FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
-
-				Fields.Remove(Field);
-
-				break;
+				FoundField->SetValue(Class, &FieldHash);
 			}
+
+			FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
 		}
 	}
 
 	if (const auto FoundClass = Cast<UClass>(InStruct))
 	{
-		FUnrealCSharpModuleDelegates::OnCSharpClassBinding.Broadcast(FoundClass);
+		FUnrealCSharpModuleDelegates::GetOnCSharpClassBinding().Broadcast(FoundClass);
 
 		TMap<FString, UFunction*> Functions;
 
@@ -212,27 +286,17 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& Field : Fields)
+			if (Fields.Remove(FunctionName) > 0)
 			{
-				if (Field == FunctionName)
+				auto FieldHash = FUnrealCSharpFunctionLibrary::GetHash(Function);
+
+				if (auto FoundField = Class->GetField(FString::Printf(TEXT("__%s"), *FunctionName)))
 				{
-					auto FieldHash = GetTypeHash(Function);
-
-					if (auto FoundField = Class->GetField(FString::Printf(TEXT(
-						"__%s"
-					),
-					                                                      *Field)))
-					{
-						FoundField->SetValue(Class, &FieldHash);
-					}
-
-					FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
-						FieldHash, NewClassDescriptor, Function);
-
-					Fields.Remove(Field);
-
-					break;
+					FoundField->SetValue(Class, &FieldHash);
 				}
+
+				FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
+					FieldHash, NewClassDescriptor, Function);
 			}
 		}
 
@@ -245,7 +309,7 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 			if (auto Function = *It)
 			{
 				if (Function->HasAnyFunctionFlags(FUNC_BlueprintEvent) &&
-#if UE_DO_NATIVE_IMPL_OPTIMIZATION
+#if UE_DO_NATIVE_IMPL_OPTIMIZATION && !WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
 					!Function->HasAnyFunctionFlags(FUNC_Native) &&
 #endif
 					!Function->HasAnyFunctionFlags(FUNC_Final))
@@ -268,43 +332,16 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 			}
 		}
 
-		TMap<FString, FMethodReflection*> Methods;
-
-		for (const auto& [Name, Method] : Class->GetMethods())
-		{
-			if (Method != nullptr)
-			{
-				if (Method->IsOverride())
-				{
-					Methods.Add(Name.Get<0>(), Method);
-				}
-			}
-		}
-
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& [MethodName, Method] : Methods)
+			const auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
+				                                ? Function->NumParms - 1
+				                                : Function->NumParms;
+
+			if (const auto Method = Class->GetMethod(FunctionName, FunctionParamCount);
+				Method != nullptr && Method->IsOverride())
 			{
-				if (Method != nullptr)
-				{
-					if (FunctionName == MethodName)
-					{
-						const auto MethodParamCount = Method->GetParamCount();
-
-						auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
-							                          ? Function->NumParms - 1
-							                          : Function->NumParms;
-
-						if (MethodParamCount == FunctionParamCount)
-						{
-							Bind(NewClassDescriptor, FoundClass, MethodName, Function);
-
-							Methods.Remove(MethodName);
-
-							break;
-						}
-					}
-				}
+				Bind(NewClassDescriptor, FoundClass, FunctionName, Function);
 			}
 		}
 	}
@@ -320,7 +357,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		return false;
 	}
 
-	if (InClassDescriptor->HasFunctionDescriptor(GetTypeHash(InFunction)))
+	if (InClassDescriptor->HasFunctionDescriptor(FUnrealCSharpFunctionLibrary::GetHash(InFunction)))
 	{
 		return false;
 	}
@@ -340,18 +377,33 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		const auto OverrideFunction = DuplicateFunction(OriginalFunction, InClass, *NewFunctionName);
 
-		auto FunctionHash = GetTypeHash(OriginalFunction);
+		const auto OriginalFunctionFlags = OriginalFunction->FunctionFlags;
+
+		const auto OriginalNativeFunc = OriginalFunction->GetNativeFunc();
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+		const auto OwnerClassInfo = RegisterCallCSharpNativeFunction(InClass, OriginalFunction);
+#else
+		RegisterCallCSharpNativeFunction(InClass, OriginalFunction);
+#endif
+
+		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetHash(OriginalFunction);
 
 		FCSharpEnvironment::GetEnvironment().AddFunctionHash<FCSharpFunctionDescriptor>(
 			FunctionHash, InClassDescriptor, OriginalFunction,
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
 			FCSharpFunctionRegister(OriginalFunction, OverrideFunction,
-			                        OriginalFunction->FunctionFlags, OriginalFunction->GetNativeFunc()));
+			                        OriginalFunctionFlags, OriginalNativeFunc, OwnerClassInfo));
+#else
+		FCSharpFunctionRegister(OriginalFunction, OverrideFunction,
+		                        OriginalFunctionFlags, OriginalNativeFunc));
+#endif
 
 		if (FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction())
 		{
 			const auto& OverrideMethodName = FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(InMethodName);
 
-			auto OverrideFunctionHash = GetTypeHash(OverrideFunction);
+			auto OverrideFunctionHash = FUnrealCSharpFunctionLibrary::GetHash(OverrideFunction);
 
 			if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InClass))
 			{
@@ -368,8 +420,6 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 			FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
 				OverrideFunctionHash, InClassDescriptor, OverrideFunction);
 		}
-
-		RegisterCallCSharpNativeFunction(InClass, OriginalFunction);
 	}
 	else
 	{
@@ -382,12 +432,21 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
 
-		auto FunctionHash = GetTypeHash(NewFunction);
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+		const auto OwnerClassInfo = RegisterCallCSharpNativeFunction(InClass, NewFunction);
+#else
+		RegisterCallCSharpNativeFunction(InClass, NewFunction);
+#endif
+
+		auto FunctionHash = FUnrealCSharpFunctionLibrary::GetHash(NewFunction);
 
 		FCSharpEnvironment::GetEnvironment().AddFunctionHash<FCSharpFunctionDescriptor>(
-			FunctionHash, InClassDescriptor, NewFunction, FCSharpFunctionRegister(NewFunction, OriginalFunction));
-
-		RegisterCallCSharpNativeFunction(InClass, NewFunction);
+			FunctionHash, InClassDescriptor, NewFunction,
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+			FCSharpFunctionRegister(NewFunction, OriginalFunction, FUNC_None, nullptr, OwnerClassInfo));
+#else
+		FCSharpFunctionRegister(NewFunction, OriginalFunction, FUNC_None, nullptr));
+#endif
 	}
 
 	return true;
@@ -413,7 +472,14 @@ bool FCSharpBind::BindImplementation(const IManagedHandle InManagedObject, const
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject);
+	if (!FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject))
+	{
+		InScriptStruct->DestroyStruct(Structure);
+
+		FMemory::Free(Structure);
+
+		return false;
+	}
 
 	return true;
 }
@@ -470,10 +536,24 @@ bool FCSharpBind::IsCallCSharpFunction(const UFunction* InFunction)
 	return InFunction != nullptr && InFunction->GetNativeFunc() == &UCSharpFunction::execCallCSharp;
 }
 
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+FCSharpFunctionOwnerClassInfo FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction)
+#else
 void FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* InFunction)
+#endif
 {
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	FCSharpFunctionOwnerClassInfo OwnerClassInfo;
+#endif
+
 	if (InClass != nullptr && InFunction != nullptr)
 	{
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+		OwnerClassInfo.OriginalOwnerClass = GetOriginalOwnerClass(InFunction);
+
+		OwnerClassInfo.DummyOwnerClass = GetOrCreateDummyOwnerClass(InFunction);
+#endif
+
 		InFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
 
 		InFunction->FunctionFlags |= FUNC_Native;
@@ -485,6 +565,218 @@ void FCSharpBind::RegisterCallCSharpNativeFunction(UClass* InClass, UFunction* I
 			}))
 		{
 			InClass->AddNativeFunction(*InFunction->GetName(), &UCSharpFunction::execCallCSharp);
+		}
+
+		RegisterScriptTick(InClass, InFunction);
+	}
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+	return OwnerClassInfo;
+#endif
+}
+
+#if WITH_OVERRIDE_BLUEPRINT_NATIVE_EVENT
+UClass* FCSharpBind::GetOrCreateDummyOwnerClass(UClass* InClass)
+{
+	UClass* DummyOwnerClass{};
+
+	if (InClass != nullptr)
+	{
+		if (const auto FoundDummyOwnerClass = OriginalOwnerClass2DummyOwnerClass.Find(InClass))
+		{
+			DummyOwnerClass = FoundDummyOwnerClass->Get();
+		}
+
+		if (DummyOwnerClass == nullptr)
+		{
+			const auto Name = MakeUniqueObjectName(
+				UObject::StaticClass()->GetPackage(),
+				UClass::StaticClass(),
+				*FString::Printf(TEXT(
+					"%s%s"
+				),
+				                 DummyOwnerClassNamePrefix,
+				                 *InClass->GetName())
+			);
+
+			if (const auto DummyClass = NewObject<UClass>(
+				UObject::StaticClass()->GetPackage(),
+				UClass::StaticClass(),
+				Name,
+				RF_Public | RF_Transient))
+			{
+				DummyClass->AddToRoot();
+
+				DummyClass->SetSuperStruct(UObject::StaticClass());
+
+				DummyClass->ClassConstructor = UObject::StaticClass()->ClassConstructor;
+
+				DummyClass->ClassWithin = UObject::StaticClass()->ClassWithin;
+
+				DummyClass->ClassCastFlags = UObject::StaticClass()->ClassCastFlags;
+
+				DummyClass->ClassFlags |= CLASS_TokenStreamAssembled;
+
+				DummyClass->PropertiesSize = UObject::StaticClass()->GetPropertiesSize();
+
+				DummyClass->MinAlignment = UObject::StaticClass()->GetMinAlignment();
+
+				(void)DummyClass->GetDefaultObject(true);
+
+				OriginalOwnerClass2DummyOwnerClass.Add(InClass, DummyClass);
+
+				DummyOwnerClass = DummyClass;
+			}
+		}
+	}
+
+	return DummyOwnerClass;
+}
+
+UClass* FCSharpBind::GetOrCreateDummyOwnerClass(UFunction* InFunction)
+{
+	UClass* DummyOwnerClass{};
+
+	if (InFunction != nullptr)
+	{
+		if (const auto OuterClass = Cast<UClass>(InFunction->GetOuter());
+			OuterClass != nullptr && OuterClass->GetName().StartsWith(DummyOwnerClassNamePrefix))
+		{
+			DummyOwnerClass = OuterClass;
+		}
+		else
+		{
+			if (const auto OwnerClass = InFunction->GetOwnerClass();
+				OwnerClass != nullptr && InFunction->HasAnyFunctionFlags(FUNC_Native))
+			{
+				DummyOwnerClass = GetOrCreateDummyOwnerClass(OwnerClass);
+
+				if (DummyOwnerClass != nullptr)
+				{
+					InFunction->Rename(nullptr, DummyOwnerClass,
+					                   REN_DontCreateRedirectors | REN_NonTransactional | REN_DoNotDirty);
+				}
+			}
+		}
+	}
+
+	return DummyOwnerClass;
+}
+
+UClass* FCSharpBind::GetOriginalOwnerClass(const UFunction* InFunction)
+{
+	UClass* OriginalOwnerClass{};
+
+	if (InFunction != nullptr)
+	{
+		if (const auto OuterClass = Cast<UClass>(InFunction->GetOuter());
+			OuterClass != nullptr && OuterClass->GetName().StartsWith(DummyOwnerClassNamePrefix))
+		{
+			if (const auto FoundOriginalOwnerClass = OriginalOwnerClass2DummyOwnerClass.FindKey(OuterClass))
+			{
+				OriginalOwnerClass = FoundOriginalOwnerClass->Get();
+			}
+		}
+		else
+		{
+			OriginalOwnerClass = OuterClass;
+		}
+	}
+
+	return OriginalOwnerClass;
+}
+#endif
+
+void FCSharpBind::RegisterScriptTick(const UClass* InClass, const UFunction* InFunction)
+{
+	if (InClass != nullptr && InFunction != nullptr)
+	{
+		static const FName ReceiveTickName(GET_FUNCTION_NAME_CHECKED(AActor, ReceiveTick));
+
+		static const FName TickName(GET_FUNCTION_NAME_CHECKED(UUserWidget, Tick));
+
+		static const FName OnPaintName(GET_FUNCTION_NAME_CHECKED(UUserWidget, OnPaint));
+
+		const auto FunctionName = InFunction->GetFName();
+
+		const auto bIsReceiveTick = FunctionName == ReceiveTickName &&
+			(InClass->IsChildOf<AActor>() || InClass->IsChildOf<UActorComponent>()) &&
+			(InClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint) || !InClass->HasAnyClassFlags(CLASS_Native));
+
+		const auto bIsTick = FunctionName == TickName && InClass->IsChildOf<UUserWidget>();
+
+		const auto bIsOnPaint = FunctionName == OnPaintName && InClass->IsChildOf<UUserWidget>();
+
+		if (bIsReceiveTick || bIsTick || bIsOnPaint)
+		{
+			auto RegisterScriptTickImplementation = [bIsReceiveTick, bIsTick, bIsOnPaint](UObject* InObject)
+			{
+				if (InObject != nullptr && !InObject->HasAnyInternalFlags(EInternalObjectFlags::Garbage))
+				{
+					if (bIsReceiveTick)
+					{
+						if (const auto Actor = Cast<AActor>(InObject))
+						{
+							Actor->PrimaryActorTick.bCanEverTick = true;
+
+							if (!Actor->IsTemplate() &&
+								Actor->GetLevel() != nullptr &&
+								!Actor->PrimaryActorTick.IsTickFunctionRegistered())
+							{
+								Actor->RegisterAllActorTickFunctions(false, false);
+
+								Actor->RegisterAllActorTickFunctions(true, false);
+							}
+						}
+						else if (const auto ActorComponent = Cast<UActorComponent>(InObject))
+						{
+							ActorComponent->PrimaryComponentTick.bCanEverTick = true;
+
+							if (!ActorComponent->IsTemplate() &&
+								!ActorComponent->PrimaryComponentTick.IsTickFunctionRegistered())
+							{
+								ActorComponent->RegisterAllComponentTickFunctions(false);
+
+								ActorComponent->RegisterAllComponentTickFunctions(true);
+							}
+						}
+					}
+					else if (bIsTick || bIsOnPaint)
+					{
+						if (const auto Widget = Cast<UUserWidget>(InObject))
+						{
+							const auto bHasScriptImplementedTick = Widget->bHasScriptImplementedTick != 0;
+
+							if (bIsTick)
+							{
+								Widget->bHasScriptImplementedTick = true;
+							}
+
+							if (bIsOnPaint)
+							{
+								Widget->bHasScriptImplementedPaint = true;
+							}
+
+							if (bIsTick && !bHasScriptImplementedTick)
+							{
+#if UE_U_USER_WIDGET_UPDATE_CAN_TICK
+								Widget->UpdateCanTick();
+#else
+								if (Widget->GetDesiredTickFrequency() != EWidgetTickFrequency::Never)
+								{
+									if (const auto CachedWidget = Widget->GetCachedWidget(); CachedWidget.IsValid())
+									{
+										CachedWidget->SetCanTick(true);
+									}
+								}
+#endif
+							}
+						}
+					}
+				}
+			};
+
+			ForEachObjectOfClass(InClass, RegisterScriptTickImplementation, false, RF_NoFlags);
 		}
 	}
 }

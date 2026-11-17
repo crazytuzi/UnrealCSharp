@@ -30,6 +30,8 @@ public:
 
 	static void Generator();
 
+	static void Reset();
+
 	static void GeneratorField(FReflection* InReflection, const FClassReflection* InClassReflection,
 	                           FDynamicDependencyGraph::FNode& OutNode);
 
@@ -38,6 +40,10 @@ public:
 	static void GeneratorFunction(const FClassReflection* InClassReflection, FDynamicDependencyGraph::FNode& OutNode);
 
 	static void GeneratorInterface(const FClassReflection* InClassReflection, FDynamicDependencyGraph::FNode& OutNode);
+
+	static void GeneratorAccessor(const FClassReflection* InClassReflection, UClass* InClass);
+
+	static void GeneratorAccessor(UClass* InClass);
 
 	static void Generator(const FClassReflection* InClassReflection,
 	                      const TFunction<void(FClassReflection*)>& InGenerator);
@@ -99,21 +105,23 @@ public:
 #if WITH_EDITOR
 	static EDynamicType GetDynamicType(const FString& InName);
 
-	static const TArray<FClassReflection*>& GetClassMetaDataAttributes();
+	static TArray<FClassReflection*> GetClassMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetStructMetaDataAttributes();
+	static TArray<FClassReflection*> GetStructMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetEnumMetaDataAttributes();
+	static TArray<FClassReflection*> GetEnumMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetInterfaceMetaDataAttributes();
+	static TArray<FClassReflection*> GetInterfaceMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetPropertyMetaDataAttributes();
+	static TArray<FClassReflection*> GetPropertyMetaDataAttributes();
 
-	static const TArray<FClassReflection*>& GetFunctionMetaDataAttributes();
+	static TArray<FClassReflection*> GetFunctionMetaDataAttributes();
 #endif
 
 private:
 #if WITH_EDITOR
 	static TMap<FString, TArray<FString>> DynamicMap;
 #endif
+
+	static TMap<TObjectPtr<UClass>, TArray<TTuple<FString, const FClassReflection*, FName>>> PendingAccessors;
 };

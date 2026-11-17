@@ -1,10 +1,10 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/MetaDataAttributeMacro.h"
+#include "CoreMacro/ClassAttributeMacro.h"
 #include "Domain/Script/IManagedHandle.h"
 #include "Domain/Script/IScriptDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -14,6 +14,9 @@
 #if WITH_EDITOR
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
 #endif
+
+TMap<TObjectPtr<UClass>, TArray<TTuple<FString, const FClassReflection*, FName>>>
+FDynamicGeneratorCore::PendingAccessors;
 
 #if WITH_EDITOR
 void FDynamicGeneratorCore::BeginCodeAnalysisGenerator()
@@ -77,6 +80,11 @@ void FDynamicGeneratorCore::OnCompleted(const FString& InName, const TFunction<v
 void FDynamicGeneratorCore::Generator()
 {
 	FDynamicDependencyGraph::Get().Generator();
+}
+
+void FDynamicGeneratorCore::Reset()
+{
+	FDynamicDependencyGraph::Get().Reset();
 }
 
 void FDynamicGeneratorCore::GeneratorField(FReflection* InReflection,
@@ -196,15 +204,97 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 		return;
 	}
 
-	for (const auto& [PLACEHOLDER, Method] : InClassReflection->GetMethods())
+	for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
 	{
-		if (Method->IsUFunction())
+		for (const auto Method : Methods)
 		{
-			for (const auto Param : Method->GetParams())
+			if (Method->IsUFunction())
 			{
-				GeneratorField(Param, Param->GetReflectionType(), OutNode);
+				for (const auto Param : Method->GetParams())
+				{
+					GeneratorField(Param, Param->GetReflectionType(), OutNode);
+				}
 			}
 		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorAccessor(const FClassReflection* InClassReflection, UClass* InClass)
+{
+	if (InClassReflection != nullptr && InClass != nullptr)
+	{
+		const auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+		const auto GetterAttributeClass = ReflectionRegistry.GetBlueprintGetterAttributeClass();
+
+		const auto SetterAttributeClass = ReflectionRegistry.GetBlueprintSetterAttributeClass();
+
+		auto& AccessorMetaData = PendingAccessors.FindOrAdd(InClass);
+
+		AccessorMetaData.Reset();
+
+		for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
+		{
+			for (const auto Method : Methods)
+			{
+				if (Method->IsUFunction())
+				{
+					if (Method->HasAttribute(GetterAttributeClass))
+					{
+						const auto BlueprintGetter = Method->GetAttributeValue(GetterAttributeClass);
+
+						AccessorMetaData.Emplace(Method->GetName(), GetterAttributeClass,
+						                         FName(BlueprintGetter.IsEmpty()
+							                               ? Method->GetName()
+							                               : BlueprintGetter));
+					}
+
+					if (Method->HasAttribute(SetterAttributeClass))
+					{
+						const auto BlueprintSetter = Method->GetAttributeValue(SetterAttributeClass);
+
+						AccessorMetaData.Emplace(Method->GetName(), SetterAttributeClass,
+						                         FName(BlueprintSetter.IsEmpty()
+							                               ? Method->GetName()
+							                               : BlueprintSetter));
+					}
+				}
+			}
+		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorAccessor(UClass* InClass)
+{
+	if (InClass != nullptr)
+	{
+		if (const auto AccessorMetaData = PendingAccessors.Find(InClass))
+		{
+			for (const auto& [MethodName, AttributeClass, PropertyName] : *AccessorMetaData)
+			{
+				if (const auto Property = InClass->FindPropertyByName(PropertyName))
+				{
+#if WITH_EDITOR
+					SetMetaData(Property, AttributeClass->GetName(), MethodName);
+#endif
+				}
+
+				for (TFieldIterator<UFunction> Iterator(InClass, EFieldIteratorFlags::IncludeSuper); Iterator;
+				     ++Iterator)
+				{
+					if ((*Iterator)->GetName() == MethodName)
+					{
+#if WITH_EDITOR
+						SetMetaData(*Iterator, AttributeClass->GetName(), MethodName);
+#endif
+
+						break;
+					}
+				}
+			}
+		}
+
+		PendingAccessors.Remove(InClass);
 	}
 }
 
@@ -261,6 +351,24 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 		return;
 	}
 
+	const auto GetLifetimeCondition = [](const FString& InValue)
+	{
+		if (InValue.IsNumeric())
+		{
+			return static_cast<ELifetimeCondition>(FCString::Atoi(*InValue));
+		}
+
+		if (const auto Enum = StaticEnum<ELifetimeCondition>())
+		{
+			if (const auto Value = Enum->GetValueByNameString(InValue); Value != INDEX_NONE)
+			{
+				return static_cast<ELifetimeCondition>(Value);
+			}
+		}
+
+		return COND_None;
+	};
+
 #if WITH_EDITOR
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditAnywhereAttributeClass()))
 	{
@@ -280,6 +388,11 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleAnywhereAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst);
+	}
+
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleDefaultsOnlyAttributeClass()))
+	{
+		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst | CPF_DisableEditOnInstance);
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleInstanceOnlyAttributeClass()))
@@ -319,7 +432,6 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetLocalizedAttributeClass()))
 	{
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetTransientAttributeClass()))
@@ -367,9 +479,8 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 	{
 		InProperty->SetPropertyFlags(CPF_Net);
 
-		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
-			UKismetStringLibrary::Conv_StringToInt(
-				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0))));
+		InProperty->SetBlueprintReplicationCondition(GetLifetimeCondition(
+			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedAttributeClass(), 0)));
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass()))
@@ -379,9 +490,8 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 		InProperty->RepNotifyFunc = FName(
 			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0));
 
-		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
-			UKismetStringLibrary::Conv_StringToInt(
-				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 1))));
+		InProperty->SetBlueprintReplicationCondition(GetLifetimeCondition(
+			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 1)));
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNotReplicatedAttributeClass()))
@@ -447,7 +557,6 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InRefle
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetFieldNotifyAttributeClass()))
 	{
-		// @TODO
 	}
 #endif
 
@@ -485,6 +594,10 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 
 	auto FunctionExportFlags = 0u;
 
+#if WITH_EDITOR
+	auto bIsSealedEvent = false;
+#endif
+
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintNativeEventAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
@@ -500,8 +613,12 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		{
 			UE_LOG(LogUnrealCSharp, Error, TEXT("A Private function cannot be a BlueprintNativeEvent!"));
 		}
-
-		// @TODO A function cannot be both BlueprintNativeEvent and a Blueprint Property accessor!
+		else if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintGetterAttributeClass()) ||
+			InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
+		{
+			UE_LOG(LogUnrealCSharp, Error,
+			       TEXT("A function cannot be both BlueprintNativeEvent and a Blueprint Property accessor!"));
+		}
 
 		InFunction->FunctionFlags |= FUNC_Event;
 
@@ -544,6 +661,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 #if WITH_EDITOR
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSealedEventAttributeClass()))
 	{
+		bIsSealedEvent = true;
 	}
 #endif
 
@@ -628,8 +746,6 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 
 		InFunction->FunctionFlags |= FUNC_BlueprintPure;
-
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
@@ -640,8 +756,6 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		}
 
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
-
-		// @TODO
 	}
 
 	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintPureAttributeClass()))
@@ -698,6 +812,19 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 	}
 
 #if WITH_EDITOR
+	if (bIsSealedEvent)
+	{
+		if (InFunction->FunctionFlags & FUNC_BlueprintEvent)
+		{
+			UE_LOG(LogUnrealCSharp, Error,
+			       TEXT("A function cannot be both SealedEvent and BlueprintImplementableEvent!"));
+		}
+		else
+		{
+			InFunction->FunctionFlags |= FUNC_Final;
+		}
+	}
+
 	SetMetaData(InFunction, InReflection);
 #endif
 }
@@ -842,6 +969,37 @@ void FDynamicGeneratorCore::SetMetaData(UClass* InClass, FReflection* InReflecti
 
 			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
 		                 }
+
+		                 if (const auto DontAutoCollapseCategoriesAttributeClass = FReflectionRegistry::Get().
+			                 GetDontAutoCollapseCategoriesAttributeClass())
+		                 {
+			                 if (InReflection->HasAttribute(DontAutoCollapseCategoriesAttributeClass))
+			                 {
+				                 TArray<FString> AutoCollapseCategories;
+
+				                 if (const auto SuperClass = InClass->GetSuperClass())
+				                 {
+					                 SuperClass->GetAutoCollapseCategories(AutoCollapseCategories);
+				                 }
+
+				                 auto DontAutoCollapseCategories = InReflection->GetAttributeValue(
+					                 DontAutoCollapseCategoriesAttributeClass);
+
+				                 DontAutoCollapseCategories.ReplaceInline(TEXT(","), TEXT(" "));
+
+				                 TArray<FString> Categories;
+
+				                 DontAutoCollapseCategories.ParseIntoArray(Categories, TEXT(" "), true);
+
+				                 for (const auto& Category : Categories)
+				                 {
+					                 AutoCollapseCategories.RemoveSwap(Category);
+				                 }
+
+				                 SetMetaData(InClass, CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE,
+				                             FString::Join(AutoCollapseCategories, TEXT(" ")));
+			                 }
+		                 }
 	                 });
 }
 
@@ -901,15 +1059,16 @@ void FDynamicGeneratorCore::GeneratorProperty(const FClassReflection* InClassRef
 		{
 			if (Property->IsUProperty())
 			{
-				const auto CppProperty = FTypeBridge::Factory<true>(
+				if (const auto CppProperty = FTypeBridge::Factory<true>(
 					Property->GetReflectionType(), InField, FName(Name),
-					EObjectFlags::RF_Public);
+					EObjectFlags::RF_Public))
+				{
+					SetFlags(CppProperty, Property);
 
-				SetFlags(CppProperty, Property);
+					InField->AddCppProperty(CppProperty);
 
-				InField->AddCppProperty(CppProperty);
-
-				InGenerator(Property, CppProperty);
+					InGenerator(Property, CppProperty);
+				}
 			}
 		}
 	}
@@ -924,65 +1083,69 @@ void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassRef
 		return;
 	}
 
-	for (const auto& [Pair, Method] : InClassReflection->GetMethods())
+	for (const auto& [PLACEHOLDER, Methods] : InClassReflection->GetMethods())
 	{
-		if (Method->IsUFunction())
+		for (const auto Method : Methods)
 		{
-			auto Function = NewObject<UFunction>(InClass, FName(Pair.Get<0>()), RF_Public | RF_Transient);
-
-			if (Method->IsStatic())
+			if (Method->IsUFunction())
 			{
-				Function->FunctionFlags |= FUNC_Static;
-			}
+				auto Function = NewObject<UFunction>(InClass, FName(Method->GetName()), RF_Public | RF_Transient);
 
-			Function->MinAlignment = 1;
-
-			if (const auto Return = Method->GetReturn())
-			{
-				if (const auto Property = FTypeBridge::Factory<true>(Return, Function, "",
-				                                                     RF_Public | RF_Transient))
+				if (Method->IsStatic())
 				{
-					Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
-
-					Function->AddCppProperty(Property);
-
-					Function->FunctionFlags |= FUNC_HasOutParms;
-				}
-			}
-
-			const auto& Params = Method->GetParams();
-
-			for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
-			{
-				const auto Property = FTypeBridge::Factory<true>(
-					Params[Index]->GetReflectionType(),
-					Function,
-					FName(Params[Index]->GetName()),
-					RF_Public | RF_Transient);
-
-				Property->SetPropertyFlags(CPF_Parm);
-
-				if (Params[Index]->IsRef())
-				{
-					Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+					Function->FunctionFlags |= FUNC_Static;
 				}
 
-				Function->AddCppProperty(Property);
+				Function->MinAlignment = 1;
+
+				if (const auto Return = Method->GetReturn())
+				{
+					if (const auto Property = FTypeBridge::Factory<true>(Return, Function, "",
+					                                                     RF_Public | RF_Transient))
+					{
+						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
+
+						Function->AddCppProperty(Property);
+
+						Function->FunctionFlags |= FUNC_HasOutParms;
+					}
+				}
+
+				const auto& Params = Method->GetParams();
+
+				for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
+				{
+					if (const auto Property = FTypeBridge::Factory<true>(
+						Params[Index]->GetReflectionType(),
+						Function,
+						FName(Params[Index]->GetName()),
+						RF_Public | RF_Transient))
+					{
+						Property->SetPropertyFlags(CPF_Parm);
+
+						if (Params[Index]->IsRef())
+						{
+							Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+						}
+
+						Function->AddCppProperty(Property);
+					}
+				}
+
+				Function->Bind();
+
+				Function->StaticLink(true);
+
+				Function->Next = InClass->Children;
+
+				InClass->Children = Function;
+
+				SetFlags(Function, Method);
+
+				InClass->AddFunctionToFunctionMap(Function, FName(Method->GetName()));
+
+				InGenerator(Method, Function);
 			}
-
-			Function->Bind();
-
-			Function->StaticLink(true);
-
-			Function->Next = InClass->Children;
-
-			InClass->Children = Function;
-
-			SetFlags(Function, Method);
-
-			InClass->AddFunctionToFunctionMap(Function, FName(Method->GetName()));
-
-			InGenerator(Method, Function);
 		}
 	}
 }
@@ -1033,11 +1196,11 @@ EDynamicType FDynamicGeneratorCore::GetDynamicType(const FString& InName)
 	return EDynamicType::None;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetClassMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> ClassMetaDataAttributes = {
+	TArray<FClassReflection*> ClassMetaDataAttributes = {
 		ReflectionRegistry.GetHideCategoriesAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetBlueprintSpawnableComponentAttributeClass(),
@@ -1058,17 +1221,18 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttribut
 		ReflectionRegistry.GetDontUseGenericSpawnObjectAttributeClass(),
 		ReflectionRegistry.GetExposedAsyncProxyAttributeClass(),
 		ReflectionRegistry.GetBlueprintThreadSafeAttributeClass(),
-		ReflectionRegistry.GetUsesHierarchyAttributeClass()
+		ReflectionRegistry.GetUsesHierarchyAttributeClass(),
+		ReflectionRegistry.GetCustomThunkTemplatesAttributeClass()
 	};
 
 	return ClassMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetStructMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> StructMetaDataAttributes = {
+	TArray<FClassReflection*> StructMetaDataAttributes = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetHasNativeBreakAttributeClass(),
 		ReflectionRegistry.GetHasNativeMakeAttributeClass(),
@@ -1079,11 +1243,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttribu
 	return StructMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetEnumMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> EnumMetaDataAttrs = {
+	TArray<FClassReflection*> EnumMetaDataAttrs = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetBitflagsAttributeClass(),
 		ReflectionRegistry.GetUseEnumValuesAsMaskValuesInEditorAttributeClass()
@@ -1092,11 +1256,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttribute
 	return EnumMetaDataAttrs;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetInterfaceMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> InterfaceMetaDataAttributes = {
+	TArray<FClassReflection*> InterfaceMetaDataAttributes = {
 		ReflectionRegistry.GetConversionRootAttributeClass(),
 		ReflectionRegistry.GetCannotImplementInterfaceInBlueprintAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass()
@@ -1105,11 +1269,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttr
 	return InterfaceMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetPropertyMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> PropertyMetaDataAttributes = {
+	TArray<FClassReflection*> PropertyMetaDataAttributes = {
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetDeprecationMessageAttributeClass(),
 		ReflectionRegistry.GetDisplayNameAttributeClass(),
@@ -1198,11 +1362,11 @@ const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttri
 	return PropertyMetaDataAttributes;
 }
 
-const TArray<FClassReflection*>& FDynamicGeneratorCore::GetFunctionMetaDataAttributes()
+TArray<FClassReflection*> FDynamicGeneratorCore::GetFunctionMetaDataAttributes()
 {
-	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+	const auto& ReflectionRegistry = FReflectionRegistry::Get();
 
-	static TArray<FClassReflection*> FunctionMetaDataAttributes = {
+	TArray<FClassReflection*> FunctionMetaDataAttributes = {
 		ReflectionRegistry.GetCallInEditorAttributeClass(),
 		ReflectionRegistry.GetToolTipAttributeClass(),
 		ReflectionRegistry.GetCategoryAttributeClass(),

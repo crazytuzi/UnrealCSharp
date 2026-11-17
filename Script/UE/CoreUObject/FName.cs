@@ -1,15 +1,30 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FName
+    public class FName : IDisposable
     {
         public FName()
         {
         }
 
-        ~FName() => FNameImplementation.FName_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~FName() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                FNameImplementation.FName_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public FName(string InValue) => FNameImplementation.FName_RegisterImplementation(this, InValue);
 
@@ -37,10 +52,11 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as FName;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            FNameImplementation.FName_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public override string ToString() =>
-            FNameImplementation.FName_ToStringImplementation(HandleData.GetHandle(this));
+            FNameImplementation.FName_ToStringImplementation(HandleData.GetHandle(this)) ?? string.Empty;
 
         public static FName NAME_None => FNameImplementation.FName_NAME_NoneImplementation();
     }

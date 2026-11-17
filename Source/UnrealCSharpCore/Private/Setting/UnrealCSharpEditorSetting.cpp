@@ -237,6 +237,8 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 	return ResultArray;
 #elif PLATFORM_MAC
 	return {TEXT("/usr/local/share/dotnet/dotnet")};
+#else
+	return {};
 #endif
 }
 
@@ -360,11 +362,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetClassList()
 	}
 
 	return ClassArray;
-}
-
-const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
-{
-	return ClassBlacklist;
 }
 
 ESolutionConfiguration UUnrealCSharpEditorSetting::GetEditorConfiguration() const

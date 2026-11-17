@@ -5,6 +5,7 @@
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FStringRegistry.h"
+#include "Registry/FFieldPathRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
@@ -95,7 +96,7 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const IManagedHandle InManagedHandle) const;
 
-	bool AddObjectReference(const FClassReflection* InClass, UObject* InObject, IManagedHandle InManagedHandle) const;
+	IManagedHandle AddObjectReference(UObject* InObject, IManagedHandle InManagedHandle) const;
 
 	IManagedHandle GetObject(const UObject* InObject) const;
 
@@ -207,6 +208,21 @@ public:
 	auto RemoveStringReference(const IManagedHandle InManagedHandle) const;
 
 public:
+	IManagedHandle GetFieldPathObject(const void* InAddress) const;
+
+	FFieldPath* GetFieldPath(const IManagedHandle InManagedHandle) const;
+
+	FField* GetField(const IManagedHandle InManagedHandle) const;
+
+	IManagedHandle GetFieldObject(FField* InField) const;
+
+	template <auto IsNeedFree, auto IsMember>
+	auto AddFieldPathReference(FClassReflection* InClass, const IManagedHandle InManagedHandle,
+	                           FFieldPath* InValue) const;
+
+	bool RemoveFieldPathReference(const IManagedHandle InManagedHandle) const;
+
+public:
 	IManagedHandle GetBinding(void* InObject) const;
 
 	template <typename T>
@@ -253,7 +269,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
+	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value && !TIsScriptStruct<T>::Value, T>>
 	{
 	public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,
@@ -306,7 +322,7 @@ public:
 private:
 	static FCSharpEnvironment Environment;
 
-	FDomain* Domain;
+	FDomain* Domain{};
 
 private:
 	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;
@@ -331,30 +347,32 @@ private:
 #endif
 
 private:
-	FDynamicRegistry* DynamicRegistry;
+	FDynamicRegistry* DynamicRegistry{};
 
-	class FCSharpBind* CSharpBind;
+	class FCSharpBind* CSharpBind{};
 
-	FClassRegistry* ClassRegistry;
+	FClassRegistry* ClassRegistry{};
 
-	FReferenceRegistry* ReferenceRegistry;
+	FReferenceRegistry* ReferenceRegistry{};
 
-	FObjectRegistry* ObjectRegistry;
+	FObjectRegistry* ObjectRegistry{};
 
-	FStructRegistry* StructRegistry;
+	FStructRegistry* StructRegistry{};
 
-	class FContainerRegistry* ContainerRegistry;
+	class FContainerRegistry* ContainerRegistry{};
 
-	class FDelegateRegistry* DelegateRegistry;
+	class FDelegateRegistry* DelegateRegistry{};
 
-	FMultiRegistry* MultiRegistry;
+	FMultiRegistry* MultiRegistry{};
 
-	FStringRegistry* StringRegistry;
+	FStringRegistry* StringRegistry{};
 
-	class FBindingRegistry* BindingRegistry;
+	FFieldPathRegistry* FieldPathRegistry{};
+
+	class FBindingRegistry* BindingRegistry{};
 
 #if UE_F_OPTIONAL_PROPERTY
-	class FOptionalRegistry* OptionalRegistry;
+	class FOptionalRegistry* OptionalRegistry{};
 #endif
 };
 

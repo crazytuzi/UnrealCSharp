@@ -144,6 +144,10 @@ public:
 
 	static bool EnableCallOverrideFunction();
 
+	static uint32 GetHash(const FProperty* InProperty);
+
+	static uint32 GetHash(const UFunction* InFunction);
+
 	static FString GetOverrideFunctionNamePrefix();
 
 	static FString GetOverrideFunctionNameSuffix();
@@ -186,6 +190,8 @@ public:
 
 	static FString GetFullInteropPublishPath();
 
+	static FString GetFullInteropBuildDirectory();
+
 	static FString GetFullUEPublishPath();
 
 	static FString GetFullGamePublishPath();
@@ -193,6 +199,8 @@ public:
 	static TArray<FString> GetFullCustomProjectsPublishPath();
 
 	static TArray<FString> GetFullAssemblyPublishPath();
+
+	static bool IsAssembliesFileExists(const TArray<FString>& InAssemblies);
 
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
@@ -208,8 +216,6 @@ public:
 	static FString GetSourceGeneratorPath();
 
 	static FString GetWeaversPath();
-
-	static FString GetInteropPath();
 #endif
 
 #if WITH_EDITOR
@@ -232,6 +238,8 @@ public:
 
 #if WITH_EDITOR
 	static TArray<FString> GetChangedDirectories();
+
+	static bool IsScriptPublishOutdated();
 #endif
 
 	static FString Encode(const FString& InName, bool bIsNative = true, bool bEncodeWideString = false);
@@ -272,19 +280,47 @@ public:
 	static void SyncProcess(const FString& InURL, const FString& InParms,
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
 	                        const FString& InWorkingDirectory = FString(),
-	                        const TFunction<void(const FString&)>& InOnOutput = {});
+	                        const TFunction<void(const FString&)>& InOnOutput = {},
+	                        const TFunction<bool()>& InIsStopped = {},
+	                        double InTimeoutSeconds = 600.0,
+	                        double InSilenceTimeoutSeconds = 120.0);
 #endif
 
 #if WITH_EDITOR
-	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
-
 	static EScriptDomainType GetScriptDomainType(const FString& InPlatformName);
 
 	static EScriptDomainType GetScriptDomainType();
+
+private:
+	friend struct FScriptDomainTypeScope;
+
+	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
+
+	static bool IsDotNetSdkSupported(const FString& InDotNetPath);
+
+	static bool GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion, int32& OutMinorVersion);
+
+	static TArray<FString> GetDotNetPathArray();
 
 private:
 	static EScriptDomainType ScriptDomainType;
 
 	static bool bScriptChanged;
 #endif
+
+private:
+	template <typename T>
+	static uint32 GetHash(const T* InField, [[maybe_unused]] const UStruct* InStruct)
+	{
+#if WITH_FIELD_HASH
+		return FCrc::StrCrc32(*FString::Printf(TEXT(
+			"%s::%s"
+		),
+		                                       InStruct != nullptr ? *InStruct->GetName() : TEXT(""),
+		                                       InField != nullptr ? *InField->GetName() : TEXT("")
+		).ToLower());
+#else
+		return GetTypeHash(InField);
+#endif
+	}
 };

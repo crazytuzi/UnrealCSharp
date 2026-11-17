@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class ShowWorldContextPinAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public ShowWorldContextPinAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

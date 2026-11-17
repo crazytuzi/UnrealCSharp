@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Text;
 using Interop;
 
 namespace Script.Library
@@ -10,7 +11,7 @@ namespace Script.Library
 
         public static void FDelegate_RegisterImplementation(object InDelegate, Type InType)
         {
-            __FDelegate_RegisterImplementation(HandleData.Alloc(InDelegate), HandleData.Alloc(InType));
+            __FDelegate_RegisterImplementation(HandleData.Alloc(InDelegate, true), HandleData.Alloc(InType));
         }
 
         private static unsafe partial void __FDelegate_UnRegisterImplementation(nint InDelegate);
@@ -20,13 +21,19 @@ namespace Script.Library
             __FDelegate_UnRegisterImplementation(InDelegate);
         }
 
-        private static unsafe partial void __FDelegate_BindImplementation(nint InDelegate, nint InObject, nint InType, nint InMethodInfo);
+        private static unsafe partial void __FDelegate_BindImplementation(nint InDelegate, nint InObject, nint InType,
+            byte* InMethodName, int InParamCount);
 
-        public static void FDelegate_BindImplementation(nint InDelegate, nint InObject, Type InType,
+        public static unsafe void FDelegate_BindImplementation(nint InDelegate, nint InObject, Type InType,
             MethodInfo InMethodInfo)
         {
-            __FDelegate_BindImplementation(InDelegate, InObject, HandleData.Alloc(InType),
-                HandleData.Alloc(InMethodInfo));
+            var UTF8 = Encoding.UTF8.GetBytes(InMethodInfo.Name + '\0');
+
+            fixed (byte* Ptr = UTF8)
+            {
+                __FDelegate_BindImplementation(InDelegate, InObject, HandleData.Alloc(InType), Ptr,
+                    InMethodInfo.GetParameters().Length);
+            }
         }
 
         private static unsafe partial byte __FDelegate_IsBoundImplementation(nint InDelegate);

@@ -3,14 +3,22 @@
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(Src);
+	auto Object = InvalidManagedHandle;
 
-	if (!IManagedHandleIsValid(Object))
+	if (Property->GetObjectPropertyValue(Src) != nullptr)
 	{
-		Object = Class->NewObject();
+		Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(Src);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
-			Class, Object, Src);
+		if (!IManagedHandleIsValid(Object))
+		{
+			if (Class != nullptr)
+			{
+				Object = Class->NewObject(true);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
+					Class, Object, Src);
+			}
+		}
 	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
@@ -18,20 +26,30 @@ void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgumen
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject(true);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	const auto Object = Class->NewObject();
+	auto Object = InvalidManagedHandle;
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true, false>(
-		Class, Object, Src);
+	if (Class != nullptr)
+	{
+		Object = Class->NewObject(true);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true, false>(
+			Class, Object, Src);
+	}
 
 	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
@@ -44,15 +62,21 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	Property->SetObjectPropertyValue(Dest, SrcMulti->Get());
+	if (SrcMulti != nullptr)
+	{
+		Property->SetObjectPropertyValue(Dest, SrcMulti->Get());
+	}
 }
 
 bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
 	const auto ObjectA = Property->GetObjectPropertyValue(A);
 
-	const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-		*static_cast<IManagedHandle*>(const_cast<void*>(B)))->Get();
+	if (const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
+		*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->StaticIdentical(ObjectA, ObjectB->Get(), PortFlags);
+	}
 
-	return Property->StaticIdentical(ObjectA, ObjectB, PortFlags);
+	return false;
 }

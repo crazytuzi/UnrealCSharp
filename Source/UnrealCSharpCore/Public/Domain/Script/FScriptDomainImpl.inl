@@ -71,10 +71,10 @@ FString SCRIPT_DOMAIN_TYPE::GetFullName(const IManagedHandle InManagedClass)
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_NEW_OBJECT
-IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass)
+IManagedHandle SCRIPT_DOMAIN_TYPE::NewObject(const IManagedHandle InManagedClass, const bool bIsWeak)
 {
 	return ObjectBridgeNewObjectFn != nullptr
-		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass)
+		       ? SCRIPT_DOMAIN_INVOKE(IManagedHandle, ObjectBridgeNewObjectFn, InManagedClass, bIsWeak ? 1 : 0)
 		       : InvalidManagedHandle;
 }
 #endif
@@ -334,6 +334,15 @@ FString SCRIPT_DOMAIN_TYPE::StringToFString(const IManagedHandle InManagedHandle
 }
 #endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_IS_ALIVE
+bool SCRIPT_DOMAIN_TYPE::IsAlive(const IManagedHandle InManagedHandle)
+{
+	return IManagedHandleIsValid(InManagedHandle) && HandleDataIsAliveFn != nullptr
+		       ? SCRIPT_DOMAIN_INVOKE(int32, HandleDataIsAliveFn, InManagedHandle.Value) != 0
+		       : true;
+}
+#endif
+
 #ifndef SCRIPT_DOMAIN_CUSTOM_FREE
 void SCRIPT_DOMAIN_TYPE::Free(const IManagedHandle InManagedHandle)
 {
@@ -403,12 +412,13 @@ void SCRIPT_DOMAIN_TYPE::SetFieldStaticValue(const IManagedHandle InManagedClass
 #endif
 
 #ifndef SCRIPT_DOMAIN_CUSTOM_GET_FIELD_STATIC_VALUE
-void* SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName)
+bool SCRIPT_DOMAIN_TYPE::GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+                                             int64& OutValue)
 {
 	return IManagedHandleIsValid(InManagedClass) && FieldBridgeGetStaticValueFn != nullptr
-		       ? IManagedHandleToObject(SCRIPT_DOMAIN_INVOKE(IManagedHandle, FieldBridgeGetStaticValueFn,
-		                                                     InManagedClass, SCRIPT_DOMAIN_STRING_CAST(InName)))
-		       : nullptr;
+		       ? SCRIPT_DOMAIN_INVOKE(uint8, FieldBridgeGetStaticValueFn, InManagedClass,
+		                              SCRIPT_DOMAIN_STRING_CAST(InName), &OutValue) != 0
+		       : false;
 }
 #endif
 
@@ -597,8 +607,18 @@ void SCRIPT_DOMAIN_TYPE::RegisterLog()
 }
 #endif
 
+#ifndef SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
+void SCRIPT_DOMAIN_TYPE::UnregisterLog()
+{
+	if (LogBridgeDeinitializeFn != nullptr)
+	{
+		LogBridgeDeinitializeFn();
+	}
+}
+#endif
+
 #ifndef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
-void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
+void SCRIPT_DOMAIN_TYPE::RegisterBinding()
 {
 	if (MethodBridgeRegisterBindingFn != nullptr)
 	{
@@ -607,6 +627,8 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 		TArray<const uint8*> MethodNames;
 
 		TArray<PTRINT> Methods;
+
+		TArray<int32> ParamCounts;
 
 		for (const auto& Class : FBinding::Get().Register().GetClasses())
 		{
@@ -625,10 +647,24 @@ void SCRIPT_DOMAIN_TYPE::RegisterBinding() const
 				MethodNames.Add(reinterpret_cast<const uint8*>(Name.GetData()));
 
 				Methods.Add(reinterpret_cast<PTRINT>(const_cast<void*>(Method.GetFunction())));
+
+				ParamCounts.Add(Method.GetParamCount());
 			}
 		}
 
-		MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), MethodNames.Num());
+		if (!MethodNames.IsEmpty())
+		{
+			MethodBridgeRegisterBindingFn(MethodNames.GetData(), Methods.GetData(), ParamCounts.GetData(),
+			                              MethodNames.Num());
+		}
+		else
+		{
+			bIsInitialized = false;
+		}
+	}
+	else
+	{
+		bIsInitialized = false;
 	}
 }
 #endif

@@ -4,12 +4,12 @@
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, Src);
 }
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, nullptr);
 }
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
@@ -26,14 +26,40 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 	Property->InitializeValue(Dest);
 
-	const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
+	if (SrcMulticastDelegateHelper != nullptr)
+	{
+		FScriptDelegate ScriptDelegate;
 
-	FScriptDelegate ScriptDelegate;
+		ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
+		                             SrcMulticastDelegateHelper->GetFunctionName());
 
-	ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
-	                             SrcMulticastDelegateHelper->GetFunctionName());
+		if (ScriptDelegate.IsBound())
+		{
+			if (const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest)))
+			{
+				MulticastScriptDelegate->Add(ScriptDelegate);
+			}
+			else
+			{
+				FMulticastScriptDelegate MulticastDelegate;
 
-	MulticastScriptDelegate->Add(ScriptDelegate);
+				MulticastDelegate.Add(ScriptDelegate);
+
+				Property->SetMulticastDelegate(Dest, MulticastDelegate);
+			}
+		}
+	}
+}
+
+bool FMulticastDelegatePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
+		FMulticastDelegateHelper>(*static_cast<IManagedHandle*>(const_cast<void*>(B))))
+	{
+		return Property->Identical(A, MulticastDelegateHelper->GetAddress(), PortFlags);
+	}
+
+	return false;
 }
 
 const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const
@@ -47,31 +73,39 @@ IManagedHandle FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) con
 
 	if (!IManagedHandleIsValid(Object))
 	{
-		const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
-			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
-			Property->SignatureFunction);
+		if (Class != nullptr)
+		{
+			const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
+				const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
+				Property->SignatureFunction, Property, InAddress);
 
-		Object = Class->NewObject();
+			Object = Class->NewObject(true);
 
-		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
-			InAddress, Property);
+			const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
+				InAddress, Property);
 
-		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerManagedHandle, InAddress,
-		                                                          MulticastDelegateHelper, Class, Object);
+			FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerManagedHandle, InAddress,
+			                                                          MulticastDelegateHelper, Class, Object);
+		}
 	}
 
 	return Object;
 }
 
-IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
+IManagedHandle FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress, void* InPropertyAddress) const
 {
-	const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
-		const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
-		Property->SignatureFunction);
+	auto Object = InvalidManagedHandle;
 
-	const auto Object = Class->NewObject();
+	if (Class != nullptr)
+	{
+		const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
+			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
+			Property->SignatureFunction, Property, InPropertyAddress);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Class, Object);
+		Object = Class->NewObject(true);
+
+		FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Class, Object);
+	}
 
 	return Object;
 }

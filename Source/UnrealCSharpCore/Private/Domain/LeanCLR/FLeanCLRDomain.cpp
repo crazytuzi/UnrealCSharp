@@ -8,6 +8,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Reflection/FClassReflection.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Binding/FBinding.h"
 #include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingMethod.h"
@@ -34,9 +35,11 @@ TMap<const leanclr::metadata::RtMethodInfo*, TTuple<int32, int32>> FLeanCLRDomai
 
 TMap<const leanclr::metadata::RtMethodInfo*, FLeanCLRDomain::FPInvokeSignature> FLeanCLRDomain::PInvokeSignatures;
 
+TMap<UPTRINT, int32> FLeanCLRDomain::PInvokeParamCounts;
+
 void FLeanCLRDomain::Initialize()
 {
-	if (bIsInitialized)
+	if (bIsInitializeCompleted)
 	{
 		return;
 	}
@@ -82,16 +85,20 @@ void FLeanCLRDomain::Initialize()
 	}
 
 	bIsInitialized = true;
+
+	bIsInitializeCompleted = true;
 }
 
 void FLeanCLRDomain::Deinitialize()
 {
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bIsInitializeCompleted)
 	{
 		return;
 	}
 
 	bIsInitialized = false;
+
+	bIsInitializeCompleted = false;
 
 	UnloadAssembly();
 }
@@ -102,6 +109,7 @@ void FLeanCLRDomain::Deinitialize()
 #define SCRIPT_DOMAIN_CUSTOM_INVOKE
 #define SCRIPT_DOMAIN_CUSTOM_GET_CLASSES_WITH_ATTRIBUTE
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_LOG
+#define SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
 #define SCRIPT_DOMAIN_CUSTOM_REGISTER_SYNCHRONIZATION_CONTEXT_TICK
 #define SCRIPT_DOMAIN_TYPE FLeanCLRDomain
@@ -109,6 +117,7 @@ void FLeanCLRDomain::Deinitialize()
 #undef SCRIPT_DOMAIN_TYPE
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_SYNCHRONIZATION_CONTEXT_TICK
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_BINDING
+#undef SCRIPT_DOMAIN_CUSTOM_UNREGISTER_LOG
 #undef SCRIPT_DOMAIN_CUSTOM_REGISTER_LOG
 #undef SCRIPT_DOMAIN_CUSTOM_GET_CLASSES_WITH_ATTRIBUTE
 #undef SCRIPT_DOMAIN_CUSTOM_INVOKE
@@ -543,6 +552,14 @@ leanclr::RtErr FLeanCLRDomain::PInvoke_Classify(const leanclr::metadata::RtMetho
 		return leanclr::RtErr::ExecutionEngine;
 	}
 
+	if (const auto FoundParamCount = PInvokeParamCounts.Find(reinterpret_cast<UPTRINT>(Entry->func)))
+	{
+		if (*FoundParamCount != INDEX_NONE && *FoundParamCount != InManagedMethod->parameter_count)
+		{
+			return leanclr::RtErr::ExecutionEngine;
+		}
+	}
+
 	auto ReturnReduceResult = leanclr::interp::InterpDefs::get_reduce_type_and_size_by_typesig(
 		InManagedMethod->return_type);
 
@@ -757,6 +774,11 @@ bool FLeanCLRDomain::FileLoader(const char* InAssemblyName, const char* InExtens
 
 bool FLeanCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 {
+	if (!FUnrealCSharpFunctionLibrary::IsAssembliesFileExists(InAssemblies))
+	{
+		return false;
+	}
+
 	LoadAssembly(InAssemblies);
 
 	UEModule = nullptr;
@@ -781,7 +803,7 @@ bool FLeanCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	FReflectionRegistry::Get().Initialize();
 
-	return true;
+	return FReflectionRegistry::Get().IsInitialized();
 }
 
 void FLeanCLRDomain::LoadAssembly(const TArray<FString>& InAssemblies)
@@ -812,6 +834,8 @@ void FLeanCLRDomain::UnloadAssembly()
 		Bridge_Invoke(AssemblyLoaderUnloadFn);
 	}
 
+	UnregisterLog();
+
 	Assemblies.Empty();
 
 	UEModule = nullptr;
@@ -829,6 +853,8 @@ void FLeanCLRDomain::UnloadAssembly()
 #undef LEANCLR_METHOD_CLEAR
 
 	MethodInvokePaths.Empty();
+
+	FDynamicGenerator::Reset();
 }
 
 void FLeanCLRDomain::RegisterInterop()
@@ -849,6 +875,20 @@ void FLeanCLRDomain::RegisterInterop()
 	LEANCLR_INTEROP_BRIDGE_METHODS(RESOLVE_LEANCLR_METHOD)
 
 #undef RESOLVE_LEANCLR_METHOD
+}
+
+void FLeanCLRDomain::UnregisterLog()
+{
+	if (InteropModule != nullptr)
+	{
+		if (const auto Deinitialize = Class_Get_Method_From_Name(InteropModule,
+		                                                         COMBINE_FULL_NAME(
+			                                                         NAMESPACE_INTEROP, CLASS_LOG_BRIDGE),
+		                                                         FUNCTION_LOG_BRIDGE_DEINITIALIZE))
+		{
+			Bridge_Invoke(Deinitialize);
+		}
+	}
 }
 
 void FLeanCLRDomain::RegisterBinding() const
@@ -878,6 +918,9 @@ void FLeanCLRDomain::RegisterBinding() const
 		for (const auto& Method : Class->GetMethods())
 		{
 			RegisterPInvoke(Method.GetMethod(), Method.GetFunction());
+
+			PInvokeParamCounts.Add(reinterpret_cast<UPTRINT>(const_cast<void*>(Method.GetFunction())),
+			                       Method.GetParamCount());
 		}
 	}
 

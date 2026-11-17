@@ -28,7 +28,7 @@ public:
 
 	virtual FString GetFullName(const IManagedHandle InManagedClass) = 0;
 
-	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) = 0;
+	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass, const bool bIsWeak = false) = 0;
 
 	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) = 0;
 
@@ -37,6 +37,8 @@ public:
 	virtual IManagedHandle NewString(const char* InText) = 0;
 
 	virtual FString StringToFString(const IManagedHandle InManagedHandle) = 0;
+
+	virtual bool IsAlive(const IManagedHandle InManagedHandle) = 0;
 
 	virtual void Free(const IManagedHandle InManagedHandle) = 0;
 
@@ -51,7 +53,8 @@ public:
 
 	virtual void SetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName, void* InValue) = 0;
 
-	virtual void* GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName) = 0;
+	virtual bool GetFieldStaticValue(const IManagedHandle InManagedClass, const FString& InName,
+	                                 int64& OutValue) = 0;
 
 	virtual void SetPropertyValue(const IManagedHandle InManagedHandle, const FString& InName, void** InParams) = 0;
 

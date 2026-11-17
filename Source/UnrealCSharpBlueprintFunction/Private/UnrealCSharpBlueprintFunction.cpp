@@ -18,7 +18,7 @@ class FUnrealCSharpBlueprintFunctionModule final : public IModuleInterface
 public:
 	virtual void StartupModule() override
 	{
-		OnCSharpClassBindingHandle = FUnrealCSharpModuleDelegates::OnCSharpClassBinding.AddLambda([](UClass* InClass)
+		OnCSharpClassBindingHandle = FUnrealCSharpModuleDelegates::GetOnCSharpClassBinding().AddLambda([](UClass* InClass)
 		{
 			FCSharpFunctionInjector::InjectClass(InClass);
 		});
@@ -39,7 +39,7 @@ public:
 	{
 		if (OnCSharpClassBindingHandle.IsValid())
 		{
-			FUnrealCSharpModuleDelegates::OnCSharpClassBinding.Remove(OnCSharpClassBindingHandle);
+			FUnrealCSharpModuleDelegates::GetOnCSharpClassBinding().Remove(OnCSharpClassBindingHandle);
 		}
 
 #if WITH_EDITOR

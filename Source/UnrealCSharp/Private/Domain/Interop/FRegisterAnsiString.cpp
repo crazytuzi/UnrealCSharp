@@ -35,21 +35,42 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundAnsiString = FCSharpEnvironment::GetEnvironment().
+				GetString<FAnsiString>(InManagedHandle))
+			{
+				return static_cast<int32>(GetTypeHash(*FoundAnsiString));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<
 					FAnsiString>(InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<
+						FAnsiString>(InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto AnsiString = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InManagedHandle);
 
-			return AnsiString != nullptr
-				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FAnsiString(*AnsiString)))
+			const auto ScriptDomain = IScriptDomain::Get();
+
+			return AnsiString != nullptr && ScriptDomain != nullptr
+				       ? ScriptDomain->NewString(TCHAR_TO_UTF8(*FString(**AnsiString)))
 				       : InvalidManagedHandle;
 		}
 
@@ -58,6 +79,7 @@ namespace
 			FClassBuilder(TEXT("FAnsiString"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("ToString", ToStringImplementation);
 		}

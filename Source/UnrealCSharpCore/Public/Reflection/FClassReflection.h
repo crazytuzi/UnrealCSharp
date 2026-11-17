@@ -58,16 +58,14 @@ public:
 
 	FFieldReflection* GetField(const FString& InName) const;
 
-	const TMap<TTuple<FString, int32>, FMethodReflection*>& GetMethods() const;
+	const TMap<TTuple<FString, int32>, TArray<FMethodReflection*>>& GetMethods() const;
 
 	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
-
-	FMethodReflection* GetMethod(const IManagedHandle InManagedMethod);
 
 	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
 public:
-	IManagedHandle NewObject() const;
+	IManagedHandle NewObject(const bool bIsWeak = false) const;
 
 	IManagedHandle InitObject(int32 InParamCount = 0, void** InParams = nullptr) const;
 
@@ -175,5 +173,5 @@ private:
 
 	TMap<FString, FFieldReflection*> Fields;
 
-	TMap<TTuple<FString, int32>, FMethodReflection*> Methods;
+	TMap<TTuple<FString, int32>, TArray<FMethodReflection*>> Methods;
 };

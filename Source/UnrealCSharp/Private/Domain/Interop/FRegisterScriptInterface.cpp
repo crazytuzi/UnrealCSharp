@@ -4,6 +4,7 @@
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
+#include "Templates/TypeHash.h"
 #include "UEVersion.h"
 
 namespace
@@ -13,22 +14,28 @@ namespace
 		static void RegisterImplementation(const IManagedHandle InManagedObject,
 		                                   const IManagedHandle InObject, const IManagedHandle InManagedType)
 		{
-			const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+			{
 #if UE_T_SCRIPT_INTERFACE_CONSTRUCTOR_U_OBJECT
-			const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
+				const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
 #else
-			const auto ScriptInterface = new TScriptInterface<IInterface>();
+				const auto ScriptInterface = new TScriptInterface<IInterface>();
 
-			ScriptInterface->SetObject(FoundObject);
+				ScriptInterface->SetObject(FoundObject);
 
-			static_cast<FScriptInterface*>(ScriptInterface)->SetInterface(FoundObject);
+				static_cast<FScriptInterface*>(ScriptInterface)->SetInterface(FoundObject);
 #endif
 
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
+				const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
-				Class, InManagedObject, ScriptInterface);
+				const auto bIsAdded = FCSharpEnvironment::GetEnvironment().AddMultiReference<
+					TScriptInterface<IInterface>, true, false>(Class, InManagedObject, ScriptInterface);
+
+				if (!bIsAdded)
+				{
+					delete ScriptInterface;
+				}
+			}
 		}
 
 		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
@@ -50,13 +57,32 @@ namespace
 			return 0;
 		}
 
+		static int32 GetTypeHashImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundScriptInterface = FCSharpEnvironment::GetEnvironment().
+				GetMulti<TScriptInterface<IInterface>>(InManagedHandle))
+			{
+				return static_cast<int32>(PointerHash(FoundScriptInterface->GetObject()));
+			}
+
+			return 0;
+		}
+
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static IManagedHandle GetObjectImplementation(const IManagedHandle InManagedHandle)
@@ -64,7 +90,9 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 				InManagedHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
+			return Multi != nullptr
+				       ? FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject())
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterScriptInterface()
@@ -72,6 +100,7 @@ namespace
 			FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
+				.Function("GetTypeHash", GetTypeHashImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("GetObject", GetObjectImplementation);
 		}

@@ -32,9 +32,9 @@ private:
 
 	void OnAssetAdded(const FAssetData& InAssetData) const;
 
-	void OnAssetRemoved(const FAssetData& InAssetData) const;
+	void OnAssetRemoved(const FAssetData& InAssetData);
 
-	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const;
+	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath);
 
 	void OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const;
 
@@ -63,6 +63,8 @@ private:
 
 	static void WaitForCompile();
 
+	static bool PumpTaskGraphWhileCompiling(float InDeltaTime);
+
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
@@ -84,7 +86,7 @@ private:
 
 	FDelegateHandle OnApplicationActivationStateChangedDelegateHandle;
 
-	FDelegateHandle OnDirectoryChangedDelegateHandle;
+	TMap<FString, FDelegateHandle> OnDirectoryChangedDelegateHandles;
 
 	FDelegateHandle OnBlueprintCompiledDelegateHandle;
 

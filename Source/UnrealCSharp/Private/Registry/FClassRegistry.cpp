@@ -5,6 +5,8 @@
 
 TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
 
+FCriticalSection FClassRegistry::CriticalSection;
+
 FClassRegistry::FClassRegistry()
 {
 	Initialize();
@@ -24,18 +26,22 @@ void FClassRegistry::Deinitialize()
 {
 	FDynamicClassGenerator::ClassConstructorSet.Remove(&FClassRegistry::ClassConstructor);
 
-	for (const auto& [Key, Value] : ClassConstructorMap)
 	{
-		if (Key.IsValid())
+		FScopeLock Lock(&CriticalSection);
+
+		for (const auto& [Key, Value] : ClassConstructorMap)
 		{
-			if (Key->ClassConstructor == &FClassRegistry::ClassConstructor)
+			if (Key.IsValid())
 			{
-				Key->ClassConstructor = Value;
+				if (Key->ClassConstructor == &FClassRegistry::ClassConstructor)
+				{
+					Key->ClassConstructor = Value;
+				}
 			}
 		}
-	}
 
-	ClassConstructorMap.Empty();
+		ClassConstructorMap.Empty();
+	}
 
 	for (auto& [Key, Value] : ClassDescriptorMap)
 	{
@@ -110,6 +116,8 @@ FClassDescriptor* FClassRegistry::AddClassDescriptor(UStruct* InStruct)
 
 void FClassRegistry::AddClassConstructor(UClass* InClass)
 {
+	FScopeLock Lock(&CriticalSection);
+
 	if (!ClassConstructorMap.Contains(InClass))
 	{
 		ClassConstructorMap.Add(InClass, InClass->ClassConstructor);
@@ -124,6 +132,8 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 	{
 		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
 		{
+			FScopeLock Lock(&CriticalSection);
+
 			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
 			{
 				Class->ClassConstructor = *FoundClassConstructor;
@@ -224,18 +234,30 @@ void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
 
 void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitializer)
 {
-	auto Class = InObjectInitializer.GetClass();
+	UClass::ClassConstructorType FoundClassConstructor{};
 
-	while (Class != nullptr)
 	{
-		if (ClassConstructorMap.Contains(Class) && ClassConstructorMap[Class] != &FClassRegistry::ClassConstructor)
+		FScopeLock Lock(&CriticalSection);
+
+		auto Class = InObjectInitializer.GetClass();
+
+		while (Class != nullptr)
 		{
-			ClassConstructorMap[Class](InObjectInitializer);
+			if (const auto Found = ClassConstructorMap.Find(Class);
+				Found != nullptr && *Found != &FClassRegistry::ClassConstructor)
+			{
+				FoundClassConstructor = *Found;
 
-			break;
+				break;
+			}
+
+			Class = Class->GetSuperClass();
 		}
+	}
 
-		Class = Class->GetSuperClass();
+	if (FoundClassConstructor != nullptr)
+	{
+		FoundClassConstructor(InObjectInitializer);
 	}
 
 	if (IsInGameThread())

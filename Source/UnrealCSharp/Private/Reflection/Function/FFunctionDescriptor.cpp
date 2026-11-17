@@ -2,12 +2,13 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction,
-                                         const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator) :
+                                         const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator,
+                                         const UClass* InOwnerClass) :
 	Function(InFunction),
 	ReturnPropertyDescriptor(nullptr),
 	BufferAllocator(InBufferAllocator)
 {
-	FFunctionDescriptor::Initialize();
+	FFunctionDescriptor::Initialize(InOwnerClass);
 }
 
 FFunctionDescriptor::~FFunctionDescriptor()
@@ -15,15 +16,15 @@ FFunctionDescriptor::~FFunctionDescriptor()
 	FFunctionDescriptor::Deinitialize();
 }
 
-void FFunctionDescriptor::Initialize()
+void FFunctionDescriptor::Initialize(const UClass* InOwnerClass)
 {
 	if (!Function.IsValid())
 	{
 		return;
 	}
 
-	const auto IsNativeFunction =
-		FUnrealCSharpFunctionLibrary::IsNativeFunction(Function->GetOwnerClass(), Function->GetFName()) ||
+	const auto IsNativeFunction = FUnrealCSharpFunctionLibrary::IsNativeFunction(
+			InOwnerClass != nullptr ? InOwnerClass : Function->GetOwnerClass(), Function->GetFName()) ||
 		Function->GetName().EndsWith(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX);
 
 	PropertyDescriptors.Reserve(Function->ReturnValueOffset != MAX_uint16

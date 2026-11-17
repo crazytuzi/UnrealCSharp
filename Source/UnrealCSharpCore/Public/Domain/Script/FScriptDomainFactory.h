@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "IScriptDomain.h"
-#include "Setting/UnrealCSharpSetting.h"
 
 class UNREALCSHARPCORE_API FScriptDomainFactory
 {
@@ -13,6 +12,4 @@ public:
 
 private:
 	FScriptDomainFactory() = delete;
-
-	static EScriptDomainType GetScriptDomainType();
 };

@@ -25,9 +25,9 @@ public:
 public:
 	static void* Object_Unbox(const IManagedHandle InManagedHandle);
 
-	static IManagedHandle String_New(const char* InText);
-
 	static FString StringToFString(const IManagedHandle InManagedHandle);
+
+	static bool GCHandle_IsAlive(const IManagedHandle InManagedHandle);
 
 	static void GCHandle_Free(const IManagedHandle InManagedHandle);
 

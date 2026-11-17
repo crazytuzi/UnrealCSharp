@@ -34,6 +34,8 @@
 
 #define FUNCTION_ASSEMBLY_LOADER_UNLOAD FString(TEXT("Unload"))
 
+#define FUNCTION_HANDLE_DATA_IS_ALIVE FString(TEXT("IsAlive"))
+
 #define FUNCTION_HANDLE_DATA_FREE FString(TEXT("Free"))
 
 #define FUNCTION_HANDLE_DATA_GET_OBJECT_POINTER FString(TEXT("GetObjectPointer"))
@@ -43,6 +45,8 @@
 #define FUNCTION_LOG_BRIDGE_SET_LOG FString(TEXT("SetLog"))
 
 #define FUNCTION_LOG_BRIDGE_INITIALIZE FString(TEXT("Initialize"))
+
+#define FUNCTION_LOG_BRIDGE_DEINITIALIZE FString(TEXT("Deinitialize"))
 
 #if WITH_LEANCLR
 #define FUNCTION_LOG_BRIDGE_INITIALIZE_LEANCLR FString(TEXT("InitializeLeanCLR"))

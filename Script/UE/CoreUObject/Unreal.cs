@@ -37,15 +37,26 @@ namespace Script.CoreUObject
             FString Filename = null,
             ELoadFlags LoadFlags = ELoadFlags.LOAD_None,
             UPackageMap Sandbox = null
-        ) where T : UObject =>
-            UnrealImplementation.Unreal_LoadObjectImplementation<T>(
+        ) where T : UObject
+        {
+            var ObjectName = HandleData.GetHandle(Name) != 0
+                ? Name
+                : new FString(Utils.GetPathName(typeof(T)));
+
+            var Object = UnrealImplementation.Unreal_LoadObjectImplementation<T>(
                 HandleData.GetHandle(Outer),
-                HandleData.GetHandle(Name) != 0
-                    ? HandleData.GetHandle(Name)
-                    : HandleData.GetHandle(new FString(Utils.GetPathName(typeof(T)))),
+                HandleData.GetHandle(ObjectName),
                 HandleData.GetHandle(Filename),
                 LoadFlags,
                 HandleData.GetHandle(Sandbox));
+
+            if (!ReferenceEquals(ObjectName, Name))
+            {
+                ObjectName.Dispose();
+            }
+
+            return Object;
+        }
 
         public static UClass LoadClass(UObject Outer,
             FString Name,

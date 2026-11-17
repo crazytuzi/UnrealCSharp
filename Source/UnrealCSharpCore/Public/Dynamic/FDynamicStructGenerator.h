@@ -8,6 +8,8 @@ class FDynamicStructGenerator
 public:
 	static void Generator();
 
+	static void Reset();
+
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
 #endif

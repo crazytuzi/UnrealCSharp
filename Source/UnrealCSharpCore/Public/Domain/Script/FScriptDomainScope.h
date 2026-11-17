@@ -10,6 +10,8 @@ public:
 	{
 		auto ScriptDomain = IScriptDomain::Get();
 
+		auto bNeedDestroy = false;
+
 		if (ScriptDomain == nullptr)
 		{
 			ScriptDomain = FScriptDomainFactory::Create();
@@ -18,7 +20,7 @@ public:
 			{
 				IScriptDomain::Set(ScriptDomain);
 
-				Domain = ScriptDomain;
+				bNeedDestroy = true;
 			}
 		}
 
@@ -33,21 +35,16 @@ public:
 			{
 				InFunction();
 			}
+			else if (bNeedDestroy)
+			{
+				FScriptDomainFactory::Destroy(ScriptDomain);
+			}
 		}
 	}
 
-	~FScriptDomainScope()
-	{
-		if (Domain != nullptr)
-		{
-			FScriptDomainFactory::Destroy(Domain);
-		}
-	}
+	~FScriptDomainScope() = default;
 
 	FScriptDomainScope(const FScriptDomainScope&) = delete;
 
 	FScriptDomainScope& operator=(const FScriptDomainScope&) = delete;
-
-private:
-	IScriptDomain* Domain{};
 };

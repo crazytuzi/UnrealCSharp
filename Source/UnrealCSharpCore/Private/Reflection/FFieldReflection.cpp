@@ -12,12 +12,10 @@ FFieldReflection::~FFieldReflection()
 {
 	if (IManagedHandleIsValid(ManagedField))
 	{
-#if WITH_CORECLR
 		if (const auto ScriptDomain = IScriptDomain::Get())
 		{
 			ScriptDomain->Free(ManagedField);
 		}
-#endif
 
 		ManagedField = InvalidManagedHandle;
 	}

@@ -5,6 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class LatentCallbackTargetAttribute : Attribute
     {
-        private string Value { get; set; } = "true";
+        public LatentCallbackTargetAttribute(string InValue = "true")
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace
 	{
 		static FBox2D PlusImplementation(const FBox2D& In, const FVector2D& Other)
 		{
-			return &In != nullptr && (&Other != nullptr) ? In + Other : decltype(In + Other)();
+			return In + Other;
 		}
 
 		FRegisterBox2D()
@@ -19,8 +19,6 @@ namespace
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, EForceInit))
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const FVector2D&, const FVector2D&),
 				             TArray<FString>{"InMin", "InMax"})
-				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const FVector2D*, const int32),
-				             TArray<FString>{"Points", "Count"})
 				.Constructor(BINDING_CONSTRUCTOR(FBox2D, const TArray<FVector2D>&),
 				             TArray<FString>{"Points"})
 				.Plus()

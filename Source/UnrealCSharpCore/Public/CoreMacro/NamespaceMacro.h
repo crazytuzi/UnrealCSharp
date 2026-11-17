@@ -12,6 +12,10 @@
 
 #define NAMESPACE_CORE_UOBJECT FString(TEXT("CoreUObject"))
 
+#define NAMESPACE_REFLECTION FString(TEXT("Reflection"))
+
+#define NAMESPACE_REFLECTION_PROPERTY FString(TEXT("Property"))
+
 #define NAMESPACE_DYNAMIC FString(TEXT("Dynamic"))
 
 #define NAMESPACE_SYSTEM FString(TEXT("System"))

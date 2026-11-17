@@ -42,25 +42,34 @@ void FMonoLog::Log(const char* InLogDomain, const char* InLogLevel, const char* 
                    void* InUserdata)
 {
 #if !NO_LOGGING
-	if (InFatal || 0 == FCStringAnsi::Strncmp("error", InLogLevel, 5))
+	const FString LogDomain = InLogDomain != nullptr ? ANSI_TO_TCHAR(InLogDomain) : TEXT("");
+
+	const FString LogMessage = InMessage != nullptr ? ANSI_TO_TCHAR(InMessage) : TEXT("");
+
+	if (InFatal)
 	{
-		UE_LOG(LogUnrealCSharp, Fatal, TEXT("%s%s%s"), InLogDomain != nullptr ? ANSI_TO_TCHAR(InLogDomain) : TEXT(""),
-		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), ANSI_TO_TCHAR(InMessage));
+		UE_LOG(LogUnrealCSharp, Fatal, TEXT("%s%s%s"), *LogDomain,
+		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), *LogMessage);
 	}
-	else if (0 == FCStringAnsi::Strncmp("warning", InLogLevel, 7))
+	else if (InLogLevel != nullptr && 0 == FCStringAnsi::Strncmp("error", InLogLevel, 5))
 	{
-		UE_LOG(LogUnrealCSharp, Warning, TEXT("%s%s%s"), InLogDomain != nullptr ? ANSI_TO_TCHAR(InLogDomain) : TEXT(""),
-		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), ANSI_TO_TCHAR(InMessage));
+		UE_LOG(LogUnrealCSharp, Error, TEXT("%s%s%s"), *LogDomain,
+		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), *LogMessage);
 	}
-	else if (0 == FCStringAnsi::Strncmp("critical", InLogLevel, 8))
+	else if (InLogLevel != nullptr && 0 == FCStringAnsi::Strncmp("warning", InLogLevel, 7))
 	{
-		UE_LOG(LogUnrealCSharp, Error, TEXT("%s%s%s"), InLogDomain != nullptr ? ANSI_TO_TCHAR(InLogDomain) : TEXT(""),
-		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), ANSI_TO_TCHAR(InMessage));
+		UE_LOG(LogUnrealCSharp, Warning, TEXT("%s%s%s"), *LogDomain,
+		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), *LogMessage);
+	}
+	else if (InLogLevel != nullptr && 0 == FCStringAnsi::Strncmp("critical", InLogLevel, 8))
+	{
+		UE_LOG(LogUnrealCSharp, Error, TEXT("%s%s%s"), *LogDomain,
+		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), *LogMessage);
 	}
 	else
 	{
-		UE_LOG(LogUnrealCSharp, Log, TEXT("%s%s%s"), InLogDomain != nullptr ? ANSI_TO_TCHAR(InLogDomain) : TEXT(""),
-		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), ANSI_TO_TCHAR(InMessage));
+		UE_LOG(LogUnrealCSharp, Log, TEXT("%s%s%s"), *LogDomain,
+		       InLogDomain != nullptr ? TEXT(": ") : TEXT(""), *LogMessage);
 	}
 #endif
 }

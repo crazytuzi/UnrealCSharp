@@ -62,6 +62,10 @@ public:
 
 	static FClassReflection* GetClass(const FSetProperty* InProperty);
 
+	static FClassReflection* GetClass(const FFieldPathProperty* InProperty);
+
+	static FClassReflection* GetClass(const FFieldClass* InFieldClass);
+
 #if UE_F_OPTIONAL_PROPERTY
 	static FClassReflection* GetClass(const FOptionalProperty* InProperty);
 #endif

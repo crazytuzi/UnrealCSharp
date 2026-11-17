@@ -11,7 +11,7 @@ namespace Script.Library
         public static unsafe void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf,
             nint InClass, Type InType) where T : UObject
         {
-            __TSubclassOf_RegisterImplementation(HandleData.Alloc(InSubclassOf), InClass,
+            __TSubclassOf_RegisterImplementation(HandleData.Alloc(InSubclassOf, true), InClass,
                 HandleData.Alloc(InType));
         }
 
@@ -20,6 +20,13 @@ namespace Script.Library
         public static unsafe bool TSubclassOf_IdenticalImplementation(nint InA, nint InB)
         {
             return __TSubclassOf_IdenticalImplementation(InA, InB) != 0;
+        }
+
+        private static unsafe partial int __TSubclassOf_GetTypeHashImplementation(nint InSubclassOf);
+
+        public static unsafe int TSubclassOf_GetTypeHashImplementation(nint InSubclassOf)
+        {
+            return __TSubclassOf_GetTypeHashImplementation(InSubclassOf);
         }
 
         private static unsafe partial void __TSubclassOf_UnRegisterImplementation(nint InSubclassOf);

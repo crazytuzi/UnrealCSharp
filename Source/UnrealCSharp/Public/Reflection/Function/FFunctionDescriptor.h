@@ -7,12 +7,13 @@ class FFunctionDescriptor
 {
 public:
 	explicit FFunctionDescriptor(UFunction* InFunction,
-	                             const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator);
+	                             const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator,
+	                             const UClass* InOwnerClass = nullptr);
 
 	virtual ~FFunctionDescriptor();
 
 public:
-	virtual void Initialize();
+	virtual void Initialize(const UClass* InOwnerClass);
 
 	virtual void Deinitialize();
 

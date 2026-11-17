@@ -23,12 +23,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	SubclassOfManagedHandle2Address.Empty();
@@ -41,12 +36,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	WeakObjectPtrManagedHandle2Address.Empty();
@@ -59,12 +49,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	LazyObjectPtrManagedHandle2Address.Empty();
@@ -77,12 +62,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	SoftObjectPtrManagedHandle2Address.Empty();
@@ -95,12 +75,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	ScriptInterfaceManagedHandle2Address.Empty();
@@ -113,12 +88,7 @@ void FMultiRegistry::Deinitialize()
 
 		Key = IManagedHandle{};
 
-		if (Value.bNeedFree)
-		{
-			FMemory::Free(Value.Value);
-
-			Value.Value = nullptr;
-		}
+		Value.Free();
 	}
 
 	SoftClassPtrManagedHandle2Address.Empty();

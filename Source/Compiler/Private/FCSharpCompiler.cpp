@@ -1,4 +1,5 @@
 #include "FCSharpCompiler.h"
+#include "Misc/CoreDelegates.h"
 #include "FCSharpCompilerRunnable.h"
 
 FCSharpCompiler::FCSharpCompiler() :
@@ -8,18 +9,23 @@ FCSharpCompiler::FCSharpCompiler() :
 	Runnable = new FCSharpCompilerRunnable();
 
 	Thread = FRunnableThread::Create(Runnable, TEXT("CSharpCompiler"));
+
+	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FCSharpCompiler::OnPreExit);
 }
 
 FCSharpCompiler::~FCSharpCompiler()
 {
+	OnPreExit();
+
 	if (Thread != nullptr)
 	{
-		Thread->Kill(true);
-
 		delete Thread;
 
 		Thread = nullptr;
+	}
 
+	if (Runnable != nullptr)
+	{
 		delete Runnable;
 
 		Runnable = nullptr;
@@ -33,7 +39,7 @@ FCSharpCompiler& FCSharpCompiler::Get()
 	return Compiler;
 }
 
-void FCSharpCompiler::Compile() const
+void FCSharpCompiler::AsyncCompile() const
 {
 	if (Runnable != nullptr)
 	{
@@ -41,20 +47,25 @@ void FCSharpCompiler::Compile() const
 	}
 }
 
-void FCSharpCompiler::ImmediatelyCompile(const bool bForceCompileInterop) const
-{
-	if (Runnable != nullptr)
-	{
-		Runnable->ImmediatelyDoWork(bForceCompileInterop);
-	}
-}
-
-void FCSharpCompiler::Compile(const TArray<FFileChangeData>& InFileChangeData) const
+void FCSharpCompiler::AsyncCompile(const TArray<FFileChangeData>& InFileChangeData) const
 {
 	if (Runnable != nullptr)
 	{
 		Runnable->EnqueueTask(InFileChangeData);
 	}
+}
+
+void FCSharpCompiler::EnqueueTask(const TFunction<void()>& InTask) const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->EnqueueTask(InTask);
+	}
+}
+
+bool FCSharpCompiler::SyncCompile() const
+{
+	return Runnable != nullptr ? Runnable->SyncCompile() : false;
 }
 
 void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
@@ -68,6 +79,14 @@ void FCSharpCompiler::Compile(const TFunction<void()>& InFunction) const
 	}
 }
 
+void FCSharpCompiler::ImmediatelyCompile(const bool bForceCompileInterop) const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->ImmediatelyDoWork(bForceCompileInterop);
+	}
+}
+
 bool FCSharpCompiler::IsCompiling() const
 {
 	return Runnable != nullptr ? Runnable->IsCompiling() : false;
@@ -76,4 +95,24 @@ bool FCSharpCompiler::IsCompiling() const
 FString FCSharpCompiler::GetCompileProgress() const
 {
 	return Runnable != nullptr ? Runnable->GetCompileProgress() : TEXT("");
+}
+
+void FCSharpCompiler::OnPreExit()
+{
+	if (OnPreExitHandle.IsValid())
+	{
+		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
+
+		OnPreExitHandle.Reset();
+
+		if (Runnable != nullptr)
+		{
+			Runnable->Stop();
+		}
+
+		if (Thread != nullptr)
+		{
+			Thread->Kill(true);
+		}
+	}
 }

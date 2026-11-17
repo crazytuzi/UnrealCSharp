@@ -18,6 +18,11 @@ void FCSharpDelegateDescriptor::Execute1(const FScriptDelegate* InScriptDelegate
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
 	PROCESS_RETURN()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -28,6 +33,11 @@ void FCSharpDelegateDescriptor::Execute2(const FScriptDelegate* InScriptDelegate
 	PROCESS_SCRIPT_IN()
 
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -41,6 +51,11 @@ void FCSharpDelegateDescriptor::Execute3(const FScriptDelegate* InScriptDelegate
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
 	PROCESS_RETURN()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -51,6 +66,11 @@ void FCSharpDelegateDescriptor::Execute4(const FScriptDelegate* InScriptDelegate
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
 	PROCESS_OUT()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -64,6 +84,11 @@ void FCSharpDelegateDescriptor::Execute6(const FScriptDelegate* InScriptDelegate
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
 	PROCESS_OUT()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -79,6 +104,11 @@ void FCSharpDelegateDescriptor::Execute7(const FScriptDelegate* InScriptDelegate
 	PROCESS_OUT()
 
 	PROCESS_RETURN()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -104,6 +134,11 @@ void FCSharpDelegateDescriptor::Broadcast2(const FMulticastScriptDelegate* InMul
 #else
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
 #endif
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -119,6 +154,11 @@ void FCSharpDelegateDescriptor::Broadcast4(const FMulticastScriptDelegate* InMul
 #endif
 
 	PROCESS_OUT()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }
 
 template <auto ReturnType>
@@ -136,4 +176,9 @@ void FCSharpDelegateDescriptor::Broadcast6(const FMulticastScriptDelegate* InMul
 #endif
 
 	PROCESS_OUT()
+
+	if (BufferAllocator.IsValid())
+	{
+		BufferAllocator->Free(Params);
+	}
 }

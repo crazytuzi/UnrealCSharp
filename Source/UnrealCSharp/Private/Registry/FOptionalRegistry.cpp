@@ -47,9 +47,19 @@ FOptionalHelper* FOptionalRegistry::GetOptional(const IManagedHandle InManagedHa
 
 IManagedHandle FOptionalRegistry::GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress)
 {
-	const auto FoundManagedHandle = Address2ManagedHandle.Find(InAddress);
+	if (const auto FoundManagedHandle = Address2ManagedHandle.Find(InAddress))
+	{
+		if (FDomain::GCHandle_IsAlive(*FoundManagedHandle))
+		{
+			return *FoundManagedHandle;
+		}
 
-	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
+		(void)RemoveReference(*FoundManagedHandle);
+
+		Address2ManagedHandle.Remove(InAddress);
+	}
+
+	return InvalidManagedHandle;
 }
 
 bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)
@@ -69,6 +79,8 @@ bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 		delete *FoundValue;
 
 		ManagedHandle2Helper.Remove(InManagedHandle);
+
+		FDomain::GCHandle_Free(InManagedHandle);
 
 		return true;
 	}

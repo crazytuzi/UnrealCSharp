@@ -1,21 +1,36 @@
+using System;
 using Script.Library;
 using Interop;
 
 namespace Script.CoreUObject
 {
-    public class TSubclassOf<T> where T : UObject
+    public class TSubclassOf<T> : IDisposable where T : UObject
     {
         public TSubclassOf()
         {
         }
 
-        ~TSubclassOf() => TSubclassOfImplementation.TSubclassOf_UnRegisterImplementation(HandleData.GetHandle(this));
+        ~TSubclassOf() => Dispose();
+
+        private bool bIsDisposed;
+
+        public void Dispose()
+        {
+            if (!bIsDisposed)
+            {
+                bIsDisposed = true;
+
+                TSubclassOfImplementation.TSubclassOf_UnRegisterImplementation(HandleData.GetHandle(this));
+            }
+
+            GC.SuppressFinalize(this);
+        }
 
         public TSubclassOf(UClass InClass) =>
             TSubclassOfImplementation.TSubclassOf_RegisterImplementation(
                 this, HandleData.GetHandle(InClass), GetType());
 
-        public static implicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
+        public static explicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
 
         public static bool operator ==(TSubclassOf<T> A, TSubclassOf<T> B)
         {
@@ -39,7 +54,8 @@ namespace Script.CoreUObject
 
         public override bool Equals(object Other) => this == Other as TSubclassOf<T>;
 
-        public override int GetHashCode() => (int)HandleData.GetHandle(this);
+        public override int GetHashCode() =>
+            TSubclassOfImplementation.TSubclassOf_GetTypeHashImplementation(HandleData.GetHandle(this));
 
         public UClass Get() => TSubclassOfImplementation.TSubclassOf_GetImplementation(HandleData.GetHandle(this));
     }

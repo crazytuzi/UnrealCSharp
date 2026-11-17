@@ -12,21 +12,30 @@ namespace
 	{
 		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
-
-			FCSharpBind::Bind<FMapHelper>(Class,
-			                              Class->GetGenericArgument(),
-			                              Class->GetGenericArgument(1),
-			                              InManagedObject);
+			if (const auto Class = FReflectionRegistry::Get().GetClass(InManagedType))
+			{
+				FCSharpBind::Bind<FMapHelper>(Class,
+				                              Class->GetGenericArgument(),
+				                              Class->GetGenericArgument(1),
+				                              InManagedObject);
+			}
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
 		{
-			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+			if (IsInGameThread())
 			{
 				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
 					InManagedHandle);
-			});
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
+				{
+					(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
+						InManagedHandle);
+				});
+			}
 		}
 
 		static void EmptyImplementation(const IManagedHandle InManagedHandle, const int32 InExpectedNumElements)
@@ -88,8 +97,14 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				MapHelper->GetKeyPropertyDescriptor()->Get(MapHelper->FindKey(IN_VALUE_BUFFER),
-				                                           reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Key = MapHelper->FindKey(IN_VALUE_BUFFER))
+				{
+					MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(MapHelper->GetKeyPropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
 		}
 
@@ -99,8 +114,14 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Find(IN_KEY_BUFFER),
-				                                             reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Value = MapHelper->Find(IN_KEY_BUFFER))
+				{
+					MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(MapHelper->GetValuePropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
 		}
 
@@ -121,8 +142,14 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Get(IN_KEY_BUFFER),
-				                                             reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Value = MapHelper->Get(IN_KEY_BUFFER))
+				{
+					MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(MapHelper->GetValuePropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
 		}
 
@@ -164,9 +191,14 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				const auto Key = MapHelper->GetEnumeratorKey(InIndex);
-
-				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Key = MapHelper->GetEnumeratorKey(InIndex))
+				{
+					MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(MapHelper->GetKeyPropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
 		}
 
@@ -176,10 +208,97 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				const auto Value = MapHelper->GetEnumeratorValue(InIndex);
-
-				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				if (const auto Value = MapHelper->GetEnumeratorValue(InIndex))
+				{
+					MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
+				}
+				else
+				{
+					FPropertyDescriptor::GetDefaultValue(MapHelper->GetValuePropertyDescriptor(), RETURN_BUFFER);
+				}
 			}
+		}
+
+		static int32 GetKeyTypeSizeImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+				InManagedHandle))
+			{
+				return MapHelper->GetKeyPropertyDescriptor() != nullptr
+					       ? MapHelper->GetKeyPropertyDescriptor()->GetBufferSize()
+					       : 0;
+			}
+
+			return 0;
+		}
+
+		static int32 GetValueTypeSizeImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+				InManagedHandle))
+			{
+				return MapHelper->GetValuePropertyDescriptor() != nullptr
+					       ? MapHelper->GetValuePropertyDescriptor()->GetBufferSize()
+					       : 0;
+			}
+
+			return 0;
+		}
+
+		static int32 GetPairsImplementation(const IManagedHandle InManagedHandle, const int32 InIndex,
+		                                    const int32 InCount, uint8* OutBuffer, const int32 InBufferSize,
+		                                    int32* OutNextIndex)
+		{
+			if (OutNextIndex != nullptr)
+			{
+				*OutNextIndex = InIndex;
+			}
+
+			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+				InManagedHandle))
+			{
+				const auto KeySize = MapHelper->GetKeyPropertyDescriptor() != nullptr
+					                     ? MapHelper->GetKeyPropertyDescriptor()->GetBufferSize()
+					                     : 0;
+
+				const auto ValueSize = MapHelper->GetValuePropertyDescriptor() != nullptr
+					                       ? MapHelper->GetValuePropertyDescriptor()->GetBufferSize()
+					                       : 0;
+
+				if (const auto PairSize = KeySize + ValueSize;
+					KeySize > 0 && ValueSize > 0 && InIndex >= 0 && InCount > 0 && OutBuffer != nullptr &&
+					static_cast<int64>(InCount) * PairSize <= InBufferSize)
+				{
+					const auto MaxIndex = MapHelper->GetMaxIndex();
+
+					auto Index = InIndex;
+
+					auto Count = 0;
+
+					for (; Index < MaxIndex && Count < InCount; ++Index)
+					{
+						if (MapHelper->IsValidIndex(Index))
+						{
+							FMemory::Memcpy(OutBuffer + static_cast<int64>(Count) * PairSize,
+							                MapHelper->GetEnumeratorKey(Index), KeySize);
+
+							FMemory::Memcpy(OutBuffer + static_cast<int64>(Count) * PairSize + KeySize,
+							                MapHelper->GetEnumeratorValue(Index), ValueSize);
+
+							++Count;
+						}
+					}
+
+					if (OutNextIndex != nullptr)
+					{
+						*OutNextIndex = Index;
+					}
+
+					return Count;
+				}
+			}
+
+			return 0;
 		}
 
 		FRegisterMap()
@@ -200,7 +319,10 @@ namespace
 				.Function("GetMaxIndex", GetMaxIndexImplementation)
 				.Function("IsValidIndex", IsValidIndexImplementation)
 				.Function("GetEnumeratorKey", GetEnumeratorKeyImplementation)
-				.Function("GetEnumeratorValue", GetEnumeratorValueImplementation);
+				.Function("GetEnumeratorValue", GetEnumeratorValueImplementation)
+				.Function("GetKeyTypeSize", GetKeyTypeSizeImplementation)
+				.Function("GetValueTypeSize", GetValueTypeSizeImplementation)
+				.Function("GetPairs", GetPairsImplementation);
 		}
 	};
 

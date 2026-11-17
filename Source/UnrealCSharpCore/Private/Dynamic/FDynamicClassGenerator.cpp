@@ -53,10 +53,14 @@ void FDynamicClassGenerator::Generator()
 			                                 return;
 		                                 }
 
+		                                 const auto NameSpace = InClassReflection->GetNameSpace();
+
+		                                 const auto ClassName = InClassReflection->GetName();
+
 		                                 auto Node = FDynamicDependencyGraph::FNode(
-			                                 InClassReflection->GetName(), [InClassReflection]()
+			                                 ClassName, [NameSpace, ClassName]()
 			                                 {
-				                                 Generator(InClassReflection,
+				                                 Generator(FReflectionRegistry::Get().GetClass(NameSpace, ClassName),
 				                                           EDynamicClassGeneratorType::DependencyGraph);
 			                                 });
 
@@ -79,6 +83,42 @@ void FDynamicClassGenerator::Generator()
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
+}
+
+void FDynamicClassGenerator::Reset()
+{
+	for (const auto Class : DynamicClassSet)
+	{
+		if (Class != nullptr)
+		{
+#if WITH_EDITOR
+			if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(Class))
+			{
+				if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+				{
+					Blueprint->RemoveFromRoot();
+
+					Blueprint->MarkAsGarbage();
+				}
+			}
+
+#endif
+
+			Class->RemoveFromRoot();
+
+			Class->MarkAsGarbage();
+		}
+	}
+
+	DynamicClassSet.Empty();
+
+	DynamicClassMap.Empty();
+
+	NamespaceMap.Empty();
+
+	DefaultSubObjectInfoMap.Empty();
+
+	DefaultValueMap.Empty();
 }
 
 #if WITH_EDITOR
@@ -172,6 +212,8 @@ void FDynamicClassGenerator::Generator(FClassReflection* InClassReflection,
 	if (DynamicClassMap.Contains(ClassName))
 	{
 		OldClass = DynamicClassMap[ClassName];
+
+		DynamicClassMap.Remove(ClassName);
 
 		DynamicClassSet.Remove(OldClass);
 
@@ -283,21 +325,24 @@ FString FDynamicClassGenerator::GetNameSpace(const UClass* InClass)
 
 void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentClass)
 {
-	InClass->PropertyLink = InParentClass->PropertyLink;
+	if (InParentClass != nullptr)
+	{
+		InClass->PropertyLink = InParentClass->PropertyLink;
 
-	InClass->ClassWithin = InParentClass->ClassWithin;
+		InClass->ClassWithin = InParentClass->ClassWithin;
 
-	InClass->ClassConfigName = InParentClass->ClassConfigName;
+		InClass->ClassConfigName = InParentClass->ClassConfigName;
 
-	InClass->SetSuperStruct(InParentClass);
+		InClass->SetSuperStruct(InParentClass);
 
 #if UE_U_CLASS_ADD_REFERENCED_OBJECTS
-	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
+		InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
-	InClass->ClassFlags |= CLASS_Native;
+		InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+	}
 
-	InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+	InClass->ClassFlags |= CLASS_Native;
 
 	InClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
 }
@@ -322,6 +367,8 @@ void FDynamicClassGenerator::ProcessGenerator(FClassReflection* InClassReflectio
 	GeneratorFunction(InClassReflection, InClass);
 
 	GeneratorInterface(InClassReflection, InClass);
+
+	FDynamicGeneratorCore::GeneratorAccessor(InClassReflection, InClass);
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
@@ -537,6 +584,12 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 	}
 	else
 	{
+		NamespaceMap.Remove(InOldClass);
+
+		DefaultSubObjectInfoMap.Remove(InOldClass);
+
+		DefaultValueMap.Remove(InOldClass);
+
 		InOldClass->RemoveFromRoot();
 
 		InOldClass->MarkAsGarbage();

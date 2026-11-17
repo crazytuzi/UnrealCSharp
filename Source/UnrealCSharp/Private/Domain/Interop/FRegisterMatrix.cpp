@@ -9,7 +9,7 @@ namespace
 	{
 		static FMatrix MultipliesImplementation(const FMatrix& In, const FMatrix::FReal Other)
 		{
-			return &In != nullptr ? In * Other : decltype(In * Other)();
+			return In * Other;
 		}
 
 		FRegisterMatrix()
@@ -75,7 +75,7 @@ namespace
 				                                      TArray<FString>{"Axis0", "Axis1", "Axis2", "Origin"}))
 				.Function("GetColumn", BINDING_FUNCTION(&FMatrix::GetColumn,
 				                                        TArray<FString>{"i"}))
-				.Function("GetColumn", BINDING_FUNCTION(&FMatrix::SetColumn,
+				.Function("SetColumn", BINDING_FUNCTION(&FMatrix::SetColumn,
 				                                        TArray<FString>{"i", "Value"}))
 				.Function("Rotator", BINDING_FUNCTION(&FMatrix::Rotator))
 				.Function("ToQuat", BINDING_FUNCTION(&FMatrix::ToQuat))

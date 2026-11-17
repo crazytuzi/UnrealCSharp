@@ -68,6 +68,8 @@ private:
 	TMap<uint32, FUnrealFunctionDescriptor*> UnrealFunctionDescriptorMap;
 
 	static TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> ClassConstructorMap;
+
+	static FCriticalSection CriticalSection;
 };
 
 #include "FClassRegistry.inl"
