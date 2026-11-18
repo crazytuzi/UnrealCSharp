@@ -54,7 +54,7 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 	FString Fallback;
 
-	for (const auto& Path : GetDotNetPathArray())
+	for (const auto& Path : GetDotNetExecutablePaths())
 	{
 		if (Fallback.IsEmpty())
 		{
@@ -1751,7 +1751,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsProcRunning(ProcessHandle))
 	{
-		constexpr auto SyncProcessPollIntervalSeconds = 0.01;
+		constexpr auto SyncProcessPollIntervalSeconds = 0.01f;
 
 		FThreadHeartBeat::Get().HeartBeat();
 
@@ -1853,12 +1853,7 @@ bool FUnrealCSharpFunctionLibrary::IsDotNetSdkSupported(const FString& InDotNetP
 		return false;
 	}
 
-	if (const auto DotnetVersion = GetDotnetVersion(); MajorVersion != DotnetVersion)
-	{
-		return MajorVersion > DotnetVersion;
-	}
-
-	return MinorVersion >= DOTNET_MINOR_VERSION;
+	return MajorVersion >= GetDotnetVersion();
 }
 
 bool FUnrealCSharpFunctionLibrary::GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion,
@@ -1903,7 +1898,7 @@ bool FUnrealCSharpFunctionLibrary::GetDotNetSdkVersion(const FString& InDotNetPa
 	return bIsFound;
 }
 
-TArray<FString> FUnrealCSharpFunctionLibrary::GetDotNetPathArray()
+TArray<FString> FUnrealCSharpFunctionLibrary::GetDotNetExecutablePaths()
 {
 #if PLATFORM_WINDOWS
 	const auto ExecutableName = TEXT("dotnet.exe");
@@ -1919,16 +1914,32 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetDotNetPathArray()
 
 	FPlatformMisc::GetEnvironmentVariable(TEXT("PATH")).ParseIntoArray(SearchPaths, PathDelimiter);
 
-	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("DOTNET_ROOT")));
+	if (const auto DotNetRoot = FPlatformMisc::GetEnvironmentVariable(TEXT("DOTNET_ROOT"));
+		!DotNetRoot.IsEmpty())
+	{
+		SearchPaths.Add(DotNetRoot);
+	}
 
 #if PLATFORM_WINDOWS
-	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA")) / TEXT("Microsoft/dotnet"));
+	if (const auto LocalAppData = FPlatformMisc::GetEnvironmentVariable(TEXT("LOCALAPPDATA"));
+		!LocalAppData.IsEmpty())
+	{
+		SearchPaths.Add(LocalAppData / TEXT("Microsoft/dotnet"));
+	}
 
-	SearchPaths.Add(FPlatformMisc::GetEnvironmentVariable(TEXT("ProgramFiles")) / TEXT("dotnet"));
+	if (const auto ProgramFiles = FPlatformMisc::GetEnvironmentVariable(TEXT("ProgramFiles"));
+		!ProgramFiles.IsEmpty())
+	{
+		SearchPaths.Add(ProgramFiles / TEXT("dotnet"));
+	}
 #elif PLATFORM_MAC
 	SearchPaths.Add(TEXT("/usr/local/share/dotnet"));
 #else
 	SearchPaths.Add(TEXT("/usr/share/dotnet"));
+
+	SearchPaths.Add(TEXT("/usr/lib/dotnet"));
+
+	SearchPaths.Add(TEXT("/usr/lib64/dotnet"));
 #endif
 
 	TArray<FString> Result;

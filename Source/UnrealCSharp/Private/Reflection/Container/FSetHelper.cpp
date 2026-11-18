@@ -1,16 +1,15 @@
 #include "Reflection/Container/FSetHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
-#include "CppVersion.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
                        const bool InbNeedFreeData, const bool InbNeedFreeProperty,
                        const FDataDeleter InDataDeleter) :
 	ElementPropertyDescriptor(nullptr),
 	ScriptSet(nullptr),
+	ElementBuffer(nullptr),
 	bNeedFreeData(InbNeedFreeData),
 	bNeedFreeProperty(InbNeedFreeProperty),
-	DataDeleter(InDataDeleter),
-	bNeedRehash(false)
+	DataDeleter(InDataDeleter)
 {
 	if (InData != nullptr)
 	{
@@ -25,8 +24,18 @@ FSetHelper::FSetHelper(FProperty* InProperty, void* InData,
 	{
 		ElementPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
-		ScriptSetLayout = FScriptSet::GetScriptLayout(ElementPropertyDescriptor->GetSize(),
-		                                              ElementPropertyDescriptor->GetMinAlignment());
+		const auto Size = ElementPropertyDescriptor->GetSize();
+
+		const auto Alignment = ElementPropertyDescriptor->GetMinAlignment();
+
+		ScriptSetLayout = FScriptSet::GetScriptLayout(Size, Alignment);
+
+		if (Size > 0 && Alignment > 0)
+		{
+			ElementBuffer = FMemory::Malloc(Size, Alignment);
+
+			FMemory::Memzero(ElementBuffer, Size);
+		}
 	}
 
 	Initialize();
@@ -62,6 +71,13 @@ void FSetHelper::Deinitialize()
 		ScriptSet = nullptr;
 	}
 
+	if (ElementBuffer != nullptr)
+	{
+		FMemory::Free(ElementBuffer);
+
+		ElementBuffer = nullptr;
+	}
+
 	if (ElementPropertyDescriptor != nullptr)
 	{
 		if (bNeedFreeProperty)
@@ -72,19 +88,6 @@ void FSetHelper::Deinitialize()
 		delete ElementPropertyDescriptor;
 
 		ElementPropertyDescriptor = nullptr;
-	}
-}
-
-void FSetHelper::EnsureRehash() const
-{
-	if (bNeedRehash)
-	{
-		ScriptSet->Rehash(ScriptSetLayout, [this](const void* Src)
-		{
-			return ElementPropertyDescriptor->GetValueTypeHash(Src);
-		});
-
-		bNeedRehash = false;
 	}
 }
 
@@ -103,8 +106,6 @@ void FSetHelper::Empty(const int32 InExpectedNumElements) const
 		}
 
 		ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
-
-		bNeedRehash = false;
 	}
 }
 
@@ -125,83 +126,68 @@ int32 FSetHelper::GetMaxIndex() const
 
 void FSetHelper::Add(void* InValue) const
 {
-	auto ValueIndex = static_cast<int32>(INDEX_NONE);
-
-	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	if (ElementPropertyDescriptor != nullptr && ElementBuffer != nullptr)
 	{
-		if (ScriptSet->IsValidIndex(Index))
-		{
-			if (const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
-				ElementPropertyDescriptor->Identical(Data, InValue))
-			{
-				ValueIndex = Index;
+		InitializeElementBuffer(InValue);
 
-				break;
-			}
-		}
-	}
+		ScriptSet->FindOrAdd(ElementBuffer, ScriptSetLayout,
+		                     [this](const void* Src)
+		                     {
+			                     return GetElementHash(Src);
+		                     },
+		                     [this](const void* A, const void* B)
+		                     {
+			                     return IsIdenticalElement(A, B);
+		                     },
+		                     [this, InValue](void* Dest)
+		                     {
+			                     ElementPropertyDescriptor->Set(InValue, Dest);
+		                     });
 
-	if (ValueIndex == INDEX_NONE)
-	{
-		ValueIndex = ScriptSet->AddUninitialized(ScriptSetLayout);
-
-		const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
-
-		ElementPropertyDescriptor->Set(InValue, Data);
-
-		bNeedRehash = true;
+		DestroyElementBuffer();
 	}
 }
 
 int32 FSetHelper::Remove(const void* InValue) const
 {
-	auto ValueIndex = static_cast<int32>(INDEX_NONE);
+	auto Result = 0;
 
-	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	if (ElementPropertyDescriptor != nullptr && ElementBuffer != nullptr)
 	{
-		if (ScriptSet->IsValidIndex(Index))
+		InitializeElementBuffer(InValue);
+
+		if (const auto Index = FindElementIndex(ElementBuffer); Index != INDEX_NONE)
 		{
-			if (const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
-				ElementPropertyDescriptor->Identical(Data, InValue))
+			if (const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout)))
 			{
-				ValueIndex = Index;
-
-				break;
+				ElementPropertyDescriptor->DestroyValue(Data);
 			}
+
+			ScriptSet->RemoveAt(Index, ScriptSetLayout);
+
+			Result = 1;
 		}
+
+		DestroyElementBuffer();
 	}
 
-	if (ValueIndex == INDEX_NONE)
-	{
-		return 0;
-	}
-
-	const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
-
-	EnsureRehash();
-
-	ElementPropertyDescriptor->DestroyValue(Data);
-
-	ScriptSet->RemoveAt(ValueIndex, ScriptSetLayout);
-
-	return 1;
+	return Result;
 }
 
 bool FSetHelper::Contains(const void* InValue) const
 {
-	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	auto Result = false;
+
+	if (ElementPropertyDescriptor != nullptr && ElementBuffer != nullptr)
 	{
-		if (ScriptSet->IsValidIndex(Index))
-		{
-			if (const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
-				ElementPropertyDescriptor->Identical(Data, InValue))
-			{
-				return true;
-			}
-		}
+		InitializeElementBuffer(InValue);
+
+		Result = FindElementIndex(ElementBuffer) != INDEX_NONE;
+
+		DestroyElementBuffer();
 	}
 
-	return false;
+	return Result;
 }
 
 FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
@@ -229,4 +215,60 @@ void* FSetHelper::GetEnumerator(const int32 InIndex) const
 	return ScriptSet->IsValidIndex(InIndex)
 		       ? static_cast<uint8*>(ScriptSet->GetData(InIndex, ScriptSetLayout))
 		       : nullptr;
+}
+
+void FSetHelper::InitializeElementBuffer(const void* InValue) const
+{
+	const auto Size = ElementPropertyDescriptor->GetSize();
+
+	FMemory::Memzero(ElementBuffer, Size);
+
+	if (const auto Property = ElementPropertyDescriptor->GetProperty())
+	{
+		Property->InitializeValue(ElementBuffer);
+	}
+
+	ElementPropertyDescriptor->Set(const_cast<void*>(InValue), ElementBuffer);
+}
+
+void FSetHelper::DestroyElementBuffer() const
+{
+	ElementPropertyDescriptor->DestroyValue(ElementBuffer);
+}
+
+uint32 FSetHelper::GetElementHash(const void* InValue) const
+{
+	auto Result = 0u;
+
+	if (const auto Property = ElementPropertyDescriptor->GetProperty())
+	{
+		Result = Property->GetValueTypeHash(InValue);
+	}
+
+	return Result;
+}
+
+bool FSetHelper::IsIdenticalElement(const void* A, const void* B) const
+{
+	auto Result = false;
+
+	if (const auto Property = ElementPropertyDescriptor->GetProperty())
+	{
+		Result = Property->Identical(A, B, 0);
+	}
+
+	return Result;
+}
+
+int32 FSetHelper::FindElementIndex(const void* InValue) const
+{
+	return ScriptSet->FindIndex(InValue, ScriptSetLayout,
+	                            [this](const void* Src)
+	                            {
+		                            return GetElementHash(Src);
+	                            },
+	                            [this](const void* A, const void* B)
+	                            {
+		                            return IsIdenticalElement(A, B);
+	                            });
 }

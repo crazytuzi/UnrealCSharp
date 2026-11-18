@@ -1,5 +1,4 @@
 #include "Reflection/Container/FMapHelper.h"
-#include "CppVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
                        const bool InbNeedFreeData, const bool InbNeedFreeProperty,
@@ -8,10 +7,10 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
 	ScriptMapLayout{},
+	KeyBuffer(nullptr),
 	bNeedFreeData(InbNeedFreeData),
 	bNeedFreeProperty(InbNeedFreeProperty),
-	DataDeleter(InDataDeleter),
-	bNeedRehash(false)
+	DataDeleter(InDataDeleter)
 {
 	if (InData != nullptr)
 	{
@@ -35,6 +34,17 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 		                                              KeyPropertyDescriptor->GetMinAlignment(),
 		                                              ValuePropertyDescriptor->GetSize(),
 		                                              ValuePropertyDescriptor->GetMinAlignment());
+
+		const auto Size = KeyPropertyDescriptor->GetSize();
+
+		const auto Alignment = KeyPropertyDescriptor->GetMinAlignment();
+
+		if (Size > 0 && Alignment > 0)
+		{
+			KeyBuffer = FMemory::Malloc(Size, Alignment);
+
+			FMemory::Memzero(KeyBuffer, Size);
+		}
 	}
 
 	Initialize();
@@ -70,6 +80,13 @@ void FMapHelper::Deinitialize()
 		ScriptMap = nullptr;
 	}
 
+	if (KeyBuffer != nullptr)
+	{
+		FMemory::Free(KeyBuffer);
+
+		KeyBuffer = nullptr;
+	}
+
 	if (KeyPropertyDescriptor != nullptr)
 	{
 		if (bNeedFreeProperty)
@@ -95,19 +112,6 @@ void FMapHelper::Deinitialize()
 	}
 }
 
-void FMapHelper::EnsureRehash() const
-{
-	if (bNeedRehash)
-	{
-		ScriptMap->Rehash(ScriptMapLayout, [this](const void* Src)
-		{
-			return KeyPropertyDescriptor->GetValueTypeHash(Src);
-		});
-
-		bNeedRehash = false;
-	}
-}
-
 void FMapHelper::Empty(const int32 InExpectedNumElements) const
 {
 	if (InExpectedNumElements >= 0)
@@ -125,8 +129,6 @@ void FMapHelper::Empty(const int32 InExpectedNumElements) const
 		}
 
 		ScriptMap->Empty(InExpectedNumElements, ScriptMapLayout);
-
-		bNeedRehash = false;
 	}
 }
 
@@ -149,42 +151,34 @@ int32 FMapHelper::Remove(const void* InKey) const
 {
 	auto Count = 0;
 
-	do
+	if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr && KeyBuffer != nullptr)
 	{
-		auto KeyIndex = static_cast<int32>(INDEX_NONE);
+		InitializeKeyBuffer(InKey);
 
-		for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+		do
 		{
-			if (ScriptMap->IsValidIndex(Index))
+			if (const auto Index = FindPairIndex(KeyBuffer); Index != INDEX_NONE)
 			{
-				if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
-					KeyPropertyDescriptor->Identical(Data, InKey))
-				{
-					KeyIndex = Index;
+				++Count;
 
-					break;
+				if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout)))
+				{
+					KeyPropertyDescriptor->DestroyValue(Data);
+
+					ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
 				}
+
+				ScriptMap->RemoveAt(Index, ScriptMapLayout);
+			}
+			else
+			{
+				break;
 			}
 		}
+		while (true);
 
-		if (KeyIndex == INDEX_NONE)
-		{
-			break;
-		}
-
-		++Count;
-
-		const auto Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
-
-		EnsureRehash();
-
-		KeyPropertyDescriptor->DestroyValue(Data);
-
-		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
-
-		ScriptMap->RemoveAt(KeyIndex, ScriptMapLayout);
+		DestroyKeyBuffer();
 	}
-	while (true);
 
 	return Count;
 }
@@ -218,59 +212,62 @@ bool FMapHelper::Contains(const void* InKey) const
 
 void* FMapHelper::Get(const void* InKey) const
 {
-	for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+	auto Result = static_cast<void*>(nullptr);
+
+	if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr && KeyBuffer != nullptr)
 	{
-		if (ScriptMap->IsValidIndex(Index))
+		InitializeKeyBuffer(InKey);
+
+		if (const auto Index = FindPairIndex(KeyBuffer); Index != INDEX_NONE)
 		{
-			if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
-				KeyPropertyDescriptor->Identical(Data, InKey))
+			if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout)))
 			{
-				return Data + ScriptMapLayout.ValueOffset;
+				Result = Data + ScriptMapLayout.ValueOffset;
 			}
 		}
+
+		DestroyKeyBuffer();
 	}
 
-	return nullptr;
+	return Result;
 }
 
 void FMapHelper::Set(void* InKey, void* InValue) const
 {
-	auto KeyIndex = static_cast<int32>(INDEX_NONE);
-
-	for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+	if (KeyPropertyDescriptor != nullptr && ValuePropertyDescriptor != nullptr && KeyBuffer != nullptr)
 	{
-		if (ScriptMap->IsValidIndex(Index))
-		{
-			if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
-				KeyPropertyDescriptor->Identical(Data, InKey))
-			{
-				KeyIndex = Index;
+		InitializeKeyBuffer(InKey);
 
-				break;
+		if (const auto Index = FindPairIndex(KeyBuffer); Index != INDEX_NONE)
+		{
+			if (const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout)))
+			{
+				ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+
+				ValuePropertyDescriptor->Set(InValue, Data + ScriptMapLayout.ValueOffset);
 			}
 		}
+		else
+		{
+			ScriptMap->FindOrAdd(KeyBuffer, ScriptMapLayout,
+			                     [this](const void* Src)
+			                     {
+				                     return GetKeyHash(Src);
+			                     },
+			                     [this](const void* A, const void* B)
+			                     {
+				                     return IsIdenticalKey(A, B);
+			                     },
+			                     [this, InKey, InValue](void* NewKey, void* NewValue)
+			                     {
+				                     KeyPropertyDescriptor->Set(InKey, NewKey);
+
+				                     ValuePropertyDescriptor->Set(InValue, NewValue);
+			                     });
+		}
+
+		DestroyKeyBuffer();
 	}
-
-	uint8* Data;
-
-	if (KeyIndex == INDEX_NONE)
-	{
-		KeyIndex = ScriptMap->AddUninitialized(ScriptMapLayout);
-
-		Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
-
-		KeyPropertyDescriptor->Set(InKey, Data);
-
-		bNeedRehash = true;
-	}
-	else
-	{
-		Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
-
-		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
-	}
-
-	ValuePropertyDescriptor->Set(InValue, Data + ScriptMapLayout.ValueOffset);
 }
 
 FPropertyDescriptor* FMapHelper::GetKeyPropertyDescriptor() const
@@ -315,4 +312,60 @@ void* FMapHelper::GetEnumeratorValue(const int32 InIndex) const
 	return ScriptMap->IsValidIndex(InIndex)
 		       ? static_cast<uint8*>(ScriptMap->GetData(InIndex, ScriptMapLayout)) + ScriptMapLayout.ValueOffset
 		       : nullptr;
+}
+
+void FMapHelper::InitializeKeyBuffer(const void* InKey) const
+{
+	const auto Size = KeyPropertyDescriptor->GetSize();
+
+	FMemory::Memzero(KeyBuffer, Size);
+
+	if (const auto Property = KeyPropertyDescriptor->GetProperty())
+	{
+		Property->InitializeValue(KeyBuffer);
+	}
+
+	KeyPropertyDescriptor->Set(const_cast<void*>(InKey), KeyBuffer);
+}
+
+void FMapHelper::DestroyKeyBuffer() const
+{
+	KeyPropertyDescriptor->DestroyValue(KeyBuffer);
+}
+
+uint32 FMapHelper::GetKeyHash(const void* InKey) const
+{
+	auto Result = 0u;
+
+	if (const auto Property = KeyPropertyDescriptor->GetProperty())
+	{
+		Result = Property->GetValueTypeHash(InKey);
+	}
+
+	return Result;
+}
+
+bool FMapHelper::IsIdenticalKey(const void* A, const void* B) const
+{
+	auto Result = false;
+
+	if (const auto Property = KeyPropertyDescriptor->GetProperty())
+	{
+		Result = Property->Identical(A, B, 0);
+	}
+
+	return Result;
+}
+
+int32 FMapHelper::FindPairIndex(const void* InKey) const
+{
+	return ScriptMap->FindPairIndex(InKey, ScriptMapLayout,
+	                                [this](const void* Src)
+	                                {
+		                                return GetKeyHash(Src);
+	                                },
+	                                [this](const void* A, const void* B)
+	                                {
+		                                return IsIdenticalKey(A, B);
+	                                });
 }

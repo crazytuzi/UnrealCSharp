@@ -56,7 +56,15 @@ public:
 	void* GetEnumeratorValue(int32 InIndex) const;
 
 private:
-	void EnsureRehash() const;
+	void InitializeKeyBuffer(const void* InKey) const;
+
+	void DestroyKeyBuffer() const;
+
+	uint32 GetKeyHash(const void* InKey) const;
+
+	bool IsIdenticalKey(const void* A, const void* B) const;
+
+	int32 FindPairIndex(const void* InKey) const;
 
 private:
 	FPropertyDescriptor* KeyPropertyDescriptor;
@@ -67,11 +75,11 @@ private:
 
 	FScriptMapLayout ScriptMapLayout;
 
+	void* KeyBuffer;
+
 	bool bNeedFreeData;
 
 	bool bNeedFreeProperty;
 
 	FDataDeleter DataDeleter;
-
-	mutable bool bNeedRehash;
 };

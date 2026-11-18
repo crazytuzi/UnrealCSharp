@@ -300,7 +300,7 @@ private:
 
 	static bool GetDotNetSdkVersion(const FString& InDotNetPath, int32& OutMajorVersion, int32& OutMinorVersion);
 
-	static TArray<FString> GetDotNetPathArray();
+	static TArray<FString> GetDotNetExecutablePaths();
 
 private:
 	static EScriptDomainType ScriptDomainType;

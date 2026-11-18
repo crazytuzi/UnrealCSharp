@@ -44,7 +44,15 @@ public:
 	void* GetEnumerator(int32 InIndex) const;
 
 private:
-	void EnsureRehash() const;
+	void InitializeElementBuffer(const void* InValue) const;
+
+	void DestroyElementBuffer() const;
+
+	uint32 GetElementHash(const void* InValue) const;
+
+	bool IsIdenticalElement(const void* A, const void* B) const;
+
+	int32 FindElementIndex(const void* InValue) const;
 
 private:
 	FPropertyDescriptor* ElementPropertyDescriptor;
@@ -53,11 +61,11 @@ private:
 
 	FScriptSetLayout ScriptSetLayout;
 
+	void* ElementBuffer;
+
 	bool bNeedFreeData;
 
 	bool bNeedFreeProperty;
 
 	FDataDeleter DataDeleter;
-
-	mutable bool bNeedRehash;
 };
