@@ -47,6 +47,21 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "UnrealCSharpBlueprintFunction",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "UnrealCSharpBlueprintFunctionEditor",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "UnrealCSharpWidgetBindingEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostDefault"
+		},
+		{
 			"Name": "SourceCodeGenerator",
 			"Type": "Program",
 			"LoadingPhase": "PostConfigInit"

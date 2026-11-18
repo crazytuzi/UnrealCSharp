@@ -4,7 +4,7 @@
 
 class FClassReflection;
 
-class FParamReflection : public FReflection
+class UNREALCSHARPCORE_API FParamReflection : public FReflection
 {
 public:
 	FParamReflection(const FString& InName, bool InIsRef, FClassReflection* InReflectionType);

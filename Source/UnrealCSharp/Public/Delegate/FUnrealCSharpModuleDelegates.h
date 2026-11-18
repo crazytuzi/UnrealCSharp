@@ -1,6 +1,6 @@
 #pragma once
 
-class FUnrealCSharpModuleDelegates
+class UNREALCSHARP_API FUnrealCSharpModuleDelegates
 {
 public:
 	DECLARE_MULTICAST_DELEGATE(FOnUnrealCSharpModuleActive);

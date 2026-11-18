@@ -3,7 +3,7 @@
 #include "Reflection/Property/FPropertyDescriptor.h"
 #include "FFunctionParamBufferAllocator.h"
 
-class FFunctionDescriptor
+class UNREALCSHARP_API FFunctionDescriptor
 {
 public:
 	explicit FFunctionDescriptor(UFunction* InFunction,

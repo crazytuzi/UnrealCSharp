@@ -62,5 +62,7 @@ private:
 
 	bool bHasTicked = false;
 
+	bool bPendingDynamicGenerator = false;
+
 	TStrongObjectPtr<UDynamicDataSource> DynamicDataSource;
 };
