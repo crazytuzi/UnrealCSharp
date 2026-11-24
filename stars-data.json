@@ -2,24 +2,6 @@
   "version": 1,
   "snapshots": [
     {
-      "timestamp": "2026-10-03T03:53:55.824Z",
-      "totalStars": 802,
-      "repos": [
-        {
-          "fullName": "crazytuzi/UnrealCSharp",
-          "name": "UnrealCSharp",
-          "owner": "crazytuzi",
-          "stars": 800
-        },
-        {
-          "fullName": "UnrealCSharp/UnrealCSharp",
-          "name": "UnrealCSharp",
-          "owner": "UnrealCSharp",
-          "stars": 2
-        }
-      ]
-    },
-    {
       "timestamp": "2026-10-04T04:25:16.340Z",
       "totalStars": 803,
       "repos": [
@@ -921,6 +903,24 @@
     },
     {
       "timestamp": "2026-11-23T05:52:52.200Z",
+      "totalStars": 818,
+      "repos": [
+        {
+          "fullName": "crazytuzi/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "crazytuzi",
+          "stars": 816
+        },
+        {
+          "fullName": "UnrealCSharp/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "UnrealCSharp",
+          "stars": 2
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-11-24T08:30:42.838Z",
       "totalStars": 818,
       "repos": [
         {
